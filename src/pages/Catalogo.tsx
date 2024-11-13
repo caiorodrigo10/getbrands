@@ -1,5 +1,4 @@
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -10,6 +9,16 @@ import {
 } from "@/components/ui/pagination";
 import ProductGrid from "@/components/ProductGrid";
 import { Product } from "@/types/product";
+import { Button } from "@/components/ui/button";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 const products: Product[] = [
   {
@@ -148,6 +157,60 @@ const Catalogo = () => {
         <h1 className="text-4xl font-bold text-gray-900 mb-2">Catálogo de Produtos</h1>
         <p className="text-gray-600">Explore nossa seleção de produtos e selecione os ideais para seu projeto</p>
       </header>
+
+      <div className="mb-8 space-y-4">
+        {/* Search and Filters */}
+        <div className="flex gap-4 flex-wrap">
+          <div className="relative flex-1 min-w-[240px]">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Buscar produtos..."
+              className="pl-10 bg-white border-gray-200"
+            />
+          </div>
+          <Select>
+            <SelectTrigger className="w-[180px] bg-white border-gray-200">
+              <SelectValue placeholder="Categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas Categorias</SelectItem>
+              <SelectItem value="proteins">Proteínas & Blends</SelectItem>
+              <SelectItem value="vitamins">Vitaminas</SelectItem>
+              <SelectItem value="supplements">Suplementos</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select>
+            <SelectTrigger className="w-[180px] bg-white border-gray-200">
+              <SelectValue placeholder="Ordenar por" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">Mais Recentes</SelectItem>
+              <SelectItem value="price-asc">Menor Preço</SelectItem>
+              <SelectItem value="price-desc">Maior Preço</SelectItem>
+              <SelectItem value="profit">Maior Lucro</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" className="border-gray-200 text-gray-600 hover:text-gray-900">
+            Limpar Filtros
+          </Button>
+        </div>
+
+        {/* Tags/Pills */}
+        <div className="flex gap-2 flex-wrap">
+          <Button variant="secondary" size="sm" className="rounded-full">
+            Novos Produtos
+          </Button>
+          <Button variant="secondary" size="sm" className="rounded-full">
+            Mais Vendidos
+          </Button>
+          <Button variant="secondary" size="sm" className="rounded-full">
+            TikTok
+          </Button>
+          <Button variant="secondary" size="sm" className="rounded-full">
+            Promoções
+          </Button>
+        </div>
+      </div>
 
       <ProductGrid 
         products={products}
