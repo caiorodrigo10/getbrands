@@ -11,7 +11,7 @@ interface OrderTableProps {
 
 const OrderTable = ({ orders }: OrderTableProps) => {
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case "completed":
         return "bg-green-100 text-green-800";
       case "canceled":
@@ -68,7 +68,7 @@ const OrderTable = ({ orders }: OrderTableProps) => {
               </TableCell>
               <TableCell>
                 <Badge className={getStatusColor(order.status)}>
-                  {order.status.toUpperCase()}
+                  {order.status?.toUpperCase() || "PENDING"}
                 </Badge>
               </TableCell>
               <TableCell>
@@ -86,7 +86,7 @@ const OrderTable = ({ orders }: OrderTableProps) => {
                     {order.tracking_number && (
                       <DropdownMenuItem>Track Shipment</DropdownMenuItem>
                     )}
-                    {order.status === "pending" && (
+                    {order.status?.toLowerCase() === "pending" && (
                       <DropdownMenuItem>Cancel Order</DropdownMenuItem>
                     )}
                   </DropdownMenuContent>
