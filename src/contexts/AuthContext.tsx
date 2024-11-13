@@ -20,7 +20,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       id: "1",
       email: email,
       app_metadata: {},
-      user_metadata: {},
+      user_metadata: {
+        name: email.split("@")[0],
+        avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
+      },
       aud: "authenticated",
       created_at: new Date().toISOString(),
     } as User;
