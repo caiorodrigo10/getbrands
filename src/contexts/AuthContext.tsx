@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           
           toast({
             title: "Success",
-            description: "Account created successfully. Please check your email for verification.",
+            description: "Account created successfully!",
           });
           return;
         }
@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       toast({
         title: "Success",
-        description: "Logged in successfully.",
+        description: "Logged in successfully!",
       });
     } catch (error) {
       console.error('Login error:', error);
