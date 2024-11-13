@@ -1,20 +1,22 @@
 import { Search, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useProducts } from "@/hooks/useProducts";
-import { useNavigate } from "react-router-dom";
 import { Product } from "@/types/product";
+import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ProductSearchProps {
   onSelectProduct?: (product: Product) => void;
 }
 
 export const ProductSearch = ({ onSelectProduct }: ProductSearchProps) => {
-  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const { data: products = [] } = useProducts();
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { addItem } = useCart();
+  const { toast } = useToast();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -35,13 +37,24 @@ export const ProductSearch = ({ onSelectProduct }: ProductSearchProps) => {
     product.name.toLowerCase().includes(query.toLowerCase())
   );
 
-  const handleSelect = (product: Product) => {
-    setOpen(false);
-    setQuery("");
-    if (onSelectProduct) {
-      onSelectProduct(product);
-    } else {
-      navigate(`/produtos/${product.id}`);
+  const handleSelect = async (product: Product) => {
+    try {
+      await addItem(product);
+      toast({
+        title: "Sucesso",
+        description: "Produto adicionado ao carrinho de amostras.",
+      });
+      setOpen(false);
+      setQuery("");
+      if (onSelectProduct) {
+        onSelectProduct(product);
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Não foi possível adicionar o produto ao carrinho.",
+      });
     }
   };
 
@@ -54,7 +67,7 @@ export const ProductSearch = ({ onSelectProduct }: ProductSearchProps) => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setOpen(true)}
-          placeholder="Find your products"
+          placeholder="Encontre seus produtos"
           className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
         {query && (
@@ -77,7 +90,7 @@ export const ProductSearch = ({ onSelectProduct }: ProductSearchProps) => {
         >
           {filteredProducts.length === 0 ? (
             <div className="p-4 text-center text-gray-500">
-              No products found
+              Nenhum produto encontrado
             </div>
           ) : (
             <div className="p-2">
@@ -95,7 +108,7 @@ export const ProductSearch = ({ onSelectProduct }: ProductSearchProps) => {
                   <div className="flex-1 text-left">
                     <p className="font-medium text-gray-900">{product.name}</p>
                     <p className="text-sm text-gray-500">
-                      ${product.from_price.toFixed(2)}
+                      R$ {product.from_price.toFixed(2)}
                     </p>
                   </div>
                 </button>
