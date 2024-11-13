@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { formatCurrency } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 const stripePromise = loadStripe("pk_test_51QKiKUALHp5HR9166VeZiOJ6scDCMG23Zj82rMJjmB960htXAzAlh8hX5gfUDwrCraxiCftRorhs2MLpLbG4YNej00sMWFLqA3");
 
@@ -21,25 +21,19 @@ const Payment = () => {
       const stripe = await stripePromise;
       if (!stripe) throw new Error("Stripe failed to load");
 
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
           items,
           success_url: `${window.location.origin}/checkout/success`,
           cancel_url: `${window.location.origin}/checkout/payment`,
-        }),
+        },
       });
 
-      const { sessionId, error } = await response.json();
-      
-      if (error) throw new Error(error);
+      if (error) throw new Error(error.message);
+      if (!data?.sessionId) throw new Error("No session ID returned");
       
       const { error: stripeError } = await stripe.redirectToCheckout({
-        sessionId,
+        sessionId: data.sessionId,
       });
 
       if (stripeError) {

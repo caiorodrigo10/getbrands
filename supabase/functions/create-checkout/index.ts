@@ -38,6 +38,8 @@ serve(async (req) => {
       cancel_url: cancel_url,
     });
 
+    console.log('Checkout session created:', session.id);
+
     return new Response(
       JSON.stringify({ sessionId: session.id }),
       { 
@@ -46,7 +48,7 @@ serve(async (req) => {
       },
     );
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error creating checkout session:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
