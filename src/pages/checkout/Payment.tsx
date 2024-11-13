@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
+import type { Stripe } from "@stripe/stripe-js";
 import { 
   Elements, 
   PaymentElement, 
   useStripe, 
-  useElements,
-  StripeElementsOptions 
+  useElements
 } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -133,7 +133,7 @@ const Payment = () => {
     );
   }
 
-  const options: StripeElementsOptions = {
+  const options = {
     clientSecret,
     appearance: {
       theme: 'stripe',
