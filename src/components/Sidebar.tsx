@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { UserRound, Briefcase, BookOpen, Package, FileText } from "lucide-react";
+import { UserRound, Briefcase, BookOpen, Package, FileText, Box } from "lucide-react";
 import UserMenu from "./UserMenu";
 
 const Sidebar = () => {
@@ -9,6 +9,7 @@ const Sidebar = () => {
     { icon: Briefcase, label: "Projects", path: "/projetos" },
     { icon: BookOpen, label: "Catalog", path: "/catalogo" },
     { icon: Package, label: "My Products", path: "/produtos" },
+    { icon: Box, label: "Sample Orders", path: "/sample-orders" },
     { icon: FileText, label: "Documents", path: "/documentos" },
   ];
 

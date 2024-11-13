@@ -14,6 +14,7 @@ import Projetos from "./pages/Projetos";
 import Catalogo from "./pages/Catalogo";
 import Produtos from "./pages/Produtos";
 import Documentos from "./pages/Documentos";
+import SampleOrders from "./pages/SampleOrders";
 import Checkout from "./pages/checkout/Checkout";
 import Error404 from "./pages/Error404";
 import Success from "./pages/checkout/Success";
@@ -38,9 +39,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => (
   <div className="flex min-h-screen bg-background">
     <Sidebar />
     <main className="flex-1 ml-64 p-8 animate-fade-in">
-      <div className="max-w-7xl mx-auto">
-        {children}
-      </div>
+      <div className="max-w-7xl mx-auto">{children}</div>
     </main>
   </div>
 );
@@ -53,65 +52,102 @@ const App = () => (
           <TooltipProvider>
             <Routes>
               <Route path="/login" element={<Login />} />
-              <Route path="/" element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <Index />
-                  </AppLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="/perfil" element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <Perfil />
-                  </AppLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="/projetos" element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <Projetos />
-                  </AppLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="/catalogo" element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <Catalogo />
-                  </AppLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="/produtos" element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <Produtos />
-                  </AppLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="/documentos" element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <Documentos />
-                  </AppLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="/checkout/*" element={
-                <ProtectedRoute>
-                  <Checkout />
-                </ProtectedRoute>
-              } />
-              <Route path="/checkout/success" element={
-                <ProtectedRoute>
-                  <Success />
-                </ProtectedRoute>
-              } />
-              <Route path="*" element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <Error404 />
-                  </AppLayout>
-                </ProtectedRoute>
-              } />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Index />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/perfil"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Perfil />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/projetos"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Projetos />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/catalogo"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Catalogo />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/produtos"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Produtos />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/documentos"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Documentos />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/sample-orders"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <SampleOrders />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/checkout/*"
+                element={
+                  <ProtectedRoute>
+                    <Checkout />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/checkout/success"
+                element={
+                  <ProtectedRoute>
+                    <Success />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="*"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Error404 />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
             <Toaster />
             <Sonner />
