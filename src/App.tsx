@@ -10,6 +10,7 @@ import Projetos from "./pages/Projetos";
 import Catalogo from "./pages/Catalogo";
 import Produtos from "./pages/Produtos";
 import Documentos from "./pages/Documentos";
+import PedidoAmostra from "./pages/PedidoAmostra";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => {
                 <Route path="/catalogo" element={<Catalogo />} />
                 <Route path="/produtos" element={<Produtos />} />
                 <Route path="/documentos" element={<Documentos />} />
+                <Route path="/pedido-amostra" element={<PedidoAmostra />} />
               </Routes>
             </main>
           </div>

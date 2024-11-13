@@ -1,6 +1,5 @@
 import { useToast } from "@/components/ui/use-toast";
 import ProductGrid from "@/components/ProductGrid";
-import CatalogHeader from "@/components/CatalogHeader";
 import CatalogFilters from "@/components/CatalogFilters";
 import FeaturedSlider from "@/components/FeaturedSlider";
 import { Product } from "@/types/product";
@@ -13,6 +12,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 const products: Product[] = [
   {
@@ -155,8 +156,22 @@ const Catalogo = () => {
 
   return (
     <div className="p-8 bg-white min-h-screen">
-      <CatalogHeader />
-      <CatalogFilters />
+      <div className="mb-8 pt-8">
+        <h1 className="text-4xl font-bold text-gray-900">Seja bem-vindo, Caio Rodrigo!</h1>
+        <p className="text-gray-600 mt-2">Escolha um produto para customizar</p>
+      </div>
+
+      <div className="flex justify-between items-center mb-8">
+        <CatalogFilters />
+        <div className="relative w-72">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            placeholder="Buscar produtos..."
+            className="pl-10 bg-white border-gray-200"
+          />
+        </div>
+      </div>
+
       <FeaturedSlider />
       <ProductGrid 
         products={paginatedProducts}
@@ -166,11 +181,11 @@ const Catalogo = () => {
       
       <div className="mt-8">
         <Pagination>
-          <PaginationContent>
+          <PaginationContent className="text-gray-900">
             <PaginationItem>
               <PaginationPrevious 
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                className={`${currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"} text-gray-900`}
               />
             </PaginationItem>
             
@@ -179,7 +194,7 @@ const Catalogo = () => {
                 <PaginationLink
                   onClick={() => setCurrentPage(page)}
                   isActive={currentPage === page}
-                  className="cursor-pointer"
+                  className="cursor-pointer text-gray-900"
                 >
                   {page}
                 </PaginationLink>
@@ -189,7 +204,7 @@ const Catalogo = () => {
             <PaginationItem>
               <PaginationNext 
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                className={`${currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"} text-gray-900`}
               />
             </PaginationItem>
           </PaginationContent>

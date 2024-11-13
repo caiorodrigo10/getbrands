@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Product } from "@/types/product";
+import { useNavigate } from "react-router-dom";
 
 interface ProductCardProps {
   product: Product;
@@ -10,6 +11,13 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardProps) => {
+  const navigate = useNavigate();
+
+  const handleRequestSample = () => {
+    onRequestSample(product.id);
+    navigate("/pedido-amostra");
+  };
+
   return (
     <Card className="bg-gray-50 border-gray-200 overflow-hidden">
       <div className="relative aspect-square">
@@ -52,7 +60,7 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
           <Button 
             variant="outline" 
             className="flex-1 text-primary hover:text-primary border-primary hover:bg-primary/10"
-            onClick={() => onRequestSample(product.id)}
+            onClick={handleRequestSample}
           >
             Pedir Amostra
           </Button>
