@@ -59,7 +59,7 @@ const products: Product[] = [
     id: 4,
     category: "Vitamins & Supplements",
     name: "Vitamin C 1000mg",
-    image: "/placeholder.svg",
+    image: "https://app.supliful.com/_next/image?url=https%3A%2F%2Fsupliful.s3.amazonaws.com%2Fproducts%2Fimages%2F20240726103115-jtp7adwc-advanced-100--whey-protein-isolate-chocolate.png&w=768&q=75",
     fromPrice: 19.99,
     srp: 29.99,
     profit: 10.00,
@@ -68,7 +68,7 @@ const products: Product[] = [
     id: 5,
     category: "Snacks",
     name: "Protein Bar (Chocolate Chip)",
-    image: "/placeholder.svg",
+    image: "https://app.supliful.com/_next/image?url=https%3A%2F%2Fsupliful.s3.amazonaws.com%2Fproducts%2Fimages%2F20240710184044-vox4test-alpha-energy.png&w=768&q=75",
     fromPrice: 1.50,
     srp: 2.99,
     profit: 1.49,
@@ -77,7 +77,7 @@ const products: Product[] = [
     id: 6,
     category: "Beverages",
     name: "Green Tea (Lemon Flavor)",
-    image: "/placeholder.svg",
+    image: "https://app.supliful.com/_next/image?url=https%3A%2F%2Fsupliful.s3.amazonaws.com%2Fproducts%2Fimages%2F20240618170201-vox45htp-5-htp.png&w=768&q=75",
     fromPrice: 2.50,
     srp: 5.00,
     profit: 2.50,
@@ -86,7 +86,7 @@ const products: Product[] = [
     id: 7,
     category: "Personal Care",
     name: "Moisturizing Cream",
-    image: "/placeholder.svg",
+    image: "https://app.supliful.com/_next/image?url=https%3A%2F%2Fsupliful.s3.amazonaws.com%2Fproducts%2Fimages%2F20240726103115-jtp7adwc-advanced-100--whey-protein-isolate-chocolate.png&w=768&q=75",
     fromPrice: 12.00,
     srp: 19.99,
     profit: 7.99,
@@ -95,7 +95,7 @@ const products: Product[] = [
     id: 8,
     category: "Vitamins",
     name: "Omega 3 Fish Oil",
-    image: "/placeholder.svg",
+    image: "https://app.supliful.com/_next/image?url=https%3A%2F%2Fsupliful.s3.amazonaws.com%2Fproducts%2Fimages%2F20240710184044-vox4test-alpha-energy.png&w=768&q=75",
     fromPrice: 25.00,
     srp: 39.99,
     profit: 14.99,
@@ -104,7 +104,7 @@ const products: Product[] = [
     id: 9,
     category: "Supplements",
     name: "Pre Workout Formula",
-    image: "/placeholder.svg",
+    image: "https://app.supliful.com/_next/image?url=https%3A%2F%2Fsupliful.s3.amazonaws.com%2Fproducts%2Fimages%2F20240618170201-vox45htp-5-htp.png&w=768&q=75",
     fromPrice: 29.99,
     srp: 49.99,
     profit: 20.00,
@@ -113,7 +113,7 @@ const products: Product[] = [
     id: 10,
     category: "Snacks",
     name: "Granola Bar (Oats & Honey)",
-    image: "/placeholder.svg",
+    image: "https://app.supliful.com/_next/image?url=https%3A%2F%2Fsupliful.s3.amazonaws.com%2Fproducts%2Fimages%2F20240726103115-jtp7adwc-advanced-100--whey-protein-isolate-chocolate.png&w=768&q=75",
     fromPrice: 1.00,
     srp: 2.50,
     profit: 1.50,
@@ -122,7 +122,7 @@ const products: Product[] = [
     id: 11,
     category: "Beverages",
     name: "Protein Shake (Vanilla)",
-    image: "/placeholder.svg",
+    image: "https://app.supliful.com/_next/image?url=https%3A%2F%2Fsupliful.s3.amazonaws.com%2Fproducts%2Fimages%2F20240710184044-vox4test-alpha-energy.png&w=768&q=75",
     fromPrice: 3.00,
     srp: 5.50,
     profit: 2.50,
@@ -131,12 +131,19 @@ const products: Product[] = [
     id: 12,
     category: "Beauty",
     name: "Nourishing Face Mask",
-    image: "/placeholder.svg",
+    image: "https://app.supliful.com/_next/image?url=https%3A%2F%2Fsupliful.s3.amazonaws.com%2Fproducts%2Fimages%2F20240618170201-vox45htp-5-htp.png&w=768&q=75",
     fromPrice: 15.00,
     srp: 24.99,
     profit: 9.99,
   },
 ];
+
+// Update all other products to use these 3 images in rotation
+products.forEach((product, index) => {
+  if (index > 2) {
+    product.image = products[index % 3].image;
+  }
+});
 
 const Catalogo = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -181,7 +188,7 @@ const Catalogo = () => {
               <img
                 src={product.image}
                 alt={product.name}
-                className="w-full h-48 object-cover"
+                className="w-full h-64 object-contain"
               />
             </div>
             <div className="p-4">

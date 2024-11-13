@@ -11,7 +11,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-black p-4 text-white">
+    <aside className="fixed left-0 top-0 h-screen w-48 bg-black p-4 text-white">
       <div className="mb-8 px-4">
         <h1 className="text-2xl font-bold text-primary">Mainer</h1>
       </div>
