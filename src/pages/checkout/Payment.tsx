@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
@@ -94,7 +95,7 @@ const Payment = () => {
     return <div>Loading...</div>;
   }
 
-  const options = {
+  const options: Parameters<typeof Elements>[0]['options'] = {
     clientSecret,
     appearance: {
       theme: 'stripe',
