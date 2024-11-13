@@ -38,19 +38,19 @@ const CatalogLayout = ({ onRequestSample, onSelectProduct }: CatalogLayoutProps)
   return (
     <div className="space-y-8">
       <div className="flex flex-col space-y-8">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900">Seja bem-vindo, Caio Rodrigo!</h1>
-            <p className="text-gray-600 mt-2">Escolha um produto para customizar</p>
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900">Seja bem-vindo, Caio Rodrigo!</h1>
+          <p className="text-gray-600 mt-2">Escolha um produto para customizar</p>
+        </div>
+
+        <div className="flex justify-between items-center gap-4">
+          <div className="flex-1 overflow-x-auto">
+            <CatalogFilters />
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 min-w-[300px]">
             <CatalogHeader />
             <CartButton />
           </div>
-        </div>
-
-        <div className="w-full overflow-x-auto">
-          <CatalogFilters />
         </div>
 
         <div>
