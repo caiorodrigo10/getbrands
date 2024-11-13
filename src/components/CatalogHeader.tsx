@@ -3,7 +3,7 @@ import { Search } from "lucide-react";
 
 const CatalogHeader = () => {
   return (
-    <div className="mb-8">
+    <div className="mb-8 pt-8">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-4xl font-bold text-gray-900">Seja bem-vindo, Caio Rodrigo!</h1>

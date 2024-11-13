@@ -2,25 +2,21 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 
 const FeaturedSlider = () => {
   return (
     <div className="mb-8">
-      <Carousel>
+      <Carousel opts={{ loop: true, align: "start", duration: 20 }}>
         <CarouselContent>
           <CarouselItem>
             <img
               src="https://supliful.s3.amazonaws.com/banners/catalog/20241023090259-catalog-banner-pc-extended-catalog.png"
               alt="Featured products"
-              className="w-full h-[200px] object-cover rounded-lg"
+              className="w-full h-[400px] object-cover rounded-lg"
             />
           </CarouselItem>
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
       </Carousel>
     </div>
   );
