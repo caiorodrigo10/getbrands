@@ -38,7 +38,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
         .from('cart_items')
         .select(`
           product_id,
-          products (*)
+          products (
+            id,
+            category,
+            name,
+            description,
+            image_url,
+            from_price,
+            srp,
+            is_new,
+            is_tiktok,
+            created_at,
+            updated_at
+          )
         `)
         .eq('user_id', user?.id);
 
