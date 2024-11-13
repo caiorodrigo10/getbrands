@@ -5,11 +5,11 @@ import UserMenu from "./UserMenu";
 const Sidebar = () => {
   const location = useLocation();
   const menuItems = [
-    { icon: UserRound, label: "Meu Perfil", path: "/perfil" },
-    { icon: Briefcase, label: "Projetos", path: "/projetos" },
-    { icon: BookOpen, label: "Catalogo", path: "/catalogo" },
-    { icon: Package, label: "Meus Produtos", path: "/produtos" },
-    { icon: FileText, label: "Documentos", path: "/documentos" },
+    { icon: UserRound, label: "My Profile", path: "/perfil" },
+    { icon: Briefcase, label: "Projects", path: "/projetos" },
+    { icon: BookOpen, label: "Catalog", path: "/catalogo" },
+    { icon: Package, label: "My Products", path: "/produtos" },
+    { icon: FileText, label: "Documents", path: "/documentos" },
   ];
 
   return (

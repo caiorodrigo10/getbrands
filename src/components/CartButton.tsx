@@ -32,7 +32,7 @@ export function CartButton() {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Ver carrinho de amostras</p>
+          <p>View sample cart</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

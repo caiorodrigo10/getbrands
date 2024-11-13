@@ -43,8 +43,8 @@ export const ProductSearch = ({ onSelectProduct }: ProductSearchProps) => {
     try {
       await addItem(product);
       toast({
-        title: "Sucesso",
-        description: "Produto adicionado ao carrinho de amostras.",
+        title: "Success",
+        description: "Product added to sample cart.",
       });
       setOpen(false);
       setQuery("");
@@ -55,8 +55,8 @@ export const ProductSearch = ({ onSelectProduct }: ProductSearchProps) => {
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível adicionar o produto ao carrinho.",
+        title: "Error",
+        description: "Could not add product to cart.",
       });
     }
   };
@@ -70,7 +70,7 @@ export const ProductSearch = ({ onSelectProduct }: ProductSearchProps) => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setOpen(true)}
-          placeholder="Encontre seus produtos"
+          placeholder="Find your products"
           className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
         {query && (
@@ -93,7 +93,7 @@ export const ProductSearch = ({ onSelectProduct }: ProductSearchProps) => {
         >
           {filteredProducts.length === 0 ? (
             <div className="p-4 text-center text-gray-500">
-              Nenhum produto encontrado
+              No products found
             </div>
           ) : (
             <div className="p-2">

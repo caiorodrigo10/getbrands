@@ -8,9 +8,9 @@ import Payment from "./Payment";
 import Sidebar from "@/components/Sidebar";
 
 const steps = [
-  { id: "confirmation", name: "Confirmação", path: "/checkout/confirmation", icon: CheckCircle },
-  { id: "shipping", name: "Envio", path: "/checkout/shipping", icon: Truck },
-  { id: "payment", name: "Pagamento", path: "/checkout/payment", icon: CreditCard },
+  { id: "confirmation", name: "Confirmation", path: "/checkout/confirmation", icon: CheckCircle },
+  { id: "shipping", name: "Shipping", path: "/checkout/shipping", icon: Truck },
+  { id: "payment", name: "Payment", path: "/checkout/payment", icon: CreditCard },
 ];
 
 const Checkout = () => {
@@ -45,7 +45,7 @@ const Checkout = () => {
               onClick={goBack}
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
-              Voltar
+              Back
             </Button>
             
             <div className="space-y-4 max-w-2xl mx-auto">
