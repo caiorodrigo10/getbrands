@@ -40,9 +40,9 @@ const PedidoAmostra = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 space-y-8">
-      <div className="flex items-center gap-4 mb-8">
-        <div className="flex-1 max-w-xl">
+    <div className="max-w-2xl mx-auto px-4 space-y-6">
+      <div className="flex items-center gap-4 mb-6">
+        <div className="flex-1 max-w-lg">
           <ProductSearch />
         </div>
         <Button className="bg-primary hover:bg-primary-dark text-white whitespace-nowrap">
@@ -50,17 +50,17 @@ const PedidoAmostra = () => {
         </Button>
       </div>
 
-      <div className="space-y-4 mb-8">
+      <div className="space-y-4 mb-6">
         {items.map((item) => (
-          <div key={item.id} className="flex items-center justify-between p-6 border rounded-lg bg-white shadow-sm">
-            <div className="flex items-center gap-6">
-              <img src={item.image_url || '/placeholder.svg'} alt={item.name} className="w-20 h-20 object-contain bg-gray-50 rounded p-2" />
+          <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm">
+            <div className="flex items-center gap-4">
+              <img src={item.image_url || '/placeholder.svg'} alt={item.name} className="w-16 h-16 object-contain bg-gray-50 rounded p-2" />
               <div>
                 <h3 className="font-semibold text-gray-900">{item.name}</h3>
                 <p className="text-sm text-gray-600">${item.from_price.toFixed(2)} por unidade</p>
               </div>
             </div>
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
@@ -78,7 +78,7 @@ const PedidoAmostra = () => {
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
-              <p className="font-semibold text-gray-900 w-24 text-right">
+              <p className="font-semibold text-gray-900 w-20 text-right">
                 ${(item.from_price * item.quantity).toFixed(2)}
               </p>
               <Button
@@ -94,8 +94,8 @@ const PedidoAmostra = () => {
         ))}
       </div>
 
-      <div className="flex justify-between items-start gap-8">
-        <div className="w-72">
+      <div className="flex justify-between items-start gap-6">
+        <div className="w-64">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             País de envio
           </label>
@@ -110,7 +110,7 @@ const PedidoAmostra = () => {
             </SelectContent>
           </Select>
         </div>
-        <div className="w-72 space-y-3 bg-white p-6 rounded-lg shadow-sm">
+        <div className="w-64 space-y-3 bg-white p-4 rounded-lg shadow-sm">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Subtotal:</span>
             <span className="font-semibold text-gray-900">${calculateSubtotal().toFixed(2)}</span>
@@ -128,10 +128,10 @@ const PedidoAmostra = () => {
         </div>
       </div>
 
-      <div className="flex justify-end mt-8">
+      <div className="flex justify-end mt-6">
         <Button
           onClick={handleProceedToShipping}
-          className="bg-primary hover:bg-primary-dark text-white px-8"
+          className="bg-primary hover:bg-primary-dark text-white px-6"
           disabled={!selectedCountry || items.length === 0}
         >
           Prosseguir para Envio

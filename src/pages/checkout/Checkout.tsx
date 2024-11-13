@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -37,7 +36,7 @@ const Checkout = () => {
     <div className="flex min-h-screen bg-background">
       <Sidebar />
       <main className="flex-1 ml-64">
-        <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="max-w-3xl mx-auto px-4 py-8">
           <div className="mb-8">
             <Button
               variant="ghost"
@@ -49,7 +48,7 @@ const Checkout = () => {
               Voltar
             </Button>
             
-            <div className="space-y-4">
+            <div className="space-y-4 max-w-2xl mx-auto">
               <Progress value={(currentStep / (steps.length - 1)) * 100} />
               <div className="flex justify-between">
                 {steps.map((step, index) => {
