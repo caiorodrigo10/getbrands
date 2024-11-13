@@ -71,22 +71,24 @@ export const useCartOperations = (user: User | null) => {
     }
 
     try {
-      // First, check if the user profile exists
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
+      setIsLoading(true);
+      
+      // First, check if the item already exists in the cart
+      const { data: existingItem } = await supabase
+        .from('cart_items')
         .select('id')
-        .eq('id', user.id)
+        .eq('user_id', user.id)
+        .eq('product_id', product.id)
         .single();
 
-      if (profileError || !profile) {
+      if (existingItem) {
         toast({
-          variant: "destructive",
-          title: "Erro de perfil",
-          description: "Seu perfil não foi encontrado. Por favor, faça login novamente.",
+          description: "Este produto já está no seu carrinho.",
         });
-        throw new Error("User profile not found");
+        return;
       }
 
+      // If not, add the item
       const { error } = await supabase
         .from('cart_items')
         .insert({
@@ -94,21 +96,9 @@ export const useCartOperations = (user: User | null) => {
           product_id: product.id
         });
 
-      if (error) {
-        if (error.code === '23505') {
-          toast({
-            description: "Este produto já está no seu carrinho.",
-          });
-          return;
-        }
-        throw error;
-      }
+      if (error) throw error;
 
-      setItems((currentItems) => {
-        const existingItem = currentItems.find((item) => item.id === product.id);
-        if (existingItem) return currentItems;
-        return [...currentItems, { ...product, quantity: 1 }];
-      });
+      setItems((currentItems) => [...currentItems, { ...product, quantity: 1 }]);
 
       toast({
         description: "Produto adicionado ao carrinho.",
@@ -121,6 +111,8 @@ export const useCartOperations = (user: User | null) => {
         description: "Não foi possível adicionar o item ao carrinho. Tente novamente mais tarde.",
       });
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -128,6 +120,7 @@ export const useCartOperations = (user: User | null) => {
     if (!user?.id) return;
 
     try {
+      setIsLoading(true);
       const { error } = await supabase
         .from('cart_items')
         .delete()
@@ -148,6 +141,8 @@ export const useCartOperations = (user: User | null) => {
         title: "Erro ao remover item",
         description: "Não foi possível remover o item do carrinho. Tente novamente mais tarde.",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -163,6 +158,7 @@ export const useCartOperations = (user: User | null) => {
     if (!user?.id) return;
 
     try {
+      setIsLoading(true);
       const { error } = await supabase
         .from('cart_items')
         .delete()
@@ -182,6 +178,8 @@ export const useCartOperations = (user: User | null) => {
         title: "Erro ao limpar carrinho",
         description: "Não foi possível limpar o carrinho. Tente novamente mais tarde.",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
