@@ -41,14 +41,11 @@ const CheckoutForm = ({ clientSecret, total, shippingCost }: { clientSecret: str
         confirmParams: {
           return_url: `${window.location.origin}/checkout/success`,
           shipping: {
-            shipping_rate_data: {
-              fixed_amount: {
-                amount: Math.round(shippingCost * 100),
-                currency: 'brl',
-              },
-              display_name: 'Frete',
-              type: 'fixed_amount',
+            address: {
+              country: 'BR',
             },
+            amount: Math.round(shippingCost * 100),
+            name: 'Frete padrão',
           },
         },
       });

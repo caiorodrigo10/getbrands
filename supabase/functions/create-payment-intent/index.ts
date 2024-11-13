@@ -21,14 +21,11 @@ serve(async (req) => {
         enabled: true,
       },
       shipping: shipping_amount ? {
-        shipping_rate_data: {
-          fixed_amount: {
-            amount: shipping_amount,
-            currency,
-          },
-          display_name: 'Frete',
-          type: 'fixed_amount',
+        address: {
+          country: 'BR',
         },
+        amount: shipping_amount,
+        name: 'Frete padrão',
       } : undefined,
     })
 
