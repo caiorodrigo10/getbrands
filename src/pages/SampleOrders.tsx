@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import OrderFilters from "@/components/sample-orders/OrderFilters";
 import OrderTable from "@/components/sample-orders/OrderTable";
 import { useToast } from "@/components/ui/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const SampleOrders = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -47,7 +48,15 @@ const SampleOrders = () => {
   });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+        <Skeleton className="h-[400px] w-full" />
+      </div>
+    );
   }
 
   return (
@@ -66,7 +75,13 @@ const SampleOrders = () => {
         setSearchQuery={setSearchQuery}
       />
 
-      <OrderTable orders={filteredOrders} />
+      {filteredOrders && filteredOrders.length > 0 ? (
+        <OrderTable orders={filteredOrders} />
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-lg text-gray-600">No orders found.</p>
+        </div>
+      )}
     </div>
   );
 };

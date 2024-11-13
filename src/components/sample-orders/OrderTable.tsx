@@ -2,7 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Package, ArrowDown, MoreVertical } from "lucide-react";
+import { Package, ArrowDown, MoreVertical, Truck } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
 interface OrderTableProps {
@@ -62,9 +62,16 @@ const OrderTable = ({ orders }: OrderTableProps) => {
                   minute: "2-digit",
                 })}
               </TableCell>
-              <TableCell>{order.shipping_city}</TableCell>
+              <TableCell>{order.shipping_city || "-"}</TableCell>
               <TableCell>
-                {order.tracking_number || "-"}
+                {order.tracking_number ? (
+                  <div className="flex items-center gap-2">
+                    <Truck className="h-4 w-4" />
+                    <span>{order.tracking_number}</span>
+                  </div>
+                ) : (
+                  "-"
+                )}
               </TableCell>
               <TableCell>
                 <Badge className={getStatusColor(order.status)}>
