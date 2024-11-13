@@ -1,10 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { stripe } from "../_shared/stripe.ts"
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { corsHeaders } from "../_shared/cors.ts"
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -21,30 +17,28 @@ serve(async (req) => {
         enabled: true,
       },
       shipping: shipping_amount ? {
+        name: 'Frete padrão',
         address: {
-          line1: "Endereço de entrega", // Required field
+          line1: "Endereço de entrega",
           city: "Cidade",
           state: "Estado",
           postal_code: "00000-000",
           country: 'BR',
         },
-        amount: shipping_amount,
-        name: 'Frete padrão',
       } : undefined,
     })
 
     return new Response(
       JSON.stringify({ clientSecret: paymentIntent.client_secret }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       },
     )
   } catch (error) {
-    console.error('Error:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
       },
