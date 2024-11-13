@@ -73,15 +73,16 @@ export const useCartOperations = (user: User | null) => {
     try {
       setIsLoading(true);
       
-      // First, check if the item already exists in the cart
-      const { data: existingItem } = await supabase
+      // Check if the item already exists in the cart
+      const { data: existingItems, error: queryError } = await supabase
         .from('cart_items')
         .select('id')
         .eq('user_id', user.id)
-        .eq('product_id', product.id)
-        .single();
+        .eq('product_id', product.id);
 
-      if (existingItem) {
+      if (queryError) throw queryError;
+
+      if (existingItems && existingItems.length > 0) {
         toast({
           description: "Este produto já está no seu carrinho.",
         });
