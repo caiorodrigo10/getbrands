@@ -22,6 +22,10 @@ serve(async (req) => {
       },
       shipping: shipping_amount ? {
         address: {
+          line1: "Endereço de entrega", // Required field
+          city: "Cidade",
+          state: "Estado",
+          postal_code: "00000-000",
           country: 'BR',
         },
         amount: shipping_amount,

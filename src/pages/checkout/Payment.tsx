@@ -42,6 +42,10 @@ const CheckoutForm = ({ clientSecret, total, shippingCost }: { clientSecret: str
           return_url: `${window.location.origin}/checkout/success`,
           shipping: {
             address: {
+              line1: "Endereço de entrega", // Required field
+              city: "Cidade",
+              state: "Estado",
+              postal_code: "00000-000",
               country: 'BR',
             },
             amount: Math.round(shippingCost * 100),
