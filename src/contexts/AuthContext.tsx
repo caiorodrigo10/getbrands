@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (email: string, password: string) => {
     // Simulate API call
     const mockUser = {
-      id: "1",
+      id: "d7bed82c-0d74-4b4d-a6cd-0fb0bead6c2a", // Valid UUID format
       email: email,
       app_metadata: {},
       user_metadata: {
