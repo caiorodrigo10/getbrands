@@ -1,21 +1,62 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { formatCurrency } from "@/lib/utils";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const Payment = () => {
   const navigate = useNavigate();
-  const { items } = useCart();
+  const { toast } = useToast();
+  const { items, clearCart } = useCart();
 
   const total = items.reduce((sum, item) => sum + item.from_price * item.quantity, 0);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Implement payment processing here
-    console.log("Processing payment...");
+  const handleCheckout = async () => {
+    try {
+      const stripe = await stripePromise;
+      if (!stripe) throw new Error("Stripe failed to load");
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          items,
+          success_url: `${window.location.origin}/checkout/success`,
+          cancel_url: `${window.location.origin}/checkout/payment`,
+        }),
+      });
+
+      const { sessionId, error } = await response.json();
+      
+      if (error) throw new Error(error);
+      
+      const { error: stripeError } = await stripe.redirectToCheckout({
+        sessionId,
+      });
+
+      if (stripeError) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: stripeError.message,
+        });
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "There was a problem processing your payment. Please try again.",
+      });
+    }
   };
 
   return (
@@ -23,47 +64,37 @@ const Payment = () => {
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <h2 className="text-xl font-semibold mb-6">Payment</h2>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <RadioGroup defaultValue="card">
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="card" id="card" />
-              <Label htmlFor="card">Credit Card</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="paypal" id="paypal" />
-              <Label htmlFor="paypal">PayPal</Label>
-            </div>
-          </RadioGroup>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Order Summary</CardTitle>
-              <CardDescription>Review your order details</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span>{formatCurrency(total)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span>Free</span>
-                </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Order Summary</CardTitle>
+            <CardDescription>Review your order details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Subtotal</span>
+                <span>{formatCurrency(total)}</span>
               </div>
-            </CardContent>
-            <CardFooter className="flex justify-between font-semibold">
-              <span>Total</span>
-              <span>{formatCurrency(total)}</span>
-            </CardFooter>
-          </Card>
+              <div className="flex justify-between text-sm">
+                <span>Shipping</span>
+                <span>Free</span>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-between font-semibold">
+            <span>Total</span>
+            <span>{formatCurrency(total)}</span>
+          </CardFooter>
+        </Card>
 
-          <div className="flex justify-end pt-6">
-            <Button type="submit" className="w-full md:w-auto">
-              Complete Order
-            </Button>
-          </div>
-        </form>
+        <div className="flex justify-end pt-6">
+          <Button
+            onClick={handleCheckout}
+            className="w-full md:w-auto"
+          >
+            Proceed to Payment
+          </Button>
+        </div>
       </div>
     </div>
   );

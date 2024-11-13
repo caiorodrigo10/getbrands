@@ -17,6 +17,7 @@ import Documentos from "./pages/Documentos";
 import PedidoAmostra from "./pages/PedidoAmostra";
 import Checkout from "./pages/checkout/Checkout";
 import Error404 from "./pages/Error404";
+import Success from "./pages/checkout/Success";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -105,6 +106,11 @@ const App = () => (
               <Route path="/checkout/*" element={
                 <ProtectedRoute>
                   <Checkout />
+                </ProtectedRoute>
+              } />
+              <Route path="/checkout/success" element={
+                <ProtectedRoute>
+                  <Success />
                 </ProtectedRoute>
               } />
               <Route path="*" element={
