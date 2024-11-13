@@ -1,8 +1,18 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { stripe } from "../_shared/stripe.ts"
-import { corsHeaders } from "../_shared/cors.ts"
+import Stripe from "https://esm.sh/stripe@12.4.0?target=deno"
+
+const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') as string, {
+  apiVersion: '2023-10-16',
+  httpClient: Stripe.createFetchHttpClient(),
+})
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -12,22 +22,18 @@ serve(async (req) => {
 
     console.log('Creating payment intent with:', { amount, currency, shipping_amount })
 
+    // Calculate total amount including shipping
+    const totalAmount = amount + (shipping_amount || 0)
+
     const paymentIntent = await stripe.paymentIntents.create({
-      amount,
+      amount: totalAmount,
       currency,
       automatic_payment_methods: {
         enabled: true,
       },
-      shipping_options: [{
-        shipping_rate_data: {
-          type: 'fixed_amount',
-          fixed_amount: {
-            amount: shipping_amount,
-            currency,
-          },
-          display_name: 'Standard Shipping',
-        },
-      }],
+      metadata: {
+        shipping_amount: shipping_amount || 0,
+      }
     })
 
     return new Response(
