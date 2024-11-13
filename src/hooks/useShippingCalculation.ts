@@ -21,6 +21,7 @@ export const useShippingCalculation = (country: string, totalItems: number) => {
 
       if (error) throw error;
 
+      // Find the applicable rate based on the number of items
       const applicableRate = rates?.find(
         (rate: ShippingRate) =>
           totalItems >= rate.min_items &&
@@ -31,9 +32,9 @@ export const useShippingCalculation = (country: string, totalItems: number) => {
 
       let shippingCost = applicableRate.base_rate;
 
-      // Calculate additional cost for items above min_items
-      if (applicableRate.additional_rate_per_item && totalItems > applicableRate.min_items) {
-        const additionalItems = totalItems - applicableRate.min_items;
+      // For 6 or more items, add the additional cost per item above 5
+      if (applicableRate.additional_rate_per_item && totalItems > 5) {
+        const additionalItems = totalItems - 5;
         shippingCost += additionalItems * applicableRate.additional_rate_per_item;
       }
 
