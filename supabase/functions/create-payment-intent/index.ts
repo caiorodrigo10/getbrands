@@ -13,16 +13,18 @@ serve(async (req) => {
   }
 
   try {
-    const { amount } = await req.json()
+    const { amount, currency = 'brl' } = await req.json()
 
+    // Create a PaymentIntent with the order amount and currency
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
-      currency: 'usd',
+      currency,
       automatic_payment_methods: {
         enabled: true,
       },
     })
 
+    // Send publishable key and PaymentIntent details to client
     return new Response(
       JSON.stringify({ clientSecret: paymentIntent.client_secret }),
       { 
@@ -31,6 +33,7 @@ serve(async (req) => {
       },
     )
   } catch (error) {
+    console.error('Error:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
