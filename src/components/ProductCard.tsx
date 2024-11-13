@@ -55,7 +55,7 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
         title: "Success",
         description: "Sample request created successfully.",
       });
-      navigate("/pedido-amostra");
+      navigate("/checkout/confirmation");
     } catch (error) {
       console.error('Error requesting sample:', error);
       toast({

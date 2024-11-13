@@ -4,6 +4,7 @@ import { useProducts } from "@/hooks/useProducts";
 import { Product } from "@/types/product";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface ProductSearchProps {
   onSelectProduct?: (product: Product) => void;
@@ -17,6 +18,7 @@ export const ProductSearch = ({ onSelectProduct }: ProductSearchProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { addItem } = useCart();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -46,6 +48,7 @@ export const ProductSearch = ({ onSelectProduct }: ProductSearchProps) => {
       });
       setOpen(false);
       setQuery("");
+      navigate("/checkout/confirmation");
       if (onSelectProduct) {
         onSelectProduct(product);
       }
