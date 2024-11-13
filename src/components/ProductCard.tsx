@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Product } from "@/types/product";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "@/contexts/CartContext";
 
 interface ProductCardProps {
   product: Product;
@@ -12,8 +13,10 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardProps) => {
   const navigate = useNavigate();
+  const { addItem } = useCart();
 
   const handleRequestSample = () => {
+    addItem(product);
     onRequestSample(product.id);
     navigate("/pedido-amostra");
   };

@@ -3,12 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Trash2, Plus, Minus } from "lucide-react";
 import { useState } from "react";
-import { Product } from "@/types/product";
+import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
-
-interface CartItem extends Product {
-  quantity: number;
-}
 
 const SHIPPING_RATES = {
   US: 10,
@@ -19,25 +15,15 @@ const SHIPPING_RATES = {
 const PedidoAmostra = () => {
   const navigate = useNavigate();
   const [selectedCountry, setSelectedCountry] = useState("");
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const { items, updateQuantity, removeItem } = useCart();
 
   const handleQuantityChange = (itemId: number, newQuantity: number) => {
-    setCartItems(items =>
-      items.map(item =>
-        item.id === itemId
-          ? { ...item, quantity: Math.max(1, newQuantity) }
-          : item
-      )
-    );
-  };
-
-  const removeFromCart = (itemId: number) => {
-    setCartItems(items => items.filter(item => item.id !== itemId));
+    updateQuantity(itemId, Math.max(1, newQuantity));
   };
 
   const calculateSubtotal = () => {
-    return cartItems.reduce((total, item) => total + (item.fromPrice * item.quantity), 0);
+    return items.reduce((total, item) => total + (item.fromPrice * item.quantity), 0);
   };
 
   const getShippingCost = () => {
@@ -49,7 +35,7 @@ const PedidoAmostra = () => {
   };
 
   const handleProceedToShipping = () => {
-    if (selectedCountry && cartItems.length > 0) {
+    if (selectedCountry && items.length > 0) {
       navigate("/pedido-amostra/envio");
     }
   };
@@ -75,7 +61,7 @@ const PedidoAmostra = () => {
         </div>
 
         <div className="space-y-4 mb-8">
-          {cartItems.map((item) => (
+          {items.map((item) => (
             <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg">
               <div className="flex items-center gap-4">
                 <img src={item.image} alt={item.name} className="w-16 h-16 object-contain" />
@@ -108,7 +94,7 @@ const PedidoAmostra = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => removeItem(item.id)}
                   className="text-red-500 hover:text-red-700"
                 >
                   <Trash2 className="h-5 w-5" />
@@ -156,7 +142,7 @@ const PedidoAmostra = () => {
           <Button
             onClick={handleProceedToShipping}
             className="bg-primary hover:bg-primary-dark"
-            disabled={!selectedCountry || cartItems.length === 0}
+            disabled={!selectedCountry || items.length === 0}
           >
             Prosseguir para Envio
           </Button>
