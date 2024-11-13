@@ -16,7 +16,8 @@ import { formatCurrency } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useShippingCalculation } from "@/hooks/useShippingCalculation";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+// Initialize Stripe with the public key
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
 
 const CheckoutForm = ({ clientSecret, total }: { clientSecret: string; total: number }) => {
   const stripe = useStripe();
