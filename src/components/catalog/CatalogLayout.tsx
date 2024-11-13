@@ -6,6 +6,7 @@ import ProductGrid from "@/components/ProductGrid";
 import CatalogPagination from "./CatalogPagination";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/components/ui/use-toast";
 
 interface CatalogLayoutProps {
   products: Product[];
@@ -18,6 +19,7 @@ const ITEMS_PER_PAGE = 12;
 
 const CatalogLayout = ({ products, isLoading, onRequestSample, onSelectProduct }: CatalogLayoutProps) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const { toast } = useToast();
 
   const totalPages = Math.ceil((products?.length || 0) / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;

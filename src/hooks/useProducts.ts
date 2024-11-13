@@ -17,5 +17,11 @@ export const useProducts = () => {
 
       return data as Product[];
     },
+    // Cache the data for 24 hours
+    staleTime: 1000 * 60 * 60 * 24,
+    // Keep the data in cache even when window is unfocused
+    refetchOnWindowFocus: false,
+    // Don't refetch on component mount if we have data
+    refetchOnMount: false,
   });
 };
