@@ -21,7 +21,14 @@ serve(async (req) => {
         enabled: true,
       },
       shipping: shipping_amount ? {
-        amount: shipping_amount,
+        shipping_rate_data: {
+          fixed_amount: {
+            amount: shipping_amount,
+            currency,
+          },
+          display_name: 'Frete',
+          type: 'fixed_amount',
+        },
       } : undefined,
     })
 
