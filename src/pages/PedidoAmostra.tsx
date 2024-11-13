@@ -40,9 +40,11 @@ const PedidoAmostra = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="max-w-4xl mx-auto px-4 space-y-8">
       <div className="flex items-center gap-4 mb-8">
-        <ProductSearch />
+        <div className="flex-1 max-w-xl">
+          <ProductSearch />
+        </div>
         <Button className="bg-primary hover:bg-primary-dark text-white whitespace-nowrap">
           Adicionar Produto
         </Button>
@@ -50,15 +52,15 @@ const PedidoAmostra = () => {
 
       <div className="space-y-4 mb-8">
         {items.map((item) => (
-          <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
-            <div className="flex items-center gap-4">
-              <img src={item.image_url || '/placeholder.svg'} alt={item.name} className="w-16 h-16 object-contain" />
+          <div key={item.id} className="flex items-center justify-between p-6 border rounded-lg bg-white shadow-sm">
+            <div className="flex items-center gap-6">
+              <img src={item.image_url || '/placeholder.svg'} alt={item.name} className="w-20 h-20 object-contain bg-gray-50 rounded p-2" />
               <div>
                 <h3 className="font-semibold text-gray-900">{item.name}</h3>
                 <p className="text-sm text-gray-600">${item.from_price.toFixed(2)} por unidade</p>
               </div>
             </div>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-8">
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
@@ -92,7 +94,7 @@ const PedidoAmostra = () => {
         ))}
       </div>
 
-      <div className="flex justify-between items-start mb-8">
+      <div className="flex justify-between items-start gap-8">
         <div className="w-72">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             País de envio
@@ -108,7 +110,7 @@ const PedidoAmostra = () => {
             </SelectContent>
           </Select>
         </div>
-        <div className="w-72 space-y-2">
+        <div className="w-72 space-y-3 bg-white p-6 rounded-lg shadow-sm">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Subtotal:</span>
             <span className="font-semibold text-gray-900">${calculateSubtotal().toFixed(2)}</span>
@@ -117,7 +119,7 @@ const PedidoAmostra = () => {
             <span className="text-gray-600">Frete:</span>
             <span className="font-semibold text-gray-900">${getShippingCost().toFixed(2)}</span>
           </div>
-          <div className="border-t pt-2 mt-2">
+          <div className="border-t pt-3 mt-3">
             <div className="flex justify-between">
               <span className="font-semibold text-gray-900">Total:</span>
               <span className="font-semibold text-gray-900">${calculateTotal().toFixed(2)}</span>
@@ -126,10 +128,10 @@ const PedidoAmostra = () => {
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end mt-8">
         <Button
           onClick={handleProceedToShipping}
-          className="bg-primary hover:bg-primary-dark text-white"
+          className="bg-primary hover:bg-primary-dark text-white px-8"
           disabled={!selectedCountry || items.length === 0}
         >
           Prosseguir para Envio
