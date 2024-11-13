@@ -109,12 +109,6 @@ const Payment = () => {
   useEffect(() => {
     const createPaymentIntent = async () => {
       try {
-        console.log('Creating payment intent with:', {
-          subtotal,
-          shippingCost,
-          total: total
-        });
-
         const { data, error } = await supabase.functions.invoke('create-payment-intent', {
           body: { 
             amount: Math.round(total * 100),

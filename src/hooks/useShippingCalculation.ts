@@ -31,14 +31,10 @@ export const useShippingCalculation = (country: string, totalItems: number) => {
 
       let shippingCost = applicableRate.base_rate;
 
-      if (
-        applicableRate.additional_rate_per_item &&
-        applicableRate.max_items &&
-        totalItems > applicableRate.max_items
-      ) {
-        const additionalItems = totalItems - applicableRate.max_items;
-        shippingCost +=
-          additionalItems * applicableRate.additional_rate_per_item;
+      // Calculate additional cost for items above max_items
+      if (applicableRate.additional_rate_per_item && totalItems > applicableRate.min_items) {
+        const additionalItems = totalItems - applicableRate.min_items;
+        shippingCost += additionalItems * applicableRate.additional_rate_per_item;
       }
 
       return shippingCost;

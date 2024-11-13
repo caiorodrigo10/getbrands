@@ -16,7 +16,7 @@ serve(async (req) => {
       automatic_payment_methods: {
         enabled: true,
       },
-      shipping: shipping_amount ? {
+      shipping: {
         name: 'Frete padrão',
         address: {
           line1: "Endereço de entrega",
@@ -25,7 +25,8 @@ serve(async (req) => {
           postal_code: "00000-000",
           country: 'BR',
         },
-      } : undefined,
+        amount: shipping_amount,
+      },
     })
 
     return new Response(
