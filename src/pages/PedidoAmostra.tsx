@@ -11,7 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 const PedidoAmostra = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [selectedCountry, setSelectedCountry] = useState("USA");
+  const [selectedCountry] = useState("USA");
   const { items, updateQuantity, removeItem } = useCart();
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -20,14 +20,6 @@ const PedidoAmostra = () => {
     selectedCountry,
     totalItems
   );
-
-  if (isError) {
-    toast({
-      variant: "destructive",
-      title: "Error",
-      description: "Failed to calculate shipping cost. Please try again.",
-    });
-  }
 
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
     updateQuantity(itemId, Math.max(1, newQuantity));
@@ -107,15 +99,16 @@ const PedidoAmostra = () => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Shipping Country
           </label>
-          <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+          <Select value={selectedCountry} disabled>
             <SelectTrigger className="bg-white">
-              <SelectValue placeholder="Select country" />
+              <SelectValue>United States</SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="USA">United States</SelectItem>
             </SelectContent>
           </Select>
         </div>
+        
         <div className="w-64 space-y-3 bg-white p-4 rounded-lg shadow-sm">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Subtotal:</span>
