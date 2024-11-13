@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
-import type { Stripe } from "@stripe/stripe-js";
+import type { Stripe, StripeElementsOptions } from "@stripe/stripe-js";
 import { 
   Elements, 
   PaymentElement, 
@@ -85,7 +85,7 @@ const Payment = () => {
   const { items } = useCart();
   const { toast } = useToast();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [selectedCountry] = useState("BR"); // You might want to get this from a context or previous step
+  const [selectedCountry] = useState("BR");
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   
   const { data: shippingCost = 0 } = useShippingCalculation(
@@ -101,7 +101,7 @@ const Payment = () => {
       try {
         const { data, error } = await supabase.functions.invoke('create-payment-intent', {
           body: { 
-            amount: Math.round(total * 100), // Convert to cents
+            amount: Math.round(total * 100),
             currency: 'brl'
           },
         });
@@ -133,7 +133,7 @@ const Payment = () => {
     );
   }
 
-  const options = {
+  const options: StripeElementsOptions = {
     clientSecret,
     appearance: {
       theme: 'stripe',
