@@ -15,6 +15,7 @@ interface ProductCardProps {
 const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardProps) => {
   const navigate = useNavigate();
   const { addItem } = useCart();
+  const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleRequestSample = () => {
@@ -23,15 +24,20 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
     navigate("/pedido-amostra");
   };
 
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoaded(true);
+  };
+
   return (
     <Card className="bg-white border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200">
-      <div className="relative aspect-square">
+      <div className="relative aspect-square bg-gray-50">
         {!imageLoaded && (
           <div className="absolute inset-0 bg-gray-100 animate-pulse" />
         )}
         {product.is_new && (
           <Badge className="absolute top-4 right-4 z-10 bg-primary">
-            NOVO
+            NEW
           </Badge>
         )}
         {product.is_tiktok && (
@@ -40,12 +46,13 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
           </Badge>
         )}
         <img
-          src={product.image_url || '/placeholder.svg'}
+          src={imageError ? '/placeholder.svg' : (product.image_url || '/placeholder.svg')}
           alt={product.name}
           className={`w-full h-full object-contain p-4 transition-opacity duration-200 ${
             imageLoaded ? "opacity-100" : "opacity-0"
           }`}
           onLoad={() => setImageLoaded(true)}
+          onError={handleImageError}
           loading="lazy"
         />
       </div>
@@ -76,13 +83,13 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
             className="flex-1 text-primary hover:text-primary border-primary hover:bg-primary/10"
             onClick={handleRequestSample}
           >
-            Pedir Amostra
+            Request Sample
           </Button>
           <Button 
             className="flex-1 bg-primary hover:bg-primary-dark text-white"
             onClick={() => onSelectProduct(product.id)}
           >
-            Selecionar
+            Select
           </Button>
         </div>
       </div>
