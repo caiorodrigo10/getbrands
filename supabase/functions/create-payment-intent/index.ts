@@ -7,24 +7,24 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { amount, currency = 'brl' } = await req.json()
+    const { amount, currency = 'brl', shipping_amount } = await req.json()
 
-    // Create a PaymentIntent with the order amount and currency
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
       automatic_payment_methods: {
         enabled: true,
       },
+      shipping: shipping_amount ? {
+        amount: shipping_amount,
+      } : undefined,
     })
 
-    // Send publishable key and PaymentIntent details to client
     return new Response(
       JSON.stringify({ clientSecret: paymentIntent.client_secret }),
       { 

@@ -16,10 +16,9 @@ import { formatCurrency } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useShippingCalculation } from "@/hooks/useShippingCalculation";
 
-// Initialize Stripe with the public key
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
 
-const CheckoutForm = ({ clientSecret, total }: { clientSecret: string; total: number }) => {
+const CheckoutForm = ({ clientSecret, total, shippingCost }: { clientSecret: string; total: number; shippingCost: number }) => {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -41,6 +40,9 @@ const CheckoutForm = ({ clientSecret, total }: { clientSecret: string; total: nu
         elements,
         confirmParams: {
           return_url: `${window.location.origin}/checkout/success`,
+          shipping: {
+            amount: Math.round(shippingCost * 100),
+          },
         },
       });
 
@@ -100,10 +102,17 @@ const Payment = () => {
   useEffect(() => {
     const createPaymentIntent = async () => {
       try {
+        console.log('Creating payment intent with:', {
+          subtotal,
+          shippingCost,
+          total: total
+        });
+
         const { data, error } = await supabase.functions.invoke('create-payment-intent', {
           body: { 
-            amount: Math.round(total * 100), // Incluindo o frete no valor total
-            currency: 'brl'
+            amount: Math.round(total * 100),
+            currency: 'brl',
+            shipping_amount: Math.round(shippingCost * 100)
           },
         });
 
@@ -121,10 +130,10 @@ const Payment = () => {
       }
     };
 
-    if (total > 0 && !isLoadingShipping) {
+    if (total > 0 && !isLoadingShipping && shippingCost !== undefined) {
       createPaymentIntent();
     }
-  }, [total, toast, isLoadingShipping]);
+  }, [total, toast, isLoadingShipping, shippingCost, subtotal]);
 
   if (!clientSecret || isLoadingShipping) {
     return (
@@ -166,7 +175,11 @@ const Payment = () => {
             </div>
           </div>
           <Elements stripe={stripePromise} options={options}>
-            <CheckoutForm clientSecret={clientSecret} total={total} />
+            <CheckoutForm 
+              clientSecret={clientSecret} 
+              total={total} 
+              shippingCost={shippingCost}
+            />
           </Elements>
         </CardContent>
       </Card>
