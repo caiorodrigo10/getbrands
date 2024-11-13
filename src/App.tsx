@@ -21,7 +21,7 @@ const App = () => (
       <BrowserRouter>
         <div className="flex">
           <Sidebar />
-          <main className="ml-64 flex-1 bg-gray-50 min-h-screen">
+          <main className="ml-64 flex-1 bg-gray-950 min-h-screen">
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/perfil" element={<Perfil />} />
