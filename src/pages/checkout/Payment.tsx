@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { loadStripe } from "@stripe/stripe-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { formatCurrency } from "@/lib/utils";
-import { loadStripe } from "@stripe/stripe-js";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+const stripePromise = loadStripe("pk_test_51QKiKUALHp5HR9166VeZiOJ6scDCMG23Zj82rMJjmB960htXAzAlh8hX5gfUDwrCraxiCftRorhs2MLpLbG4YNej00sMWFLqA3");
 
 const Payment = () => {
   const navigate = useNavigate();

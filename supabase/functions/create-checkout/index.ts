@@ -1,15 +1,24 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { stripe } from "../_shared/stripe.ts"
-import { corsHeaders } from "../_shared/cors.ts"
+import Stripe from "https://esm.sh/stripe@12.4.0?target=deno"
+
+const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') as string, {
+  apiVersion: '2023-10-16',
+  httpClient: Stripe.createFetchHttpClient(),
+});
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 serve(async (req) => {
-  // Handle CORS
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { items, success_url, cancel_url } = await req.json()
+    const { items, success_url, cancel_url } = await req.json();
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -25,19 +34,25 @@ serve(async (req) => {
         quantity: item.quantity,
       })),
       mode: 'payment',
-      success_url: `${success_url}?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url,
-    })
+      success_url: success_url,
+      cancel_url: cancel_url,
+    });
 
     return new Response(
       JSON.stringify({ sessionId: session.id }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      },
+    );
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      },
+    );
   }
-})
+});
