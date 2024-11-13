@@ -14,7 +14,6 @@ import Projetos from "./pages/Projetos";
 import Catalogo from "./pages/Catalogo";
 import Produtos from "./pages/Produtos";
 import Documentos from "./pages/Documentos";
-import PedidoAmostra from "./pages/PedidoAmostra";
 import Checkout from "./pages/checkout/Checkout";
 import Error404 from "./pages/Error404";
 import Success from "./pages/checkout/Success";
@@ -93,13 +92,6 @@ const App = () => (
                 <ProtectedRoute>
                   <AppLayout>
                     <Documentos />
-                  </AppLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="/pedido-amostra" element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <PedidoAmostra />
                   </AppLayout>
                 </ProtectedRoute>
               } />
