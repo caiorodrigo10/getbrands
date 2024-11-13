@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { formatCurrency } from "@/lib/utils";
 
-type OrderStatus = "all" | "new" | "accepted" | "completed" | "canceled";
+type OrderStatus = "all" | "pending" | "completed" | "canceled";
 
 const SampleOrders = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,10 +63,8 @@ const SampleOrders = () => {
         return "bg-green-100 text-green-800";
       case "canceled":
         return "bg-red-100 text-red-800";
-      case "new":
-        return "bg-blue-100 text-blue-800";
-      case "accepted":
-        return "bg-purple-100 text-purple-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -88,22 +86,22 @@ const SampleOrders = () => {
             All
           </Button>
           <Button
-            variant={selectedStatus === "new" ? "default" : "outline"}
-            onClick={() => setSelectedStatus("new")}
+            variant={selectedStatus === "pending" ? "default" : "outline"}
+            onClick={() => setSelectedStatus("pending")}
           >
-            New
-          </Button>
-          <Button
-            variant={selectedStatus === "accepted" ? "default" : "outline"}
-            onClick={() => setSelectedStatus("accepted")}
-          >
-            Accepted
+            Pending
           </Button>
           <Button
             variant={selectedStatus === "completed" ? "default" : "outline"}
             onClick={() => setSelectedStatus("completed")}
           >
             Completed
+          </Button>
+          <Button
+            variant={selectedStatus === "canceled" ? "default" : "outline"}
+            onClick={() => setSelectedStatus("canceled")}
+          >
+            Canceled
           </Button>
           <div className="flex items-center gap-2 ml-4">
             <Switch
@@ -134,6 +132,7 @@ const SampleOrders = () => {
               <TableHead>Order Number</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Shipped To</TableHead>
+              <TableHead>Tracking #</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Total</TableHead>
               <TableHead className="w-12"></TableHead>
@@ -164,6 +163,9 @@ const SampleOrders = () => {
                 </TableCell>
                 <TableCell>{order.shipping_city}</TableCell>
                 <TableCell>
+                  {order.tracking_number || "-"}
+                </TableCell>
+                <TableCell>
                   <Badge className={getStatusColor(order.status)}>
                     {order.status.toUpperCase()}
                   </Badge>
@@ -180,8 +182,12 @@ const SampleOrders = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem>View Details</DropdownMenuItem>
-                      <DropdownMenuItem>Track Shipment</DropdownMenuItem>
-                      <DropdownMenuItem>Cancel Order</DropdownMenuItem>
+                      {order.tracking_number && (
+                        <DropdownMenuItem>Track Shipment</DropdownMenuItem>
+                      )}
+                      {order.status === "pending" && (
+                        <DropdownMenuItem>Cancel Order</DropdownMenuItem>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
