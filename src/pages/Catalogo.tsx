@@ -8,19 +8,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import ProductCard from "@/components/ProductCard";
-
-interface Product {
-  id: number;
-  category: string;
-  name: string;
-  image: string;
-  fromPrice: number;
-  srp: number;
-  profit: number;
-  isNew?: boolean;
-  isTiktok?: boolean;
-}
+import ProductGrid from "@/components/ProductGrid";
+import { Product } from "@/types/product";
 
 const products: Product[] = [
   {
@@ -136,17 +125,8 @@ const products: Product[] = [
   },
 ];
 
-// Update all other products to use these 3 images in rotation
-products.forEach((product, index) => {
-  if (index > 2) {
-    product.image = products[index % 3].image;
-  }
-});
-
 const Catalogo = () => {
-  const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
-  const productsPerPage = 12;
 
   const handleRequestSample = (productId: number) => {
     toast({
@@ -163,42 +143,39 @@ const Catalogo = () => {
   };
 
   return (
-    <div className="p-8 bg-gray-950 min-h-screen">
+    <div className="p-8 bg-white min-h-screen">
       <header className="mb-8">
-        <h1 className="text-4xl font-bold text-white mb-2">Catálogo de Produtos</h1>
-        <p className="text-gray-400">Explore nossa seleção de produtos e selecione os ideais para seu projeto</p>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">Catálogo de Produtos</h1>
+        <p className="text-gray-600">Explore nossa seleção de produtos e selecione os ideais para seu projeto</p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            onRequestSample={handleRequestSample}
-            onSelectProduct={handleSelectProduct}
-          />
-        ))}
-      </div>
+      <ProductGrid 
+        products={products}
+        onRequestSample={handleRequestSample}
+        onSelectProduct={handleSelectProduct}
+      />
 
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious href="#" />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#" isActive className="text-primary">1</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">2</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">3</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext href="#" />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <div className="mt-8">
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious href="#" />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink href="#" isActive className="text-primary">1</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink href="#">2</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink href="#">3</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext href="#" />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
     </div>
   );
 };

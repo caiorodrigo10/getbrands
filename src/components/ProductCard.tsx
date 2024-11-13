@@ -1,26 +1,17 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Product } from "@/types/product";
 
 interface ProductCardProps {
-  product: {
-    id: number;
-    category: string;
-    name: string;
-    image: string;
-    fromPrice: number;
-    srp: number;
-    profit: number;
-    isNew?: boolean;
-    isTiktok?: boolean;
-  };
+  product: Product;
   onRequestSample: (id: number) => void;
   onSelectProduct: (id: number) => void;
 }
 
 const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardProps) => {
   return (
-    <Card className="bg-white border-gray-200 overflow-hidden">
+    <Card className="bg-gray-50 border-gray-200 overflow-hidden">
       <div className="relative aspect-square">
         {product.isNew && (
           <Badge className="absolute top-4 right-4 z-10 bg-primary">
@@ -40,7 +31,7 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
       </div>
       <div className="p-4">
         <div className="text-sm text-gray-600 mb-2">{product.category}</div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">{product.name}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 min-h-[3.5rem] line-clamp-2">{product.name}</h3>
         
         <div className="grid grid-cols-3 gap-2 mb-4">
           <div>
