@@ -37,6 +37,6 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
       };
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    keepPreviousData: true, // Keep previous page data while loading next page
+    gcTime: 1000 * 60 * 5,
   });
 };
