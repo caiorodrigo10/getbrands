@@ -22,8 +22,8 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#363636",
-        foreground: "#FFFFFF",
+        background: "#FFFFFF",
+        foreground: "#333333",
         primary: {
           DEFAULT: "#b012ff",
           light: "#c44aff",
@@ -35,16 +35,16 @@ export default {
           foreground: "#999999",
         },
         muted: {
-          DEFAULT: "#999999",
-          foreground: "#FFFFFF",
+          DEFAULT: "#666666",
+          foreground: "#333333",
         },
         accent: {
           DEFAULT: "#b012ff",
           foreground: "#FFFFFF",
         },
         card: {
-          DEFAULT: "#2A2F3F",
-          foreground: "#FFFFFF",
+          DEFAULT: "#FFFFFF",
+          foreground: "#333333",
         },
       },
       fontFamily: {

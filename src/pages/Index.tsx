@@ -13,7 +13,7 @@ const Index = () => {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card className="p-5 bg-secondary/50 hover:bg-secondary/60 transition-colors duration-200">
+        <Card className="p-5 bg-white hover:bg-gray-50 transition-colors duration-200 border border-gray-100">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-primary/10 rounded-lg">
               <ChartBar className="w-5 h-5 text-primary" />
@@ -23,7 +23,7 @@ const Index = () => {
           <ProjectProgress progress={65} />
         </Card>
 
-        <Card className="p-5 bg-secondary/50 hover:bg-secondary/60 transition-colors duration-200">
+        <Card className="p-5 bg-white hover:bg-gray-50 transition-colors duration-200 border border-gray-100">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-primary/10 rounded-lg">
               <Clock className="w-5 h-5 text-primary" />
@@ -34,7 +34,7 @@ const Index = () => {
           <p className="text-xs text-muted">Restantes</p>
         </Card>
 
-        <Card className="p-5 bg-secondary/50 hover:bg-secondary/60 transition-colors duration-200">
+        <Card className="p-5 bg-white hover:bg-gray-50 transition-colors duration-200 border border-gray-100">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-primary/10 rounded-lg">
               <FileText className="w-5 h-5 text-primary" />
@@ -48,13 +48,13 @@ const Index = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2">
-          <Card className="p-5 bg-secondary/50">
+          <Card className="p-5 bg-white border border-gray-100">
             <h2 className="text-lg font-medium text-foreground mb-4">Etapas do Projeto</h2>
             <StagesTimeline />
           </Card>
         </div>
         <div>
-          <Card className="p-5 bg-secondary/50">
+          <Card className="p-5 bg-white border border-gray-100">
             <h2 className="text-lg font-medium text-foreground mb-4">Documentos Recentes</h2>
             <RecentDocuments />
           </Card>

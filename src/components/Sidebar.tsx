@@ -13,7 +13,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-secondary p-6 text-secondary-foreground flex flex-col shadow-xl">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-secondary p-6 flex flex-col shadow-xl">
       <div className="mb-8">
         <h1 className="text-2xl font-heading font-bold text-primary">Mainer</h1>
       </div>
@@ -26,7 +26,7 @@ const Sidebar = () => {
                 className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition-all duration-200 hover:bg-primary/10 hover:text-primary ${
                   location.pathname === item.path
                     ? "bg-primary/20 text-primary font-medium"
-                    : "text-muted"
+                    : "text-secondary-foreground"
                 }`}
               >
                 <item.icon className="h-5 w-5" />
@@ -36,7 +36,7 @@ const Sidebar = () => {
           ))}
         </ul>
       </nav>
-      <div className="mt-auto pt-6 border-t border-muted/20">
+      <div className="mt-auto pt-6 border-t border-white/10">
         <UserMenu />
       </div>
     </aside>
