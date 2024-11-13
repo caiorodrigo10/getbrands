@@ -41,7 +41,7 @@ const PedidoAmostra = () => {
   };
 
   return (
-    <div className="p-8 bg-white min-h-screen">
+    <div className="p-8 bg-white text-gray-900 min-h-screen">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Pedido de amostras</h1>
         
@@ -55,14 +55,14 @@ const PedidoAmostra = () => {
               className="pl-10 bg-white border-gray-200"
             />
           </div>
-          <Button className="bg-primary hover:bg-primary-dark">
+          <Button className="bg-primary hover:bg-primary-dark text-white">
             Adicionar Produto
           </Button>
         </div>
 
         <div className="space-y-4 mb-8">
           {items.map((item) => (
-            <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg">
+            <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
               <div className="flex items-center gap-4">
                 <img src={item.image} alt={item.name} className="w-16 h-16 object-contain" />
                 <div>
@@ -79,7 +79,7 @@ const PedidoAmostra = () => {
                   >
                     <Minus className="h-4 w-4" />
                   </Button>
-                  <span className="w-12 text-center">{item.quantity}</span>
+                  <span className="w-12 text-center text-gray-900">{item.quantity}</span>
                   <Button
                     variant="outline"
                     size="icon"
@@ -123,16 +123,16 @@ const PedidoAmostra = () => {
           <div className="w-72 space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Subtotal:</span>
-              <span className="font-semibold">${calculateSubtotal().toFixed(2)}</span>
+              <span className="font-semibold text-gray-900">${calculateSubtotal().toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Frete:</span>
-              <span className="font-semibold">${getShippingCost().toFixed(2)}</span>
+              <span className="font-semibold text-gray-900">${getShippingCost().toFixed(2)}</span>
             </div>
             <div className="border-t pt-2 mt-2">
               <div className="flex justify-between">
-                <span className="font-semibold">Total:</span>
-                <span className="font-semibold">${calculateTotal().toFixed(2)}</span>
+                <span className="font-semibold text-gray-900">Total:</span>
+                <span className="font-semibold text-gray-900">${calculateTotal().toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -141,7 +141,7 @@ const PedidoAmostra = () => {
         <div className="flex justify-end">
           <Button
             onClick={handleProceedToShipping}
-            className="bg-primary hover:bg-primary-dark"
+            className="bg-primary hover:bg-primary-dark text-white"
             disabled={!selectedCountry || items.length === 0}
           >
             Prosseguir para Envio
