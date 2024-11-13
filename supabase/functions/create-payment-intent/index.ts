@@ -10,23 +10,24 @@ serve(async (req) => {
   try {
     const { amount, currency = 'usd', shipping_amount } = await req.json()
 
+    console.log('Creating payment intent with:', { amount, currency, shipping_amount })
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
       automatic_payment_methods: {
         enabled: true,
       },
-      shipping: {
-        name: 'Standard Shipping',
-        address: {
-          line1: "Shipping Address",
-          city: "City",
-          state: "State",
-          postal_code: "00000",
-          country: 'US',
+      shipping_options: [{
+        shipping_rate_data: {
+          type: 'fixed_amount',
+          fixed_amount: {
+            amount: shipping_amount,
+            currency,
+          },
+          display_name: 'Standard Shipping',
         },
-        amount: shipping_amount,
-      },
+      }],
     })
 
     return new Response(
@@ -37,6 +38,7 @@ serve(async (req) => {
       },
     )
   } catch (error) {
+    console.error('Error creating payment intent:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       {
