@@ -36,7 +36,7 @@ const PedidoAmostra = () => {
 
   const handleProceedToShipping = () => {
     if (selectedCountry && items.length > 0) {
-      navigate("/pedido-amostra/envio");
+      navigate("/checkout/review");
     }
   };
 
