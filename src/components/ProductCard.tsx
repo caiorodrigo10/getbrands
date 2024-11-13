@@ -5,6 +5,7 @@ import { Product } from "@/types/product";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ProductCardProps {
   product: Product;
@@ -15,13 +16,22 @@ interface ProductCardProps {
 const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardProps) => {
   const navigate = useNavigate();
   const { addItem } = useCart();
+  const { toast } = useToast();
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  const handleRequestSample = () => {
-    addItem(product);
-    onRequestSample(product.id);
-    navigate("/pedido-amostra");
+  const handleRequestSample = async () => {
+    try {
+      await addItem(product);
+      onRequestSample(product.id);
+      navigate("/pedido-amostra");
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao adicionar produto",
+        description: "Não foi possível adicionar o produto ao carrinho. Tente novamente.",
+      });
+    }
   };
 
   const handleImageError = () => {
@@ -29,7 +39,6 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
     setImageLoaded(true);
   };
 
-  // Calculate profit as SRP - From Price
   const profit = product.srp - product.from_price;
 
   return (

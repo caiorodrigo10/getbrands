@@ -48,7 +48,6 @@ export const useCartOperations = (user: User | null) => {
       setItems(formattedItems);
     } catch (error) {
       console.error('Error loading cart items:', error);
-      // Only show error toast if user is authenticated
       if (user?.id) {
         toast({
           variant: "destructive",
@@ -68,7 +67,7 @@ export const useCartOperations = (user: User | null) => {
         title: "Erro",
         description: "Você precisa estar logado para adicionar itens ao carrinho.",
       });
-      return;
+      throw new Error("User not authenticated");
     }
 
     try {
@@ -105,6 +104,7 @@ export const useCartOperations = (user: User | null) => {
         title: "Erro ao adicionar item",
         description: "Não foi possível adicionar o item ao carrinho. Tente novamente mais tarde.",
       });
+      throw error;
     }
   };
 
