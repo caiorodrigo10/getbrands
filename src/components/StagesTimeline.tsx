@@ -13,20 +13,26 @@ const StagesTimeline = () => {
   return (
     <div className="space-y-4">
       {stages.map((stage, index) => (
-        <div key={stage.name} className="flex items-start gap-4">
-          <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border-2">
+        <div key={stage.name} className="flex items-start gap-3">
+          <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center border ${
+            stage.status === "completed" 
+              ? "border-primary bg-primary/10" 
+              : stage.status === "in-progress"
+              ? "border-primary-light bg-primary-light/10"
+              : "border-muted bg-muted/10"
+          }`}>
             {stage.status === "completed" ? (
-              <Check className="w-4 h-4 text-primary" />
+              <Check className="w-3.5 h-3.5 text-primary" />
             ) : stage.status === "in-progress" ? (
-              <Clock className="w-4 h-4 text-primary-light" />
+              <Clock className="w-3.5 h-3.5 text-primary-light" />
             ) : (
-              <div className="w-2 h-2 bg-gray-300 rounded-full" />
+              <div className="w-1.5 h-1.5 bg-muted rounded-full" />
             )}
           </div>
           <div className="flex-grow">
             <div className="flex justify-between items-center">
-              <h3 className="font-semibold text-gray-900">{stage.name}</h3>
-              <span className="text-sm text-gray-500">{stage.date}</span>
+              <h3 className="text-sm font-medium text-foreground">{stage.name}</h3>
+              <span className="text-xs text-muted-foreground">{stage.date}</span>
             </div>
             <div className="mt-1">
               <div
@@ -35,7 +41,7 @@ const StagesTimeline = () => {
                     ? "bg-primary"
                     : stage.status === "in-progress"
                     ? "bg-primary-light"
-                    : "bg-gray-200"
+                    : "bg-muted"
                 }`}
               />
             </div>

@@ -13,13 +13,13 @@ const ProjectProgress = ({ progress }: ProjectProgressProps) => {
 
   return (
     <div>
-      <p className="text-3xl font-bold text-primary mb-1">{progress}%</p>
+      <p className="text-2xl font-bold text-primary mb-1">{progress}%</p>
       <div className="flex justify-between mb-2">
-        <span className="text-sm text-gray-400">Progresso Total</span>
+        <span className="text-xs text-muted-foreground">Progresso Total</span>
       </div>
-      <div className="h-2 w-full bg-gray-800 rounded-full overflow-hidden">
+      <div className="h-1.5 w-full bg-background rounded-full overflow-hidden">
         <div
-          className="h-full bg-primary-light transition-all duration-1000 ease-out rounded-full"
+          className="h-full bg-primary transition-all duration-1000 ease-out rounded-full"
           style={{ width: mounted ? `${progress}%` : '0%' }}
         />
       </div>
