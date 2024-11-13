@@ -5,6 +5,17 @@ import { Search, Trash2, Plus, Minus } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
+import { useProducts } from "@/hooks/useProducts";
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 
 const SHIPPING_RATES = {
   US: 10,
@@ -15,8 +26,9 @@ const SHIPPING_RATES = {
 const PedidoAmostra = () => {
   const navigate = useNavigate();
   const [selectedCountry, setSelectedCountry] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [open, setOpen] = useState(false);
   const { items, updateQuantity, removeItem } = useCart();
+  const { data: products = [] } = useProducts();
 
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
     updateQuantity(itemId, Math.max(1, newQuantity));
@@ -47,13 +59,47 @@ const PedidoAmostra = () => {
         
         <div className="flex items-center gap-4 mb-8">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Encontre seus produtos..."
-              className="pl-10 bg-white border-gray-200"
-            />
+            <Command className="relative border rounded-lg">
+              <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
+                <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                <input
+                  placeholder="Encontre seus produtos..."
+                  className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                  onFocus={() => setOpen(true)}
+                />
+              </div>
+              {open && (
+                <div className="absolute mt-2 top-full left-0 right-0 rounded-md border bg-popover text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95">
+                  <CommandList>
+                    <CommandEmpty>Nenhum produto encontrado.</CommandEmpty>
+                    <CommandGroup heading="Produtos">
+                      {products.map((product) => (
+                        <CommandItem
+                          key={product.id}
+                          onSelect={() => {
+                            setOpen(false);
+                            navigate(`/produtos/${product.id}`);
+                          }}
+                          className="flex items-center gap-2 p-2 cursor-pointer hover:bg-accent"
+                        >
+                          <img
+                            src={product.image_url || '/placeholder.svg'}
+                            alt={product.name}
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <div>
+                            <p className="font-medium">{product.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              ${product.from_price.toFixed(2)}
+                            </p>
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </div>
+              )}
+            </Command>
           </div>
           <Button className="bg-primary hover:bg-primary-dark text-white">
             Adicionar Produto
