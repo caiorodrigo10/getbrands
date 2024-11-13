@@ -15,7 +15,7 @@ export const ContactFields = ({ form }: ContactFieldsProps) => {
         name="zipCode"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>CEP</FormLabel>
+            <FormLabel>ZIP Code</FormLabel>
             <FormControl>
               <Input placeholder="12345" {...field} />
             </FormControl>
@@ -28,7 +28,7 @@ export const ContactFields = ({ form }: ContactFieldsProps) => {
         name="phone"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Telefone</FormLabel>
+            <FormLabel>Phone</FormLabel>
             <FormControl>
               <Input placeholder="(555) 123-4567" {...field} />
             </FormControl>

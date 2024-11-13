@@ -21,24 +21,24 @@ const Payment = () => {
   return (
     <div className="space-y-8">
       <div className="bg-white p-6 rounded-lg shadow-sm">
-        <h2 className="text-xl font-semibold mb-6">Pagamento</h2>
+        <h2 className="text-xl font-semibold mb-6">Payment</h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <RadioGroup defaultValue="card">
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="card" id="card" />
-              <Label htmlFor="card">Cartão de Crédito</Label>
+              <Label htmlFor="card">Credit Card</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="pix" id="pix" />
-              <Label htmlFor="pix">PIX</Label>
+              <RadioGroupItem value="paypal" id="paypal" />
+              <Label htmlFor="paypal">PayPal</Label>
             </div>
           </RadioGroup>
 
           <Card>
             <CardHeader>
-              <CardTitle>Resumo do Pedido</CardTitle>
-              <CardDescription>Revise os valores antes de finalizar</CardDescription>
+              <CardTitle>Order Summary</CardTitle>
+              <CardDescription>Review your order details</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
@@ -47,8 +47,8 @@ const Payment = () => {
                   <span>{formatCurrency(total)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Frete</span>
-                  <span>Grátis</span>
+                  <span>Shipping</span>
+                  <span>Free</span>
                 </div>
               </div>
             </CardContent>
@@ -60,7 +60,7 @@ const Payment = () => {
 
           <div className="flex justify-end pt-6">
             <Button type="submit" className="w-full md:w-auto">
-              Finalizar Pedido
+              Complete Order
             </Button>
           </div>
         </form>

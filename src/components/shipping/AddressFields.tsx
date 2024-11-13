@@ -9,7 +9,7 @@ interface AddressFieldsProps {
 }
 
 export const AddressFields = ({ form }: AddressFieldsProps) => {
-  const estados = [
+  const states = [
     "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
     "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
     "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
@@ -24,7 +24,7 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
         name="address1"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Endereço Linha 1</FormLabel>
+            <FormLabel>Address Line 1</FormLabel>
             <FormControl>
               <Input placeholder="123 Main St" {...field} />
             </FormControl>
@@ -38,7 +38,7 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
         name="address2"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Endereço Linha 2 (opcional)</FormLabel>
+            <FormLabel>Address Line 2 (optional)</FormLabel>
             <FormControl>
               <Input placeholder="Apt 4B" {...field} />
             </FormControl>
@@ -53,7 +53,7 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
           name="city"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Cidade</FormLabel>
+              <FormLabel>City</FormLabel>
               <FormControl>
                 <Input placeholder="New York" {...field} />
               </FormControl>
@@ -66,17 +66,17 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
           name="state"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Estado</FormLabel>
+              <FormLabel>State</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione o estado" />
+                    <SelectValue placeholder="Select state" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {estados.map((estado) => (
-                    <SelectItem key={estado} value={estado}>
-                      {estado}
+                  {states.map((state) => (
+                    <SelectItem key={state} value={state}>
+                      {state}
                     </SelectItem>
                   ))}
                 </SelectContent>

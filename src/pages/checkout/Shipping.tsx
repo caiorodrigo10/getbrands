@@ -10,14 +10,14 @@ import { ContactFields } from "@/components/shipping/ContactFields";
 import type { ShippingFormData } from "@/types/shipping";
 
 const formSchema = z.object({
-  firstName: z.string().min(2, "Nome muito curto"),
-  lastName: z.string().min(2, "Sobrenome muito curto"),
-  address1: z.string().min(5, "Endereço muito curto"),
+  firstName: z.string().min(2, "First name is too short"),
+  lastName: z.string().min(2, "Last name is too short"),
+  address1: z.string().min(5, "Address is too short"),
   address2: z.string().optional(),
-  city: z.string().min(2, "Cidade muito curta"),
-  state: z.string().min(2, "Estado inválido"),
-  zipCode: z.string().min(5, "CEP inválido"),
-  phone: z.string().min(10, "Telefone inválido"),
+  city: z.string().min(2, "City is too short"),
+  state: z.string().min(2, "Invalid state"),
+  zipCode: z.string().min(5, "Invalid ZIP code"),
+  phone: z.string().min(10, "Invalid phone number"),
 });
 
 const Shipping = () => {
@@ -44,7 +44,7 @@ const Shipping = () => {
   return (
     <div className="space-y-8">
       <div className="bg-white p-6 rounded-lg shadow-sm">
-        <h2 className="text-xl font-semibold mb-6">Informações de Envio</h2>
+        <h2 className="text-xl font-semibold mb-6">Shipping Information</h2>
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -57,7 +57,7 @@ const Shipping = () => {
                 type="submit"
                 className="w-full md:w-auto"
               >
-                Continuar para pagamento
+                Continue to Payment
               </Button>
             </div>
           </form>
