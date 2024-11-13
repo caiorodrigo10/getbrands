@@ -134,7 +134,6 @@ const SampleOrders = () => {
               <TableHead>Order Number</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Shipped To</TableHead>
-              <TableHead>Tracking #</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Total</TableHead>
               <TableHead className="w-12"></TableHead>
@@ -164,9 +163,6 @@ const SampleOrders = () => {
                   })}
                 </TableCell>
                 <TableCell>{order.shipping_city}</TableCell>
-                <TableCell>
-                  {order.tracking_number || "-"}
-                </TableCell>
                 <TableCell>
                   <Badge className={getStatusColor(order.status)}>
                     {order.status.toUpperCase()}
