@@ -1,11 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-}
+import { User } from "@supabase/supabase-js";
 
 interface AuthContextType {
   user: User | null;
@@ -24,10 +18,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Simulate API call
     const mockUser = {
       id: "1",
-      name: "John Doe",
       email: email,
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
-    };
+      app_metadata: {},
+      user_metadata: {},
+      aud: "authenticated",
+      created_at: new Date().toISOString(),
+    } as User;
+    
     setUser(mockUser);
     localStorage.setItem("user", JSON.stringify(mockUser));
   };
