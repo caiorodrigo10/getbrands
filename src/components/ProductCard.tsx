@@ -29,6 +29,9 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
     setImageLoaded(true);
   };
 
+  // Calculate profit as SRP - From Price
+  const profit = product.srp - product.from_price;
+
   return (
     <Card className="bg-white border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200">
       <div className="relative aspect-square bg-gray-50">
@@ -73,7 +76,7 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
           </div>
           <div>
             <p className="text-sm text-gray-600">Profit</p>
-            <p className="font-semibold text-green-600">${(product.profit || 0).toFixed(2)}</p>
+            <p className="font-semibold text-green-600">${profit.toFixed(2)}</p>
           </div>
         </div>
 

@@ -6,7 +6,6 @@ export interface Product {
   image_url: string | null;
   from_price: number;
   srp: number;
-  profit: number | null;
   is_new: boolean | null;
   is_tiktok: boolean | null;
   created_at: string;

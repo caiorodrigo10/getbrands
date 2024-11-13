@@ -58,7 +58,6 @@ export type Database = {
           is_new: boolean | null
           is_tiktok: boolean | null
           name: string
-          profit: number | null
           srp: number
           updated_at: string
         }
@@ -72,7 +71,6 @@ export type Database = {
           is_new?: boolean | null
           is_tiktok?: boolean | null
           name: string
-          profit?: number | null
           srp: number
           updated_at?: string
         }
@@ -86,7 +84,6 @@ export type Database = {
           is_new?: boolean | null
           is_tiktok?: boolean | null
           name?: string
-          profit?: number | null
           srp?: number
           updated_at?: string
         }
