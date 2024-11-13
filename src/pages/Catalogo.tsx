@@ -4,7 +4,15 @@ import { useProducts } from "@/hooks/useProducts";
 
 const Catalogo = () => {
   const { toast } = useToast();
-  const { data: products, isLoading } = useProducts();
+  const { data: products, isLoading, error } = useProducts();
+
+  if (error) {
+    toast({
+      variant: "destructive",
+      title: "Erro ao carregar produtos",
+      description: "Não foi possível carregar os produtos. Tente novamente mais tarde.",
+    });
+  }
 
   const handleRequestSample = (productId: string) => {
     toast({

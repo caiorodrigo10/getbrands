@@ -11,7 +11,10 @@ export const useProducts = () => {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        throw new Error(error.message);
+      }
+
       return data as Product[];
     },
   });
