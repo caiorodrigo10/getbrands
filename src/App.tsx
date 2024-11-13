@@ -14,11 +14,9 @@ import Documentos from "./pages/Documentos";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+  <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
         <div className="flex">
           <Sidebar />
           <main className="ml-48 flex-1 bg-gray-950 min-h-screen">
@@ -32,9 +30,11 @@ const App = () => (
             </Routes>
           </main>
         </div>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+        <Toaster />
+        <Sonner />
+      </TooltipProvider>
+    </QueryClientProvider>
+  </BrowserRouter>
 );
 
 export default App;
