@@ -71,6 +71,22 @@ export const useCartOperations = (user: User | null) => {
     }
 
     try {
+      // First, check if the user profile exists
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError || !profile) {
+        toast({
+          variant: "destructive",
+          title: "Erro de perfil",
+          description: "Seu perfil não foi encontrado. Por favor, faça login novamente.",
+        });
+        throw new Error("User profile not found");
+      }
+
       const { error } = await supabase
         .from('cart_items')
         .insert({
