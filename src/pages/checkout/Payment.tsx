@@ -95,7 +95,7 @@ const Payment = () => {
   const { items } = useCart();
   const { toast } = useToast();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [selectedCountry] = useState("BR");
+  const [selectedCountry] = useState("USA");
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   
   const { data: shippingCost = 0, isLoading: isLoadingShipping } = useShippingCalculation(
@@ -112,7 +112,7 @@ const Payment = () => {
         const { data, error } = await supabase.functions.invoke('create-payment-intent', {
           body: { 
             amount: Math.round(total * 100),
-            currency: 'brl',
+            currency: 'usd',
             shipping_amount: Math.round(shippingCost * 100)
           },
         });

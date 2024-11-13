@@ -8,7 +8,7 @@ serve(async (req) => {
   }
 
   try {
-    const { amount, currency = 'brl', shipping_amount } = await req.json()
+    const { amount, currency = 'usd', shipping_amount } = await req.json()
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
@@ -17,13 +17,13 @@ serve(async (req) => {
         enabled: true,
       },
       shipping: {
-        name: 'Frete padrão',
+        name: 'Standard Shipping',
         address: {
-          line1: "Endereço de entrega",
-          city: "Cidade",
-          state: "Estado",
-          postal_code: "00000-000",
-          country: 'BR',
+          line1: "Shipping Address",
+          city: "City",
+          state: "State",
+          postal_code: "00000",
+          country: 'US',
         },
         amount: shipping_amount,
       },

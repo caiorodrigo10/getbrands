@@ -11,7 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 const PedidoAmostra = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState("USA");
   const { items, updateQuantity, removeItem } = useCart();
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -105,16 +105,14 @@ const PedidoAmostra = () => {
       <div className="flex justify-between items-start gap-6">
         <div className="w-64">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            País de envio
+            Shipping Country
           </label>
           <Select value={selectedCountry} onValueChange={setSelectedCountry}>
             <SelectTrigger className="bg-white">
-              <SelectValue placeholder="Selecione o país" />
+              <SelectValue placeholder="Select country" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="USA">Estados Unidos</SelectItem>
-              <SelectItem value="BR">Brasil</SelectItem>
-              <SelectItem value="CA">Canadá</SelectItem>
+              <SelectItem value="USA">United States</SelectItem>
             </SelectContent>
           </Select>
         </div>
