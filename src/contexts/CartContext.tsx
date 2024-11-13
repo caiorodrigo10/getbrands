@@ -26,12 +26,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (user) {
+    if (user?.id) {
       loadCartItems();
+    } else {
+      setItems([]);
+      setIsLoading(false);
     }
   }, [user]);
 
   const loadCartItems = async () => {
+    if (!user?.id) return;
+    
     try {
       setIsLoading(true);
       const { data: cartItems, error } = await supabase
@@ -52,14 +57,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
             updated_at
           )
         `)
-        .eq('user_id', user?.id);
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
-      const formattedItems = cartItems.map((item) => ({
+      const formattedItems = cartItems?.map((item) => ({
         ...item.products,
         quantity: 1
-      }));
+      })) || [];
 
       setItems(formattedItems);
     } catch (error) {
