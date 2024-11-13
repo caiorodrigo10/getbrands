@@ -16,27 +16,66 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
 
+  // Initialize the session on mount
+  useEffect(() => {
+    // Set session data if it exists in localStorage
+    const savedSession = localStorage.getItem("sb-session");
+    if (savedSession) {
+      const session = JSON.parse(savedSession);
+      if (session?.user) {
+        setUser(session.user);
+      }
+    }
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUser(session.user);
+        localStorage.setItem("sb-session", JSON.stringify(session));
+      }
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setUser(session.user);
+        localStorage.setItem("sb-session", JSON.stringify(session));
+      } else {
+        setUser(null);
+        localStorage.removeItem("sb-session");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const login = async (email: string, password: string) => {
     try {
-      // Try to sign in first since we know the user exists
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
+        options: {
+          persistSession: true // Ensure session persistence
+        }
       });
 
       if (signInError) {
-        // If sign in fails, try to sign up
         if (signInError.message.includes('Invalid login credentials')) {
           const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email,
             password,
+            options: {
+              persistSession: true // Ensure session persistence
+            }
           });
 
           if (signUpError) throw signUpError;
           if (!signUpData.user) throw new Error('No user returned after sign up');
           
           setUser(signUpData.user);
-          localStorage.setItem("user", JSON.stringify(signUpData.user));
+          localStorage.setItem("sb-session", JSON.stringify(signUpData.session));
           
           toast({
             title: "Success",
@@ -50,7 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (!signInData.user) throw new Error('No user returned after sign in');
 
       setUser(signInData.user);
-      localStorage.setItem("user", JSON.stringify(signInData.user));
+      localStorage.setItem("sb-session", JSON.stringify(signInData.session));
 
       toast({
         title: "Success",
@@ -71,7 +110,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await supabase.auth.signOut();
       setUser(null);
-      localStorage.removeItem("user");
+      localStorage.removeItem("sb-session");
     } catch (error) {
       console.error('Logout error:', error);
       toast({
@@ -81,31 +120,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
     }
   };
-
-  useEffect(() => {
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setUser(session.user);
-        localStorage.setItem("user", JSON.stringify(session.user));
-      }
-    });
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        setUser(session.user);
-        localStorage.setItem("user", JSON.stringify(session.user));
-      } else {
-        setUser(null);
-        localStorage.removeItem("user");
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   return (
     <AuthContext.Provider
