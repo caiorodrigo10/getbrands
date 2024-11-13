@@ -15,7 +15,7 @@ const ProjectProgress = ({ progress }: ProjectProgressProps) => {
     <div>
       <p className="text-2xl font-bold text-primary mb-1">{progress}%</p>
       <div className="flex justify-between mb-2">
-        <span className="text-xs text-muted-foreground">Progresso Total</span>
+        <span className="text-xs text-muted">Progresso Total</span>
       </div>
       <div className="h-1.5 w-full bg-background rounded-full overflow-hidden">
         <div

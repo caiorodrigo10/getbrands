@@ -32,7 +32,7 @@ const StagesTimeline = () => {
           <div className="flex-grow">
             <div className="flex justify-between items-center">
               <h3 className="text-sm font-medium text-foreground">{stage.name}</h3>
-              <span className="text-xs text-muted-foreground">{stage.date}</span>
+              <span className="text-xs text-muted">{stage.date}</span>
             </div>
             <div className="mt-1">
               <div
