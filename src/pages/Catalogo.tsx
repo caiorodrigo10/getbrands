@@ -4,6 +4,15 @@ import CatalogHeader from "@/components/CatalogHeader";
 import CatalogFilters from "@/components/CatalogFilters";
 import FeaturedSlider from "@/components/FeaturedSlider";
 import { Product } from "@/types/product";
+import { useState } from "react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 const products: Product[] = [
   {
@@ -119,8 +128,11 @@ const products: Product[] = [
   },
 ];
 
+const ITEMS_PER_PAGE = 12;
+
 const Catalogo = () => {
   const { toast } = useToast();
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleRequestSample = (productId: number) => {
     toast({
@@ -136,16 +148,53 @@ const Catalogo = () => {
     });
   };
 
+  // Calculate pagination
+  const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedProducts = products.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
   return (
     <div className="p-8 bg-white min-h-screen">
       <CatalogHeader />
       <CatalogFilters />
       <FeaturedSlider />
       <ProductGrid 
-        products={products}
+        products={paginatedProducts}
         onRequestSample={handleRequestSample}
         onSelectProduct={handleSelectProduct}
       />
+      
+      <div className="mt-8">
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious 
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+            
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <PaginationItem key={page}>
+                <PaginationLink
+                  onClick={() => setCurrentPage(page)}
+                  isActive={currentPage === page}
+                  className="cursor-pointer"
+                >
+                  {page}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            <PaginationItem>
+              <PaginationNext 
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
     </div>
   );
 };
