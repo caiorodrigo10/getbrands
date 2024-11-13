@@ -9,8 +9,8 @@ import { useState } from "react";
 interface CatalogLayoutProps {
   products: Product[];
   isLoading: boolean;
-  onRequestSample: (id: number) => void;
-  onSelectProduct: (id: number) => void;
+  onRequestSample: (id: string) => void;
+  onSelectProduct: (id: string) => void;
 }
 
 const ITEMS_PER_PAGE = 12;

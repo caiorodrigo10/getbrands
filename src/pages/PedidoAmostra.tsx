@@ -18,12 +18,12 @@ const PedidoAmostra = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { items, updateQuantity, removeItem } = useCart();
 
-  const handleQuantityChange = (itemId: number, newQuantity: number) => {
+  const handleQuantityChange = (itemId: string, newQuantity: number) => {
     updateQuantity(itemId, Math.max(1, newQuantity));
   };
 
   const calculateSubtotal = () => {
-    return items.reduce((total, item) => total + (item.fromPrice * item.quantity), 0);
+    return items.reduce((total, item) => total + (item.from_price * item.quantity), 0);
   };
 
   const getShippingCost = () => {
@@ -64,10 +64,10 @@ const PedidoAmostra = () => {
           {items.map((item) => (
             <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
               <div className="flex items-center gap-4">
-                <img src={item.image} alt={item.name} className="w-16 h-16 object-contain" />
+                <img src={item.image_url || '/placeholder.svg'} alt={item.name} className="w-16 h-16 object-contain" />
                 <div>
                   <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                  <p className="text-sm text-gray-600">${item.fromPrice.toFixed(2)} por unidade</p>
+                  <p className="text-sm text-gray-600">${item.from_price.toFixed(2)} por unidade</p>
                 </div>
               </div>
               <div className="flex items-center gap-6">
@@ -89,7 +89,7 @@ const PedidoAmostra = () => {
                   </Button>
                 </div>
                 <p className="font-semibold text-gray-900 w-24 text-right">
-                  ${(item.fromPrice * item.quantity).toFixed(2)}
+                  ${(item.from_price * item.quantity).toFixed(2)}
                 </p>
                 <Button
                   variant="ghost"
