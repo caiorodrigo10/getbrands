@@ -4,12 +4,19 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Package, ArrowDown, MoreVertical, Truck } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
 
 interface OrderTableProps {
   orders: any[];
+  onOrdersChange?: () => void;
 }
 
-const OrderTable = ({ orders }: OrderTableProps) => {
+const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
+  const { toast } = useToast();
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case "completed":
@@ -20,6 +27,39 @@ const OrderTable = ({ orders }: OrderTableProps) => {
         return "bg-yellow-100 text-yellow-800";
       default:
         return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const handleCancelOrder = async (orderId: string) => {
+    if (isDeleting) return;
+
+    try {
+      setIsDeleting(true);
+      const { error } = await supabase
+        .from('sample_requests')
+        .update({ status: 'canceled' })
+        .eq('id', orderId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Order canceled successfully",
+      });
+
+      // Refresh orders list if callback provided
+      if (onOrdersChange) {
+        onOrdersChange();
+      }
+    } catch (error) {
+      console.error('Error canceling order:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to cancel order. Please try again.",
+      });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -94,7 +134,12 @@ const OrderTable = ({ orders }: OrderTableProps) => {
                       <DropdownMenuItem>Track Shipment</DropdownMenuItem>
                     )}
                     {order.status?.toLowerCase() === "pending" && (
-                      <DropdownMenuItem>Cancel Order</DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleCancelOrder(order.id)}
+                        disabled={isDeleting}
+                      >
+                        Cancel Order
+                      </DropdownMenuItem>
                     )}
                   </DropdownMenuContent>
                 </DropdownMenu>
