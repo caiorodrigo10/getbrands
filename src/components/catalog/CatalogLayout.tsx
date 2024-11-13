@@ -4,6 +4,7 @@ import CatalogFilters from "@/components/CatalogFilters";
 import FeaturedSlider from "@/components/FeaturedSlider";
 import ProductGrid from "@/components/ProductGrid";
 import CatalogPagination from "./CatalogPagination";
+import { CartButton } from "@/components/CartButton";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
@@ -33,6 +34,7 @@ const CatalogLayout = ({ products, isLoading, onRequestSample, onSelectProduct }
         <div className="w-full md:w-auto overflow-x-auto">
           <CatalogFilters />
         </div>
+        <CartButton />
       </div>
 
       <div>
