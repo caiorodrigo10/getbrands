@@ -7,7 +7,7 @@ import { User } from "@supabase/supabase-js";
 
 export const useCartOperations = (user: User | null) => {
   const [items, setItems] = useState<CartItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const loadCartItems = async () => {
@@ -48,11 +48,14 @@ export const useCartOperations = (user: User | null) => {
       setItems(formattedItems);
     } catch (error) {
       console.error('Error loading cart items:', error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao carregar carrinho",
-        description: "Não foi possível carregar seus itens. Tente novamente mais tarde.",
-      });
+      // Only show error toast if user is authenticated
+      if (user?.id) {
+        toast({
+          variant: "destructive",
+          title: "Erro ao carregar carrinho",
+          description: "Não foi possível carregar seus itens. Tente novamente mais tarde.",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
