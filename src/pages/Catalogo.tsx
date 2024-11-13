@@ -1,18 +1,8 @@
 import { useToast } from "@/components/ui/use-toast";
 import CatalogLayout from "@/components/catalog/CatalogLayout";
-import { useProducts } from "@/hooks/useProducts";
 
 const Catalogo = () => {
   const { toast } = useToast();
-  const { data: products, isLoading, error } = useProducts();
-
-  if (error) {
-    toast({
-      variant: "destructive",
-      title: "Erro ao carregar produtos",
-      description: "Não foi possível carregar os produtos. Tente novamente mais tarde.",
-    });
-  }
 
   const handleRequestSample = (productId: string) => {
     toast({
@@ -30,8 +20,6 @@ const Catalogo = () => {
 
   return (
     <CatalogLayout
-      products={products || []}
-      isLoading={isLoading}
       onRequestSample={handleRequestSample}
       onSelectProduct={handleSelectProduct}
     />

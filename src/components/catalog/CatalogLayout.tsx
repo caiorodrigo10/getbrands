@@ -8,23 +8,32 @@ import { CartButton } from "@/components/CartButton";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
+import { useProducts } from "@/hooks/useProducts";
 
 interface CatalogLayoutProps {
-  products: Product[];
-  isLoading: boolean;
   onRequestSample: (id: string) => void;
   onSelectProduct: (id: string) => void;
 }
 
-const ITEMS_PER_PAGE = 9; // Changed from 12 to 9
-
-const CatalogLayout = ({ products, isLoading, onRequestSample, onSelectProduct }: CatalogLayoutProps) => {
+const CatalogLayout = ({ onRequestSample, onSelectProduct }: CatalogLayoutProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
+  
+  const { 
+    data: productsData, 
+    isLoading,
+    error 
+  } = useProducts({ 
+    page: currentPage,
+  });
 
-  const totalPages = Math.ceil((products?.length || 0) / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedProducts = products?.slice(startIndex, startIndex + ITEMS_PER_PAGE) || [];
+  if (error) {
+    toast({
+      variant: "destructive",
+      title: "Erro ao carregar produtos",
+      description: "Ocorreu um erro ao carregar os produtos. Por favor, tente novamente.",
+    });
+  }
 
   return (
     <div className="space-y-8">
@@ -58,9 +67,9 @@ const CatalogLayout = ({ products, isLoading, onRequestSample, onSelectProduct }
               </div>
             ))}
           </div>
-        ) : products && products.length > 0 ? (
+        ) : productsData?.data && productsData.data.length > 0 ? (
           <ProductGrid
-            products={paginatedProducts}
+            products={productsData.data}
             onRequestSample={onRequestSample}
             onSelectProduct={onSelectProduct}
           />
@@ -70,11 +79,11 @@ const CatalogLayout = ({ products, isLoading, onRequestSample, onSelectProduct }
           </div>
         )}
         
-        {products && products.length > ITEMS_PER_PAGE && (
+        {productsData?.totalPages && productsData.totalPages > 1 && (
           <div className="mt-8 flex justify-center">
             <CatalogPagination
               currentPage={currentPage}
-              totalPages={totalPages}
+              totalPages={productsData.totalPages}
               onPageChange={setCurrentPage}
             />
           </div>

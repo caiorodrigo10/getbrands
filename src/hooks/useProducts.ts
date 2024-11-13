@@ -2,26 +2,41 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 
-export const useProducts = () => {
+interface UseProductsOptions {
+  page?: number;
+  limit?: number;
+}
+
+export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) => {
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
   return useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", { page, limit }],
     queryFn: async () => {
+      // First, get total count
+      const { count } = await supabase
+        .from("products")
+        .select("*", { count: "exact", head: true });
+
+      // Then get paginated data
       const { data, error } = await supabase
         .from("products")
         .select("*")
+        .range(from, to)
         .order("created_at", { ascending: false });
 
       if (error) {
         throw new Error(error.message);
       }
 
-      return data as Product[];
+      return {
+        data: data as Product[],
+        totalPages: Math.ceil((count || 0) / limit),
+        totalCount: count || 0,
+      };
     },
-    // Cache the data for 24 hours
-    staleTime: 1000 * 60 * 60 * 24,
-    // Keep the data in cache even when window is unfocused
-    refetchOnWindowFocus: false,
-    // Don't refetch on component mount if we have data
-    refetchOnMount: false,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    keepPreviousData: true, // Keep previous page data while loading next page
   });
 };
