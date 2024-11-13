@@ -55,20 +55,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
-        password,
-        options: {
-          persistSession: true // Ensure session persistence
-        }
+        password
       });
 
       if (signInError) {
         if (signInError.message.includes('Invalid login credentials')) {
           const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email,
-            password,
-            options: {
-              persistSession: true // Ensure session persistence
-            }
+            password
           });
 
           if (signUpError) throw signUpError;
