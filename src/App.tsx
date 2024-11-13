@@ -16,15 +16,13 @@ import Produtos from "./pages/Produtos";
 import Documentos from "./pages/Documentos";
 import PedidoAmostra from "./pages/PedidoAmostra";
 import Envio from "./pages/Envio";
+import Error404 from "./pages/Error404";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Default stale time of 24 hours
       staleTime: 1000 * 60 * 60 * 24,
-      // Don't refetch on window focus by default
       refetchOnWindowFocus: false,
-      // Don't refetch on mount if we have data
       refetchOnMount: false,
     },
   },
@@ -108,6 +106,13 @@ const App = () => (
                 <ProtectedRoute>
                   <AppLayout>
                     <Envio />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="*" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Error404 />
                   </AppLayout>
                 </ProtectedRoute>
               } />
