@@ -3,8 +3,8 @@ import { Product } from "@/types/product";
 
 interface ProductGridProps {
   products: Product[];
-  onRequestSample: (id: number) => void;
-  onSelectProduct: (id: number) => void;
+  onRequestSample: (id: string) => void;
+  onSelectProduct: (id: string) => void;
 }
 
 const ProductGrid = ({ products, onRequestSample, onSelectProduct }: ProductGridProps) => {

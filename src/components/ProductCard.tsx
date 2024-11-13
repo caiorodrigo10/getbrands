@@ -8,8 +8,8 @@ import { useState } from "react";
 
 interface ProductCardProps {
   product: Product;
-  onRequestSample: (id: number) => void;
-  onSelectProduct: (id: number) => void;
+  onRequestSample: (id: string) => void;
+  onSelectProduct: (id: string) => void;
 }
 
 const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardProps) => {
@@ -29,18 +29,18 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
         {!imageLoaded && (
           <div className="absolute inset-0 bg-gray-100 animate-pulse" />
         )}
-        {product.isNew && (
+        {product.is_new && (
           <Badge className="absolute top-4 right-4 z-10 bg-primary">
             NOVO
           </Badge>
         )}
-        {product.isTiktok && (
+        {product.is_tiktok && (
           <Badge className="absolute top-4 right-4 z-10 bg-pink-600">
             TIKTOK
           </Badge>
         )}
         <img
-          src={product.image}
+          src={product.image_url || '/placeholder.svg'}
           alt={product.name}
           className={`w-full h-full object-contain p-4 transition-opacity duration-200 ${
             imageLoaded ? "opacity-100" : "opacity-0"
@@ -58,7 +58,7 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
         <div className="grid grid-cols-3 gap-2 mb-4">
           <div>
             <p className="text-sm text-gray-600">From</p>
-            <p className="font-semibold text-gray-900">${product.fromPrice.toFixed(2)}</p>
+            <p className="font-semibold text-gray-900">${product.from_price.toFixed(2)}</p>
           </div>
           <div>
             <p className="text-sm text-gray-600">SRP</p>
@@ -66,7 +66,7 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
           </div>
           <div>
             <p className="text-sm text-gray-600">Profit</p>
-            <p className="font-semibold text-green-600">${product.profit.toFixed(2)}</p>
+            <p className="font-semibold text-green-600">${(product.profit || 0).toFixed(2)}</p>
           </div>
         </div>
 

@@ -1,11 +1,14 @@
 export interface Product {
-  id: number;
+  id: string;
   category: string;
   name: string;
-  image: string;
-  fromPrice: number;
+  description: string | null;
+  image_url: string | null;
+  from_price: number;
   srp: number;
-  profit: number;
-  isNew?: boolean;
-  isTiktok?: boolean;
+  profit: number | null;
+  is_new: boolean | null;
+  is_tiktok: boolean | null;
+  created_at: string;
+  updated_at: string;
 }

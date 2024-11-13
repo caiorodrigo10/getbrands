@@ -6,14 +6,14 @@ const Catalogo = () => {
   const { toast } = useToast();
   const { data: products, isLoading } = useProducts();
 
-  const handleRequestSample = (productId: number) => {
+  const handleRequestSample = (productId: string) => {
     toast({
       title: "Amostra Solicitada",
       description: "Sua solicitação de amostra foi registrada com sucesso.",
     });
   };
 
-  const handleSelectProduct = (productId: number) => {
+  const handleSelectProduct = (productId: string) => {
     toast({
       title: "Produto Selecionado",
       description: "Produto adicionado ao seu projeto.",
