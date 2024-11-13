@@ -18,38 +18,43 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      // First sign up the user with Supabase Auth
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      // Try to sign in first since we know the user exists
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (signUpError) {
-        // If signup fails because user exists, try to sign in
-        if (signUpError.message.includes('already registered')) {
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      if (signInError) {
+        // If sign in fails, try to sign up
+        if (signInError.message.includes('Invalid login credentials')) {
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email,
             password,
           });
 
-          if (signInError) throw signInError;
-          if (!signInData.user) throw new Error('No user returned after sign in');
+          if (signUpError) throw signUpError;
+          if (!signUpData.user) throw new Error('No user returned after sign up');
           
-          setUser(signInData.user);
-          localStorage.setItem("user", JSON.stringify(signInData.user));
+          setUser(signUpData.user);
+          localStorage.setItem("user", JSON.stringify(signUpData.user));
+          
+          toast({
+            title: "Success",
+            description: "Account created successfully. Please check your email for verification.",
+          });
           return;
         }
-        throw signUpError;
+        throw signInError;
       }
 
-      if (!signUpData.user) throw new Error('No user returned after sign up');
+      if (!signInData.user) throw new Error('No user returned after sign in');
 
-      setUser(signUpData.user);
-      localStorage.setItem("user", JSON.stringify(signUpData.user));
+      setUser(signInData.user);
+      localStorage.setItem("user", JSON.stringify(signInData.user));
 
       toast({
         title: "Success",
-        description: "Account created and logged in successfully.",
+        description: "Logged in successfully.",
       });
     } catch (error) {
       console.error('Login error:', error);
