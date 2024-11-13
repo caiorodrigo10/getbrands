@@ -25,7 +25,7 @@ const Projetos = () => {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 bg-gray-900 border-gray-800 p-6">
+        <Card className="lg:col-span-2 bg-gray-950 border-gray-800 p-6">
           <div className="flex justify-between items-start mb-6">
             <div>
               <h2 className="text-2xl font-bold text-white mb-2">Marca Própria - Beauty Care</h2>
@@ -44,11 +44,11 @@ const Projetos = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="p-4 bg-gray-800 rounded-lg">
+            <div className="p-4 bg-gray-900 rounded-lg">
               <p className="text-gray-400 text-sm mb-1">Data de Início</p>
               <p className="font-semibold">10 Mar 2024</p>
             </div>
-            <div className="p-4 bg-gray-800 rounded-lg">
+            <div className="p-4 bg-gray-900 rounded-lg">
               <p className="text-gray-400 text-sm mb-1">Previsão de Conclusão</p>
               <p className="font-semibold">25 Mai 2024</p>
             </div>
@@ -64,7 +64,7 @@ const Projetos = () => {
         </Card>
 
         <div className="space-y-6">
-          <Card className="bg-gray-900 border-gray-800 p-6">
+          <Card className="bg-gray-950 border-gray-800 p-6">
             <h3 className="text-lg font-semibold mb-4 text-white">Últimas Atualizações</h3>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
@@ -84,7 +84,7 @@ const Projetos = () => {
             </div>
           </Card>
 
-          <Card className="bg-gray-900 border-gray-800 p-6">
+          <Card className="bg-gray-950 border-gray-800 p-6">
             <h3 className="text-lg font-semibold mb-4 text-white">Próximos Passos</h3>
             <div className="space-y-4">
               <div className="flex items-center gap-3">
