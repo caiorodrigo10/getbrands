@@ -5,17 +5,29 @@ import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { ProductSearch } from "@/components/ProductSearch";
-
-const SHIPPING_RATES = {
-  US: 10,
-  BR: 15,
-  PT: 20,
-};
+import { useShippingCalculation } from "@/hooks/useShippingCalculation";
+import { useToast } from "@/components/ui/use-toast";
 
 const PedidoAmostra = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [selectedCountry, setSelectedCountry] = useState("");
   const { items, updateQuantity, removeItem } = useCart();
+
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  
+  const { data: shippingCost, isError } = useShippingCalculation(
+    selectedCountry,
+    totalItems
+  );
+
+  if (isError) {
+    toast({
+      variant: "destructive",
+      title: "Error",
+      description: "Failed to calculate shipping cost. Please try again.",
+    });
+  }
 
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
     updateQuantity(itemId, Math.max(1, newQuantity));
@@ -25,12 +37,8 @@ const PedidoAmostra = () => {
     return items.reduce((total, item) => total + (item.from_price * item.quantity), 0);
   };
 
-  const getShippingCost = () => {
-    return selectedCountry ? SHIPPING_RATES[selectedCountry as keyof typeof SHIPPING_RATES] || 0 : 0;
-  };
-
   const calculateTotal = () => {
-    return calculateSubtotal() + getShippingCost();
+    return calculateSubtotal() + (shippingCost || 0);
   };
 
   const handleProceedToShipping = () => {
@@ -104,9 +112,9 @@ const PedidoAmostra = () => {
               <SelectValue placeholder="Selecione o país" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="USA">Estados Unidos</SelectItem>
               <SelectItem value="BR">Brasil</SelectItem>
-              <SelectItem value="US">Estados Unidos</SelectItem>
-              <SelectItem value="PT">Portugal</SelectItem>
+              <SelectItem value="CA">Canadá</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -117,7 +125,7 @@ const PedidoAmostra = () => {
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Frete:</span>
-            <span className="font-semibold text-gray-900">${getShippingCost().toFixed(2)}</span>
+            <span className="font-semibold text-gray-900">${(shippingCost || 0).toFixed(2)}</span>
           </div>
           <div className="border-t pt-3 mt-3">
             <div className="flex justify-between">

@@ -247,6 +247,39 @@ export type Database = {
           },
         ]
       }
+      shipping_rates: {
+        Row: {
+          additional_rate_per_item: number | null
+          base_rate: number
+          country: string
+          created_at: string
+          id: string
+          max_items: number | null
+          min_items: number
+          updated_at: string
+        }
+        Insert: {
+          additional_rate_per_item?: number | null
+          base_rate: number
+          country: string
+          created_at?: string
+          id?: string
+          max_items?: number | null
+          min_items: number
+          updated_at?: string
+        }
+        Update: {
+          additional_rate_per_item?: number | null
+          base_rate?: number
+          country?: string
+          created_at?: string
+          id?: string
+          max_items?: number | null
+          min_items?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
