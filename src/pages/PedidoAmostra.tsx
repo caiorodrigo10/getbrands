@@ -56,7 +56,7 @@ const PedidoAmostra = () => {
             <div className="flex items-center gap-4">
               <img src={item.image_url || '/placeholder.svg'} alt={item.name} className="w-16 h-16 object-contain bg-gray-50 rounded p-2" />
               <div>
-                <h3 className="font-medium text-gray-900 text-sm">{item.name}</h3>
+                <h3 className="font-semibold text-gray-900">{item.name}</h3>
                 <p className="text-sm text-gray-600">${item.from_price.toFixed(2)} por unidade</p>
               </div>
             </div>
