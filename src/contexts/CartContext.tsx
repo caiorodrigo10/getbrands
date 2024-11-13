@@ -32,11 +32,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setItems([]);
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user?.id]); // Add user?.id as dependency to properly track auth state
 
   const loadCartItems = async () => {
-    if (!user?.id) return;
-    
+    if (!user?.id) {
+      setIsLoading(false);
+      return;
+    }
+
     try {
       setIsLoading(true);
       const { data: cartItems, error } = await supabase
@@ -80,7 +83,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const addItem = async (product: Product) => {
-    if (!user) return;
+    if (!user?.id) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Você precisa estar logado para adicionar itens ao carrinho.",
+      });
+      return;
+    }
 
     try {
       const { error } = await supabase
@@ -120,7 +130,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const removeItem = async (id: string) => {
-    if (!user) return;
+    if (!user?.id) return;
 
     try {
       const { error } = await supabase
@@ -155,7 +165,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const clearCart = async () => {
-    if (!user) return;
+    if (!user?.id) return;
 
     try {
       const { error } = await supabase
