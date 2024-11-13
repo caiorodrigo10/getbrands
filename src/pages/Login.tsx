@@ -37,7 +37,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="bg-[#292829] p-8 rounded-lg shadow-xl w-full max-w-md animate-scale-in">
+      <div className="bg-[#1a1a1a] p-8 rounded-lg shadow-xl w-full max-w-md animate-scale-in">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-primary mb-2">Mainer</h1>
           <p className="text-gray-300">Entre na sua conta</p>
@@ -49,7 +49,7 @@ const Login = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-gray-800/50 border-gray-700 text-gray-100"
+              className="bg-white border-gray-200 text-gray-900 placeholder:text-gray-500"
               required
             />
           </div>
@@ -59,7 +59,7 @@ const Login = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-gray-800/50 border-gray-700 text-gray-100"
+              className="bg-white border-gray-200 text-gray-900 placeholder:text-gray-500"
               required
             />
           </div>
