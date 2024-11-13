@@ -13,28 +13,30 @@ import Documentos from "./pages/Documentos";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <BrowserRouter>
+const App = () => {
+  return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <div className="flex">
-          <Sidebar />
-          <main className="ml-48 flex-1 bg-gray-950 min-h-screen">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/perfil" element={<Perfil />} />
-              <Route path="/projetos" element={<Projetos />} />
-              <Route path="/catalogo" element={<Catalogo />} />
-              <Route path="/produtos" element={<Produtos />} />
-              <Route path="/documentos" element={<Documentos />} />
-            </Routes>
-          </main>
-        </div>
-        <Toaster />
-        <Sonner />
-      </TooltipProvider>
+      <BrowserRouter>
+        <TooltipProvider>
+          <div className="flex">
+            <Sidebar />
+            <main className="ml-48 flex-1 bg-gray-950 min-h-screen">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/perfil" element={<Perfil />} />
+                <Route path="/projetos" element={<Projetos />} />
+                <Route path="/catalogo" element={<Catalogo />} />
+                <Route path="/produtos" element={<Produtos />} />
+                <Route path="/documentos" element={<Documentos />} />
+              </Routes>
+            </main>
+          </div>
+          <Toaster />
+          <Sonner />
+        </TooltipProvider>
+      </BrowserRouter>
     </QueryClientProvider>
-  </BrowserRouter>
-);
+  );
+};
 
 export default App;
