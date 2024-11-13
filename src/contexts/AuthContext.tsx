@@ -16,66 +16,90 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
 
-  // Simulated authentication - In a real app, this would connect to a backend
   const login = async (email: string, password: string) => {
     try {
-      // Simulate API call
-      const mockUser = {
-        id: "d7bed82c-0d74-4b4d-a6cd-0fb0bead6c2a", // Valid UUID format
-        email: email,
-        app_metadata: {},
-        user_metadata: {
-          name: email.split("@")[0],
-          avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
-        },
-        aud: "authenticated",
-        created_at: new Date().toISOString(),
-      } as User;
+      // First sign up the user with Supabase Auth
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
 
-      // Create or update profile in Supabase
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert({
-          id: mockUser.id,
-          email: mockUser.email,
-          name: mockUser.user_metadata.name,
-          avatar_url: mockUser.user_metadata.avatar_url,
-        })
-        .select()
-        .single();
+      if (signUpError) {
+        // If signup fails because user exists, try to sign in
+        if (signUpError.message.includes('already registered')) {
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
 
-      if (profileError) {
-        console.error('Error creating/updating profile:', profileError);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to create user profile. Please try again.",
-        });
-        return;
+          if (signInError) throw signInError;
+          if (!signInData.user) throw new Error('No user returned after sign in');
+          
+          setUser(signInData.user);
+          localStorage.setItem("user", JSON.stringify(signInData.user));
+          return;
+        }
+        throw signUpError;
       }
-      
-      setUser(mockUser);
-      localStorage.setItem("user", JSON.stringify(mockUser));
+
+      if (!signUpData.user) throw new Error('No user returned after sign up');
+
+      setUser(signUpData.user);
+      localStorage.setItem("user", JSON.stringify(signUpData.user));
+
+      toast({
+        title: "Success",
+        description: "Account created and logged in successfully.",
+      });
     } catch (error) {
       console.error('Login error:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to log in. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to log in. Please try again.",
+      });
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      localStorage.removeItem("user");
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to log out. Please try again.",
       });
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
-  };
-
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUser(session.user);
+        localStorage.setItem("user", JSON.stringify(session.user));
+      }
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        localStorage.setItem("user", JSON.stringify(session.user));
+      } else {
+        setUser(null);
+        localStorage.removeItem("user");
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   return (
