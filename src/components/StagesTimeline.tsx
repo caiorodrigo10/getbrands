@@ -25,7 +25,7 @@ const StagesTimeline = () => {
           </div>
           <div className="flex-grow">
             <div className="flex justify-between items-center">
-              <h3 className="font-semibold">{stage.name}</h3>
+              <h3 className="font-semibold text-gray-900">{stage.name}</h3>
               <span className="text-sm text-gray-500">{stage.date}</span>
             </div>
             <div className="mt-1">

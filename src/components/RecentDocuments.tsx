@@ -16,7 +16,7 @@ const RecentDocuments = () => {
         >
           <FileText className="w-5 h-5 text-primary" />
           <div className="flex-grow">
-            <h4 className="font-medium text-sm">{doc.name}</h4>
+            <h4 className="font-medium text-sm text-gray-900">{doc.name}</h4>
             <p className="text-xs text-gray-500">{doc.date}</p>
           </div>
           <span className="text-xs font-medium text-gray-400">{doc.type}</span>
