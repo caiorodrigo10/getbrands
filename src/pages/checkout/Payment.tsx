@@ -89,20 +89,20 @@ const Payment = () => {
   const [selectedCountry] = useState("BR");
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   
-  const { data: shippingCost = 0 } = useShippingCalculation(
+  const { data: shippingCost = 0, isLoading: isLoadingShipping } = useShippingCalculation(
     selectedCountry,
     totalItems
   );
 
   const subtotal = items.reduce((sum, item) => sum + item.from_price * item.quantity, 0);
-  const total = subtotal + shippingCost;
+  const total = subtotal + (shippingCost || 0);
 
   useEffect(() => {
     const createPaymentIntent = async () => {
       try {
         const { data, error } = await supabase.functions.invoke('create-payment-intent', {
           body: { 
-            amount: Math.round(total * 100),
+            amount: Math.round(total * 100), // Incluindo o frete no valor total
             currency: 'brl'
           },
         });
@@ -121,12 +121,12 @@ const Payment = () => {
       }
     };
 
-    if (total > 0) {
+    if (total > 0 && !isLoadingShipping) {
       createPaymentIntent();
     }
-  }, [total, toast]);
+  }, [total, toast, isLoadingShipping]);
 
-  if (!clientSecret) {
+  if (!clientSecret || isLoadingShipping) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
