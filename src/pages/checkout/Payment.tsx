@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
+import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
@@ -7,89 +8,116 @@ import { useCart } from "@/contexts/CartContext";
 import { formatCurrency } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 
-const stripePromise = loadStripe("pk_test_51QKiKUALHp5HR9166VeZiOJ6scDCMG23Zj82rMJjmB960htXAzAlh8hX5gfUDwrCraxiCftRorhs2MLpLbG4YNej00sMWFLqA3");
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
-const Payment = () => {
+const CheckoutForm = ({ clientSecret }: { clientSecret: string }) => {
+  const stripe = useStripe();
+  const elements = useElements();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { items, clearCart } = useCart();
+  const { clearCart } = useCart();
 
-  const total = items.reduce((sum, item) => sum + item.from_price * item.quantity, 0);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const handleCheckout = async () => {
-    try {
-      const stripe = await stripePromise;
-      if (!stripe) throw new Error("Stripe failed to load");
+    if (!stripe || !elements) {
+      return;
+    }
 
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          items,
-          success_url: `${window.location.origin}/checkout/success`,
-          cancel_url: `${window.location.origin}/checkout/payment`,
-        },
-      });
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `${window.location.origin}/checkout/success`,
+      },
+    });
 
-      if (error) throw new Error(error.message);
-      if (!data?.sessionId) throw new Error("No session ID returned");
-      
-      const { error: stripeError } = await stripe.redirectToCheckout({
-        sessionId: data.sessionId,
-      });
-
-      if (stripeError) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: stripeError.message,
-        });
-      }
-    } catch (error) {
-      console.error("Payment error:", error);
+    if (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "There was a problem processing your payment. Please try again.",
+        description: error.message || "An error occurred during payment.",
       });
+    } else {
+      clearCart();
+      navigate("/checkout/success");
     }
   };
 
   return (
-    <div className="space-y-8">
-      <div className="bg-white p-6 rounded-lg shadow-sm">
-        <h2 className="text-xl font-semibold mb-6">Payment</h2>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <PaymentElement />
+      <Button 
+        type="submit" 
+        disabled={!stripe} 
+        className="w-full"
+      >
+        Pay Now
+      </Button>
+    </form>
+  );
+};
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Order Summary</CardTitle>
-            <CardDescription>Review your order details</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Subtotal</span>
-                <span>{formatCurrency(total)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span>Shipping</span>
-                <span>Free</span>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-between font-semibold">
-            <span>Total</span>
-            <span>{formatCurrency(total)}</span>
-          </CardFooter>
-        </Card>
+const Payment = () => {
+  const { items } = useCart();
+  const { toast } = useToast();
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
-        <div className="flex justify-end pt-6">
-          <Button
-            onClick={handleCheckout}
-            className="w-full md:w-auto"
-          >
-            Proceed to Payment
-          </Button>
-        </div>
-      </div>
+  const total = items.reduce((sum, item) => sum + item.from_price * item.quantity, 0);
+
+  useEffect(() => {
+    const createPaymentIntent = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('create-payment-intent', {
+          body: { amount: total * 100 }, // Convert to cents
+        });
+
+        if (error) throw error;
+        if (!data?.clientSecret) throw new Error("No client secret returned");
+
+        setClientSecret(data.clientSecret);
+      } catch (error) {
+        console.error('Payment error:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "There was a problem setting up the payment. Please try again.",
+        });
+      }
+    };
+
+    if (total > 0) {
+      createPaymentIntent();
+    }
+  }, [total, toast]);
+
+  if (!clientSecret) {
+    return <div>Loading...</div>;
+  }
+
+  const options = {
+    clientSecret,
+    appearance: {
+      theme: 'stripe',
+    },
+  };
+
+  return (
+    <div className="max-w-md mx-auto p-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Complete Your Payment</CardTitle>
+          <CardDescription>Enter your payment details below</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Elements stripe={stripePromise} options={options}>
+            <CheckoutForm clientSecret={clientSecret} />
+          </Elements>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <span>Total</span>
+          <span className="font-semibold">{formatCurrency(total)}</span>
+        </CardFooter>
+      </Card>
     </div>
   );
 };
