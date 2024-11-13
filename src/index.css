@@ -29,7 +29,7 @@
   }
 
   body {
-    @apply bg-gray-50 font-inter;
+    @apply bg-gray-950 font-inter text-white;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -37,10 +37,14 @@
   }
 }
 
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+}
+
 .progress-bar {
   position: relative;
   height: 8px;
-  background: #e0e0e0;
+  background: theme('colors.gray.800');
   border-radius: 4px;
   overflow: hidden;
 }
@@ -51,11 +55,7 @@
   top: 0;
   left: 0;
   height: 100%;
-  background: theme('colors.primary.DEFAULT');
+  background: theme('colors.primary.light');
   border-radius: 4px;
   animation: progress-fill 1.5s ease-out forwards;
-}
-
-.card-hover {
-  @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
 }

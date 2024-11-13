@@ -14,11 +14,14 @@ const ProjectProgress = ({ progress }: ProjectProgressProps) => {
   return (
     <div>
       <div className="flex justify-between mb-2">
-        <span className="text-sm text-gray-600">Progresso Total</span>
-        <span className="text-sm font-semibold">{progress}%</span>
+        <span className="text-sm text-gray-400">Progresso Total</span>
+        <span className="text-sm font-semibold text-white">{progress}%</span>
       </div>
-      <div className="progress-bar" style={{ "--progress-width": `${progress}%` } as any}>
-        <div className="progress-value" />
+      <div className="h-2 w-full bg-gray-800 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-primary-light transition-all duration-1000 ease-out rounded-full"
+          style={{ width: mounted ? `${progress}%` : '0%' }}
+        />
       </div>
     </div>
   );
