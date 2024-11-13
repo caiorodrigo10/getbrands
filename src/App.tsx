@@ -21,121 +21,93 @@ const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
-  }
+  if (!isAuthenticated) return <Navigate to="/login" />;
   return <>{children}</>;
 };
 
-const AppLayout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div className="flex">
-      <Sidebar />
-      <main className="ml-48 flex-1 bg-gray-950 min-h-screen p-6">
+const AppLayout = ({ children }: { children: React.ReactNode }) => (
+  <div className="flex min-h-screen bg-background">
+    <Sidebar />
+    <main className="flex-1 ml-64 p-8 animate-fade-in">
+      <div className="max-w-7xl mx-auto">
         {children}
-      </main>
-    </div>
-  );
-};
+      </div>
+    </main>
+  </div>
+);
 
-const App = () => {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <CartProvider>
-          <BrowserRouter>
-            <TooltipProvider>
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route
-                  path="/"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <Index />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/perfil"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <Perfil />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/projetos"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <Projetos />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/catalogo"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <Catalogo />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/produtos"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <Produtos />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/documentos"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <Documentos />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/pedido-amostra"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <PedidoAmostra />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/envio"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <Envio />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-              </Routes>
-              <Toaster />
-              <Sonner />
-            </TooltipProvider>
-          </BrowserRouter>
-        </CartProvider>
-      </AuthProvider>
-    </QueryClientProvider>
-  );
-};
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <CartProvider>
+        <BrowserRouter>
+          <TooltipProvider>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Index />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/perfil" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Perfil />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/projetos" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Projetos />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/catalogo" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Catalogo />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/produtos" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Produtos />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/documentos" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Documentos />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/pedido-amostra" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <PedidoAmostra />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/envio" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Envio />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+            </Routes>
+            <Toaster />
+            <Sonner />
+          </TooltipProvider>
+        </BrowserRouter>
+      </CartProvider>
+    </AuthProvider>
+  </QueryClientProvider>
+);
 
 export default App;

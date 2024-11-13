@@ -13,9 +13,9 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-48 bg-gray-900 p-4 text-white flex flex-col">
-      <div className="mb-8 px-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-primary">Mainer</h1>
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-secondary p-6 text-white flex flex-col shadow-xl">
+      <div className="mb-8">
+        <h1 className="text-2xl font-heading font-bold text-primary">Mainer</h1>
       </div>
       <nav className="flex-1">
         <ul className="space-y-2">
@@ -23,20 +23,20 @@ const Sidebar = () => {
             <li key={item.path}>
               <Link
                 to={item.path}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-gray-800 hover:text-primary ${
+                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition-all duration-200 hover:bg-primary/10 hover:text-primary ${
                   location.pathname === item.path
-                    ? "bg-gray-800 text-primary"
+                    ? "bg-primary/20 text-primary font-medium"
                     : "text-gray-400"
                 }`}
               >
-                <item.icon className="h-4 w-4" />
-                <span>{item.label}</span>
+                <item.icon className="h-5 w-5" />
+                <span className="font-medium">{item.label}</span>
               </Link>
             </li>
           ))}
         </ul>
       </nav>
-      <div className="mt-auto pt-4 border-t border-gray-800">
+      <div className="mt-auto pt-6 border-t border-muted">
         <UserMenu />
       </div>
     </aside>

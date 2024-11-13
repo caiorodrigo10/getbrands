@@ -6,65 +6,78 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+
+  html {
+    @apply antialiased;
   }
 
   body {
-    @apply bg-gray-950 text-gray-200;
+    @apply bg-background text-foreground font-sans;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-montserrat text-gray-100;
+    @apply font-heading font-bold text-foreground;
   }
 
-  /* Add default text colors for common elements */
-  .text-default {
-    @apply text-gray-900 dark:text-gray-100;
-  }
-
-  .bg-default {
-    @apply bg-white dark:bg-gray-950;
-  }
+  h1 { @apply text-4xl mb-6; }
+  h2 { @apply text-3xl mb-4; }
+  h3 { @apply text-2xl mb-3; }
+  h4 { @apply text-xl mb-2; }
 }
 
-.card-hover {
-  @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+@layer components {
+  .card {
+    @apply bg-card rounded-lg border border-border/50 shadow-sm transition-all duration-200;
+  }
+
+  .card-hover {
+    @apply hover:border-primary/50 hover:shadow-md hover:-translate-y-0.5;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+  }
+
+  .input-field {
+    @apply flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50;
+  }
 }
 
 .progress-bar {
-  position: relative;
-  height: 8px;
-  background: theme('colors.gray.800');
-  border-radius: 4px;
-  overflow: hidden;
+  @apply relative h-2 w-full overflow-hidden rounded-full bg-secondary;
 }
 
 .progress-bar::after {
   content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background: theme('colors.primary.light');
-  border-radius: 4px;
+  @apply absolute top-0 left-0 h-full bg-primary rounded-full transition-all duration-500;
   animation: progress-fill 1.5s ease-out forwards;
+}
+
+@keyframes progress-fill {
+  from { width: 0; }
+  to { width: var(--progress-width, 0%); }
 }
