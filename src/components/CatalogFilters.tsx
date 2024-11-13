@@ -10,7 +10,7 @@ const CatalogFilters = () => {
   return (
     <div className="flex gap-4 mb-8">
       <Select>
-        <SelectTrigger className="w-[200px] bg-gray-50">
+        <SelectTrigger className="w-[200px] bg-gray-50 text-gray-400 [&>svg]:text-gray-400">
           <SelectValue placeholder="Category" />
         </SelectTrigger>
         <SelectContent>
@@ -21,7 +21,7 @@ const CatalogFilters = () => {
       </Select>
 
       <Select>
-        <SelectTrigger className="w-[200px] bg-gray-50">
+        <SelectTrigger className="w-[200px] bg-gray-50 text-gray-400 [&>svg]:text-gray-400">
           <SelectValue placeholder="Type" />
         </SelectTrigger>
         <SelectContent>
@@ -32,7 +32,7 @@ const CatalogFilters = () => {
       </Select>
 
       <Select>
-        <SelectTrigger className="w-[200px] bg-gray-50">
+        <SelectTrigger className="w-[200px] bg-gray-50 text-gray-400 [&>svg]:text-gray-400">
           <SelectValue placeholder="Audience" />
         </SelectTrigger>
         <SelectContent>
@@ -43,7 +43,7 @@ const CatalogFilters = () => {
       </Select>
 
       <Select>
-        <SelectTrigger className="w-[200px] bg-gray-50">
+        <SelectTrigger className="w-[200px] bg-gray-50 text-gray-400 [&>svg]:text-gray-400">
           <SelectValue placeholder="Purpose" />
         </SelectTrigger>
         <SelectContent>
@@ -54,7 +54,7 @@ const CatalogFilters = () => {
       </Select>
 
       <Select>
-        <SelectTrigger className="w-[200px] bg-gray-50">
+        <SelectTrigger className="w-[200px] bg-gray-50 text-gray-400 [&>svg]:text-gray-400">
           <SelectValue placeholder="Dietary & Lifestyle" />
         </SelectTrigger>
         <SelectContent>
