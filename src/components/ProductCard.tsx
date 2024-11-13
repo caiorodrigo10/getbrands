@@ -94,7 +94,7 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
         <img
           src={imageError ? '/placeholder.svg' : (product.image_url || '/placeholder.svg')}
           alt={product.name}
-          className={`w-full h-full object-contain p-4 transition-opacity duration-200 ${
+          className={`w-full h-full object-cover p-4 transition-opacity duration-200 ${
             imageLoaded ? "opacity-100" : "opacity-0"
           }`}
           onLoad={() => setImageLoaded(true)}
