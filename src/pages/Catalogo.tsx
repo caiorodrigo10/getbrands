@@ -29,7 +29,7 @@ const products: Product[] = [
     id: 1,
     category: "Proteins & Blends",
     name: "Advanced 100% Whey Protein Isolate (Chocolate)",
-    image: "/placeholder.svg",
+    image: "https://app.supliful.com/_next/image?url=https%3A%2F%2Fsupliful.s3.amazonaws.com%2Fproducts%2Fimages%2F20240726103115-jtp7adwc-advanced-100--whey-protein-isolate-chocolate.png&w=768&q=75",
     fromPrice: 29.90,
     srp: 49.90,
     profit: 20.00,
@@ -37,9 +37,9 @@ const products: Product[] = [
   },
   {
     id: 2,
-    category: "Proteins & Blends",
-    name: "Advanced 100% Whey Protein Isolate (Vanilla)",
-    image: "/placeholder.svg",
+    category: "Energy & Performance",
+    name: "Alpha Energy Pre-Workout",
+    image: "https://app.supliful.com/_next/image?url=https%3A%2F%2Fsupliful.s3.amazonaws.com%2Fproducts%2Fimages%2F20240710184044-vox4test-alpha-energy.png&w=768&q=75",
     fromPrice: 29.90,
     srp: 49.90,
     profit: 20.00,
@@ -47,9 +47,9 @@ const products: Product[] = [
   },
   {
     id: 3,
-    category: "Personal Care and Beauty",
-    name: "Aloe & Cool Cucumber Soap",
-    image: "/placeholder.svg",
+    category: "Vitamins & Supplements",
+    name: "5-HTP Mood Support",
+    image: "https://app.supliful.com/_next/image?url=https%3A%2F%2Fsupliful.s3.amazonaws.com%2Fproducts%2Fimages%2F20240618170201-vox45htp-5-htp.png&w=768&q=75",
     fromPrice: 8.25,
     srp: 14.99,
     profit: 6.74,
@@ -199,14 +199,14 @@ const Catalogo = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-400">Profit</p>
-                  <p className="font-semibold text-primary">${product.profit.toFixed(2)}</p>
+                  <p className="font-semibold text-green-500">${product.profit.toFixed(2)}</p>
                 </div>
               </div>
 
               <div className="flex gap-2">
                 <Button 
                   variant="outline" 
-                  className="flex-1"
+                  className="flex-1 text-primary hover:text-primary"
                   onClick={() => handleRequestSample(product.id)}
                 >
                   Pedir Amostra
@@ -229,7 +229,7 @@ const Catalogo = () => {
             <PaginationPrevious href="#" />
           </PaginationItem>
           <PaginationItem>
-            <PaginationLink href="#" isActive>1</PaginationLink>
+            <PaginationLink href="#" isActive className="text-primary">1</PaginationLink>
           </PaginationItem>
           <PaginationItem>
             <PaginationLink href="#">2</PaginationLink>
