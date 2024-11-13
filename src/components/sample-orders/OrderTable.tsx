@@ -2,7 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Package, ArrowDown, MoreVertical, Truck } from "lucide-react";
+import { Package, ArrowDown, MoreVertical, Truck, Trash2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -47,7 +47,6 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
         description: "Order canceled successfully",
       });
 
-      // Refresh orders list if callback provided
       if (onOrdersChange) {
         onOrdersChange();
       }
@@ -57,6 +56,38 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
         variant: "destructive",
         title: "Error",
         description: "Failed to cancel order. Please try again.",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    if (isDeleting) return;
+
+    try {
+      setIsDeleting(true);
+      const { error } = await supabase
+        .from('sample_requests')
+        .delete()
+        .eq('id', orderId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Order permanently deleted",
+      });
+
+      if (onOrdersChange) {
+        onOrdersChange();
+      }
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete order. Please try again.",
       });
     } finally {
       setIsDeleting(false);
@@ -141,6 +172,14 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
                         Cancel Order
                       </DropdownMenuItem>
                     )}
+                    <DropdownMenuItem 
+                      onClick={() => handleDeleteOrder(order.id)}
+                      disabled={isDeleting}
+                      className="text-red-600 focus:text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Permanently
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>
