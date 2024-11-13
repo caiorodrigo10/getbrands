@@ -46,47 +46,51 @@ const Perfil = () => {
       if (!user) return;
 
       try {
-        const { data: address, error } = await supabase
-          .from("addresses")
-          .select("*")
-          .eq("user_id", user.id)
+        // First, get the user's profile
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("name, email")
+          .eq("id", user.id)
           .single();
 
-        if (error) throw error;
+        // Get the address data, but don't use .single() since it might not exist
+        const { data: addresses } = await supabase
+          .from("addresses")
+          .select("*")
+          .eq("user_id", user.id);
 
-        if (address) {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("name, email")
-            .eq("id", user.id)
-            .single();
+        const address = addresses?.[0]; // Get the first address if it exists
+        const [firstName, lastName] = (profile?.name || "").split(" ");
 
-          const [firstName, lastName] = (profile?.name || "").split(" ");
-
-          form.reset({
-            firstName: firstName || "",
-            lastName: lastName || "",
-            address1: address.street_address1,
-            address2: address.street_address2 || "",
-            city: address.city,
-            state: address.state,
-            zipCode: address.zip_code,
-          });
-        }
+        form.reset({
+          firstName: firstName || "",
+          lastName: lastName || "",
+          address1: address?.street_address1 || "",
+          address2: address?.street_address2 || "",
+          city: address?.city || "",
+          state: address?.state || "",
+          zipCode: address?.zip_code || "",
+        });
       } catch (error) {
         console.error("Error loading address:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load profile information. Please try again.",
+        });
       } finally {
         setIsLoading(false);
       }
     };
 
     loadAddress();
-  }, [user, form]);
+  }, [user, form, toast]);
 
   const onSubmit = async (data: AddressFormData) => {
     if (!user) return;
 
     try {
+      // Update profile name
       const { error: profileError } = await supabase
         .from("profiles")
         .update({ name: `${data.firstName} ${data.lastName}` })
@@ -103,11 +107,22 @@ const Perfil = () => {
         zip_code: data.zipCode,
       };
 
-      const { error: addressError } = await supabase
+      // Try to update existing address first
+      const { error: updateError, count } = await supabase
         .from("addresses")
-        .upsert(addressData, { onConflict: "user_id" });
+        .update(addressData)
+        .eq("user_id", user.id);
 
-      if (addressError) throw addressError;
+      // If no rows were updated, insert a new address
+      if (!updateError && count === 0) {
+        const { error: insertError } = await supabase
+          .from("addresses")
+          .insert([addressData]);
+
+        if (insertError) throw insertError;
+      } else if (updateError) {
+        throw updateError;
+      }
 
       toast({
         title: "Success",
