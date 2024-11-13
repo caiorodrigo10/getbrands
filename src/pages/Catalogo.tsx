@@ -1,6 +1,5 @@
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -9,8 +8,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
+import ProductCard from "@/components/ProductCard";
 
 interface Product {
   id: number;
@@ -173,60 +171,12 @@ const Catalogo = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {products.map((product) => (
-          <Card key={product.id} className="bg-gray-950 border-gray-800 overflow-hidden">
-            <div className="relative">
-              {product.isNew && (
-                <Badge className="absolute top-2 right-2 bg-primary">
-                  NOVO
-                </Badge>
-              )}
-              {product.isTiktok && (
-                <Badge className="absolute top-2 right-2 bg-pink-600">
-                  TIKTOK
-                </Badge>
-              )}
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-64 object-contain"
-              />
-            </div>
-            <div className="p-4">
-              <div className="text-sm text-gray-400 mb-2">{product.category}</div>
-              <h3 className="text-lg font-semibold text-white mb-4">{product.name}</h3>
-              
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                <div>
-                  <p className="text-sm text-gray-400">From</p>
-                  <p className="font-semibold text-white">${product.fromPrice.toFixed(2)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-400">SRP</p>
-                  <p className="font-semibold text-white">${product.srp.toFixed(2)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-400">Profit</p>
-                  <p className="font-semibold text-green-500">${product.profit.toFixed(2)}</p>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  className="flex-1 text-primary hover:text-primary"
-                  onClick={() => handleRequestSample(product.id)}
-                >
-                  Pedir Amostra
-                </Button>
-                <Button 
-                  className="flex-1"
-                  onClick={() => handleSelectProduct(product.id)}
-                >
-                  Selecionar
-                </Button>
-              </div>
-            </div>
-          </Card>
+          <ProductCard
+            key={product.id}
+            product={product}
+            onRequestSample={handleRequestSample}
+            onSelectProduct={handleSelectProduct}
+          />
         ))}
       </div>
 

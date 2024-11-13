@@ -13,7 +13,7 @@ const Sidebar = () => {
   return (
     <aside className="fixed left-0 top-0 h-screen w-48 bg-black p-4 text-white">
       <div className="mb-8 px-4">
-        <h1 className="text-2xl font-bold text-primary">Mainer</h1>
+        <h1 className="text-xl font-bold text-primary">Mainer</h1>
       </div>
       <nav>
         <ul className="space-y-2">
@@ -21,9 +21,9 @@ const Sidebar = () => {
             <li key={item.path}>
               <Link
                 to={item.path}
-                className="flex items-center gap-3 rounded-lg px-4 py-3 transition-colors hover:bg-gray-900 hover:text-primary"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-gray-900 hover:text-primary"
               >
-                <item.icon className="h-5 w-5" />
+                <item.icon className="h-4 w-4" />
                 <span>{item.label}</span>
               </Link>
             </li>
