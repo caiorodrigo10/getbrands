@@ -14,7 +14,7 @@ export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue }: Shippi
         <Button 
           type="submit"
           variant="default"
-          className="w-[200px]"
+          className="w-[150px]"
         >
           Save Address
         </Button>
@@ -23,7 +23,7 @@ export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue }: Shippi
       <div className="flex justify-end gap-4">
         <Button
           type="button"
-          variant="outline"
+          variant="destructive"
           onClick={onCancel}
         >
           Cancel Order
