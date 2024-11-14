@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,8 +27,8 @@ const Shipping = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
-  const [isAddressSaved, setIsAddressSaved] = useState(false);
+  const [selectedAddressId, setSelectedAddressId] = React.useState<string | null>(null);
+  const [isAddressSaved, setIsAddressSaved] = React.useState(false);
 
   const { data: addresses } = useQuery({
     queryKey: ["addresses", user?.id],

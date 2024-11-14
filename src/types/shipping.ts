@@ -25,7 +25,7 @@ export interface Address {
   city: string;
   state: string;
   zip_code: string;
-  type: 'shipping' | 'billing' | 'both';
+  type: 'shipping' | 'billing' | 'both' | null;
   created_at: string;
   updated_at: string;
 }
