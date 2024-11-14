@@ -327,7 +327,9 @@ export type Database = {
       sample_requests: {
         Row: {
           created_at: string
+          first_name: string | null
           id: string
+          last_name: string | null
           product_id: string | null
           shipping_address: string | null
           shipping_city: string | null
@@ -340,7 +342,9 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          first_name?: string | null
           id?: string
+          last_name?: string | null
           product_id?: string | null
           shipping_address?: string | null
           shipping_city?: string | null
@@ -353,7 +357,9 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          first_name?: string | null
           id?: string
+          last_name?: string | null
           product_id?: string | null
           shipping_address?: string | null
           shipping_city?: string | null
