@@ -37,7 +37,7 @@ export const ShippingFormContainer = ({
         .eq("id", user.id)
         .single();
 
-      // Get addresses
+      // Get addresses that were used in orders
       const { data: addressData, error } = await supabase
         .from("addresses")
         .select("*")
@@ -85,7 +85,7 @@ export const ShippingFormContainer = ({
       localStorage.setItem('shipping_state', values.state);
       localStorage.setItem('shipping_zip', values.zipCode);
 
-      // Save to addresses table
+      // Save to addresses table without marking as used_in_order
       const { error } = await supabase
         .from('addresses')
         .insert({
@@ -99,13 +99,10 @@ export const ShippingFormContainer = ({
           zip_code: values.zipCode,
           type: 'shipping',
           phone: values.phone,
-          used_in_order: true
+          used_in_order: false // This is the key change
         });
 
       if (error) throw error;
-
-      // Refetch addresses after saving
-      await refetchAddresses();
 
       toast({
         title: "Success",
