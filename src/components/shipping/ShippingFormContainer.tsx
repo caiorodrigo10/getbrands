@@ -42,6 +42,7 @@ export const ShippingFormContainer = ({
         .from("addresses")
         .select("*")
         .eq("user_id", user.id)
+        .eq("used_in_order", true)
         .in('type', ['shipping', 'both'])
         .order('created_at', { ascending: false });
 
@@ -72,56 +73,6 @@ export const ShippingFormContainer = ({
     try {
       if (!user?.id) throw new Error("User not authenticated");
 
-      // Update profile
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({
-          first_name: values.firstName,
-          last_name: values.lastName,
-        })
-        .eq("id", user.id);
-
-      if (profileError) throw profileError;
-
-      // Save shipping address
-      const { error: addressError } = await supabase
-        .from("addresses")
-        .insert({
-          user_id: user.id,
-          first_name: values.firstName,
-          last_name: values.lastName,
-          street_address1: values.address1,
-          street_address2: values.address2,
-          city: values.city,
-          state: values.state,
-          zip_code: values.zipCode,
-          type: values.useSameForBilling ? 'both' : 'shipping',
-          used_in_order: true
-        })
-        .select()
-        .single();
-
-      if (addressError) throw addressError;
-
-      // Save billing address if different
-      if (!values.useSameForBilling && values.billingAddress1) {
-        const { error: billingAddressError } = await supabase
-          .from("addresses")
-          .insert({
-            user_id: user.id,
-            first_name: values.firstName,
-            last_name: values.lastName,
-            street_address1: values.billingAddress1,
-            street_address2: values.billingAddress2,
-            city: values.billingCity!,
-            state: values.billingState!,
-            zip_code: values.billingZipCode!,
-            type: 'billing',
-          });
-
-        if (billingAddressError) throw billingAddressError;
-      }
-
       // Save to localStorage
       localStorage.setItem('firstName', values.firstName);
       localStorage.setItem('lastName', values.lastName);
@@ -130,9 +81,6 @@ export const ShippingFormContainer = ({
       localStorage.setItem('shipping_city', values.city);
       localStorage.setItem('shipping_state', values.state);
       localStorage.setItem('shipping_zip', values.zipCode);
-
-      await refetchAddresses();
-      setIsAddressSaved(true);
 
       toast({
         title: "Success",

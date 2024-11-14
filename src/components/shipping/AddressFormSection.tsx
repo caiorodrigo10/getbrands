@@ -2,7 +2,6 @@ import React from "react";
 import { Form } from "@/components/ui/form";
 import { PersonalInfoFields } from "@/components/shipping/PersonalInfoFields";
 import { AddressFields } from "@/components/shipping/AddressFields";
-import { BillingAddressFields } from "@/components/shipping/BillingAddressFields";
 import { ContactFields } from "@/components/shipping/ContactFields";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ShippingButtons } from "@/components/checkout/ShippingButtons";
@@ -27,6 +26,27 @@ export const AddressFormSection = ({
   setIsAddressSaved,
 }: AddressFormSectionProps) => {
   const useSameForBilling = form.watch("useSameForBilling");
+  const formValues = form.getValues();
+
+  // Check if form has all required fields filled
+  const isFormComplete = React.useMemo(() => {
+    return !!(
+      formValues.firstName &&
+      formValues.lastName &&
+      formValues.address1 &&
+      formValues.city &&
+      formValues.state &&
+      formValues.zipCode &&
+      formValues.phone
+    );
+  }, [formValues]);
+
+  // Set isAddressSaved to true if form is complete on mount
+  React.useEffect(() => {
+    if (isFormComplete) {
+      setIsAddressSaved(true);
+    }
+  }, [isFormComplete, setIsAddressSaved]);
 
   const handleSubmit = async () => {
     const values = form.getValues();
@@ -63,7 +83,7 @@ export const AddressFormSection = ({
         {!useSameForBilling && <BillingAddressFields form={form} />}
 
         <ShippingButtons
-          isAddressSaved={isAddressSaved}
+          isAddressSaved={isAddressSaved || isFormComplete}
           onCancel={onCancel}
           onContinue={onContinue}
           onSave={handleSubmit}
