@@ -41,6 +41,23 @@ const Shipping = () => {
         form.setValue("lastName", profileData.last_name || "");
       }
 
+      // Restore form data from localStorage if available
+      const savedFirstName = localStorage.getItem('firstName');
+      const savedLastName = localStorage.getItem('lastName');
+      const savedPhone = localStorage.getItem('phone');
+      const savedAddress = localStorage.getItem('shipping_address');
+      const savedCity = localStorage.getItem('shipping_city');
+      const savedState = localStorage.getItem('shipping_state');
+      const savedZip = localStorage.getItem('shipping_zip');
+
+      if (savedFirstName) form.setValue("firstName", savedFirstName);
+      if (savedLastName) form.setValue("lastName", savedLastName);
+      if (savedPhone) form.setValue("phone", savedPhone);
+      if (savedAddress) form.setValue("address1", savedAddress);
+      if (savedCity) form.setValue("city", savedCity);
+      if (savedState) form.setValue("state", savedState);
+      if (savedZip) form.setValue("zipCode", savedZip);
+
       return addressData.map(addr => ({
         ...addr,
         type: addr.type as Address['type']
@@ -53,15 +70,20 @@ const Shipping = () => {
     if (addresses && addresses.length > 0 && !selectedAddressId) {
       const lastAddress = addresses[0];
       const currentValues = form.getValues();
-      form.reset({
-        ...currentValues,
-        address1: lastAddress.street_address1,
-        address2: lastAddress.street_address2 || "",
-        city: lastAddress.city,
-        state: lastAddress.state,
-        zipCode: lastAddress.zip_code,
-        useSameForBilling: true,
-      });
+      
+      // Only set address values if there's no data in localStorage
+      if (!localStorage.getItem('shipping_address')) {
+        form.reset({
+          ...currentValues,
+          address1: lastAddress.street_address1,
+          address2: lastAddress.street_address2 || "",
+          city: lastAddress.city,
+          state: lastAddress.state,
+          zipCode: lastAddress.zip_code,
+          useSameForBilling: true,
+        });
+      }
+      
       setSelectedAddressId(lastAddress.id);
       setIsAddressSaved(true);
     }
