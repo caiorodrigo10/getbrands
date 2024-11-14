@@ -52,15 +52,14 @@ const Shipping = () => {
   React.useEffect(() => {
     if (addresses && addresses.length > 0 && !selectedAddressId) {
       const lastAddress = addresses[0];
+      const currentValues = form.getValues();
       form.reset({
-        firstName: form.getValues("firstName"),
-        lastName: form.getValues("lastName"),
+        ...currentValues,
         address1: lastAddress.street_address1,
         address2: lastAddress.street_address2 || "",
         city: lastAddress.city,
         state: lastAddress.state,
         zipCode: lastAddress.zip_code,
-        phone: "",
         useSameForBilling: true,
       });
       setSelectedAddressId(lastAddress.id);

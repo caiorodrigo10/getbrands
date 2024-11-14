@@ -28,13 +28,16 @@ export const AddressSelectionSection = ({
 
   return (
     <div className="mb-4">
-      <Button
-        variant="outline"
-        onClick={() => setShowAddressSelect(!showAddressSelect)}
-        className="w-full mb-4"
-      >
-        {showAddressSelect ? "Hide Saved Addresses" : "Select Another Address"}
-      </Button>
+      <div className="flex justify-end mb-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowAddressSelect(!showAddressSelect)}
+          className="w-auto"
+        >
+          {showAddressSelect ? "Hide Saved Addresses" : "Select Another Address"}
+        </Button>
+      </div>
       
       {showAddressSelect && (
         <SavedAddressSelect
