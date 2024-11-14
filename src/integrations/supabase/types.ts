@@ -174,12 +174,12 @@ export type Database = {
       }
       profiles: {
         Row: {
-          address_city: string | null
-          address_state: string | null
-          address_street: string | null
-          address_street2: string | null
-          address_zip: string | null
           avatar_url: string | null
+          billing_address_street: string | null
+          billing_address_street2: string | null
+          billing_city: string | null
+          billing_state: string | null
+          billing_zip: string | null
           created_at: string
           email: string | null
           first_name: string | null
@@ -187,15 +187,20 @@ export type Database = {
           last_name: string | null
           name: string | null
           phone: string | null
+          shipping_address_city: string | null
+          shipping_address_state: string | null
+          shipping_address_street: string | null
+          shipping_address_street2: string | null
+          shipping_address_zip: string | null
           updated_at: string
         }
         Insert: {
-          address_city?: string | null
-          address_state?: string | null
-          address_street?: string | null
-          address_street2?: string | null
-          address_zip?: string | null
           avatar_url?: string | null
+          billing_address_street?: string | null
+          billing_address_street2?: string | null
+          billing_city?: string | null
+          billing_state?: string | null
+          billing_zip?: string | null
           created_at?: string
           email?: string | null
           first_name?: string | null
@@ -203,15 +208,20 @@ export type Database = {
           last_name?: string | null
           name?: string | null
           phone?: string | null
+          shipping_address_city?: string | null
+          shipping_address_state?: string | null
+          shipping_address_street?: string | null
+          shipping_address_street2?: string | null
+          shipping_address_zip?: string | null
           updated_at?: string
         }
         Update: {
-          address_city?: string | null
-          address_state?: string | null
-          address_street?: string | null
-          address_street2?: string | null
-          address_zip?: string | null
           avatar_url?: string | null
+          billing_address_street?: string | null
+          billing_address_street2?: string | null
+          billing_city?: string | null
+          billing_state?: string | null
+          billing_zip?: string | null
           created_at?: string
           email?: string | null
           first_name?: string | null
@@ -219,6 +229,11 @@ export type Database = {
           last_name?: string | null
           name?: string | null
           phone?: string | null
+          shipping_address_city?: string | null
+          shipping_address_state?: string | null
+          shipping_address_street?: string | null
+          shipping_address_street2?: string | null
+          shipping_address_zip?: string | null
           updated_at?: string
         }
         Relationships: []
