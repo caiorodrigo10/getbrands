@@ -23,6 +23,7 @@ export const SavedAddressSelect = ({
         .from("addresses")
         .select("*")
         .eq("user_id", userId)
+        .eq("used_in_order", true)
         .in('type', ['shipping', 'both'])
         .order('created_at', { ascending: false });
 
