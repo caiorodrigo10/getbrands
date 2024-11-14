@@ -1,7 +1,8 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UseFormReturn } from "react-hook-form";
-import { ProfileFormData } from "./types";
+import { ProfileFormData, US_STATES } from "./types";
 
 interface AddressFieldsProps {
   form: UseFormReturn<ProfileFormData>;
@@ -15,9 +16,23 @@ export function AddressFields({ form }: AddressFieldsProps) {
         name="address_street"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Street Address</FormLabel>
+            <FormLabel>Address Line 1</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} placeholder="Street address" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="address_street2"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Address Line 2 (Optional)</FormLabel>
+            <FormControl>
+              <Input {...field} placeholder="Apartment, suite, etc." />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -45,7 +60,18 @@ export function AddressFields({ form }: AddressFieldsProps) {
             <FormItem>
               <FormLabel>State</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select state" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {US_STATES.map((state) => (
+                      <SelectItem key={state} value={state}>
+                        {state}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -58,7 +84,7 @@ export function AddressFields({ form }: AddressFieldsProps) {
             <FormItem className="col-span-2 sm:col-span-1">
               <FormLabel>ZIP Code</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} placeholder="12345" />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -42,10 +42,10 @@ export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
         control={form.control}
         name="phone"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="max-w-[250px]">
             <FormLabel>Phone Number</FormLabel>
             <FormControl>
-              <Input {...field} type="tel" />
+              <Input {...field} type="tel" placeholder="(555) 555-5555" />
             </FormControl>
             <FormMessage />
           </FormItem>
