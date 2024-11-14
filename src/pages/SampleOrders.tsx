@@ -41,10 +41,7 @@ const SampleOrders = () => {
       }
 
       if (activeSearchQuery) {
-        query = query.or([
-          { 'product.name': { ilike: `%${activeSearchQuery}%` } },
-          { id: { ilike: `%${activeSearchQuery}%` } }
-        ]);
+        query = query.ilike('id', `%${activeSearchQuery}%`);
       }
 
       const from = (currentPage - 1) * ITEMS_PER_PAGE;

@@ -20,7 +20,7 @@ const OrderSearch = ({ searchQuery, setSearchQuery, onSearch }: OrderSearchProps
       <div className="relative w-full sm:w-72">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
         <Input
-          placeholder="Search by product or order number"
+          placeholder="Search by order number"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyPress={handleKeyPress}
