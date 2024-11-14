@@ -1,11 +1,43 @@
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/lib/utils";
 
+interface OrderProduct {
+  id: string;
+  name: string;
+  image_url: string | null;
+  from_price: number;
+  quantity?: number;
+}
+
 interface OrderExpandedDetailsProps {
-  order: any;
+  order: {
+    id: string;
+    shipping_address: string;
+    shipping_city: string;
+    shipping_state: string;
+    shipping_zip: string;
+    products: OrderProduct[];
+    tracking_number?: string | null;
+  };
 }
 
 const OrderExpandedDetails = ({ order }: OrderExpandedDetailsProps) => {
+  const calculateSubtotal = (products: OrderProduct[]) => {
+    return products.reduce((total, product) => {
+      return total + (product.from_price * (product.quantity || 1));
+    }, 0);
+  };
+
+  const calculateShippingCost = (products: OrderProduct[]) => {
+    const totalItems = products.reduce((sum, product) => sum + (product.quantity || 1), 0);
+    // Base shipping rate of $4.50 for first item, $2 for each additional item
+    return 4.50 + Math.max(0, totalItems - 1) * 2;
+  };
+
+  const subtotal = calculateSubtotal(order.products);
+  const shippingCost = calculateShippingCost(order.products);
+  const total = subtotal + shippingCost;
+
   return (
     <motion.div
       initial={{ height: 0, opacity: 0 }}
@@ -19,19 +51,23 @@ const OrderExpandedDetails = ({ order }: OrderExpandedDetailsProps) => {
           {/* Product Details */}
           <div className="space-y-4">
             <h4 className="font-semibold text-lg">Product Details</h4>
-            <div className="flex items-start gap-4 bg-white p-4 rounded-lg">
-              <img
-                src={order.product?.image_url || "/placeholder.svg"}
-                alt={order.product?.name}
-                className="w-20 h-20 object-cover rounded"
-              />
-              <div>
-                <h5 className="font-medium">{order.product?.name}</h5>
-                <p className="text-sm text-gray-600">SKU: {order.product?.id.slice(0, 8)}</p>
-                <p className="text-sm text-gray-600 mt-2">
-                  1 x {formatCurrency(order.product?.from_price || 0)} = {formatCurrency(order.product?.from_price || 0)}
-                </p>
-              </div>
+            <div className="space-y-4">
+              {order.products.map((product) => (
+                <div key={product.id} className="flex items-start gap-4 bg-white p-4 rounded-lg">
+                  <img
+                    src={product.image_url || "/placeholder.svg"}
+                    alt={product.name}
+                    className="w-20 h-20 object-cover rounded"
+                  />
+                  <div>
+                    <h5 className="font-medium">{product.name}</h5>
+                    <p className="text-sm text-gray-600">SKU: {product.id.slice(0, 8)}</p>
+                    <p className="text-sm text-gray-600 mt-2">
+                      {product.quantity || 1} x {formatCurrency(product.from_price)} = {formatCurrency(product.from_price * (product.quantity || 1))}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -42,6 +78,12 @@ const OrderExpandedDetails = ({ order }: OrderExpandedDetailsProps) => {
               <p>{order.shipping_address}</p>
               <p>{order.shipping_city}, {order.shipping_state} {order.shipping_zip}</p>
               <p>United States</p>
+              {order.tracking_number && (
+                <div className="mt-4 pt-4 border-t">
+                  <p className="text-sm font-medium">Tracking Number:</p>
+                  <p className="text-sm text-gray-600">{order.tracking_number}</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -52,20 +94,16 @@ const OrderExpandedDetails = ({ order }: OrderExpandedDetailsProps) => {
           <div className="space-y-2">
             <div className="flex justify-between">
               <span>Subtotal:</span>
-              <span>{formatCurrency(order.product?.from_price || 0)}</span>
+              <span>{formatCurrency(subtotal)}</span>
             </div>
             <div className="flex justify-between">
               <span>Shipping:</span>
-              <span>{formatCurrency(4.50)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Credits Applied:</span>
-              <span>{formatCurrency(0)}</span>
+              <span>{formatCurrency(shippingCost)}</span>
             </div>
             <div className="border-t pt-2 mt-2">
               <div className="flex justify-between font-semibold">
                 <span>Total:</span>
-                <span>{formatCurrency((order.product?.from_price || 0) + 4.50)}</span>
+                <span>{formatCurrency(total)}</span>
               </div>
             </div>
           </div>

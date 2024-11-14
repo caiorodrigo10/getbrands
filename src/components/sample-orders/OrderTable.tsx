@@ -20,6 +20,19 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
+  const calculateOrderTotal = (order: any) => {
+    const products = order.products || [];
+    const subtotal = products.reduce((total: number, product: any) => {
+      return total + (product.from_price * (product.quantity || 1));
+    }, 0);
+    
+    const totalItems = products.reduce((sum: number, product: any) => 
+      sum + (product.quantity || 1), 0);
+    const shippingCost = 4.50 + Math.max(0, totalItems - 1) * 2;
+    
+    return subtotal + shippingCost;
+  };
+
   const handleCancelOrder = async (orderId: string) => {
     if (isDeleting) return;
 
@@ -65,7 +78,7 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
             <TableHead>Order Type</TableHead>
             <TableHead>Order Number</TableHead>
             <TableHead>Date</TableHead>
-            <TableHead>Customer Name</TableHead>
+            <TableHead>Items</TableHead>
             <TableHead>Tracking #</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Total</TableHead>
@@ -104,7 +117,7 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
                     minute: "2-digit",
                   })}
                 </TableCell>
-                <TableCell>{order.user?.name || "N/A"}</TableCell>
+                <TableCell>{order.products?.length || 0} items</TableCell>
                 <TableCell>
                   {order.tracking_number ? (
                     <div className="flex items-center gap-2">
@@ -119,7 +132,7 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
                   <OrderStatusBadge status={order.status} />
                 </TableCell>
                 <TableCell>
-                  {formatCurrency(order.product?.from_price || 0)}
+                  {formatCurrency(calculateOrderTotal(order))}
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>

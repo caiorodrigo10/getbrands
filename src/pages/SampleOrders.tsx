@@ -33,10 +33,16 @@ const SampleOrders = () => {
         .from("sample_requests")
         .select(`
           *,
-          product:products(*),
-          user:profiles(*)
+          products: sample_request_products (
+            product:products (
+              id,
+              name,
+              image_url,
+              from_price
+            )
+          )
         `, { count: 'exact' })
-        .eq('user_id', user.id);  // Filter orders by current user
+        .eq('user_id', user.id);
 
       if (selectedStatus !== "all") {
         query = query.eq('status', selectedStatus);
@@ -58,13 +64,22 @@ const SampleOrders = () => {
         throw error;
       }
 
+      // Transform the data to flatten the products array
+      const transformedData = data?.map(order => ({
+        ...order,
+        products: order.products.map((p: any) => ({
+          ...p.product,
+          quantity: 1 // Default quantity, update this if you add quantity to the database
+        }))
+      }));
+
       return {
-        data,
+        data: transformedData,
         totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE),
         currentPage
       };
     },
-    enabled: !!user, // Only run query if user is authenticated
+    enabled: !!user,
   });
 
   if (!user) {
