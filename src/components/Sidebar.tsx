@@ -1,9 +1,35 @@
 import { Link, useLocation } from "react-router-dom";
-import { UserRound, Briefcase, BookOpen, Package, FileText, Box } from "lucide-react";
+import { UserRound, Briefcase, BookOpen, Package, FileText, Box, PlusCircle } from "lucide-react";
 import UserMenu from "./UserMenu";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
+import PackSelectionDialog from "./dialogs/PackSelectionDialog";
 
 const Sidebar = () => {
   const location = useLocation();
+  const { user } = useAuth();
+  const [isPackDialogOpen, setIsPackDialogOpen] = useState(false);
+
+  const { data: totalPoints } = useQuery({
+    queryKey: ["userPoints", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+      const { data: projects } = await supabase
+        .from("projects")
+        .select("points, points_used")
+        .eq("user_id", user.id);
+
+      if (!projects) return 0;
+      
+      return projects.reduce((acc, project) => {
+        return acc + (project.points - (project.points_used || 0));
+      }, 0);
+    },
+    enabled: !!user?.id,
+  });
+
   const menuItems = [
     { icon: UserRound, label: "My Profile", path: "/perfil" },
     { icon: Briefcase, label: "Projects", path: "/projetos" },
@@ -41,9 +67,29 @@ const Sidebar = () => {
           ))}
         </ul>
       </nav>
-      <div className="mt-auto pt-6 border-t border-white/10">
-        <UserMenu />
+      
+      <div className="mt-auto space-y-4">
+        <div className="p-4 bg-white/10 rounded-lg">
+          <p className="text-white text-sm mb-1">Available Points</p>
+          <p className="text-white font-bold text-xl">{totalPoints || 0} pts</p>
+          <button
+            onClick={() => setIsPackDialogOpen(true)}
+            className="mt-2 w-full flex items-center justify-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            <PlusCircle className="h-4 w-4" />
+            <span className="text-sm font-medium">Get Pack</span>
+          </button>
+        </div>
+        
+        <div className="pt-6 border-t border-white/10">
+          <UserMenu />
+        </div>
       </div>
+
+      <PackSelectionDialog 
+        open={isPackDialogOpen} 
+        onOpenChange={setIsPackDialogOpen}
+      />
     </aside>
   );
 };
