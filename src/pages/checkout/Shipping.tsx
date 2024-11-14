@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useQuery } from "@tanstack/react-query";
 import type { ShippingFormData } from "@/types/shipping";
 
 const formSchema = z.object({
@@ -36,8 +37,24 @@ const Shipping = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const [showNewAddressForm, setShowNewAddressForm] = useState(true);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+
+  const { data: addresses } = useQuery({
+    queryKey: ["addresses", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase
+        .from("addresses")
+        .select("*")
+        .eq("user_id", user.id)
+        .in('type', ['shipping', 'both'])
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
 
   const form = useForm<ShippingFormData>({
     resolver: zodResolver(formSchema),
@@ -97,9 +114,8 @@ const Shipping = () => {
         title: "Success",
         description: "Address saved successfully",
       });
-      
-      setShowNewAddressForm(false);
-      // Refresh the addresses list
+
+      // Refresh the addresses query
       const { data } = await supabase
         .from("addresses")
         .select("*")
@@ -122,17 +138,8 @@ const Shipping = () => {
   };
 
   const onSubmit = async (values: ShippingFormData) => {
-    if (showNewAddressForm) {
-      await saveAddress(values);
-      return;
-    }
-
     if (!selectedAddressId) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please select or save an address to continue.",
-      });
+      await saveAddress(values);
       return;
     }
 
@@ -150,92 +157,72 @@ const Shipping = () => {
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <h2 className="text-xl font-semibold mb-6">Shipping Information</h2>
         
-        {user && (
+        {user && addresses?.length ? (
           <div className="mb-8">
             <h3 className="text-lg font-medium mb-4">Select Shipping Address</h3>
             <SavedAddressSelect
               userId={user.id}
               selectedAddressId={selectedAddressId}
-              onAddressSelect={(id) => {
-                setSelectedAddressId(id);
-                setShowNewAddressForm(false);
-              }}
-              onAddNew={() => {
-                setSelectedAddressId(null);
-                setShowNewAddressForm(true);
-              }}
+              onAddressSelect={setSelectedAddressId}
+              onAddNew={() => setSelectedAddressId(null)}
             />
           </div>
-        )}
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {showNewAddressForm && (
-              <>
-                <PersonalInfoFields form={form} />
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-medium mb-4">Shipping Address</h3>
-                    <AddressFields form={form} />
-                  </div>
-                  <ContactFields form={form} />
+        ) : (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <PersonalInfoFields form={form} />
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Shipping Address</h3>
+                  <AddressFields form={form} />
                 </div>
+                <ContactFields form={form} />
+              </div>
 
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="useSameForBilling"
-                    checked={form.watch("useSameForBilling")}
-                    onCheckedChange={(checked) => {
-                      form.setValue("useSameForBilling", checked as boolean);
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="useSameForBilling"
+                  checked={form.watch("useSameForBilling")}
+                  onCheckedChange={(checked) => {
+                    form.setValue("useSameForBilling", checked as boolean);
+                  }}
+                />
+                <label
+                  htmlFor="useSameForBilling"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Use same address for billing
+                </label>
+              </div>
+
+              {!useSameForBilling && (
+                <div className="space-y-6 pt-4">
+                  <h3 className="text-lg font-medium">Billing Address</h3>
+                  <AddressFields 
+                    form={form} 
+                    prefix="billing"
+                    formFields={{
+                      address1: "billingAddress1",
+                      address2: "billingAddress2",
+                      city: "billingCity",
+                      state: "billingState",
+                      zipCode: "billingZipCode",
                     }}
                   />
-                  <label
-                    htmlFor="useSameForBilling"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Use same address for billing
-                  </label>
                 </div>
+              )}
 
-                {!useSameForBilling && (
-                  <div className="space-y-6 pt-4">
-                    <h3 className="text-lg font-medium">Billing Address</h3>
-                    <AddressFields 
-                      form={form} 
-                      prefix="billing"
-                      formFields={{
-                        address1: "billingAddress1",
-                        address2: "billingAddress2",
-                        city: "billingCity",
-                        state: "billingState",
-                        zipCode: "billingZipCode",
-                      }}
-                    />
-                  </div>
-                )}
-              </>
-            )}
-
-            <div className="flex flex-col gap-4 pt-6">
-              {showNewAddressForm && (
+              <div className="flex justify-end gap-4 pt-6">
                 <Button 
                   type="submit"
-                  className="w-full"
+                  className="bg-primary hover:bg-primary-dark text-white"
                 >
-                  Save Address
+                  {selectedAddressId ? 'Continue to Payment' : 'Save Address'}
                 </Button>
-              )}
-              <Button 
-                type="button"
-                onClick={() => form.handleSubmit(onSubmit)()}
-                className={`w-full ${selectedAddressId ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-400'}`}
-                disabled={!selectedAddressId && !showNewAddressForm}
-              >
-                Continue to Payment
-              </Button>
-            </div>
-          </form>
-        </Form>
+              </div>
+            </form>
+          </Form>
+        )}
       </div>
     </div>
   );

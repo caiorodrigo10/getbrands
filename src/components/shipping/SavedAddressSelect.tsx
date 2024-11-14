@@ -2,8 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
 import { Address } from "@/types/shipping";
 
 interface SavedAddressSelectProps {
@@ -17,7 +15,6 @@ export const SavedAddressSelect = ({
   userId,
   selectedAddressId,
   onAddressSelect,
-  onAddNew,
 }: SavedAddressSelectProps) => {
   const { data: addresses } = useQuery({
     queryKey: ["addresses", userId],
@@ -36,12 +33,7 @@ export const SavedAddressSelect = ({
   });
 
   if (!addresses?.length) {
-    return (
-      <Button onClick={onAddNew} variant="outline" className="w-full">
-        <PlusCircle className="mr-2 h-4 w-4" />
-        Add New Address
-      </Button>
-    );
+    return null;
   }
 
   return (
@@ -69,10 +61,6 @@ export const SavedAddressSelect = ({
           </div>
         ))}
       </RadioGroup>
-      <Button onClick={onAddNew} variant="outline" className="w-full">
-        <PlusCircle className="mr-2 h-4 w-4" />
-        Add New Address
-      </Button>
     </div>
   );
 };
