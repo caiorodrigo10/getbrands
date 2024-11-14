@@ -63,7 +63,7 @@ const OrderDetails = ({ orderDetails }: OrderDetailsProps) => {
               {orderDetails.shipping_city}, {orderDetails.shipping_state}{" "}
               {orderDetails.shipping_zip}
             </p>
-            <p>Brazil</p>
+            <p>United States</p>
           </div>
         </div>
       </CardContent>
