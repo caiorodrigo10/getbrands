@@ -10,7 +10,7 @@ import Sidebar from "./components/Sidebar";
 import Login from "./pages/Login";
 import Index from "./pages/Index";
 import Perfil from "./pages/Perfil";
-import Projetos from "./pages/Projetos";
+import Projects from "./pages/Projects";
 import Catalogo from "./pages/Catalogo";
 import Produtos from "./pages/Produtos";
 import ProductSelectedSuccess from "./pages/produtos/ProductSelectedSuccess";
@@ -74,11 +74,11 @@ const App = () => (
                 }
               />
               <Route
-                path="/projetos"
+                path="/projects"
                 element={
                   <ProtectedRoute>
                     <AppLayout>
-                      <Projetos />
+                      <Projects />
                     </AppLayout>
                   </ProtectedRoute>
                 }
