@@ -40,27 +40,33 @@ export const SavedAddressSelect = ({
   });
 
   const handleDelete = async (addressId: string) => {
-    const { error } = await supabase
-      .from("addresses")
-      .delete()
-      .eq("id", addressId);
+    try {
+      const { error } = await supabase
+        .from("addresses")
+        .delete()
+        .eq("id", addressId)
+        .eq("user_id", userId);
 
-    if (error) {
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Address deleted successfully.",
+      });
+
+      // Update the cache by removing the deleted address
+      queryClient.setQueryData(["addresses", userId], (oldData: Address[] | undefined) => {
+        if (!oldData) return [];
+        return oldData.filter(address => address.id !== addressId);
+      });
+    } catch (error) {
+      console.error("Error deleting address:", error);
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to delete address. Please try again.",
       });
-      return;
     }
-
-    toast({
-      title: "Success",
-      description: "Address deleted successfully.",
-    });
-
-    // Refresh the addresses list
-    queryClient.invalidateQueries({ queryKey: ["addresses", userId] });
   };
 
   if (!addresses?.length) {
