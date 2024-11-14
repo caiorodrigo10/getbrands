@@ -63,7 +63,7 @@ export const ProductActions = ({
 
   const handleProjectSelection = async (projectId: string) => {
     try {
-      // Add product to project and update points
+      // Add product to project
       const { error: projectError } = await supabase
         .from('project_products')
         .insert({
@@ -73,13 +73,15 @@ export const ProductActions = ({
 
       if (projectError) throw projectError;
 
-      // Update project points
+      // Update project points using a direct update
       const { error: pointsError } = await supabase
         .from('projects')
         .update({ 
           points_used: supabase.rpc('increment', { x: 1000 })
         })
-        .eq('id', projectId);
+        .eq('id', projectId)
+        .select()
+        .single();
 
       if (pointsError) throw pointsError;
 
