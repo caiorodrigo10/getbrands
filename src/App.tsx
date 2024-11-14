@@ -1,3 +1,4 @@
+```tsx
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -38,8 +39,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const AppLayout = ({ children }: { children: React.ReactNode }) => (
   <div className="flex min-h-screen bg-background">
     <Sidebar />
-    <main className="flex-1 transition-all duration-300 ease-in-out ml-0 md:ml-64 p-4 md:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">{children}</div>
+    <main className="flex-1 transition-all duration-300 ease-in-out ml-0 md:ml-64">
+      <div className="max-w-[1920px] mx-auto px-4 py-4 md:px-6 lg:px-8">
+        {children}
+      </div>
     </main>
   </div>
 );
@@ -159,3 +162,4 @@ const App = () => (
 );
 
 export default App;
+```
