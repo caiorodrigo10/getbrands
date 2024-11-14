@@ -5,9 +5,10 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, Plus, Calendar as CalendarIcon, Package, Check } from "lucide-react";
+import { ChevronDown, Plus, CalendarIcon, Package, Check } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Progress } from "@/components/ui/progress";
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -41,6 +42,11 @@ const ProjectDetails = () => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
+  const totalPoints = project?.points || 1000;
+  const usedPoints = project?.points_used || 0;
+  const remainingPoints = totalPoints - usedPoints;
+  const progressPercentage = (usedPoints / totalPoints) * 100;
 
   const stages = [
     {
@@ -76,6 +82,22 @@ const ProjectDetails = () => {
               Add Products
             </Button>
           </div>
+
+          {/* Points Progress Section */}
+          <Card className="p-4 bg-gray-50">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Project Points</span>
+                <span className="text-sm font-medium">{remainingPoints} points remaining</span>
+              </div>
+              <Progress value={progressPercentage} className="h-2" />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>{usedPoints} used</span>
+                <span>{totalPoints} total</span>
+              </div>
+            </div>
+          </Card>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {project?.project_products?.map((item) => (
               <Card key={item.id} className="p-4">
