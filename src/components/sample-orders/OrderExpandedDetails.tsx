@@ -18,6 +18,8 @@ interface OrderExpandedDetailsProps {
     shipping_zip: string;
     products: OrderProduct[];
     tracking_number?: string | null;
+    first_name?: string;
+    last_name?: string;
   };
 }
 
@@ -75,6 +77,11 @@ const OrderExpandedDetails = ({ order }: OrderExpandedDetailsProps) => {
           <div className="space-y-4">
             <h4 className="font-semibold text-lg">Shipping Address</h4>
             <div className="bg-white p-4 rounded-lg">
+              {order.first_name && order.last_name && (
+                <p className="font-medium mb-2">
+                  Shipped to: {order.first_name} {order.last_name}
+                </p>
+              )}
               <p>{order.shipping_address}</p>
               <p>{order.shipping_city}, {order.shipping_state} {order.shipping_zip}</p>
               <p>United States</p>
