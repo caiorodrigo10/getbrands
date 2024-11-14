@@ -39,16 +39,16 @@ const ProjectDetails = () => {
   });
 
   if (isLoading) {
-    return <div>Carregando...</div>;
+    return <div>Loading...</div>;
   }
 
   const stages = [
     {
       title: "Onboarding",
-      description: "Agende uma chamada com nosso time para iniciarmos seu projeto",
+      description: "Schedule a call with our team to start your project",
       content: (
         <div className="space-y-4">
-          <p className="text-muted-foreground">Selecione uma data para a chamada:</p>
+          <p className="text-muted-foreground">Select a date for the call:</p>
           <Calendar
             mode="single"
             selected={date}
@@ -57,30 +57,44 @@ const ProjectDetails = () => {
           />
           <Button className="w-full">
             <CalendarIcon className="mr-2 h-4 w-4" />
-            Agendar Chamada
+            Schedule Call
           </Button>
         </div>
       ),
     },
     {
-      title: "Seleção de Produtos",
-      description: "Escolha os produtos para seu projeto",
+      title: "Product Selection",
+      description: "Choose products for your project",
       content: (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-muted-foreground">
-              {project?.project_products?.length || 0} produtos selecionados
+              {project?.project_products?.length || 0} products selected
             </p>
-            <Button onClick={() => navigate("/catalogo")} variant="outline">
+            <Button onClick={() => navigate("/catalog")} variant="outline">
               <Plus className="mr-2 h-4 w-4" />
-              Adicionar Produtos
+              Add Products
             </Button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {project?.project_products?.map((item) => (
-              <Card key={item.id} className="p-4 flex items-center gap-3">
-                <Package className="h-5 w-5 text-muted-foreground" />
-                <span>{item.product.name}</span>
+              <Card key={item.id} className="p-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                    <img 
+                      src={item.product.image_url || "/placeholder.svg"} 
+                      alt={item.product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-sm truncate">{item.product.name}</h4>
+                    <div className="flex items-center gap-2 text-muted-foreground mt-1">
+                      <Package className="h-4 w-4" />
+                      <span className="text-sm">Product</span>
+                    </div>
+                  </div>
+                </div>
               </Card>
             ))}
           </div>
@@ -137,8 +151,8 @@ const ProjectDetails = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{project?.name}</h1>
-        <Button variant="outline" onClick={() => navigate("/projetos")}>
-          Voltar
+        <Button variant="outline" onClick={() => navigate("/projects")}>
+          Back
         </Button>
       </div>
 
