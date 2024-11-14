@@ -5,9 +5,17 @@ interface ProductGridProps {
   products: Product[];
   onRequestSample: (id: string) => void;
   onSelectProduct: (id: string) => void;
+  projectId?: string;
+  availablePoints?: number;
 }
 
-const ProductGrid = ({ products, onRequestSample, onSelectProduct }: ProductGridProps) => {
+const ProductGrid = ({ 
+  products, 
+  onRequestSample, 
+  onSelectProduct,
+  projectId,
+  availablePoints 
+}: ProductGridProps) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {products.map((product) => (
@@ -16,6 +24,8 @@ const ProductGrid = ({ products, onRequestSample, onSelectProduct }: ProductGrid
           product={product}
           onRequestSample={onRequestSample}
           onSelectProduct={onSelectProduct}
+          projectId={projectId}
+          availablePoints={availablePoints}
         />
       ))}
     </div>

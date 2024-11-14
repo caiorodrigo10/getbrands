@@ -5,10 +5,19 @@ import FeaturedSlider from "@/components/FeaturedSlider";
 import ProductGrid from "@/components/ProductGrid";
 import CatalogPagination from "./CatalogPagination";
 import { CartButton } from "@/components/CartButton";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { useProducts } from "@/hooks/useProducts";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CatalogLayoutProps {
   onRequestSample: (id: string) => void;
@@ -17,7 +26,11 @@ interface CatalogLayoutProps {
 
 const CatalogLayout = ({ onRequestSample, onSelectProduct }: CatalogLayoutProps) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedProject, setSelectedProject] = useState<string>("");
+  const [projects, setProjects] = useState<any[]>([]);
+  const [availablePoints, setAvailablePoints] = useState(0);
   const { toast } = useToast();
+  const { user } = useAuth();
   
   const { 
     data: productsData, 
@@ -27,11 +40,61 @@ const CatalogLayout = ({ onRequestSample, onSelectProduct }: CatalogLayoutProps)
     page: currentPage,
   });
 
+  useEffect(() => {
+    if (user) {
+      // Fetch user's projects
+      const fetchProjects = async () => {
+        const { data, error } = await supabase
+          .from('projects')
+          .select('*')
+          .eq('user_id', user.id);
+        
+        if (error) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to load projects.",
+          });
+        } else if (data) {
+          setProjects(data);
+        }
+      };
+
+      fetchProjects();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (selectedProject) {
+      // Fetch project points
+      const fetchProjectPoints = async () => {
+        const { data, error } = await supabase
+          .from('projects')
+          .select('points, points_used')
+          .eq('id', selectedProject)
+          .single();
+        
+        if (error) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to load project points.",
+          });
+        } else if (data) {
+          const available = (data.points || 0) - (data.points_used || 0);
+          setAvailablePoints(available);
+        }
+      };
+
+      fetchProjectPoints();
+    }
+  }, [selectedProject]);
+
   if (error) {
     toast({
       variant: "destructive",
-      title: "Erro ao carregar produtos",
-      description: "Ocorreu um erro ao carregar os produtos. Por favor, tente novamente.",
+      title: "Error loading products",
+      description: "Failed to load products. Please try again.",
     });
   }
 
@@ -39,11 +102,28 @@ const CatalogLayout = ({ onRequestSample, onSelectProduct }: CatalogLayoutProps)
     <div className="space-y-8 px-4 md:px-0">
       <div className="flex flex-col space-y-8">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Welcome, Caio Rodrigo!</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Welcome!</h1>
           <p className="text-gray-600 mt-2">Choose a product to customize</p>
         </div>
 
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="w-full md:w-64">
+            <Select
+              value={selectedProject}
+              onValueChange={setSelectedProject}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a project" />
+              </SelectTrigger>
+              <SelectContent>
+                {projects.map((project) => (
+                  <SelectItem key={project.id} value={project.id}>
+                    {project.name} ({(project.points - project.points_used)} pts)
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="w-full md:flex-1 overflow-x-auto">
             <CatalogFilters />
           </div>
@@ -72,10 +152,12 @@ const CatalogLayout = ({ onRequestSample, onSelectProduct }: CatalogLayoutProps)
             products={productsData.data}
             onRequestSample={onRequestSample}
             onSelectProduct={onSelectProduct}
+            projectId={selectedProject}
+            availablePoints={availablePoints}
           />
         ) : (
           <div className="text-center py-12">
-            <p className="text-lg text-gray-600">Nenhum produto encontrado.</p>
+            <p className="text-lg text-gray-600">No products found.</p>
           </div>
         )}
         

@@ -7,14 +7,23 @@ import { useCart } from "@/contexts/CartContext";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProductCardProps {
   product: Product;
   onRequestSample: (id: string) => void;
   onSelectProduct: (id: string) => void;
+  projectId?: string;
+  availablePoints?: number;
 }
 
-const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardProps) => {
+const ProductCard = ({ 
+  product, 
+  onRequestSample, 
+  onSelectProduct,
+  projectId,
+  availablePoints = 0
+}: ProductCardProps) => {
   const navigate = useNavigate();
   const { addItem } = useCart();
   const { toast } = useToast();
@@ -48,6 +57,64 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
         variant: "destructive",
         title: "Error",
         description: "Failed to add product to cart. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSelect = async () => {
+    if (!projectId) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No project selected. Please select a project first.",
+      });
+      return;
+    }
+
+    if (availablePoints < 1000) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Not enough points available.",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Add product to project and update points
+      const { error: projectError } = await supabase
+        .from('project_products')
+        .insert({
+          project_id: projectId,
+          product_id: product.id,
+        });
+
+      if (projectError) throw projectError;
+
+      // Update project points
+      const { error: pointsError } = await supabase
+        .from('projects')
+        .update({ 
+          points_used: availablePoints - 1000 
+        })
+        .eq('id', projectId);
+
+      if (pointsError) throw pointsError;
+
+      onSelectProduct(product.id);
+      toast({
+        title: "Success",
+        description: "Product selected successfully. 1000 points used.",
+      });
+    } catch (error) {
+      console.error('Error selecting product:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to select product. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -120,9 +187,10 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
           </Button>
           <Button 
             className="flex-1 bg-primary hover:bg-primary-dark text-white"
-            onClick={() => onSelectProduct(product.id)}
+            onClick={handleSelect}
+            disabled={isLoading || availablePoints < 1000}
           >
-            Select
+            Select (1000 pts)
           </Button>
         </div>
       </div>

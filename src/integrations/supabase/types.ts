@@ -253,12 +253,53 @@ export type Database = {
         }
         Relationships: []
       }
+      project_products: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string | null
+          project_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          project_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          project_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_products_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           created_at: string
           description: string | null
           id: string
           name: string
+          points: number | null
+          points_used: number | null
           status: string | null
           updated_at: string
           user_id: string | null
@@ -268,6 +309,8 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
+          points?: number | null
+          points_used?: number | null
           status?: string | null
           updated_at?: string
           user_id?: string | null
@@ -277,6 +320,8 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          points?: number | null
+          points_used?: number | null
           status?: string | null
           updated_at?: string
           user_id?: string | null
