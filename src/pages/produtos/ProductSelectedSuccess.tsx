@@ -77,7 +77,6 @@ const ProductSelectedSuccess = () => {
         </div>
       </Card>
     </div>
-  </div>
   );
 };
 
