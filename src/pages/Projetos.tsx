@@ -37,42 +37,34 @@ const Projetos = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Meus Projetos</h1>
-      </div>
+      <h1 className="text-2xl font-bold">Meus Projetos</h1>
 
-      <div className="grid gap-6">
+      <div className="grid gap-4">
         {projects?.map((project) => (
-          <Card key={project.id} className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-6">
+          <Card key={project.id} className="p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
                 <div>
-                  <h2 className="text-xl font-semibold mb-2">{project.name}</h2>
-                  <p className="text-sm text-muted-foreground">
-                    Iniciado em {format(new Date(project.created_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Informações do Projeto</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Package className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Produtos vinculados:</span>
-                      <span className="font-medium">{project.project_products?.length || 0}</span>
+                  <div className="flex items-center justify-between mb-1">
+                    <h2 className="text-lg font-semibold">{project.name}</h2>
+                    <span className="text-xs text-muted-foreground">
+                      {format(new Date(project.created_at), "dd/MM/yyyy", { locale: ptBR })}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Package className="w-4 h-4" />
+                      <span>{project.project_products?.length || 0} produtos</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Etapa atual:</span>
-                      <span className="font-medium">{project.status}</span>
-                    </div>
+                    <span>•</span>
+                    <span>Etapa: {project.status}</span>
                   </div>
                 </div>
 
                 <ProjectProgress progress={30} />
               </div>
 
-              <div>
-                <h3 className="text-sm font-medium mb-4">Timeline do Projeto</h3>
+              <div className="border-t md:border-t-0 md:border-l border-border/50 pt-4 md:pt-0 md:pl-6">
                 <StagesTimeline />
               </div>
             </div>
