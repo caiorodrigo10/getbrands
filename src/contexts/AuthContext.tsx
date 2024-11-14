@@ -20,9 +20,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Initial session:", session); // Debug log
       if (session) {
         setSession(session);
         setUser(session.user);
@@ -30,11 +28,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(false);
     });
 
-    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("Auth state changed:", session); // Debug log
       if (session) {
         setSession(session);
         setUser(session.user);
@@ -49,49 +45,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (signInError) {
-        if (signInError.message.includes('Invalid login credentials')) {
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-            email,
-            password,
-          });
-
-          if (signUpError) throw signUpError;
-          if (!signUpData.user) throw new Error('No user returned after sign up');
-          
-          setUser(signUpData.user);
-          setSession(signUpData.session);
-          
-          toast({
-            title: "Success",
-            description: "Account created successfully!",
-          });
-          return;
-        }
-        throw signInError;
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Invalid email or password. Please try again.",
+        });
+        throw error;
       }
 
-      if (!signInData.user) throw new Error('No user returned after sign in');
-
-      setUser(signInData.user);
-      setSession(signInData.session);
-
-      toast({
-        title: "Success",
-        description: "Logged in successfully!",
-      });
+      if (data.user) {
+        setUser(data.user);
+        setSession(data.session);
+        toast({
+          title: "Success",
+          description: "Logged in successfully!",
+        });
+      }
     } catch (error) {
       console.error('Login error:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to log in. Please try again.",
-      });
       throw error;
     }
   };
