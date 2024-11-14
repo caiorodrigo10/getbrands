@@ -2,7 +2,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Product } from "@/types/product";
 
@@ -31,7 +30,6 @@ const ProjectSelectionDialog = ({
   const [selectedProject, setSelectedProject] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleConfirm = async () => {
@@ -54,24 +52,21 @@ const ProjectSelectionDialog = ({
       setIsProcessing(false);
       onOpenChange(false);
       
-      // Navigate to success page only
+      // Navigate to success page with product and project info
       navigate("/produtos/success", { 
         state: { 
-          fromProductSelection: true 
+          product: {
+            name: product.name,
+            image_url: product.image_url
+          },
+          project: {
+            name: projects.find(p => p.id === selectedProject)?.name
+          }
         }
-      });
-      
-      toast({
-        title: "Product selected successfully! 🎉",
-        description: "The product has been added to your project.",
       });
     } catch (error) {
       setIsProcessing(false);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to select product. Please try again.",
-      });
+      console.error('Error selecting product:', error);
     }
   };
 
