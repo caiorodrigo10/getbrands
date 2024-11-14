@@ -3,11 +3,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { addressSchema, type ShippingFormData } from "@/types/shipping";
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { ProfileForm } from "@/components/profile/ProfileForm";
+import { PasswordChangeForm } from "@/components/profile/PasswordChangeForm";
 
 const Perfil = () => {
   const { user } = useAuth();
@@ -32,54 +33,55 @@ const Perfil = () => {
   });
 
   useEffect(() => {
-    const loadProfile = async () => {
-      if (!user) return;
-
-      try {
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("name, email, phone, avatar_url")
-          .eq("id", user.id)
-          .single();
-
-        if (profileError) throw profileError;
-
-        const { data: addresses, error: addressError } = await supabase
-          .from("addresses")
-          .select("*")
-          .eq("user_id", user.id)
-          .maybeSingle();
-
-        if (addressError) throw addressError;
-
-        const [firstName, lastName] = (profile?.name || "").split(" ");
-        setAvatarUrl(profile?.avatar_url);
-
-        form.reset({
-          firstName: firstName || "",
-          lastName: lastName || "",
-          email: profile?.email || "",
-          phone: profile?.phone || "",
-          address1: addresses?.street_address1 || "",
-          address2: addresses?.street_address2 || "",
-          city: addresses?.city || "",
-          state: addresses?.state || "",
-          zipCode: addresses?.zip_code || "",
-        });
-      } catch (error) {
-        console.error("Error loading profile:", error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to load profile information. Please try again.",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadProfile();
-  }, [user, form, toast]);
+  }, [user]);
+
+  const loadProfile = async () => {
+    if (!user) return;
+
+    try {
+      setIsLoading(true);
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("name, email, phone, avatar_url")
+        .eq("id", user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      const { data: addresses, error: addressError } = await supabase
+        .from("addresses")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (addressError) throw addressError;
+
+      const [firstName, lastName] = (profile?.name || "").split(" ");
+      setAvatarUrl(profile?.avatar_url);
+
+      form.reset({
+        firstName: firstName || "",
+        lastName: lastName || "",
+        email: profile?.email || "",
+        phone: profile?.phone || "",
+        address1: addresses?.street_address1 || "",
+        address2: addresses?.street_address2 || "",
+        city: addresses?.city || "",
+        state: addresses?.state || "",
+        zipCode: addresses?.zip_code || "",
+      });
+    } catch (error) {
+      console.error("Error loading profile:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load profile information. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -214,6 +216,8 @@ const Perfil = () => {
           />
         </CardContent>
       </Card>
+      
+      <PasswordChangeForm />
     </div>
   );
 };
