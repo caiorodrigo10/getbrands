@@ -58,7 +58,7 @@ const Perfil = () => {
         .from("addresses")
         .select("*")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (addressError && addressError.code !== "PGRST116") throw addressError;
 
@@ -90,10 +90,11 @@ const Perfil = () => {
     }
   };
 
-  const handleAvatarUpload = async (file: File) => {
-    if (!user) return;
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user || !event.target.files || !event.target.files[0]) return;
 
     try {
+      const file = event.target.files[0];
       const fileExt = file.name.split('.').pop();
       const filePath = `${user.id}/${Math.random()}.${fileExt}`;
 

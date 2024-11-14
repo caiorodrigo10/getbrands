@@ -43,11 +43,13 @@ export const ProfileForm = ({ form, onSubmit, isSaving }: ProfileFormProps) => {
       if (profileError) throw profileError;
 
       // Check if address exists
-      const { data: existingAddress } = await supabase
+      const { data: existingAddress, error: addressQueryError } = await supabase
         .from("addresses")
-        .select("id")
+        .select("*")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
+
+      if (addressQueryError && addressQueryError.code !== "PGRST116") throw addressQueryError;
 
       const addressData = {
         user_id: user.id,
