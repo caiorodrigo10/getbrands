@@ -75,24 +75,27 @@ export const SavedAddressSelect = ({
     <RadioGroup
       value={selectedAddressId || undefined}
       onValueChange={onAddressSelect}
-      className="space-y-2"
+      className="space-y-3"
     >
       {addresses.map((address) => (
-        <div key={address.id} className="flex items-center space-x-3 rounded-lg border p-4">
-          <RadioGroupItem value={address.id} id={address.id} />
-          <Label htmlFor={address.id} className="flex-1 cursor-pointer">
-            <div>
-              <p className="font-medium">
-                {address.first_name} {address.last_name}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {address.street_address1}
-                {address.street_address2 && `, ${address.street_address2}`}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {address.city}, {address.state} {address.zip_code}
-              </p>
+        <div key={address.id} className="flex items-start space-x-3 rounded-lg border p-4">
+          <RadioGroupItem value={address.id} id={address.id} className="mt-1" />
+          <Label htmlFor={address.id} className="flex-1 cursor-pointer space-y-1">
+            <div className="font-medium">
+              {address.first_name} {address.last_name}
             </div>
+            <div className="text-sm text-muted-foreground">
+              {address.street_address1}
+              {address.street_address2 && `, ${address.street_address2}`}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {address.city}, {address.state} {address.zip_code}
+            </div>
+            {address.phone && (
+              <div className="text-sm text-muted-foreground">
+                {address.phone}
+              </div>
+            )}
           </Label>
           <Button
             variant="ghost"

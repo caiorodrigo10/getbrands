@@ -4,7 +4,7 @@ import { SavedAddressSelect } from "@/components/shipping/SavedAddressSelect";
 import { Address } from "@/types/shipping";
 import { UseFormReturn } from "react-hook-form";
 import { ShippingFormData } from "@/types/shipping";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface AddressSelectionSectionProps {
   user: { id: string };
@@ -30,17 +30,17 @@ export const AddressSelectionSection = ({
   return (
     <div className="mb-4">
       <div className="flex justify-end mb-4">
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
             <Button variant="outline" size="sm" className="w-auto">
-              Select Another Address
+              Select Previous Address
             </Button>
-          </SheetTrigger>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>Saved Addresses</SheetTitle>
-            </SheetHeader>
-            <div className="mt-6">
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Select from previous addresses</DialogTitle>
+            </DialogHeader>
+            <div className="mt-4">
               <SavedAddressSelect
                 userId={user.id}
                 selectedAddressId={selectedAddressId}
@@ -51,6 +51,7 @@ export const AddressSelectionSection = ({
                       ...form.getValues(),
                       firstName: selectedAddress.first_name || "",
                       lastName: selectedAddress.last_name || "",
+                      phone: selectedAddress.phone || "",
                       address1: selectedAddress.street_address1,
                       address2: selectedAddress.street_address2 || "",
                       city: selectedAddress.city,
@@ -67,8 +68,8 @@ export const AddressSelectionSection = ({
                 }}
               />
             </div>
-          </SheetContent>
-        </Sheet>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
