@@ -15,8 +15,12 @@ const Sidebar = () => {
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-secondary p-6 flex flex-col shadow-xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-heading font-bold text-primary">Mainer</h1>
+      <div className="mb-8 flex justify-center">
+        <img 
+          src="https://content.app-sources.com/s/97257455971736356/uploads/Logos/Logotipo_4-7282325.png?format=webp"
+          alt="Mainer Logo"
+          className="w-[250px] h-auto object-contain"
+        />
       </div>
       <nav className="flex-1">
         <ul className="space-y-2">
@@ -27,7 +31,7 @@ const Sidebar = () => {
                 className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition-all duration-200 hover:bg-primary/10 hover:text-primary ${
                   location.pathname === item.path
                     ? "bg-primary/20 text-primary font-medium"
-                    : "text-secondary-foreground"
+                    : "text-white hover:text-primary"
                 }`}
               >
                 <item.icon className="h-5 w-5" />
