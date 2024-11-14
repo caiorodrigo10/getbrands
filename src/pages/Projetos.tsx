@@ -72,7 +72,7 @@ const Projetos = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Produtos selecionados:</span>
-                      <span className="font-medium">1</span>
+                      <span className="font-medium">5</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Etapa atual:</span>
