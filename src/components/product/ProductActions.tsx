@@ -73,12 +73,20 @@ export const ProductActions = ({
 
       if (projectError) throw projectError;
 
+      // First get current points_used
+      const { data: currentProject, error: fetchError } = await supabase
+        .from('projects')
+        .select('points_used')
+        .eq('id', projectId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
       // Update project points
+      const newPointsUsed = (currentProject?.points_used || 0) + 1000;
       const { error: pointsError } = await supabase
         .from('projects')
-        .update({ 
-          points_used: supabase.rpc('increment', { x: 1000 })
-        })
+        .update({ points_used: newPointsUsed })
         .eq('id', projectId);
 
       if (pointsError) throw pointsError;
