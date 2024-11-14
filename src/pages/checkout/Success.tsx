@@ -33,6 +33,7 @@ const Success = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [orderDetails, setOrderDetails] = useState<OrderSummary | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const shippingCost = 4.50;
 
   useEffect(() => {
@@ -55,13 +56,19 @@ const Success = () => {
           `)
           .eq('user_id', user?.id)
           .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
+          .limit(1);
 
         if (error) throw error;
         
-        if (data) {
-          setOrderDetails(data as OrderSummary);
+        if (data && data.length > 0) {
+          setOrderDetails(data[0] as OrderSummary);
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "No order found. Please try again.",
+          });
+          navigate('/catalogo');
         }
       } catch (error) {
         console.error('Error fetching order details:', error);
@@ -70,6 +77,8 @@ const Success = () => {
           title: "Error",
           description: "Failed to load order details.",
         });
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -78,6 +87,23 @@ const Success = () => {
     }
     clearCart();
   }, [user]);
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen bg-background">
+        <Sidebar />
+        <main className="flex-1 ml-64 p-8">
+          <div className="max-w-3xl mx-auto">
+            <Card>
+              <CardContent className="flex items-center justify-center p-8">
+                <p>Loading order details...</p>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
