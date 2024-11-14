@@ -23,7 +23,8 @@ const SampleOrders = () => {
         .from("sample_requests")
         .select(`
           *,
-          product:products(*)
+          product:products(*),
+          user:profiles(*)
         `, { count: 'exact' });
 
       // Apply status filter
@@ -33,7 +34,7 @@ const SampleOrders = () => {
 
       // Apply search filter if present
       if (searchQuery) {
-        query = query.or(`product.name.ilike.%${searchQuery}%,id.ilike.%${searchQuery}%`);
+        query = query.or(`product->>name.ilike.%${searchQuery}%,id.ilike.%${searchQuery}%`);
       }
 
       // Calculate pagination range
