@@ -13,7 +13,9 @@ export type Database = {
         Row: {
           city: string
           created_at: string
+          first_name: string | null
           id: string
+          last_name: string | null
           state: string
           street_address1: string
           street_address2: string | null
@@ -25,7 +27,9 @@ export type Database = {
         Insert: {
           city: string
           created_at?: string
+          first_name?: string | null
           id?: string
+          last_name?: string | null
           state: string
           street_address1: string
           street_address2?: string | null
@@ -37,7 +41,9 @@ export type Database = {
         Update: {
           city?: string
           created_at?: string
+          first_name?: string | null
           id?: string
+          last_name?: string | null
           state?: string
           street_address1?: string
           street_address2?: string | null

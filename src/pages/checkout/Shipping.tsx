@@ -92,11 +92,13 @@ const Shipping = () => {
 
       if (profileError) throw profileError;
 
-      // Save shipping address
+      // Save shipping address with first/last name
       const { error: addressError } = await supabase
         .from("addresses")
         .insert({
           user_id: user.id,
+          first_name: values.firstName,
+          last_name: values.lastName,
           street_address1: values.address1,
           street_address2: values.address2,
           city: values.city,
@@ -115,6 +117,8 @@ const Shipping = () => {
           .from("addresses")
           .insert({
             user_id: user.id,
+            first_name: values.firstName,
+            last_name: values.lastName,
             street_address1: values.billingAddress1,
             street_address2: values.billingAddress2,
             city: values.billingCity!,

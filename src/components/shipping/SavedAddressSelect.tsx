@@ -48,7 +48,9 @@ export const SavedAddressSelect = ({
             <RadioGroupItem value={address.id} id={address.id} />
             <Label htmlFor={address.id} className="flex-1 cursor-pointer">
               <div>
-                <p className="font-medium">{address.name || 'Shipping Address'}</p>
+                <p className="font-medium">
+                  {address.first_name} {address.last_name}
+                </p>
                 <p className="text-sm text-muted-foreground">
                   {address.street_address1}
                   {address.street_address2 && `, ${address.street_address2}`}

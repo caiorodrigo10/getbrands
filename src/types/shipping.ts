@@ -20,6 +20,8 @@ export interface Address {
   id: string;
   user_id: string;
   name?: string;
+  first_name?: string;
+  last_name?: string;
   street_address1: string;
   street_address2?: string | null;
   city: string;

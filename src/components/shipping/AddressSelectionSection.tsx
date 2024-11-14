@@ -48,6 +48,8 @@ export const AddressSelectionSection = ({
             if (selectedAddress) {
               form.reset({
                 ...form.getValues(),
+                firstName: selectedAddress.first_name || "",
+                lastName: selectedAddress.last_name || "",
                 address1: selectedAddress.street_address1,
                 address2: selectedAddress.street_address2 || "",
                 city: selectedAddress.city,
