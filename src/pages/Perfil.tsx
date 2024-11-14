@@ -60,13 +60,14 @@ const Perfil = () => {
         .eq("user_id", user.id)
         .single();
 
-      if (addressError && addressError.code !== 'PGRST116') throw addressError;
+      if (addressError && addressError.code !== "PGRST116") throw addressError;
 
-      const [firstName, lastName] = (profile?.name || "").split(" ");
-      
+      // Split name into first and last name
+      const [firstName = "", lastName = ""] = (profile?.name || "").split(" ");
+
       form.reset({
-        firstName: firstName || "",
-        lastName: lastName || "",
+        firstName,
+        lastName,
         email: profile?.email || "",
         phone: profile?.phone || "",
         address1: address?.street_address1 || "",
@@ -89,71 +90,49 @@ const Perfil = () => {
     }
   };
 
-  const onSubmit = async (data: ShippingFormData) => {
+  const handleAvatarUpload = async (file: File) => {
     if (!user) return;
-    setIsSaving(true);
 
     try {
-      // Update profile
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({
-          name: `${data.firstName} ${data.lastName}`,
-          email: data.email,
-          phone: data.phone,
-        })
-        .eq("id", user.id);
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}/${Math.random()}.${fileExt}`;
 
-      if (profileError) throw profileError;
+      const { error: uploadError } = await supabase.storage
+        .from('profile-pictures')
+        .upload(filePath, file);
 
-      // Prepare address data
-      const addressData = {
-        user_id: user.id,
-        street_address1: data.address1,
-        street_address2: data.address2 || null,
-        city: data.city,
-        state: data.state,
-        zip_code: data.zipCode,
-      };
+      if (uploadError) throw uploadError;
 
-      // Check if address exists
-      const { data: existingAddress } = await supabase
-        .from("addresses")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-pictures')
+        .getPublicUrl(filePath);
 
-      if (existingAddress) {
-        // Update existing address
-        const { error: updateError } = await supabase
-          .from("addresses")
-          .update(addressData)
-          .eq("user_id", user.id);
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
 
-        if (updateError) throw updateError;
-      } else {
-        // Insert new address
-        const { error: insertError } = await supabase
-          .from("addresses")
-          .insert([addressData]);
+      if (updateError) throw updateError;
 
-        if (insertError) throw insertError;
-      }
-
+      setAvatarUrl(publicUrl);
       toast({
         title: "Success",
-        description: "Profile updated successfully",
+        description: "Profile picture updated successfully",
       });
-      
-      // Reload profile data
-      await loadProfile();
     } catch (error) {
-      console.error("Error updating profile:", error);
+      console.error("Error uploading avatar:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update profile",
+        description: "Failed to upload profile picture",
       });
+    }
+  };
+
+  const onSubmit = async (data: ShippingFormData) => {
+    setIsSaving(true);
+    try {
+      await loadProfile(); // Reload profile data after saving
     } finally {
       setIsSaving(false);
     }
@@ -169,42 +148,7 @@ const Perfil = () => {
             <ProfileAvatar
               avatarUrl={avatarUrl}
               userEmail={user.email}
-              onAvatarUpload={async (file) => {
-                try {
-                  const fileExt = file.name.split('.').pop();
-                  const filePath = `${user.id}/${Math.random()}.${fileExt}`;
-
-                  const { error: uploadError } = await supabase.storage
-                    .from('profile-pictures')
-                    .upload(filePath, file);
-
-                  if (uploadError) throw uploadError;
-
-                  const { data: { publicUrl } } = supabase.storage
-                    .from('profile-pictures')
-                    .getPublicUrl(filePath);
-
-                  const { error: updateError } = await supabase
-                    .from('profiles')
-                    .update({ avatar_url: publicUrl })
-                    .eq('id', user.id);
-
-                  if (updateError) throw updateError;
-
-                  setAvatarUrl(publicUrl);
-                  toast({
-                    title: "Success",
-                    description: "Profile picture updated successfully",
-                  });
-                } catch (error) {
-                  console.error("Error uploading avatar:", error);
-                  toast({
-                    variant: "destructive",
-                    title: "Error",
-                    description: "Failed to upload profile picture",
-                  });
-                }
-              }}
+              onAvatarUpload={handleAvatarUpload}
             />
             <div>
               <CardTitle>My Profile</CardTitle>

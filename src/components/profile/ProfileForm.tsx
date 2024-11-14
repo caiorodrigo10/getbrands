@@ -7,6 +7,7 @@ import { UseFormReturn } from "react-hook-form";
 import { ShippingFormData } from "@/types/shipping";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProfileFormProps {
   form: UseFormReturn<ShippingFormData>;
@@ -16,10 +17,66 @@ interface ProfileFormProps {
 
 export const ProfileForm = ({ form, onSubmit, isSaving }: ProfileFormProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleSubmit = async (data: ShippingFormData) => {
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "You must be logged in to update your profile.",
+      });
+      return;
+    }
+
     try {
+      // Update profile information
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({
+          name: `${data.firstName} ${data.lastName}`,
+          email: data.email,
+          phone: data.phone,
+        })
+        .eq("id", user.id);
+
+      if (profileError) throw profileError;
+
+      // Check if address exists
+      const { data: existingAddress } = await supabase
+        .from("addresses")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
+
+      const addressData = {
+        user_id: user.id,
+        street_address1: data.address1,
+        street_address2: data.address2 || null,
+        city: data.city,
+        state: data.state,
+        zip_code: data.zipCode,
+      };
+
+      if (existingAddress) {
+        // Update existing address
+        const { error: addressError } = await supabase
+          .from("addresses")
+          .update(addressData)
+          .eq("user_id", user.id);
+
+        if (addressError) throw addressError;
+      } else {
+        // Insert new address
+        const { error: addressError } = await supabase
+          .from("addresses")
+          .insert([addressData]);
+
+        if (addressError) throw addressError;
+      }
+
       await onSubmit(data);
+      
       toast({
         title: "Success",
         description: "Profile updated successfully",
