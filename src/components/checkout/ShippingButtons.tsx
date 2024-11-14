@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ShippingButtonsProps {
   isAddressSaved: boolean;
@@ -9,6 +11,27 @@ interface ShippingButtonsProps {
 }
 
 export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue, onSave }: ShippingButtonsProps) => {
+  const navigate = useNavigate();
+  const { clearCart } = useCart();
+  const { toast } = useToast();
+
+  const handleCancel = async () => {
+    try {
+      await clearCart();
+      onCancel();
+      toast({
+        description: "Order cancelled and cart cleared.",
+      });
+      navigate("/catalogo");
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to cancel order. Please try again.",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-center">
@@ -26,7 +49,7 @@ export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue, onSave }
         <Button
           type="button"
           variant="destructive"
-          onClick={onCancel}
+          onClick={handleCancel}
         >
           Cancel Order
         </Button>
