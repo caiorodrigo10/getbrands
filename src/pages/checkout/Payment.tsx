@@ -1,113 +1,16 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
-import type { Stripe, StripeElementsOptions } from "@stripe/stripe-js";
-import { 
-  Elements, 
-  PaymentElement, 
-  useStripe, 
-  useElements
-} from "@stripe/react-stripe-js";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import type { StripeElementsOptions } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
-import { useAuth } from "@/contexts/AuthContext";
-import { formatCurrency } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useShippingCalculation } from "@/hooks/useShippingCalculation";
+import PaymentForm from "@/components/checkout/PaymentForm";
+import PaymentSummary from "@/components/checkout/PaymentSummary";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
-
-const CheckoutForm = ({ clientSecret, total, shippingCost }: { clientSecret: string; total: number; shippingCost: number }) => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const { items, clearCart } = useCart();
-  const { user } = useAuth();
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!stripe || !elements || !user) {
-      return;
-    }
-
-    setIsProcessing(true);
-
-    try {
-      const { error: paymentError } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/checkout/success`,
-          shipping: {
-            name: 'Frete padrão',
-            address: {
-              line1: "Endereço de entrega",
-              city: "Cidade",
-              state: "Estado",
-              postal_code: "00000-000",
-              country: 'BR',
-            },
-          },
-        },
-      });
-
-      if (paymentError) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: paymentError.message || "An error occurred during payment.",
-        });
-      } else {
-        // Create sample request with user_id
-        const { error: orderError } = await supabase
-          .from('sample_requests')
-          .insert({
-            user_id: user.id,
-            product_id: items[0]?.id,
-            status: 'pending',
-            shipping_address: "Endereço de entrega",
-            shipping_city: "Cidade",
-            shipping_state: "Estado",
-            shipping_zip: "00000-000",
-            tracking_number: null
-          });
-
-        if (orderError) throw orderError;
-
-        clearCart();
-        navigate("/checkout/success");
-      }
-    } catch (error) {
-      console.error("Payment error:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
-        <PaymentElement />
-      </div>
-      <Button 
-        type="submit" 
-        disabled={!stripe || isProcessing}
-        className="w-full"
-      >
-        {isProcessing ? "Processing..." : `Pay ${formatCurrency(total)}`}
-      </Button>
-    </form>
-  );
-};
 
 const Payment = () => {
   const { items } = useCart();
@@ -177,24 +80,13 @@ const Payment = () => {
           <CardDescription>Enter your payment details below</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="mb-6 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal:</span>
-              <span>{formatCurrency(subtotal)}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Shipping:</span>
-              <span>{formatCurrency(shippingCost)}</span>
-            </div>
-            <div className="pt-2 border-t">
-              <div className="flex justify-between font-medium">
-                <span>Total:</span>
-                <span>{formatCurrency(total)}</span>
-              </div>
-            </div>
-          </div>
+          <PaymentSummary 
+            subtotal={subtotal}
+            shippingCost={shippingCost}
+            total={total}
+          />
           <Elements stripe={stripePromise} options={options}>
-            <CheckoutForm 
+            <PaymentForm 
               clientSecret={clientSecret} 
               total={total} 
               shippingCost={shippingCost}
