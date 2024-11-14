@@ -2,11 +2,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Package, ArrowDown, MoreVertical, Truck } from "lucide-react";
+import { Package, ArrowDown, MoreVertical, Truck, ChevronDown, ChevronUp } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface OrderTableProps {
   orders: any[];
@@ -16,6 +17,7 @@ interface OrderTableProps {
 const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
   const { toast } = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -23,7 +25,7 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
         return "bg-green-100 text-green-800";
       case "canceled":
         return "bg-red-100 text-red-800";
-      case "pending":
+      case "pendente":
         return "bg-yellow-100 text-yellow-800";
       default:
         return "bg-gray-100 text-gray-800";
@@ -62,6 +64,10 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
     }
   };
 
+  const toggleOrderExpansion = (orderId: string) => {
+    setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -80,70 +86,153 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
         </TableHeader>
         <TableBody>
           {orders?.map((order) => (
-            <TableRow key={order.id}>
-              <TableCell>
-                <Button variant="ghost" size="icon">
-                  <ArrowDown className="h-4 w-4" />
-                </Button>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <Package className="h-4 w-4" />
-                  <span>SAMPLE ORDER</span>
-                </div>
-              </TableCell>
-              <TableCell>SPL{order.id.slice(0, 6)}</TableCell>
-              <TableCell>
-                {new Date(order.created_at).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </TableCell>
-              <TableCell>{order.shipping_city || "-"}</TableCell>
-              <TableCell>
-                {order.tracking_number ? (
+            <>
+              <TableRow key={order.id}>
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => toggleOrderExpansion(order.id)}
+                  >
+                    {expandedOrderId === order.id ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </Button>
+                </TableCell>
+                <TableCell>
                   <div className="flex items-center gap-2">
-                    <Truck className="h-4 w-4" />
-                    <span>{order.tracking_number}</span>
+                    <Package className="h-4 w-4" />
+                    <span>SAMPLE ORDER</span>
                   </div>
-                ) : (
-                  "-"
-                )}
-              </TableCell>
-              <TableCell>
-                <Badge className={getStatusColor(order.status)}>
-                  {order.status?.toUpperCase() || "PENDING"}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                {formatCurrency(order.product?.from_price || 0)}
-              </TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>View Details</DropdownMenuItem>
-                    {order.tracking_number && (
-                      <DropdownMenuItem>Track Shipment</DropdownMenuItem>
-                    )}
-                    {order.status?.toLowerCase() === "pending" && (
-                      <DropdownMenuItem 
-                        onClick={() => handleCancelOrder(order.id)}
-                        disabled={isDeleting}
+                </TableCell>
+                <TableCell>SPL{order.id.slice(0, 6)}</TableCell>
+                <TableCell>
+                  {new Date(order.created_at).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </TableCell>
+                <TableCell>{order.shipping_city || "-"}</TableCell>
+                <TableCell>
+                  {order.tracking_number ? (
+                    <div className="flex items-center gap-2">
+                      <Truck className="h-4 w-4" />
+                      <span>{order.tracking_number}</span>
+                    </div>
+                  ) : (
+                    "-"
+                  )}
+                </TableCell>
+                <TableCell>
+                  <Badge className={getStatusColor(order.status)}>
+                    {order.status?.toUpperCase() || "PENDENTE"}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {formatCurrency(order.product?.from_price || 0)}
+                </TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>View Details</DropdownMenuItem>
+                      {order.tracking_number && (
+                        <DropdownMenuItem>Track Shipment</DropdownMenuItem>
+                      )}
+                      {order.status?.toLowerCase() === "pendente" && (
+                        <DropdownMenuItem 
+                          onClick={() => handleCancelOrder(order.id)}
+                          disabled={isDeleting}
+                        >
+                          Cancel Order
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+              <AnimatePresence>
+                {expandedOrderId === order.id && (
+                  <TableRow>
+                    <TableCell colSpan={9}>
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
                       >
-                        Cancel Order
-                      </DropdownMenuItem>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
+                        <div className="p-6 space-y-6 bg-gray-50">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Product Details */}
+                            <div className="space-y-4">
+                              <h4 className="font-semibold text-lg">Product Details</h4>
+                              <div className="flex items-start gap-4 bg-white p-4 rounded-lg">
+                                <img
+                                  src={order.product?.image_url || "/placeholder.svg"}
+                                  alt={order.product?.name}
+                                  className="w-20 h-20 object-cover rounded"
+                                />
+                                <div>
+                                  <h5 className="font-medium">{order.product?.name}</h5>
+                                  <p className="text-sm text-gray-600">SKU: {order.product?.id.slice(0, 8)}</p>
+                                  <p className="text-sm text-gray-600 mt-2">
+                                    1 x {formatCurrency(order.product?.from_price || 0)} = {formatCurrency(order.product?.from_price || 0)}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Shipping Address */}
+                            <div className="space-y-4">
+                              <h4 className="font-semibold text-lg">Shipping Address</h4>
+                              <div className="bg-white p-4 rounded-lg">
+                                <p>{order.shipping_address}</p>
+                                <p>{order.shipping_city}, {order.shipping_state} {order.shipping_zip}</p>
+                                <p>United States</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Payment Details */}
+                          <div className="bg-white p-4 rounded-lg max-w-sm ml-auto">
+                            <h4 className="font-semibold text-lg mb-4">Payment Details</h4>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span>Subtotal:</span>
+                                <span>{formatCurrency(order.product?.from_price || 0)}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Shipping:</span>
+                                <span>{formatCurrency(4.50)}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Credits Applied:</span>
+                                <span>{formatCurrency(0)}</span>
+                              </div>
+                              <div className="border-t pt-2 mt-2">
+                                <div className="flex justify-between font-semibold">
+                                  <span>Total:</span>
+                                  <span>{formatCurrency((order.product?.from_price || 0) + 4.50)}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </AnimatePresence>
+            </>
           ))}
         </TableBody>
       </Table>

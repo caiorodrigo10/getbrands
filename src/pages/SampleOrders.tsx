@@ -5,23 +5,44 @@ import OrderFilters from "@/components/sample-orders/OrderFilters";
 import OrderTable from "@/components/sample-orders/OrderTable";
 import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+
+const ITEMS_PER_PAGE = 9;
 
 const SampleOrders = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [showOnHold, setShowOnHold] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
 
-  const { data: orders, isLoading } = useQuery({
-    queryKey: ["sample-orders"],
+  const { data: ordersData, isLoading } = useQuery({
+    queryKey: ["sample-orders", currentPage, selectedStatus, searchQuery],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("sample_requests")
         .select(`
           *,
           product:products(*)
-        `)
-        .order("created_at", { ascending: false });
+        `, { count: 'exact' });
+
+      // Apply status filter
+      if (selectedStatus !== "all") {
+        query = query.eq('status', selectedStatus);
+      }
+
+      // Apply search filter if present
+      if (searchQuery) {
+        query = query.or(`product.name.ilike.%${searchQuery}%,id.ilike.%${searchQuery}%`);
+      }
+
+      // Calculate pagination range
+      const from = (currentPage - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE - 1;
+
+      const { data, error, count } = await query
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
       if (error) {
         toast({
@@ -31,20 +52,13 @@ const SampleOrders = () => {
         });
         throw error;
       }
-      return data;
+
+      return {
+        data,
+        totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE),
+        currentPage
+      };
     },
-  });
-
-  const filteredOrders = orders?.filter((order) => {
-    const matchesSearch =
-      !searchQuery ||
-      order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.product?.name?.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesStatus =
-      selectedStatus === "all" || order.status?.toLowerCase() === selectedStatus.toLowerCase();
-
-    return matchesSearch && matchesStatus;
   });
 
   if (isLoading) {
@@ -76,10 +90,45 @@ const SampleOrders = () => {
           setSearchQuery={setSearchQuery}
         />
 
-        {filteredOrders && filteredOrders.length > 0 ? (
-          <div className="mt-6 overflow-x-auto">
-            <OrderTable orders={filteredOrders} />
-          </div>
+        {ordersData?.data && ordersData.data.length > 0 ? (
+          <>
+            <div className="mt-6 overflow-x-auto">
+              <OrderTable orders={ordersData.data} />
+            </div>
+            {ordersData.totalPages > 1 && (
+              <div className="mt-6 flex justify-center">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                    
+                    {Array.from({ length: ordersData.totalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(page)}
+                          isActive={currentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() => setCurrentPage(Math.min(ordersData.totalPages, currentPage + 1))}
+                        className={currentPage === ordersData.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-12">
             <p className="text-lg text-gray-600">No orders found.</p>
