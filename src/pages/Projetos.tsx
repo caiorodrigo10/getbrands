@@ -6,6 +6,7 @@ import ProjectProgress from "@/components/ProjectProgress";
 import StagesTimeline from "@/components/StagesTimeline";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
+import { Package } from "lucide-react";
 
 const Projetos = () => {
   const { user } = useAuth();
@@ -13,14 +14,19 @@ const Projetos = () => {
   const { data: projects, isLoading } = useQuery({
     queryKey: ["projects"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: projectsData, error: projectsError } = await supabase
         .from("projects")
-        .select("*")
+        .select(`
+          *,
+          project_products (
+            id
+          )
+        `)
         .eq('user_id', user?.id)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      return data;
+      if (projectsError) throw projectsError;
+      return projectsData;
     },
     enabled: !!user?.id,
   });
@@ -28,26 +34,6 @@ const Projetos = () => {
   if (isLoading) {
     return <div>Carregando projetos...</div>;
   }
-
-  // Calculate progress based on status
-  const getProjectProgress = (status: string) => {
-    const stages = ["onboarding", "selecao_produto", "naming", "identidade_visual", "embalagens", "ecommerce"];
-    const currentIndex = stages.indexOf(status);
-    return Math.round(((currentIndex + 1) / stages.length) * 100);
-  };
-
-  // Get current stage display name
-  const getStageDisplayName = (status: string) => {
-    const stageNames: { [key: string]: string } = {
-      onboarding: "Onboarding",
-      selecao_produto: "Seleção de Produtos",
-      naming: "Naming",
-      identidade_visual: "Identidade Visual",
-      embalagens: "Criação de Embalagens",
-      ecommerce: "E-commerce",
-    };
-    return stageNames[status] || status;
-  };
 
   return (
     <div className="space-y-6">
@@ -70,18 +56,19 @@ const Projetos = () => {
                 <div>
                   <h3 className="text-sm font-medium mb-2">Informações do Projeto</h3>
                   <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Produtos selecionados:</span>
-                      <span className="font-medium">5</span>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Package className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-muted-foreground">Produtos vinculados:</span>
+                      <span className="font-medium">{project.project_products?.length || 0}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Etapa atual:</span>
-                      <span className="font-medium">{getStageDisplayName(project.status)}</span>
+                      <span className="font-medium">{project.status}</span>
                     </div>
                   </div>
                 </div>
 
-                <ProjectProgress progress={getProjectProgress(project.status)} />
+                <ProjectProgress progress={30} />
               </div>
 
               <div>

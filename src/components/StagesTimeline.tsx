@@ -34,17 +34,6 @@ const StagesTimeline = () => {
               <h3 className="text-sm font-medium text-foreground">{stage.name}</h3>
               <span className="text-xs text-muted">{stage.date}</span>
             </div>
-            <div className="mt-1">
-              <div
-                className={`h-1 rounded-full ${
-                  stage.status === "completed"
-                    ? "bg-primary"
-                    : stage.status === "in-progress"
-                    ? "bg-primary-light"
-                    : "bg-muted"
-                }`}
-              />
-            </div>
           </div>
         </div>
       ))}
