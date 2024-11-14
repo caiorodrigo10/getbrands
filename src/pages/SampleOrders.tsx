@@ -32,7 +32,7 @@ const SampleOrders = () => {
         .from("sample_requests")
         .select(`
           *,
-          products!inner(*),
+          product:products(*),
           user:profiles(*)
         `, { count: 'exact' });
 
@@ -41,7 +41,7 @@ const SampleOrders = () => {
       }
 
       if (activeSearchQuery) {
-        query = query.or(`products.name.ilike.%${activeSearchQuery}%,id.ilike.%${activeSearchQuery}%`);
+        query = query.or(`product.name.ilike.%${activeSearchQuery}%,id.ilike.%${activeSearchQuery}%`);
       }
 
       const from = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -110,7 +110,7 @@ const SampleOrders = () => {
       <div className="overflow-x-auto">
         {ordersData?.data && ordersData.data.length > 0 ? (
           <>
-            <OrderTable orders={ordersData.data} />
+            <OrderTable orders={ordersData.data} onOrdersChange={refetch} />
             {ordersData.totalPages > 1 && (
               <div className="mt-6 flex justify-center">
                 <Pagination>
