@@ -10,6 +10,24 @@ interface PersonalInfoFieldsProps {
 export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
   return (
     <div className="space-y-4">
+      <FormField
+        control={form.control}
+        name="email"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Email</FormLabel>
+            <FormControl>
+              <Input 
+                {...field} 
+                readOnly 
+                disabled
+                className="bg-gray-100 text-gray-600 cursor-not-allowed"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <FormField
           control={form.control}
