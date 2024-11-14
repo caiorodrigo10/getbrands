@@ -99,6 +99,7 @@ export const ShippingFormContainer = ({
           zip_code: values.zipCode,
           type: 'shipping',
           phone: values.phone,
+          used_in_order: true
         });
 
       if (error) throw error;
@@ -110,6 +111,8 @@ export const ShippingFormContainer = ({
         title: "Success",
         description: "Address saved successfully",
       });
+      
+      setIsAddressSaved(true);
     } catch (error) {
       console.error("Error saving address:", error);
       toast({

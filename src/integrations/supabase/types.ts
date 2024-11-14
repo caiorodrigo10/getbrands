@@ -16,6 +16,7 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          phone: string | null
           state: string
           street_address1: string
           street_address2: string | null
@@ -31,6 +32,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          phone?: string | null
           state: string
           street_address1: string
           street_address2?: string | null
@@ -46,6 +48,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          phone?: string | null
           state?: string
           street_address1?: string
           street_address2?: string | null
