@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -11,6 +11,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
+interface OrderProduct {
+  name: string;
+  id: string;
+  from_price: number;
+}
+
 interface OrderSummary {
   id: string;
   created_at: string;
@@ -18,26 +24,20 @@ interface OrderSummary {
   shipping_city: string;
   shipping_state: string;
   shipping_zip: string;
-  product: {
-    name: string;
-    id: string;
-    from_price: number;
-  };
+  product: OrderProduct;
 }
 
 const Success = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { clearCart } = useCart();
   const { toast } = useToast();
   const { user } = useAuth();
   const [orderDetails, setOrderDetails] = useState<OrderSummary | null>(null);
-  const shippingCost = 4.50; // Fixed shipping cost
+  const shippingCost = 4.50;
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-        // Get the latest order for the current user
         const { data, error } = await supabase
           .from('sample_requests')
           .select(`
@@ -47,7 +47,7 @@ const Success = () => {
             shipping_city,
             shipping_state,
             shipping_zip,
-            product (
+            product:products (
               name,
               id,
               from_price
@@ -59,7 +59,10 @@ const Success = () => {
           .single();
 
         if (error) throw error;
-        setOrderDetails(data);
+        
+        if (data) {
+          setOrderDetails(data as OrderSummary);
+        }
       } catch (error) {
         console.error('Error fetching order details:', error);
         toast({
@@ -102,7 +105,6 @@ const Success = () => {
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Product Details */}
                 <div>
                   <h3 className="font-medium mb-4">Product Details</h3>
                   <div className="flex items-start gap-4 bg-muted/50 p-4 rounded-lg">
@@ -121,7 +123,6 @@ const Success = () => {
 
                 <Separator />
 
-                {/* Shipping Address */}
                 <div>
                   <h3 className="font-medium mb-4">Shipping Address</h3>
                   <div className="bg-muted/50 p-4 rounded-lg">
@@ -136,7 +137,6 @@ const Success = () => {
 
                 <Separator />
 
-                {/* Payment Details */}
                 <div>
                   <h3 className="font-medium mb-4">Payment Details</h3>
                   <div className="space-y-2">
