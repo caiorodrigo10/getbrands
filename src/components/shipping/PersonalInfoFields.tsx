@@ -14,6 +14,7 @@ export const PersonalInfoFields = ({ form }: PersonalInfoFieldsProps) => {
         <FormField
           control={form.control}
           name="firstName"
+          rules={{ required: "First name is required" }}
           render={({ field }) => (
             <FormItem>
               <FormLabel>First Name</FormLabel>
@@ -27,6 +28,7 @@ export const PersonalInfoFields = ({ form }: PersonalInfoFieldsProps) => {
         <FormField
           control={form.control}
           name="lastName"
+          rules={{ required: "Last name is required" }}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Last Name</FormLabel>

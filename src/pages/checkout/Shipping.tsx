@@ -34,7 +34,13 @@ const Shipping = () => {
     queryKey: ["addresses", user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-      const { data, error } = await supabase
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("first_name, last_name")
+        .eq("id", user.id)
+        .single();
+
+      const { data: addressData, error } = await supabase
         .from("addresses")
         .select("*")
         .eq("user_id", user.id)
@@ -42,7 +48,13 @@ const Shipping = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data.map(addr => ({
+      
+      if (profileData) {
+        form.setValue("firstName", profileData.first_name || "");
+        form.setValue("lastName", profileData.last_name || "");
+      }
+
+      return addressData.map(addr => ({
         ...addr,
         type: addr.type as Address['type']
       })) as Address[];
@@ -93,6 +105,17 @@ const Shipping = () => {
   const saveAddress = async (values: ShippingFormData) => {
     try {
       if (!user?.id) throw new Error("User not authenticated");
+
+      // Update profile with first and last name
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({
+          first_name: values.firstName,
+          last_name: values.lastName,
+        })
+        .eq("id", user.id);
+
+      if (profileError) throw profileError;
 
       const { data: existingAddresses } = await supabase
         .from("addresses")
