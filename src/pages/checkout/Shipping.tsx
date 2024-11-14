@@ -49,6 +49,25 @@ const Shipping = () => {
     enabled: !!user?.id,
   });
 
+  React.useEffect(() => {
+    if (addresses && addresses.length > 0 && !selectedAddressId) {
+      const lastAddress = addresses[0];
+      form.reset({
+        firstName: form.getValues("firstName"),
+        lastName: form.getValues("lastName"),
+        address1: lastAddress.street_address1,
+        address2: lastAddress.street_address2 || "",
+        city: lastAddress.city,
+        state: lastAddress.state,
+        zipCode: lastAddress.zip_code,
+        phone: "",
+        useSameForBilling: true,
+      });
+      setSelectedAddressId(lastAddress.id);
+      setIsAddressSaved(true);
+    }
+  }, [addresses, selectedAddressId]);
+
   const handleCancel = () => {
     navigate("/checkout/cart");
   };
@@ -126,6 +145,7 @@ const Shipping = () => {
         title: "Error",
         description: "Failed to save address. Please try again.",
       });
+      throw error;
     }
   };
 

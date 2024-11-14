@@ -5,16 +5,18 @@ interface ShippingButtonsProps {
   isAddressSaved: boolean;
   onCancel: () => void;
   onContinue: () => void;
+  onSave: () => void;
 }
 
-export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue }: ShippingButtonsProps) => {
+export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue, onSave }: ShippingButtonsProps) => {
   return (
     <div className="space-y-6">
       <div className="flex justify-center">
         <Button 
-          type="submit"
+          type="button"
           variant="default"
           className="w-[150px]"
+          onClick={onSave}
         >
           Save Address
         </Button>

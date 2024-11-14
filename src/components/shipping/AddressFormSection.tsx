@@ -28,14 +28,15 @@ export const AddressFormSection = ({
 }: AddressFormSectionProps) => {
   const useSameForBilling = form.watch("useSameForBilling");
 
-  const handleSubmit = async (values: ShippingFormData) => {
+  const handleSubmit = async () => {
+    const values = form.getValues();
     await onSubmit(values);
     setIsAddressSaved(true);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+      <form className="space-y-6">
         <PersonalInfoFields form={form} />
         <AddressFields form={form} />
         <ContactFields form={form} />
@@ -65,6 +66,7 @@ export const AddressFormSection = ({
           isAddressSaved={isAddressSaved}
           onCancel={onCancel}
           onContinue={onContinue}
+          onSave={handleSubmit}
         />
       </form>
     </Form>
