@@ -13,7 +13,7 @@ export function AddressFields({ form }: AddressFieldsProps) {
     <div className="space-y-4">
       <FormField
         control={form.control}
-        name="address_street"
+        name="shipping_address_street"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Address Line 1</FormLabel>
@@ -27,7 +27,7 @@ export function AddressFields({ form }: AddressFieldsProps) {
 
       <FormField
         control={form.control}
-        name="address_street2"
+        name="shipping_address_street2"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Address Line 2 (Optional)</FormLabel>
@@ -42,7 +42,7 @@ export function AddressFields({ form }: AddressFieldsProps) {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <FormField
           control={form.control}
-          name="address_city"
+          name="shipping_address_city"
           render={({ field }) => (
             <FormItem>
               <FormLabel>City</FormLabel>
@@ -55,7 +55,7 @@ export function AddressFields({ form }: AddressFieldsProps) {
         />
         <FormField
           control={form.control}
-          name="address_state"
+          name="shipping_address_state"
           render={({ field }) => (
             <FormItem>
               <FormLabel>State</FormLabel>
@@ -79,7 +79,7 @@ export function AddressFields({ form }: AddressFieldsProps) {
         />
         <FormField
           control={form.control}
-          name="address_zip"
+          name="shipping_address_zip"
           render={({ field }) => (
             <FormItem className="col-span-2 sm:col-span-1">
               <FormLabel>ZIP Code</FormLabel>
