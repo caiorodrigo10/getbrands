@@ -81,17 +81,44 @@ const Shipping = () => {
     try {
       if (!user?.id) throw new Error("User not authenticated");
 
-      const { error: shippingError } = await supabase.from("addresses").insert({
-        user_id: user.id,
-        street_address1: values.address1,
-        street_address2: values.address2,
-        city: values.city,
-        state: values.state,
-        zip_code: values.zipCode,
-        type: 'shipping',
-      });
+      // First, check if the user already has an address
+      const { data: existingAddresses } = await supabase
+        .from("addresses")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
 
-      if (shippingError) throw shippingError;
+      if (existingAddresses) {
+        // Update existing address
+        const { error: updateError } = await supabase
+          .from("addresses")
+          .update({
+            street_address1: values.address1,
+            street_address2: values.address2,
+            city: values.city,
+            state: values.state,
+            zip_code: values.zipCode,
+            type: 'shipping',
+          })
+          .eq("user_id", user.id);
+
+        if (updateError) throw updateError;
+      } else {
+        // Insert new address
+        const { error: insertError } = await supabase
+          .from("addresses")
+          .insert({
+            user_id: user.id,
+            street_address1: values.address1,
+            street_address2: values.address2,
+            city: values.city,
+            state: values.state,
+            zip_code: values.zipCode,
+            type: 'shipping',
+          });
+
+        if (insertError) throw insertError;
+      }
 
       toast({
         title: "Success",
