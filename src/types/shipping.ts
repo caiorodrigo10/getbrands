@@ -30,4 +30,5 @@ export interface Address {
   type: 'shipping' | 'billing' | 'both' | null;
   created_at: string;
   updated_at: string;
+  phone?: string | null;
 }
