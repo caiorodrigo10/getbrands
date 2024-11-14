@@ -4,11 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, Plus, CalendarIcon, Package, Check } from "lucide-react";
+import { CalendarIcon, Plus, Package } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
+import { ProjectStage } from "@/components/project/ProjectStage";
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -52,6 +52,7 @@ const ProjectDetails = () => {
     {
       title: "Onboarding",
       description: "Schedule a call with our team to start your project",
+      status: "pending" as const,
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground">Select a date for the call:</p>
@@ -71,6 +72,7 @@ const ProjectDetails = () => {
     {
       title: "Product Selection",
       description: "Choose products for your project",
+      status: "pending" as const,
       content: (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -83,7 +85,6 @@ const ProjectDetails = () => {
             </Button>
           </div>
 
-          {/* Points Progress Section */}
           <Card className="p-4 bg-gray-50">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -125,45 +126,41 @@ const ProjectDetails = () => {
     },
     {
       title: "Naming",
-      description: "Desenvolvimento do nome da sua marca",
+      description: "Brand name development",
+      status: "pending" as const,
       content: (
         <div className="space-y-2">
-          <p className="text-muted-foreground">Em desenvolvimento pelo nosso time.</p>
-          <div className="flex items-center gap-2 text-sm">
-            <Check className="h-4 w-4 text-primary" />
-            <span>Pesquisa de mercado</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Check className="h-4 w-4 text-primary" />
-            <span>Brainstorming de nomes</span>
-          </div>
+          <p className="text-muted-foreground">In development by our team.</p>
         </div>
       ),
     },
     {
-      title: "Identidade Visual",
-      description: "Criação da identidade visual da sua marca",
+      title: "Visual Identity",
+      description: "Creation of your brand's visual identity",
+      status: "completed" as const,
       content: (
         <div className="space-y-2">
-          <p className="text-muted-foreground">Aguardando conclusão da etapa anterior.</p>
+          <p className="text-muted-foreground">Visual identity has been completed.</p>
         </div>
       ),
     },
     {
-      title: "Criação de Embalagens",
-      description: "Design das embalagens dos seus produtos",
+      title: "Package Design",
+      description: "Design of your product packages",
+      status: "pending" as const,
       content: (
         <div className="space-y-2">
-          <p className="text-muted-foreground">Aguardando conclusão da etapa anterior.</p>
+          <p className="text-muted-foreground">Waiting for previous stage completion.</p>
         </div>
       ),
     },
     {
       title: "E-commerce",
-      description: "Implementação da sua loja online",
+      description: "Implementation of your online store",
+      status: "pending" as const,
       content: (
         <div className="space-y-2">
-          <p className="text-muted-foreground">Aguardando conclusão da etapa anterior.</p>
+          <p className="text-muted-foreground">Waiting for previous stage completion.</p>
         </div>
       ),
     },
@@ -179,27 +176,15 @@ const ProjectDetails = () => {
       </div>
 
       <div className="grid gap-4">
-        {stages.map((stage, index) => (
-          <Collapsible key={stage.title}>
-            <Card>
-              <CollapsibleTrigger className="w-full">
-                <div className="flex items-center justify-between p-6">
-                  <div className="space-y-1 text-left">
-                    <h3 className="text-xl font-semibold">{stage.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {stage.description}
-                    </p>
-                  </div>
-                  <ChevronDown className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
-                </div>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="border-t px-6 pb-6 pt-4">
-                  {stage.content}
-                </div>
-              </CollapsibleContent>
-            </Card>
-          </Collapsible>
+        {stages.map((stage) => (
+          <ProjectStage
+            key={stage.title}
+            title={stage.title}
+            description={stage.description}
+            status={stage.status}
+          >
+            {stage.content}
+          </ProjectStage>
         ))}
       </div>
     </div>
