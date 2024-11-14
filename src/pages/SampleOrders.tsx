@@ -34,10 +34,7 @@ const SampleOrders = () => {
 
       // Apply search filter if present
       if (searchQuery) {
-        query = query.or([
-          { 'products.name': { ilike: `%${searchQuery}%` } },
-          { id: { ilike: `%${searchQuery}%` } }
-        ]);
+        query = query.or(`products.name.ilike.%${searchQuery}%,id.ilike.%${searchQuery}%`);
       }
 
       // Calculate pagination range
