@@ -77,16 +77,18 @@ export function ProfileForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <AvatarUpload 
-          user={user}
-          avatarUrl={avatarUrl}
-          setAvatarUrl={setAvatarUrl}
-        />
-        
-        <PersonalInfoFields form={form} />
-        
-        <AddressFields form={form} />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="space-y-6">
+          <AvatarUpload 
+            user={user}
+            avatarUrl={avatarUrl}
+            setAvatarUrl={setAvatarUrl}
+          />
+          
+          <PersonalInfoFields form={form} />
+          
+          <AddressFields form={form} />
+        </div>
 
         <div className="flex justify-end">
           <Button type="submit" disabled={isLoading}>

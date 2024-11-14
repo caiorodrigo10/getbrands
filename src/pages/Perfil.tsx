@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 
 const Perfil = () => {
   return (
-    <div className="space-y-8">
+    <div className="container max-w-2xl mx-auto space-y-8 p-4">
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Profile Settings</h2>
         <p className="text-muted-foreground">

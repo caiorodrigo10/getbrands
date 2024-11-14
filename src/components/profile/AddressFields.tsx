@@ -24,7 +24,7 @@ export function AddressFields({ form }: AddressFieldsProps) {
         )}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <FormField
           control={form.control}
           name="address_city"
@@ -55,7 +55,7 @@ export function AddressFields({ form }: AddressFieldsProps) {
           control={form.control}
           name="address_zip"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="col-span-2 sm:col-span-1">
               <FormLabel>ZIP Code</FormLabel>
               <FormControl>
                 <Input {...field} />
