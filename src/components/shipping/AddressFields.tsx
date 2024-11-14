@@ -1,7 +1,9 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { UseFormReturn } from "react-hook-form";
 import type { ShippingFormData } from "@/types/shipping";
+import { US_STATES } from "@/lib/constants";
 
 interface AddressFieldsProps {
   form: UseFormReturn<ShippingFormData>;
@@ -57,7 +59,18 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
             <FormItem>
               <FormLabel>State</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select state" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {US_STATES.map((state) => (
+                      <SelectItem key={state} value={state}>
+                        {state}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -70,7 +83,7 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
             <FormItem>
               <FormLabel>ZIP Code</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} placeholder="12345" />
               </FormControl>
               <FormMessage />
             </FormItem>
