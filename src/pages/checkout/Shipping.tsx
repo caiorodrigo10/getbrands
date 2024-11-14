@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { AddressSelectionSection } from "@/components/shipping/AddressSelectionSection";
 import { AddressFormSection } from "@/components/shipping/AddressFormSection";
-import type { ShippingFormData } from "@/types/shipping";
+import type { ShippingFormData, Address } from "@/types/shipping";
 
 const formSchema = z.object({
   firstName: z.string().min(2, "First name is too short"),
@@ -42,7 +42,10 @@ const Shipping = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data.map(addr => ({
+        ...addr,
+        type: addr.type as Address['type']
+      })) as Address[];
     },
     enabled: !!user?.id,
   });
