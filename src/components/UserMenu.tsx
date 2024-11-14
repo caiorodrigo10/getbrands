@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,15 +11,37 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, Settings } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const UserMenu = () => {
   const { user, logout } = useAuth();
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
+    }
+  }, [user]);
+
+  const fetchProfile = async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
+      .from("profiles")
+      .select()
+      .eq("id", user.id)
+      .single();
+      
+    if (data) {
+      setProfile(data);
+    }
+  };
 
   if (!user) return null;
 
   const userEmail = user.email || "";
-  const userName = user.user_metadata?.name || user.email?.split("@")[0] || "User";
-  const userAvatar = user.user_metadata?.avatar_url || "";
+  const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : userEmail?.split("@")[0] || "User";
+  const userAvatar = profile?.avatar_url;
 
   return (
     <DropdownMenu>

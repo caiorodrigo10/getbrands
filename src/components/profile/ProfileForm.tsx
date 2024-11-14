@@ -10,6 +10,8 @@ import { AvatarUpload } from "./AvatarUpload";
 import { PersonalInfoFields } from "./PersonalInfoFields";
 import { AddressFields } from "./AddressFields";
 import { profileSchema, type ProfileFormData } from "./types";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export function ProfileForm() {
   const { user } = useAuth();
@@ -28,6 +30,8 @@ export function ProfileForm() {
         .eq("id", user.id)
         .single();
 
+      setAvatarUrl(profile?.avatar_url || null);
+
       return {
         first_name: profile?.first_name || "",
         last_name: profile?.last_name || "",
@@ -37,6 +41,7 @@ export function ProfileForm() {
         address_city: profile?.address_city || "",
         address_state: profile?.address_state || "",
         address_zip: profile?.address_zip || "",
+        email: user.email || "",
       };
     },
   });
@@ -57,6 +62,7 @@ export function ProfileForm() {
           address_city: data.address_city,
           address_state: data.address_state,
           address_zip: data.address_zip,
+          avatar_url: avatarUrl,
         })
         .eq("id", user.id);
 
@@ -87,7 +93,14 @@ export function ProfileForm() {
             setAvatarUrl={setAvatarUrl}
           />
           
-          <PersonalInfoFields form={form} />
+          <div className="space-y-4">
+            <div>
+              <Label>Email</Label>
+              <Input value={form.getValues("email")} disabled className="bg-muted" />
+            </div>
+            
+            <PersonalInfoFields form={form} />
+          </div>
           
           <AddressFields form={form} />
         </div>
