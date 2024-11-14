@@ -2,6 +2,7 @@ import React from "react";
 import { Form } from "@/components/ui/form";
 import { PersonalInfoFields } from "@/components/shipping/PersonalInfoFields";
 import { AddressFields } from "@/components/shipping/AddressFields";
+import { BillingAddressFields } from "@/components/shipping/BillingAddressFields";
 import { ContactFields } from "@/components/shipping/ContactFields";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ShippingButtons } from "@/components/checkout/ShippingButtons";
@@ -23,6 +24,8 @@ export const AddressFormSection = ({
   onCancel,
   onContinue,
 }: AddressFormSectionProps) => {
+  const useSameForBilling = form.watch("useSameForBilling");
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -33,7 +36,7 @@ export const AddressFormSection = ({
         <div className="flex items-center space-x-2">
           <Checkbox
             id="useSameForBilling"
-            checked={form.watch("useSameForBilling")}
+            checked={useSameForBilling}
             onCheckedChange={(checked) => {
               form.setValue("useSameForBilling", checked as boolean);
             }}
@@ -45,6 +48,8 @@ export const AddressFormSection = ({
             Use same address for billing
           </label>
         </div>
+
+        {!useSameForBilling && <BillingAddressFields form={form} />}
 
         <ShippingButtons
           isAddressSaved={isAddressSaved}

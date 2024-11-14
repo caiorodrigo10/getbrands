@@ -10,18 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AddressSelectionSection } from "@/components/shipping/AddressSelectionSection";
 import { AddressFormSection } from "@/components/shipping/AddressFormSection";
 import type { ShippingFormData, Address } from "@/types/shipping";
-
-const formSchema = z.object({
-  firstName: z.string().min(2, "First name is too short"),
-  lastName: z.string().min(2, "Last name is too short"),
-  address1: z.string().min(5, "Address is too short"),
-  address2: z.string().optional(),
-  city: z.string().min(2, "City is too short"),
-  state: z.string().min(2, "Invalid state"),
-  zipCode: z.string().min(5, "Invalid ZIP code"),
-  phone: z.string().min(10, "Invalid phone number"),
-  useSameForBilling: z.boolean().default(true),
-});
+import { useShippingForm } from "@/hooks/useShippingForm";
 
 const Shipping = () => {
   const navigate = useNavigate();
@@ -29,6 +18,7 @@ const Shipping = () => {
   const { toast } = useToast();
   const [selectedAddressId, setSelectedAddressId] = React.useState<string | null>(null);
   const [isAddressSaved, setIsAddressSaved] = React.useState(false);
+  const form = useShippingForm();
 
   const { data: addresses } = useQuery({
     queryKey: ["addresses", user?.id],
@@ -62,36 +52,6 @@ const Shipping = () => {
     enabled: !!user?.id,
   });
 
-  const form = useForm<ShippingFormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      address1: "",
-      address2: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      phone: "",
-      useSameForBilling: true,
-    },
-  });
-
-  React.useEffect(() => {
-    if (addresses && addresses.length > 0) {
-      const lastAddress = addresses[0];
-      form.reset({
-        ...form.getValues(),
-        address1: lastAddress.street_address1,
-        address2: lastAddress.street_address2 || "",
-        city: lastAddress.city,
-        state: lastAddress.state,
-        zipCode: lastAddress.zip_code,
-      });
-      setIsAddressSaved(true);
-    }
-  }, [addresses]);
-
   const handleCancel = () => {
     navigate("/checkout/cart");
   };
@@ -117,40 +77,36 @@ const Shipping = () => {
 
       if (profileError) throw profileError;
 
-      const { data: existingAddresses } = await supabase
+      // Save shipping address
+      const { error: addressError } = await supabase
         .from("addresses")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
+        .upsert({
+          user_id: user.id,
+          street_address1: values.address1,
+          street_address2: values.address2,
+          city: values.city,
+          state: values.state,
+          zip_code: values.zipCode,
+          type: values.useSameForBilling ? 'both' : 'shipping',
+        });
 
-      if (existingAddresses) {
-        const { error: updateError } = await supabase
-          .from("addresses")
-          .update({
-            street_address1: values.address1,
-            street_address2: values.address2,
-            city: values.city,
-            state: values.state,
-            zip_code: values.zipCode,
-            type: 'shipping',
-          })
-          .eq("user_id", user.id);
+      if (addressError) throw addressError;
 
-        if (updateError) throw updateError;
-      } else {
-        const { error: insertError } = await supabase
+      // Save billing address if different
+      if (!values.useSameForBilling) {
+        const { error: billingAddressError } = await supabase
           .from("addresses")
-          .insert({
+          .upsert({
             user_id: user.id,
-            street_address1: values.address1,
-            street_address2: values.address2,
-            city: values.city,
-            state: values.state,
-            zip_code: values.zipCode,
-            type: 'shipping',
+            street_address1: values.billingAddress1!,
+            street_address2: values.billingAddress2,
+            city: values.billingCity!,
+            state: values.billingState!,
+            zip_code: values.billingZipCode!,
+            type: 'billing',
           });
 
-        if (insertError) throw insertError;
+        if (billingAddressError) throw billingAddressError;
       }
 
       toast({
