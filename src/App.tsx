@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import Index from "./pages/Index";
 import Profile from "./pages/Profile";
 import Projects from "./pages/Projects";
+import ProjectDetails from "./pages/ProjectDetails";
 import Catalog from "./pages/Catalog";
 import Products from "./pages/Products";
 import ProductSelectedSuccess from "./pages/products/ProductSelectedSuccess";
@@ -79,6 +80,16 @@ const App = () => (
                   <ProtectedRoute>
                     <AppLayout>
                       <Projects />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/projects/:id"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <ProjectDetails />
                     </AppLayout>
                   </ProtectedRoute>
                 }

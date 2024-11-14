@@ -69,7 +69,7 @@ const Projects = () => {
                 <Button 
                   variant="outline" 
                   className="w-full"
-                  onClick={() => navigate(`/projeto/${project.id}`)}
+                  onClick={() => navigate(`/projects/${project.id}`)}
                 >
                   View Details
                   <ArrowRight className="ml-2 h-4 w-4" />
