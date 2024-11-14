@@ -12,12 +12,12 @@ export const ContactFields = ({ form }: ContactFieldsProps) => {
     <div className="grid grid-cols-2 gap-4">
       <FormField
         control={form.control}
-        name="zipCode"
+        name="email"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>ZIP Code</FormLabel>
+            <FormLabel>Email</FormLabel>
             <FormControl>
-              <Input placeholder="12345" {...field} />
+              <Input type="email" placeholder="john@example.com" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
