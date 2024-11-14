@@ -54,8 +54,12 @@ const ProjectSelectionDialog = ({
       setIsProcessing(false);
       onOpenChange(false);
       
-      // Navigate with state to indicate product selection
-      navigate("/produtos", { state: { fromProductSelection: true } });
+      // Navigate to success page only
+      navigate("/produtos/success", { 
+        state: { 
+          fromProductSelection: true 
+        }
+      });
       
       toast({
         title: "Product selected successfully! 🎉",
