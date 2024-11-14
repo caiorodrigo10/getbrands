@@ -6,10 +6,13 @@ import ProjectProgress from "@/components/ProjectProgress";
 import StagesTimeline from "@/components/StagesTimeline";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { Package } from "lucide-react";
+import { Package, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const Projetos = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   
   const { data: projects, isLoading } = useQuery({
     queryKey: ["projects"],
@@ -62,6 +65,15 @@ const Projetos = () => {
                 </div>
 
                 <ProjectProgress progress={30} />
+
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => navigate(`/projeto/${project.id}`)}
+                >
+                  Ver Detalhes
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
               </div>
 
               <div className="border-t md:border-t-0 md:border-l border-border/50 pt-4 md:pt-0 md:pl-6">
