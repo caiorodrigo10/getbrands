@@ -19,22 +19,27 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
   const elements = useElements();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { items } = useCart();
+  const { items, clearCart } = useCart();
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const createSampleRequest = async () => {
     if (!user) throw new Error("User not authenticated");
 
+    const shippingAddress = localStorage.getItem('shipping_address') || '';
+    const shippingCity = localStorage.getItem('shipping_city') || '';
+    const shippingState = localStorage.getItem('shipping_state') || '';
+    const shippingZip = localStorage.getItem('shipping_zip') || '';
+
     const { data: sampleRequest, error: sampleRequestError } = await supabase
       .from('sample_requests')
       .insert({
         user_id: user.id,
         status: 'pending',
-        shipping_address: localStorage.getItem('shipping_address') || '',
-        shipping_city: localStorage.getItem('shipping_city') || '',
-        shipping_state: localStorage.getItem('shipping_state') || '',
-        shipping_zip: localStorage.getItem('shipping_zip') || '',
+        shipping_address: shippingAddress,
+        shipping_city: shippingCity,
+        shipping_state: shippingState,
+        shipping_zip: shippingZip,
       })
       .select()
       .single();
@@ -65,12 +70,12 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
     setIsProcessing(true);
 
     try {
-      await createSampleRequest();
+      const orderId = await createSampleRequest();
 
       const { error: paymentError } = await stripe.confirmPayment({
         elements,
+        redirect: 'if_required',
         confirmParams: {
-          return_url: `${window.location.origin}/checkout/success`,
           payment_method_data: {
             billing_details: {
               name: `${localStorage.getItem('firstName')} ${localStorage.getItem('lastName')}`,
@@ -91,6 +96,9 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
       if (paymentError) {
         throw paymentError;
       }
+
+      clearCart();
+      navigate('/checkout/success');
 
     } catch (error) {
       console.error("Payment error:", error);

@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
-import { useCart } from "@/contexts/CartContext";
-import Sidebar from "@/components/Sidebar";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,7 +11,6 @@ import OrderSummary from "@/components/checkout/OrderSummary";
 
 const Success = () => {
   const navigate = useNavigate();
-  const { clearCart } = useCart();
   const { toast } = useToast();
   const { user } = useAuth();
   const [orderDetails, setOrderDetails] = useState(null);
@@ -51,7 +48,6 @@ const Success = () => {
         
         if (data) {
           setOrderDetails(data);
-          clearCart();
         } else {
           toast({
             variant: "destructive",
@@ -73,13 +69,12 @@ const Success = () => {
     };
 
     fetchOrderDetails();
-  }, [user, navigate, toast, clearCart]);
+  }, [user, navigate, toast]);
 
   if (isLoading) {
     return (
       <div className="flex min-h-screen bg-background">
-        <Sidebar />
-        <main className="flex-1 ml-64 p-8">
+        <main className="flex-1 p-8">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center justify-center p-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -92,8 +87,7 @@ const Success = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <main className="flex-1 ml-64 p-8">
+      <main className="flex-1 p-8">
         <div className="max-w-3xl mx-auto">
           <Card className="mb-8 border-green-200 bg-green-50">
             <CardHeader className="text-center pb-6">
