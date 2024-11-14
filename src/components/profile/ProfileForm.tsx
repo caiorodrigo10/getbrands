@@ -10,7 +10,7 @@ import { PersonalInfoFields } from "./PersonalInfoFields";
 import { AddressFields } from "./AddressFields";
 import { Button } from "@/components/ui/button";
 
-const ProfileForm = () => {
+export const ProfileForm = () => {
   const { toast } = useToast();
   const { user } = useAuth();
 
