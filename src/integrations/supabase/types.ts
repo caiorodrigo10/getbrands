@@ -261,6 +261,45 @@ export type Database = {
           },
         ]
       }
+      sample_request_products: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          sample_request_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          sample_request_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          sample_request_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sample_request_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sample_request_products_sample_request_id_fkey"
+            columns: ["sample_request_id"]
+            isOneToOne: false
+            referencedRelation: "sample_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sample_requests: {
         Row: {
           created_at: string
