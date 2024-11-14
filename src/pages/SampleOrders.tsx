@@ -5,6 +5,7 @@ import OrderTable from "@/components/sample-orders/OrderTable";
 import OrderStatusFilters from "@/components/sample-orders/OrderStatusFilters";
 import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
   Pagination, 
   PaginationContent, 
@@ -21,17 +22,21 @@ const SampleOrders = () => {
   const [showOnHold, setShowOnHold] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const { data: ordersData, isLoading, refetch } = useQuery({
-    queryKey: ["sample-orders", currentPage, selectedStatus],
+    queryKey: ["sample-orders", currentPage, selectedStatus, user?.id],
     queryFn: async () => {
+      if (!user) throw new Error("User not authenticated");
+
       let query = supabase
         .from("sample_requests")
         .select(`
           *,
           product:products(*),
           user:profiles(*)
-        `, { count: 'exact' });
+        `, { count: 'exact' })
+        .eq('user_id', user.id);  // Filter orders by current user
 
       if (selectedStatus !== "all") {
         query = query.eq('status', selectedStatus);
@@ -59,7 +64,16 @@ const SampleOrders = () => {
         currentPage
       };
     },
+    enabled: !!user, // Only run query if user is authenticated
   });
+
+  if (!user) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-lg text-gray-600">Please log in to view your orders.</p>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { formatCurrency } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useShippingCalculation } from "@/hooks/useShippingCalculation";
@@ -23,20 +24,21 @@ const CheckoutForm = ({ clientSecret, total, shippingCost }: { clientSecret: str
   const elements = useElements();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { clearCart } = useCart();
+  const { items, clearCart } = useCart();
+  const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!stripe || !elements) {
+    if (!stripe || !elements || !user) {
       return;
     }
 
     setIsProcessing(true);
 
     try {
-      const { error } = await stripe.confirmPayment({
+      const { error: paymentError } = await stripe.confirmPayment({
         elements,
         confirmParams: {
           return_url: `${window.location.origin}/checkout/success`,
@@ -53,13 +55,29 @@ const CheckoutForm = ({ clientSecret, total, shippingCost }: { clientSecret: str
         },
       });
 
-      if (error) {
+      if (paymentError) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: error.message || "An error occurred during payment.",
+          description: paymentError.message || "An error occurred during payment.",
         });
       } else {
+        // Create sample request with user_id
+        const { error: orderError } = await supabase
+          .from('sample_requests')
+          .insert({
+            user_id: user.id,
+            product_id: items[0]?.id,
+            status: 'pending',
+            shipping_address: "Endereço de entrega",
+            shipping_city: "Cidade",
+            shipping_state: "Estado",
+            shipping_zip: "00000-000",
+            tracking_number: null
+          });
+
+        if (orderError) throw orderError;
+
         clearCart();
         navigate("/checkout/success");
       }
