@@ -15,10 +15,10 @@ interface ProjectSelectionDialogProps {
 }
 
 const loadingSteps = [
-  "Registrando seleção...",
-  "Atualizando pontos do projeto...",
-  "Enviando para desenvolvimento de embalagens...",
-  "Finalizando..."
+  "Recording selection...",
+  "Updating project points...",
+  "Sending to packaging development...",
+  "Finalizing..."
 ];
 
 const ProjectSelectionDialog = ({ 
@@ -45,17 +45,30 @@ const ProjectSelectionDialog = ({
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
     
-    await onConfirm(selectedProject);
-    setIsProcessing(false);
-    onOpenChange(false);
-    
-    // Navigate with state to indicate product selection
-    navigate("/produtos", { state: { fromProductSelection: true } });
-    
-    toast({
-      title: "Produto selecionado com sucesso! 🎉",
-      description: "O produto foi adicionado ao seu projeto.",
-    });
+    try {
+      await onConfirm(selectedProject);
+      
+      // Wait a moment to ensure the product is added
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setIsProcessing(false);
+      onOpenChange(false);
+      
+      // Navigate with state to indicate product selection
+      navigate("/produtos", { state: { fromProductSelection: true } });
+      
+      toast({
+        title: "Product selected successfully! 🎉",
+        description: "The product has been added to your project.",
+      });
+    } catch (error) {
+      setIsProcessing(false);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to select product. Please try again.",
+      });
+    }
   };
 
   if (isProcessing) {
