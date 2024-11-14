@@ -31,12 +31,12 @@ const Sidebar = () => {
   });
 
   const menuItems = [
-    { icon: UserRound, label: "My Profile", path: "/perfil" },
+    { icon: UserRound, label: "My Profile", path: "/profile" },
     { icon: Briefcase, label: "Projects", path: "/projects" },
-    { icon: BookOpen, label: "Catalog", path: "/catalogo" },
-    { icon: Package, label: "My Products", path: "/produtos" },
+    { icon: BookOpen, label: "Catalog", path: "/catalog" },
+    { icon: Package, label: "My Products", path: "/products" },
     { icon: Box, label: "Sample Orders", path: "/sample-orders" },
-    { icon: FileText, label: "Documents", path: "/documentos" },
+    { icon: FileText, label: "Documents", path: "/documents" },
   ];
 
   return (

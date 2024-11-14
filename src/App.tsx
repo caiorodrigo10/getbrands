@@ -9,12 +9,12 @@ import { useAuth } from "./contexts/AuthContext";
 import Sidebar from "./components/Sidebar";
 import Login from "./pages/Login";
 import Index from "./pages/Index";
-import Perfil from "./pages/Perfil";
+import Profile from "./pages/Profile";
 import Projects from "./pages/Projects";
-import Catalogo from "./pages/Catalogo";
-import Produtos from "./pages/Produtos";
-import ProductSelectedSuccess from "./pages/produtos/ProductSelectedSuccess";
-import Documentos from "./pages/Documentos";
+import Catalog from "./pages/Catalog";
+import Products from "./pages/Products";
+import ProductSelectedSuccess from "./pages/products/ProductSelectedSuccess";
+import Documents from "./pages/Documents";
 import SampleOrders from "./pages/SampleOrders";
 import Checkout from "./pages/checkout/Checkout";
 import Error404 from "./pages/Error404";
@@ -64,11 +64,11 @@ const App = () => (
                 }
               />
               <Route
-                path="/perfil"
+                path="/profile"
                 element={
                   <ProtectedRoute>
                     <AppLayout>
-                      <Perfil />
+                      <Profile />
                     </AppLayout>
                   </ProtectedRoute>
                 }
@@ -84,27 +84,27 @@ const App = () => (
                 }
               />
               <Route
-                path="/catalogo"
+                path="/catalog"
                 element={
                   <ProtectedRoute>
                     <AppLayout>
-                      <Catalogo />
+                      <Catalog />
                     </AppLayout>
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/produtos"
+                path="/products"
                 element={
                   <ProtectedRoute>
                     <AppLayout>
-                      <Produtos />
+                      <Products />
                     </AppLayout>
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/produtos/success"
+                path="/products/success"
                 element={
                   <ProtectedRoute>
                     <ProductSelectedSuccess />
@@ -112,11 +112,11 @@ const App = () => (
                 }
               />
               <Route
-                path="/documentos"
+                path="/documents"
                 element={
                   <ProtectedRoute>
                     <AppLayout>
-                      <Documentos />
+                      <Documents />
                     </AppLayout>
                   </ProtectedRoute>
                 }
