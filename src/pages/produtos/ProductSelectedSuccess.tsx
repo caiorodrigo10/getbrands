@@ -26,6 +26,11 @@ const ProductSelectedSuccess = () => {
     }
   }, [location.state, navigate]);
 
+  const handleGoToProducts = () => {
+    // Use window.location to force a full page refresh
+    window.location.href = "/produtos";
+  };
+
   if (!state) return null;
 
   return (
@@ -72,7 +77,7 @@ const ProductSelectedSuccess = () => {
             </Button>
             <Button
               className="flex-1 max-w-[200px]"
-              onClick={() => navigate("/produtos")}
+              onClick={handleGoToProducts}
             >
               Go to My Products
             </Button>
