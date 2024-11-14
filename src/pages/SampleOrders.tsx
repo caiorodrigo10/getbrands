@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import OrderTable from "@/components/sample-orders/OrderTable";
 import OrderStatusFilters from "@/components/sample-orders/OrderStatusFilters";
-import OrderSearch from "@/components/sample-orders/OrderSearch";
 import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
@@ -18,15 +17,13 @@ import {
 const ITEMS_PER_PAGE = 9;
 
 const SampleOrders = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeSearchQuery, setActiveSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [showOnHold, setShowOnHold] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
 
   const { data: ordersData, isLoading, refetch } = useQuery({
-    queryKey: ["sample-orders", currentPage, selectedStatus, activeSearchQuery],
+    queryKey: ["sample-orders", currentPage, selectedStatus],
     queryFn: async () => {
       let query = supabase
         .from("sample_requests")
@@ -38,10 +35,6 @@ const SampleOrders = () => {
 
       if (selectedStatus !== "all") {
         query = query.eq('status', selectedStatus);
-      }
-
-      if (activeSearchQuery) {
-        query = query.ilike('id', `%${activeSearchQuery}%`);
       }
 
       const from = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -68,12 +61,6 @@ const SampleOrders = () => {
     },
   });
 
-  const handleSearch = () => {
-    setActiveSearchQuery(searchQuery);
-    setCurrentPage(1);
-    refetch();
-  };
-
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -99,11 +86,6 @@ const SampleOrders = () => {
           setSelectedStatus={setSelectedStatus}
           showOnHold={showOnHold}
           setShowOnHold={setShowOnHold}
-        />
-        <OrderSearch
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          onSearch={handleSearch}
         />
       </div>
 
