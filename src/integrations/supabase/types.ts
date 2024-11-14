@@ -21,6 +21,7 @@ export type Database = {
           street_address2: string | null
           type: string | null
           updated_at: string
+          used_in_order: boolean | null
           user_id: string
           zip_code: string
         }
@@ -35,6 +36,7 @@ export type Database = {
           street_address2?: string | null
           type?: string | null
           updated_at?: string
+          used_in_order?: boolean | null
           user_id: string
           zip_code: string
         }
@@ -49,6 +51,7 @@ export type Database = {
           street_address2?: string | null
           type?: string | null
           updated_at?: string
+          used_in_order?: boolean | null
           user_id?: string
           zip_code?: string
         }
