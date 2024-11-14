@@ -85,7 +85,7 @@ export const ProductActions = ({
 
   const handleProjectSelection = async (projectId: string) => {
     try {
-      // First check if product already exists in project using maybeSingle() instead of single()
+      // First check if product already exists in project
       const { data: existingProduct, error: checkError } = await supabase
         .from('project_products')
         .select('*')
@@ -102,33 +102,33 @@ export const ProductActions = ({
         return;
       }
 
-      // Add product to project
-      const { error: projectError } = await supabase
-        .from('project_products')
-        .insert({
-          project_id: projectId,
-          product_id: productId,
-        });
-
-      if (projectError) throw projectError;
-
-      // First get current points_used
-      const { data: currentProject, error: fetchError } = await supabase
+      // Get current project points
+      const { data: currentProject, error: projectError } = await supabase
         .from('projects')
         .select('points_used, name')
         .eq('id', projectId)
         .single();
 
-      if (fetchError) throw fetchError;
+      if (projectError) throw projectError;
 
-      // Update project points
+      // Update project points (add 1000 to points_used)
       const newPointsUsed = (currentProject?.points_used || 0) + 1000;
-      const { error: pointsError } = await supabase
+      const { error: updateError } = await supabase
         .from('projects')
         .update({ points_used: newPointsUsed })
         .eq('id', projectId);
 
-      if (pointsError) throw pointsError;
+      if (updateError) throw updateError;
+
+      // Add product to project
+      const { error: insertError } = await supabase
+        .from('project_products')
+        .insert({
+          project_id: projectId,
+          product_id: productId
+        });
+
+      if (insertError) throw insertError;
 
       // Close dialog and navigate to success page
       setShowProjectDialog(false);
