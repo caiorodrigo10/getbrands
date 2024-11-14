@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface ProductCardProps {
@@ -36,32 +35,19 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
 
     setIsLoading(true);
     try {
-      // First, add item to cart
       await addItem(product);
-
-      // Then create a sample request
-      const { error: sampleRequestError } = await supabase
-        .from('sample_requests')
-        .insert({
-          user_id: user.id,
-          product_id: product.id,
-          status: 'pendente' // Changed from 'pending' to 'pendente' to match the constraint
-        });
-
-      if (sampleRequestError) throw sampleRequestError;
-
       onRequestSample(product.id);
       toast({
         title: "Success",
-        description: "Sample request created successfully.",
+        description: "Product added to cart successfully.",
       });
-      navigate("/pedido-amostra");
+      navigate("/checkout/confirmation");
     } catch (error) {
-      console.error('Error requesting sample:', error);
+      console.error('Error adding product to cart:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to request sample. Please try again.",
+        description: "Failed to add product to cart. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -130,7 +116,7 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
             onClick={handleRequestSample}
             disabled={isLoading}
           >
-            {isLoading ? "Requesting..." : "Request Sample"}
+            {isLoading ? "Adding to cart..." : "Request Sample"}
           </Button>
           <Button 
             className="flex-1 bg-primary hover:bg-primary-dark text-white"
