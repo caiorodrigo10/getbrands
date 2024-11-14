@@ -5,22 +5,19 @@ import { CheckCircle2 } from "lucide-react";
 import { useEffect } from "react";
 
 interface LocationState {
-  product: {
-    name: string;
-    image_url: string | null;
+  product?: {
+    name?: string;
+    image_url?: string | null;
   };
-  project: {
-    name: string;
+  project?: {
+    name?: string;
   };
 }
 
 const ProductSelectedSuccess = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { product, project } = (location.state as LocationState) || {
-    product: { name: "", image_url: null },
-    project: { name: "" },
-  };
+  const state = location.state as LocationState;
 
   useEffect(() => {
     if (!location.state) {
@@ -28,7 +25,7 @@ const ProductSelectedSuccess = () => {
     }
   }, [location.state, navigate]);
 
-  if (!location.state) return null;
+  if (!state) return null;
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -48,15 +45,17 @@ const ProductSelectedSuccess = () => {
 
         <div className="flex items-center space-x-6 bg-gray-50 rounded-lg p-6">
           <img
-            src={product.image_url || "/placeholder.svg"}
-            alt={product.name}
+            src={state.product?.image_url || "/placeholder.svg"}
+            alt={state.product?.name || "Product"}
             className="w-24 h-24 object-cover rounded-lg"
           />
           <div className="space-y-2">
-            <h3 className="font-semibold text-lg">{product.name}</h3>
-            <p className="text-sm text-gray-600">
-              Added to project: <span className="font-medium">{project.name}</span>
-            </p>
+            <h3 className="font-semibold text-lg">{state.product?.name || "Product"}</h3>
+            {state.project?.name && (
+              <p className="text-sm text-gray-600">
+                Added to project: <span className="font-medium">{state.project.name}</span>
+              </p>
+            )}
           </div>
         </div>
 
@@ -70,9 +69,9 @@ const ProductSelectedSuccess = () => {
           </Button>
           <Button
             className="flex-1 max-w-[200px]"
-            onClick={() => navigate("/produtos")}
+            onClick={() => navigate("/projetos")}
           >
-            Go to My Products
+            Go to My Projects
           </Button>
         </div>
       </Card>
