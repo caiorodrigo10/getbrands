@@ -17,7 +17,12 @@ export const ContactFields = ({ form }: ContactFieldsProps) => {
           <FormItem>
             <FormLabel>Email</FormLabel>
             <FormControl>
-              <Input type="email" placeholder="john@example.com" {...field} />
+              <Input 
+                type="email" 
+                placeholder="joao@exemplo.com" 
+                autoComplete="email"
+                {...field} 
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -28,9 +33,13 @@ export const ContactFields = ({ form }: ContactFieldsProps) => {
         name="phone"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Phone</FormLabel>
+            <FormLabel>Telefone</FormLabel>
             <FormControl>
-              <Input placeholder="(555) 123-4567" {...field} />
+              <Input 
+                placeholder="(11) 98765-4321" 
+                autoComplete="tel"
+                {...field} 
+              />
             </FormControl>
             <FormMessage />
           </FormItem>

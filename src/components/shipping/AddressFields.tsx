@@ -24,9 +24,13 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
         name="address1"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Address Line 1</FormLabel>
+            <FormLabel>Endereço Linha 1</FormLabel>
             <FormControl>
-              <Input placeholder="123 Main St" {...field} />
+              <Input 
+                placeholder="Rua Principal, 123" 
+                autoComplete="street-address"
+                {...field} 
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -38,9 +42,13 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
         name="address2"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Address Line 2 (optional)</FormLabel>
+            <FormLabel>Endereço Linha 2 (opcional)</FormLabel>
             <FormControl>
-              <Input placeholder="Apt 4B" {...field} />
+              <Input 
+                placeholder="Apartamento 4B" 
+                autoComplete="address-line2"
+                {...field} 
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -53,9 +61,13 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
           name="city"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>City</FormLabel>
+              <FormLabel>Cidade</FormLabel>
               <FormControl>
-                <Input placeholder="New York" {...field} />
+                <Input 
+                  placeholder="São Paulo" 
+                  autoComplete="address-level2"
+                  {...field} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -66,11 +78,11 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
           name="state"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>State</FormLabel>
+              <FormLabel>Estado</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select state" />
+                    <SelectValue placeholder="Selecione o estado" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>

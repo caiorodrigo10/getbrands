@@ -15,9 +15,13 @@ export const PersonalInfoFields = ({ form }: PersonalInfoFieldsProps) => {
         name="firstName"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>First Name</FormLabel>
+            <FormLabel>Nome</FormLabel>
             <FormControl>
-              <Input placeholder="John" {...field} />
+              <Input 
+                placeholder="João" 
+                autoComplete="given-name"
+                {...field} 
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -28,9 +32,13 @@ export const PersonalInfoFields = ({ form }: PersonalInfoFieldsProps) => {
         name="lastName"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Last Name</FormLabel>
+            <FormLabel>Sobrenome</FormLabel>
             <FormControl>
-              <Input placeholder="Doe" {...field} />
+              <Input 
+                placeholder="Silva" 
+                autoComplete="family-name"
+                {...field} 
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
