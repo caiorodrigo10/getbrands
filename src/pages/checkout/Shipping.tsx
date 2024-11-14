@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { PersonalInfoFields } from "@/components/shipping/PersonalInfoFields";
 import { AddressFields } from "@/components/shipping/AddressFields";
 import { ContactFields } from "@/components/shipping/ContactFields";
 import { SavedAddressSelect } from "@/components/shipping/SavedAddressSelect";
+import { ShippingButtons } from "@/components/checkout/ShippingButtons";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,11 +26,6 @@ const formSchema = z.object({
   zipCode: z.string().min(5, "Invalid ZIP code"),
   phone: z.string().min(10, "Invalid phone number"),
   useSameForBilling: z.boolean().default(true),
-  billingAddress1: z.string().min(5, "Billing address is too short").optional(),
-  billingAddress2: z.string().optional(),
-  billingCity: z.string().min(2, "Billing city is too short").optional(),
-  billingState: z.string().min(2, "Invalid billing state").optional(),
-  billingZipCode: z.string().min(5, "Invalid billing ZIP code").optional(),
 });
 
 const Shipping = () => {
@@ -38,6 +33,7 @@ const Shipping = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [isAddressSaved, setIsAddressSaved] = useState(false);
 
   const { data: addresses } = useQuery({
     queryKey: ["addresses", user?.id],
@@ -68,15 +64,18 @@ const Shipping = () => {
       zipCode: "",
       phone: "",
       useSameForBilling: true,
-      billingAddress1: "",
-      billingAddress2: "",
-      billingCity: "",
-      billingState: "",
-      billingZipCode: "",
     },
   });
 
-  const useSameForBilling = form.watch("useSameForBilling");
+  const handleCancel = () => {
+    navigate("/checkout/cart");
+  };
+
+  const handleContinue = () => {
+    if (isAddressSaved || selectedAddressId) {
+      navigate("/checkout/payment");
+    }
+  };
 
   const saveAddress = async (values: ShippingFormData) => {
     try {
@@ -90,43 +89,17 @@ const Shipping = () => {
         city: values.city,
         state: values.state,
         zip_code: values.zipCode,
-        type: values.useSameForBilling ? 'both' : 'shipping',
+        type: 'shipping',
       });
 
       if (shippingError) throw shippingError;
-
-      if (!values.useSameForBilling) {
-        const { error: billingError } = await supabase.from("addresses").insert({
-          user_id: user.id,
-          name: `${values.firstName} ${values.lastName} (Billing)`,
-          street_address1: values.billingAddress1!,
-          street_address2: values.billingAddress2,
-          city: values.billingCity!,
-          state: values.billingState!,
-          zip_code: values.billingZipCode!,
-          type: 'billing',
-        });
-
-        if (billingError) throw billingError;
-      }
 
       toast({
         title: "Success",
         description: "Address saved successfully",
       });
 
-      // Refresh the addresses query
-      const { data } = await supabase
-        .from("addresses")
-        .select("*")
-        .eq("user_id", user.id)
-        .in('type', ['shipping', 'both'])
-        .order('created_at', { ascending: false })
-        .single();
-      
-      if (data) {
-        setSelectedAddressId(data.id);
-      }
+      setIsAddressSaved(true);
     } catch (error) {
       console.error("Error saving address:", error);
       toast({
@@ -138,18 +111,7 @@ const Shipping = () => {
   };
 
   const onSubmit = async (values: ShippingFormData) => {
-    if (!selectedAddressId) {
-      await saveAddress(values);
-      return;
-    }
-
-    // Store shipping info in session storage for the next step
-    sessionStorage.setItem("shippingInfo", JSON.stringify({
-      ...values,
-      addressId: selectedAddressId,
-    }));
-
-    navigate("/checkout/payment");
+    await saveAddress(values);
   };
 
   return (
@@ -171,13 +133,8 @@ const Shipping = () => {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <PersonalInfoFields form={form} />
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Shipping Address</h3>
-                  <AddressFields form={form} />
-                </div>
-                <ContactFields form={form} />
-              </div>
+              <AddressFields form={form} />
+              <ContactFields form={form} />
 
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -195,31 +152,11 @@ const Shipping = () => {
                 </label>
               </div>
 
-              {!useSameForBilling && (
-                <div className="space-y-6 pt-4">
-                  <h3 className="text-lg font-medium">Billing Address</h3>
-                  <AddressFields 
-                    form={form} 
-                    prefix="billing"
-                    formFields={{
-                      address1: "billingAddress1",
-                      address2: "billingAddress2",
-                      city: "billingCity",
-                      state: "billingState",
-                      zipCode: "billingZipCode",
-                    }}
-                  />
-                </div>
-              )}
-
-              <div className="flex justify-end gap-4 pt-6">
-                <Button 
-                  type="submit"
-                  className="bg-primary hover:bg-primary-dark text-white"
-                >
-                  {selectedAddressId ? 'Continue to Payment' : 'Save Address'}
-                </Button>
-              </div>
+              <ShippingButtons
+                isAddressSaved={isAddressSaved}
+                onCancel={handleCancel}
+                onContinue={handleContinue}
+              />
             </form>
           </Form>
         )}
