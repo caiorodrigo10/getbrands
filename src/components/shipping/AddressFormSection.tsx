@@ -80,8 +80,6 @@ export const AddressFormSection = ({
           </label>
         </div>
 
-        {!useSameForBilling && <BillingAddressFields form={form} />}
-
         <ShippingButtons
           isAddressSaved={isAddressSaved || isFormComplete}
           onCancel={onCancel}

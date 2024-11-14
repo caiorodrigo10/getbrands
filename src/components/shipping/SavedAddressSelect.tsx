@@ -48,7 +48,6 @@ export const SavedAddressSelect = ({
 
       if (error) throw error;
 
-      // Update the cache by removing only the deleted address
       queryClient.setQueryData(["addresses", userId], (oldData: Address[] | undefined) => {
         if (!oldData) return [];
         return oldData.filter(address => address.id !== addressId);
@@ -73,43 +72,41 @@ export const SavedAddressSelect = ({
   }
 
   return (
-    <div className="space-y-4">
-      <RadioGroup
-        value={selectedAddressId || undefined}
-        onValueChange={onAddressSelect}
-        className="space-y-2"
-      >
-        {addresses.map((address) => (
-          <div key={address.id} className="flex items-center space-x-3 rounded-lg border p-4">
-            <RadioGroupItem value={address.id} id={address.id} />
-            <Label htmlFor={address.id} className="flex-1 cursor-pointer">
-              <div>
-                <p className="font-medium">
-                  {address.first_name} {address.last_name}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {address.street_address1}
-                  {address.street_address2 && `, ${address.street_address2}`}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {address.city}, {address.state} {address.zip_code}
-                </p>
-              </div>
-            </Label>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={(e) => {
-                e.preventDefault();
-                handleDelete(address.id);
-              }}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        ))}
-      </RadioGroup>
-    </div>
+    <RadioGroup
+      value={selectedAddressId || undefined}
+      onValueChange={onAddressSelect}
+      className="space-y-2"
+    >
+      {addresses.map((address) => (
+        <div key={address.id} className="flex items-center space-x-3 rounded-lg border p-4">
+          <RadioGroupItem value={address.id} id={address.id} />
+          <Label htmlFor={address.id} className="flex-1 cursor-pointer">
+            <div>
+              <p className="font-medium">
+                {address.first_name} {address.last_name}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {address.street_address1}
+                {address.street_address2 && `, ${address.street_address2}`}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {address.city}, {address.state} {address.zip_code}
+              </p>
+            </div>
+          </Label>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+            onClick={(e) => {
+              e.preventDefault();
+              handleDelete(address.id);
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      ))}
+    </RadioGroup>
   );
 };
