@@ -33,7 +33,7 @@ export const ShippingFormContainer = ({
       // Get user profile data
       const { data: profileData } = await supabase
         .from("profiles")
-        .select("first_name, last_name")
+        .select("first_name, last_name, phone")
         .eq("id", user.id)
         .single();
 
@@ -52,17 +52,19 @@ export const ShippingFormContainer = ({
       const savedData = {
         firstName: localStorage.getItem('firstName') || profileData?.first_name || "",
         lastName: localStorage.getItem('lastName') || profileData?.last_name || "",
-        phone: localStorage.getItem('phone') || "",
+        phone: localStorage.getItem('phone') || profileData?.phone || "",
         address1: localStorage.getItem('shipping_address') || "",
+        address2: localStorage.getItem('shipping_address2') || "",
         city: localStorage.getItem('shipping_city') || "",
         state: localStorage.getItem('shipping_state') || "",
         zipCode: localStorage.getItem('shipping_zip') || "",
       };
 
-      form.reset({
-        ...form.getValues(),
-        ...savedData
-      });
+      // Only set form values if they're not already set
+      const currentValues = form.getValues();
+      if (!currentValues.firstName && !currentValues.lastName) {
+        form.reset(savedData);
+      }
 
       return addressData as Address[];
     },
@@ -78,9 +80,31 @@ export const ShippingFormContainer = ({
       localStorage.setItem('lastName', values.lastName);
       localStorage.setItem('phone', values.phone);
       localStorage.setItem('shipping_address', values.address1);
+      localStorage.setItem('shipping_address2', values.address2 || '');
       localStorage.setItem('shipping_city', values.city);
       localStorage.setItem('shipping_state', values.state);
       localStorage.setItem('shipping_zip', values.zipCode);
+
+      // Save to addresses table
+      const { error } = await supabase
+        .from('addresses')
+        .insert({
+          user_id: user.id,
+          first_name: values.firstName,
+          last_name: values.lastName,
+          street_address1: values.address1,
+          street_address2: values.address2,
+          city: values.city,
+          state: values.state,
+          zip_code: values.zipCode,
+          type: 'shipping',
+          phone: values.phone,
+        });
+
+      if (error) throw error;
+
+      // Refetch addresses after saving
+      await refetchAddresses();
 
       toast({
         title: "Success",
