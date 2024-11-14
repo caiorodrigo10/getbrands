@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 import PackSelectionDialog from "../dialogs/PackSelectionDialog";
 import ProjectSelectionDialog from "../dialogs/ProjectSelectionDialog";
 import { Product } from "@/types/product";
@@ -24,6 +25,7 @@ export const ProductActions = ({
   const [product, setProduct] = useState<Product | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleSelectProduct = async () => {
     if (!user) {
@@ -117,7 +119,7 @@ export const ProductActions = ({
       // First get current points_used
       const { data: currentProject, error: fetchError } = await supabase
         .from('projects')
-        .select('points_used')
+        .select('points_used, name')
         .eq('id', projectId)
         .single();
 
@@ -132,10 +134,22 @@ export const ProductActions = ({
 
       if (pointsError) throw pointsError;
 
-      toast({
-        title: "Success",
-        description: "Product selected successfully. 1000 points used.",
+      // Close dialog and navigate to success page
+      setShowProjectDialog(false);
+      
+      // Navigate to success page with product and project info
+      navigate("/produtos/success", {
+        state: {
+          product: {
+            name: product?.name,
+            image_url: product?.image_url
+          },
+          project: {
+            name: currentProject.name
+          }
+        }
       });
+
     } catch (error) {
       console.error('Error selecting product:', error);
       toast({

@@ -13,6 +13,7 @@ import Perfil from "./pages/Perfil";
 import Projetos from "./pages/Projetos";
 import Catalogo from "./pages/Catalogo";
 import Produtos from "./pages/Produtos";
+import ProductSelectedSuccess from "./pages/produtos/ProductSelectedSuccess";
 import Documentos from "./pages/Documentos";
 import SampleOrders from "./pages/SampleOrders";
 import Checkout from "./pages/checkout/Checkout";
@@ -99,6 +100,14 @@ const App = () => (
                     <AppLayout>
                       <Produtos />
                     </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/produtos/success"
+                element={
+                  <ProtectedRoute>
+                    <ProductSelectedSuccess />
                   </ProtectedRoute>
                 }
               />
