@@ -45,7 +45,7 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
         .insert({
           user_id: user.id,
           product_id: product.id,
-          status: 'pending'
+          status: 'pendente' // Changed from 'pending' to 'pendente' to match the constraint
         });
 
       if (sampleRequestError) throw sampleRequestError;
