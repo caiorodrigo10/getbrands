@@ -83,7 +83,6 @@ const Shipping = () => {
 
       const { error: shippingError } = await supabase.from("addresses").insert({
         user_id: user.id,
-        name: `${values.firstName} ${values.lastName}`,
         street_address1: values.address1,
         street_address2: values.address2,
         city: values.city,
