@@ -5,15 +5,21 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Confetti from 'react-confetti';
+import { useLocation } from "react-router-dom";
 
 const Produtos = () => {
   const { user } = useAuth();
-  const [showConfetti, setShowConfetti] = useState(true);
+  const location = useLocation();
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
+    // Only show confetti if redirected from product selection
+    const showCelebration = location.state?.fromProductSelection || false;
+    setShowConfetti(showCelebration);
+    
     const timer = setTimeout(() => setShowConfetti(false), 5000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [location.state]);
 
   const { data: products, isLoading } = useQuery({
     queryKey: ['my-products', user?.id],

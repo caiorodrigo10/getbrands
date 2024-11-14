@@ -1,8 +1,6 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle, CheckCircle2 } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -17,9 +15,10 @@ interface ProjectSelectionDialogProps {
 }
 
 const loadingSteps = [
-  { message: "Registrando seleção...", duration: 1500 },
-  { message: "Enviando para desenvolvimento de embalagens...", duration: 2000 },
-  { message: "Finalizando processo...", duration: 1500 },
+  "Registrando seleção...",
+  "Atualizando pontos do projeto...",
+  "Enviando para desenvolvimento de embalagens...",
+  "Finalizando..."
 ];
 
 const ProjectSelectionDialog = ({ 
@@ -35,20 +34,23 @@ const ProjectSelectionDialog = ({
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const processSteps = async () => {
+  const handleConfirm = async () => {
+    if (!selectedProject) return;
+    
     setIsProcessing(true);
     
+    // Process through loading steps
     for (let i = 0; i < loadingSteps.length; i++) {
       setCurrentStep(i);
-      await new Promise(resolve => setTimeout(resolve, loadingSteps[i].duration));
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
-
-    await onConfirm(selectedProject);
-    onOpenChange(false);
-    setIsProcessing(false);
-    setCurrentStep(0);
     
-    navigate("/produtos");
+    await onConfirm(selectedProject);
+    setIsProcessing(false);
+    onOpenChange(false);
+    
+    // Navigate with state to indicate product selection
+    navigate("/produtos", { state: { fromProductSelection: true } });
     
     toast({
       title: "Produto selecionado com sucesso! 🎉",
@@ -56,18 +58,23 @@ const ProjectSelectionDialog = ({
     });
   };
 
-  const handleConfirm = () => {
-    if (!selectedProject) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please select a project to continue.",
-      });
-      return;
-    }
-
-    processSteps();
-  };
+  if (isProcessing) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Processing</DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <div className="mb-4">{loadingSteps[currentStep]}</div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -75,8 +82,7 @@ const ProjectSelectionDialog = ({
         <DialogHeader>
           <DialogTitle>Select Project</DialogTitle>
           <DialogDescription>
-            Choose which project you want to add this product to. 
-            This action is final as the product will go into production.
+            Choose a project to add this product to.
           </DialogDescription>
         </DialogHeader>
 
@@ -101,61 +107,45 @@ const ProjectSelectionDialog = ({
             </AlertDescription>
           </Alert>
 
-          <Select
-            value={selectedProject}
-            onValueChange={setSelectedProject}
-            disabled={isProcessing}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select a project" />
-            </SelectTrigger>
-            <SelectContent>
-              {projects.map((project) => (
-                <SelectItem key={project.id} value={project.id}>
-                  {project.name} ({(project.points - project.points_used)} pts)
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {isProcessing && (
-            <div className="animate-fade-in space-y-4 py-4">
-              {loadingSteps.map((step, index) => (
-                <div
-                  key={index}
-                  className={`flex items-center gap-2 transition-opacity duration-300 ${
-                    index === currentStep ? 'opacity-100' : 'opacity-40'
-                  }`}
-                >
-                  {index <= currentStep ? (
-                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
-                      <CheckCircle2 className="h-4 w-4 text-primary animate-scale-in" />
-                    </div>
-                  ) : (
-                    <div className="h-6 w-6 rounded-full border border-gray-200" />
-                  )}
-                  <span className="text-sm text-gray-600">{step.message}</span>
+          <div className="space-y-2">
+            {projects.map((project) => (
+              <div
+                key={project.id}
+                className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                  selectedProject === project.id
+                    ? "border-primary bg-primary/5"
+                    : "border-gray-200 hover:border-primary/50"
+                }`}
+                onClick={() => setSelectedProject(project.id)}
+              >
+                <div className="font-medium">{project.name}</div>
+                <div className="text-sm text-gray-500">
+                  Available Points: {project.points - (project.points_used || 0)}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              </div>
+            ))}
+          </div>
 
-        <DialogFooter>
-          <Button 
-            variant="outline" 
-            onClick={() => onOpenChange(false)}
-            disabled={isProcessing}
-          >
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleConfirm}
-            disabled={isProcessing}
-          >
-            {isProcessing ? "Processing..." : "Confirm Selection"}
-          </Button>
-        </DialogFooter>
+          <div className="flex justify-end space-x-2">
+            <button
+              className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-800"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className={`px-4 py-2 text-sm font-medium text-white rounded-md ${
+                selectedProject
+                  ? "bg-primary hover:bg-primary/90"
+                  : "bg-gray-300 cursor-not-allowed"
+              }`}
+              onClick={handleConfirm}
+              disabled={!selectedProject}
+            >
+              Confirm Selection
+            </button>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );
