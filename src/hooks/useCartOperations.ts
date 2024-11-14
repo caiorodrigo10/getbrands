@@ -155,7 +155,7 @@ export const useCartOperations = (user: User | null) => {
     );
   };
 
-  const clearCart = async () => {
+  const clearCart = async (silent = false) => {
     if (!user?.id) return;
 
     try {
@@ -169,16 +169,20 @@ export const useCartOperations = (user: User | null) => {
 
       setItems([]);
       
-      toast({
-        description: "Carrinho limpo com sucesso.",
-      });
+      if (!silent) {
+        toast({
+          description: "Cart cleared successfully.",
+        });
+      }
     } catch (error) {
       console.error('Error clearing cart:', error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao limpar carrinho",
-        description: "Não foi possível limpar o carrinho. Tente novamente mais tarde.",
-      });
+      if (!silent) {
+        toast({
+          variant: "destructive",
+          title: "Error clearing cart",
+          description: "Unable to clear cart. Please try again later.",
+        });
+      }
     } finally {
       setIsLoading(false);
     }

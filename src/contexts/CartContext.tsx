@@ -21,10 +21,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (user?.id) {
       loadCartItems();
     } else {
-      // Clear items when user is not authenticated
-      items.length > 0 && clearCart();
+      // Clear items silently when user is not authenticated
+      items.length > 0 && clearCart(true);
     }
-  }, [user?.id]); // Add user?.id as dependency to properly track auth state
+  }, [user?.id]); 
 
   return (
     <CartContext.Provider

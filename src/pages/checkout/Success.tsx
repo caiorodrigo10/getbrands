@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Package, Truck, Clock } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import OrderDetails from "@/components/checkout/OrderDetails";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import Sidebar from "@/components/Sidebar";
+import Confetti from 'react-confetti';
 
 const Success = () => {
   const navigate = useNavigate();
@@ -16,6 +17,13 @@ const Success = () => {
   const { user } = useAuth();
   const [orderDetails, setOrderDetails] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showConfetti, setShowConfetti] = useState(true);
+
+  useEffect(() => {
+    // Hide confetti after 5 seconds
+    const timer = setTimeout(() => setShowConfetti(false), 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -49,6 +57,10 @@ const Success = () => {
         
         if (data) {
           setOrderDetails(data);
+          toast({
+            description: "We'll keep you updated on your sample's status via email.",
+            duration: 6000,
+          });
         } else {
           toast({
             variant: "destructive",
@@ -89,6 +101,7 @@ const Success = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
+      {showConfetti && <Confetti />}
       <Sidebar />
       <main className="flex-1 ml-64 p-8">
         <div className="max-w-3xl mx-auto">
@@ -97,9 +110,38 @@ const Success = () => {
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
               <CardTitle className="text-2xl mb-2">Payment Successful!</CardTitle>
               <p className="text-muted-foreground">
-                Thank you for your order. We'll send you a confirmation email shortly.
+                Thank you for your order. We'll send you updates about your sample via email.
               </p>
             </CardHeader>
+          </Card>
+
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Shipping Status</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between relative">
+                <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-gray-200 -z-10" />
+                <div className="flex flex-col items-center gap-2 bg-background p-2">
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                    <Package className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-sm font-medium">Pending</span>
+                </div>
+                <div className="flex flex-col items-center gap-2 bg-background p-2">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                    <Clock className="w-4 h-4 text-gray-400" />
+                  </div>
+                  <span className="text-sm text-gray-400">Processing</span>
+                </div>
+                <div className="flex flex-col items-center gap-2 bg-background p-2">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                    <Truck className="w-4 h-4 text-gray-400" />
+                  </div>
+                  <span className="text-sm text-gray-400">Shipped</span>
+                </div>
+              </div>
+            </CardContent>
           </Card>
 
           {orderDetails && (
