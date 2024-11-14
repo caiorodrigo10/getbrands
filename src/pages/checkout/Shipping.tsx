@@ -17,7 +17,7 @@ const Shipping = () => {
   const [isAddressSaved, setIsAddressSaved] = React.useState(false);
   const form = useShippingForm();
 
-  const { data: addresses } = useQuery({
+  const { data: addresses, refetch: refetchAddresses } = useQuery({
     queryKey: ["addresses", user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -96,7 +96,7 @@ const Shipping = () => {
       // Save shipping address
       const { error: addressError } = await supabase
         .from("addresses")
-        .upsert({
+        .insert({
           user_id: user.id,
           street_address1: values.address1,
           street_address2: values.address2,
@@ -104,17 +104,19 @@ const Shipping = () => {
           state: values.state,
           zip_code: values.zipCode,
           type: values.useSameForBilling ? 'both' : 'shipping',
-        });
+        })
+        .select()
+        .single();
 
       if (addressError) throw addressError;
 
       // Save billing address if different
-      if (!values.useSameForBilling) {
+      if (!values.useSameForBilling && values.billingAddress1) {
         const { error: billingAddressError } = await supabase
           .from("addresses")
-          .upsert({
+          .insert({
             user_id: user.id,
-            street_address1: values.billingAddress1!,
+            street_address1: values.billingAddress1,
             street_address2: values.billingAddress2,
             city: values.billingCity!,
             state: values.billingState!,
@@ -133,6 +135,9 @@ const Shipping = () => {
       localStorage.setItem('shipping_city', values.city);
       localStorage.setItem('shipping_state', values.state);
       localStorage.setItem('shipping_zip', values.zipCode);
+
+      await refetchAddresses();
+      setIsAddressSaved(true);
 
       toast({
         title: "Success",
