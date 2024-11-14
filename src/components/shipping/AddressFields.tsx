@@ -31,11 +31,11 @@ export const AddressFields = ({ form, prefix = "", formFields }: AddressFieldsPr
       <FormField
         control={form.control}
         name={fields.address1}
-        render={({ field }) => (
+        render={({ field: { value, ...fieldProps } }) => (
           <FormItem>
             <FormLabel>Address Line 1</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="Street address" />
+              <Input {...fieldProps} value={value as string} placeholder="Street address" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -45,11 +45,11 @@ export const AddressFields = ({ form, prefix = "", formFields }: AddressFieldsPr
       <FormField
         control={form.control}
         name={fields.address2}
-        render={({ field }) => (
+        render={({ field: { value, ...fieldProps } }) => (
           <FormItem>
             <FormLabel>Address Line 2 (Optional)</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="Apartment, suite, etc." />
+              <Input {...fieldProps} value={value as string} placeholder="Apartment, suite, etc." />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -60,11 +60,11 @@ export const AddressFields = ({ form, prefix = "", formFields }: AddressFieldsPr
         <FormField
           control={form.control}
           name={fields.city}
-          render={({ field }) => (
+          render={({ field: { value, ...fieldProps } }) => (
             <FormItem>
               <FormLabel>City</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...fieldProps} value={value as string} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -97,11 +97,11 @@ export const AddressFields = ({ form, prefix = "", formFields }: AddressFieldsPr
         <FormField
           control={form.control}
           name={fields.zipCode}
-          render={({ field }) => (
+          render={({ field: { value, ...fieldProps } }) => (
             <FormItem>
               <FormLabel>ZIP Code</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="12345" />
+                <Input {...fieldProps} value={value as string} placeholder="12345" />
               </FormControl>
               <FormMessage />
             </FormItem>
