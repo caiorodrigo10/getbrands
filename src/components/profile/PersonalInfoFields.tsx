@@ -54,3 +54,5 @@ export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
     </div>
   );
 }
+
+export default PersonalInfoFields;

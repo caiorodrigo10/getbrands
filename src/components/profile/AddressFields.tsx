@@ -94,3 +94,5 @@ export function AddressFields({ form }: AddressFieldsProps) {
     </div>
   );
 }
+
+export default AddressFields;

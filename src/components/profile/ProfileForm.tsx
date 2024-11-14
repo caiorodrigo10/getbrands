@@ -5,9 +5,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { ProfileFormSchema, profileFormSchema } from "./types";
-import PersonalInfoFields from "./PersonalInfoFields";
-import AddressFields from "./AddressFields";
+import { ProfileFormData, profileFormSchema } from "./types";
+import { PersonalInfoFields } from "./PersonalInfoFields";
+import { AddressFields } from "./AddressFields";
 import { Button } from "@/components/ui/button";
 
 const ProfileForm = () => {
@@ -30,7 +30,7 @@ const ProfileForm = () => {
     enabled: !!user?.id,
   });
 
-  const form = useForm<ProfileFormSchema>({
+  const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
       first_name: profile?.first_name || "",
@@ -56,7 +56,7 @@ const ProfileForm = () => {
     },
   });
 
-  const onSubmit = async (data: ProfileFormSchema) => {
+  const onSubmit = async (data: ProfileFormData) => {
     try {
       const { error } = await supabase
         .from("profiles")
