@@ -29,6 +29,18 @@ const OrderStatusFilters = ({
         Pending
       </Button>
       <Button
+        variant={selectedStatus === "processing" ? "default" : "outline"}
+        onClick={() => setSelectedStatus("processing")}
+      >
+        Processing
+      </Button>
+      <Button
+        variant={selectedStatus === "shipped" ? "default" : "outline"}
+        onClick={() => setSelectedStatus("shipped")}
+      >
+        Shipped
+      </Button>
+      <Button
         variant={selectedStatus === "completed" ? "default" : "outline"}
         onClick={() => setSelectedStatus("completed")}
       >
