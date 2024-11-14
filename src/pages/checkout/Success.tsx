@@ -2,10 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { CheckCircle, Package } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { formatCurrency } from "@/lib/utils";
 import Sidebar from "@/components/Sidebar";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,10 +21,7 @@ const Success = () => {
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
-      if (!user) {
-        navigate('/login');
-        return;
-      }
+      if (!user) return;
 
       try {
         const { data, error } = await supabase
@@ -42,7 +37,8 @@ const Success = () => {
               product:products (
                 name,
                 id,
-                from_price
+                from_price,
+                image_url
               )
             )
           `)
@@ -55,6 +51,7 @@ const Success = () => {
         
         if (data) {
           setOrderDetails(data);
+          clearCart();
         } else {
           toast({
             variant: "destructive",
@@ -76,7 +73,6 @@ const Success = () => {
     };
 
     fetchOrderDetails();
-    clearCart();
   }, [user, navigate, toast, clearCart]);
 
   if (isLoading) {
@@ -85,11 +81,9 @@ const Success = () => {
         <Sidebar />
         <main className="flex-1 ml-64 p-8">
           <div className="max-w-3xl mx-auto">
-            <Card>
-              <CardContent className="flex items-center justify-center p-8">
-                <p>Loading order details...</p>
-              </CardContent>
-            </Card>
+            <div className="flex items-center justify-center p-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
           </div>
         </main>
       </div>
@@ -101,10 +95,10 @@ const Success = () => {
       <Sidebar />
       <main className="flex-1 ml-64 p-8">
         <div className="max-w-3xl mx-auto">
-          <Card className="mb-8">
-            <CardHeader className="text-center">
+          <Card className="mb-8 border-green-200 bg-green-50">
+            <CardHeader className="text-center pb-6">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <CardTitle className="text-2xl">Payment Successful!</CardTitle>
+              <CardTitle className="text-2xl mb-2">Payment Successful!</CardTitle>
               <p className="text-muted-foreground">
                 Thank you for your order. We'll send you a confirmation email shortly.
               </p>
@@ -122,11 +116,13 @@ const Success = () => {
             <Button
               variant="outline"
               onClick={() => navigate("/sample-orders")}
+              className="px-6"
             >
               View All Orders
             </Button>
             <Button
               onClick={() => navigate("/catalogo")}
+              className="px-6 bg-primary hover:bg-primary-dark"
             >
               Continue Shopping
             </Button>

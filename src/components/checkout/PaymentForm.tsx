@@ -19,14 +19,13 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
   const elements = useElements();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { items, clearCart } = useCart();
+  const { items } = useCart();
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const createSampleRequest = async () => {
     if (!user) throw new Error("User not authenticated");
 
-    // First create the sample request
     const { data: sampleRequest, error: sampleRequestError } = await supabase
       .from('sample_requests')
       .insert({
@@ -42,7 +41,6 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
 
     if (sampleRequestError) throw sampleRequestError;
 
-    // Then create the sample request products
     const sampleRequestProducts = items.map(item => ({
       sample_request_id: sampleRequest.id,
       product_id: item.id,
@@ -67,10 +65,8 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
     setIsProcessing(true);
 
     try {
-      // Create the sample request first
       await createSampleRequest();
 
-      // Then confirm the payment
       const { error: paymentError } = await stripe.confirmPayment({
         elements,
         confirmParams: {
@@ -96,12 +92,6 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         throw paymentError;
       }
 
-      // Clear cart and shipping data after successful payment
-      clearCart();
-      ['shipping_address', 'shipping_city', 'shipping_state', 'shipping_zip', 'firstName', 'lastName', 'phone'].forEach(key => {
-        localStorage.removeItem(key);
-      });
-
     } catch (error) {
       console.error("Payment error:", error);
       toast({
@@ -122,7 +112,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
       <Button 
         type="submit" 
         disabled={!stripe || isProcessing}
-        className="w-full"
+        className="w-full bg-primary hover:bg-primary-dark"
       >
         {isProcessing ? "Processing..." : `Pay ${formatCurrency(total)}`}
       </Button>
