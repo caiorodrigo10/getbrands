@@ -96,7 +96,11 @@ export function ProfileForm() {
           <div className="space-y-4">
             <div>
               <Label>Email</Label>
-              <Input value={form.getValues("email")} disabled className="bg-muted" />
+              <Input 
+                value={form.getValues("email")} 
+                disabled 
+                className="bg-gray-50" 
+              />
             </div>
             
             <PersonalInfoFields form={form} />
