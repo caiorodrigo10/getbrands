@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import PackSelectionDialog from "../dialogs/PackSelectionDialog";
 import ProjectSelectionDialog from "../dialogs/ProjectSelectionDialog";
+import { Product } from "@/types/product";
 
 interface ProductActionsProps {
   productId: string;
@@ -20,6 +21,7 @@ export const ProductActions = ({
   const [showPackDialog, setShowPackDialog] = useState(false);
   const [showProjectDialog, setShowProjectDialog] = useState(false);
   const [projects, setProjects] = useState<any[]>([]);
+  const [product, setProduct] = useState<Product | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -32,6 +34,24 @@ export const ProductActions = ({
       });
       return;
     }
+
+    // Fetch product details
+    const { data: productData, error: productError } = await supabase
+      .from('products')
+      .select('*')
+      .eq('id', productId)
+      .single();
+
+    if (productError) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load product details. Please try again.",
+      });
+      return;
+    }
+
+    setProduct(productData);
 
     // Fetch user's projects
     const { data: userProjects, error: projectsError } = await supabase
@@ -128,12 +148,15 @@ export const ProductActions = ({
         onOpenChange={setShowPackDialog} 
       />
       
-      <ProjectSelectionDialog 
-        open={showProjectDialog}
-        onOpenChange={setShowProjectDialog}
-        projects={projects}
-        onConfirm={handleProjectSelection}
-      />
+      {product && (
+        <ProjectSelectionDialog 
+          open={showProjectDialog}
+          onOpenChange={setShowProjectDialog}
+          projects={projects}
+          onConfirm={handleProjectSelection}
+          product={product}
+        />
+      )}
     </div>
   );
 };

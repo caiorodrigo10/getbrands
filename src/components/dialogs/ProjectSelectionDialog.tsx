@@ -6,12 +6,14 @@ import { AlertTriangle, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { Product } from "@/types/product";
 
 interface ProjectSelectionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   projects: any[];
   onConfirm: (projectId: string) => void;
+  product: Product;
 }
 
 const loadingSteps = [
@@ -24,7 +26,8 @@ const ProjectSelectionDialog = ({
   open, 
   onOpenChange,
   projects,
-  onConfirm
+  onConfirm,
+  product
 }: ProjectSelectionDialogProps) => {
   const [selectedProject, setSelectedProject] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -47,7 +50,6 @@ const ProjectSelectionDialog = ({
     
     navigate("/produtos");
     
-    // Show celebration toast
     toast({
       title: "Produto selecionado com sucesso! 🎉",
       description: "O produto foi adicionado ao seu projeto.",
@@ -69,7 +71,7 @@ const ProjectSelectionDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Select Project</DialogTitle>
           <DialogDescription>
@@ -78,11 +80,24 @@ const ProjectSelectionDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
+          {/* Product Preview */}
+          <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+            <img 
+              src={product.image_url || "/placeholder.svg"} 
+              alt={product.name}
+              className="w-20 h-20 object-cover rounded-md"
+            />
+            <div>
+              <h3 className="font-medium text-gray-900">{product.name}</h3>
+              <p className="text-sm text-gray-500">Cost: 1000 points</p>
+            </div>
+          </div>
+
           <Alert className="bg-yellow-50 border-yellow-200">
             <AlertTriangle className="h-4 w-4 text-yellow-600" />
             <AlertDescription className="text-yellow-800">
-              Warning: Once you confirm this selection, points will be consumed and this action cannot be undone.
+              Warning: Once you confirm this selection, 1000 points will be consumed and this action cannot be undone.
             </AlertDescription>
           </Alert>
 

@@ -81,6 +81,12 @@ const ProductCard = ({
             TIKTOK
           </Badge>
         )}
+        <Badge 
+          variant="outline" 
+          className="absolute top-4 left-4 z-10 bg-white/80 backdrop-blur-sm text-xs font-normal"
+        >
+          1000 points
+        </Badge>
         <img
           src={imageError ? '/placeholder.svg' : (product.image_url || '/placeholder.svg')}
           alt={product.name}
