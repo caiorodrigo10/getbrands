@@ -1,20 +1,14 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Form } from "@/components/ui/form";
-import { PersonalInfoFields } from "@/components/shipping/PersonalInfoFields";
-import { AddressFields } from "@/components/shipping/AddressFields";
-import { ContactFields } from "@/components/shipping/ContactFields";
-import { SavedAddressSelect } from "@/components/shipping/SavedAddressSelect";
-import { ShippingButtons } from "@/components/checkout/ShippingButtons";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
+import { AddressSelectionSection } from "@/components/shipping/AddressSelectionSection";
+import { AddressFormSection } from "@/components/shipping/AddressFormSection";
 import type { ShippingFormData } from "@/types/shipping";
 
 const formSchema = z.object({
@@ -33,7 +27,6 @@ const Shipping = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const [showAddressSelect, setShowAddressSelect] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [isAddressSaved, setIsAddressSaved] = useState(false);
 
@@ -69,7 +62,6 @@ const Shipping = () => {
     },
   });
 
-  // Set form values when addresses are loaded
   React.useEffect(() => {
     if (addresses && addresses.length > 0) {
       const lastAddress = addresses[0];
@@ -99,7 +91,6 @@ const Shipping = () => {
     try {
       if (!user?.id) throw new Error("User not authenticated");
 
-      // First, check if the user already has an address
       const { data: existingAddresses } = await supabase
         .from("addresses")
         .select("id")
@@ -107,7 +98,6 @@ const Shipping = () => {
         .single();
 
       if (existingAddresses) {
-        // Update existing address
         const { error: updateError } = await supabase
           .from("addresses")
           .update({
@@ -122,7 +112,6 @@ const Shipping = () => {
 
         if (updateError) throw updateError;
       } else {
-        // Insert new address
         const { error: insertError } = await supabase
           .from("addresses")
           .insert({
@@ -154,78 +143,30 @@ const Shipping = () => {
     }
   };
 
-  const onSubmit = async (values: ShippingFormData) => {
-    await saveAddress(values);
-  };
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="space-y-8">
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <h2 className="text-xl font-semibold mb-6">Shipping Information</h2>
         
-        {user && addresses?.length > 1 && (
-          <div className="mb-4">
-            <Button
-              variant="outline"
-              onClick={() => setShowAddressSelect(!showAddressSelect)}
-              className="w-full mb-4"
-            >
-              {showAddressSelect ? "Hide Saved Addresses" : "Select Another Address"}
-            </Button>
-            
-            {showAddressSelect && (
-              <SavedAddressSelect
-                userId={user.id}
-                selectedAddressId={selectedAddressId}
-                onAddressSelect={(addressId) => {
-                  const selectedAddress = addresses.find(addr => addr.id === addressId);
-                  if (selectedAddress) {
-                    form.reset({
-                      ...form.getValues(),
-                      address1: selectedAddress.street_address1,
-                      address2: selectedAddress.street_address2 || "",
-                      city: selectedAddress.city,
-                      state: selectedAddress.state,
-                      zipCode: selectedAddress.zip_code,
-                    });
-                    setSelectedAddressId(addressId);
-                  }
-                }}
-                onAddNew={() => setSelectedAddressId(null)}
-              />
-            )}
-          </div>
-        )}
+        <AddressSelectionSection
+          user={user}
+          addresses={addresses}
+          selectedAddressId={selectedAddressId}
+          form={form}
+          setSelectedAddressId={setSelectedAddressId}
+        />
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <PersonalInfoFields form={form} />
-            <AddressFields form={form} />
-            <ContactFields form={form} />
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="useSameForBilling"
-                checked={form.watch("useSameForBilling")}
-                onCheckedChange={(checked) => {
-                  form.setValue("useSameForBilling", checked as boolean);
-                }}
-              />
-              <label
-                htmlFor="useSameForBilling"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Use same address for billing
-              </label>
-            </div>
-
-            <ShippingButtons
-              isAddressSaved={isAddressSaved}
-              onCancel={handleCancel}
-              onContinue={handleContinue}
-            />
-          </form>
-        </Form>
+        <AddressFormSection
+          form={form}
+          isAddressSaved={isAddressSaved}
+          onSubmit={saveAddress}
+          onCancel={handleCancel}
+          onContinue={handleContinue}
+        />
       </div>
     </div>
   );
