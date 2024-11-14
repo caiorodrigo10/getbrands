@@ -27,6 +27,7 @@ const Perfil = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   const form = useForm<AddressFormData>({
     resolver: zodResolver(addressSchema),
@@ -46,30 +47,32 @@ const Perfil = () => {
       if (!user) return;
 
       try {
-        // First, get the user's profile
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("name, email")
           .eq("id", user.id)
           .single();
 
-        // Get the address data, but don't use .single() since it might not exist
-        const { data: addresses } = await supabase
+        if (profileError) throw profileError;
+
+        const { data: addresses, error: addressError } = await supabase
           .from("addresses")
           .select("*")
-          .eq("user_id", user.id);
+          .eq("user_id", user.id)
+          .maybeSingle();
 
-        const address = addresses?.[0]; // Get the first address if it exists
+        if (addressError) throw addressError;
+
         const [firstName, lastName] = (profile?.name || "").split(" ");
 
         form.reset({
           firstName: firstName || "",
           lastName: lastName || "",
-          address1: address?.street_address1 || "",
-          address2: address?.street_address2 || "",
-          city: address?.city || "",
-          state: address?.state || "",
-          zipCode: address?.zip_code || "",
+          address1: addresses?.street_address1 || "",
+          address2: addresses?.street_address2 || "",
+          city: addresses?.city || "",
+          state: addresses?.state || "",
+          zipCode: addresses?.zip_code || "",
         });
       } catch (error) {
         console.error("Error loading address:", error);
@@ -88,6 +91,7 @@ const Perfil = () => {
 
   const onSubmit = async (data: AddressFormData) => {
     if (!user) return;
+    setIsSaving(true);
 
     try {
       // Update profile name
@@ -101,28 +105,36 @@ const Perfil = () => {
       const addressData = {
         user_id: user.id,
         street_address1: data.address1,
-        street_address2: data.address2,
+        street_address2: data.address2 || null,
         city: data.city,
         state: data.state,
         zip_code: data.zipCode,
       };
 
-      // Try to update existing address first
-      const { error: updateError, count } = await supabase
+      // Check if address exists
+      const { data: existingAddress } = await supabase
         .from("addresses")
-        .update(addressData)
-        .eq("user_id", user.id);
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
 
-      // If no rows were updated, insert a new address
-      if (!updateError && count === 0) {
-        const { error: insertError } = await supabase
+      let addressError;
+      if (existingAddress) {
+        // Update existing address
+        const { error } = await supabase
+          .from("addresses")
+          .update(addressData)
+          .eq("user_id", user.id);
+        addressError = error;
+      } else {
+        // Insert new address
+        const { error } = await supabase
           .from("addresses")
           .insert([addressData]);
-
-        if (insertError) throw insertError;
-      } else if (updateError) {
-        throw updateError;
+        addressError = error;
       }
+
+      if (addressError) throw addressError;
 
       toast({
         title: "Success",
@@ -135,6 +147,8 @@ const Perfil = () => {
         title: "Error",
         description: "Failed to update profile. Please try again.",
       });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -152,8 +166,8 @@ const Perfil = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <PersonalInfoFields form={form} />
               <AddressFields form={form} />
-              <Button type="submit" className="w-full">
-                Save Changes
+              <Button type="submit" disabled={isSaving} className="w-full">
+                {isSaving ? "Saving..." : "Save Changes"}
               </Button>
             </form>
           </Form>
