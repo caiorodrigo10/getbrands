@@ -10,34 +10,24 @@ import Sidebar from "@/components/Sidebar";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-
-interface OrderProduct {
-  name: string;
-  id: string;
-  from_price: number;
-}
-
-interface OrderSummary {
-  id: string;
-  created_at: string;
-  shipping_address: string;
-  shipping_city: string;
-  shipping_state: string;
-  shipping_zip: string;
-  product: OrderProduct;
-}
+import OrderDetails from "@/components/checkout/OrderDetails";
+import OrderSummary from "@/components/checkout/OrderSummary";
 
 const Success = () => {
   const navigate = useNavigate();
   const { clearCart } = useCart();
   const { toast } = useToast();
   const { user } = useAuth();
-  const [orderDetails, setOrderDetails] = useState<OrderSummary | null>(null);
+  const [orderDetails, setOrderDetails] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const shippingCost = 4.50;
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
+      if (!user) {
+        navigate('/login');
+        return;
+      }
+
       try {
         const { data, error } = await supabase
           .from('sample_requests')
@@ -48,20 +38,23 @@ const Success = () => {
             shipping_city,
             shipping_state,
             shipping_zip,
-            product:products (
-              name,
-              id,
-              from_price
+            sample_request_products (
+              product:products (
+                name,
+                id,
+                from_price
+              )
             )
           `)
-          .eq('user_id', user?.id)
+          .eq('user_id', user.id)
           .order('created_at', { ascending: false })
-          .limit(1);
+          .limit(1)
+          .single();
 
         if (error) throw error;
         
-        if (data && data.length > 0) {
-          setOrderDetails(data[0] as OrderSummary);
+        if (data) {
+          setOrderDetails(data);
         } else {
           toast({
             variant: "destructive",
@@ -82,11 +75,9 @@ const Success = () => {
       }
     };
 
-    if (user) {
-      fetchOrderDetails();
-    }
+    fetchOrderDetails();
     clearCart();
-  }, [user]);
+  }, [user, navigate, toast, clearCart]);
 
   if (isLoading) {
     return (
@@ -121,70 +112,10 @@ const Success = () => {
           </Card>
 
           {orderDetails && (
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl">Order Summary</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Order #{orderDetails.id.slice(0, 8)}
-                  </p>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <h3 className="font-medium mb-4">Product Details</h3>
-                  <div className="flex items-start gap-4 bg-muted/50 p-4 rounded-lg">
-                    <Package className="h-12 w-12 text-muted-foreground" />
-                    <div>
-                      <h4 className="font-medium">{orderDetails.product.name}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        SKU: {orderDetails.product.id.slice(0, 8)}
-                      </p>
-                      <p className="text-sm mt-2">
-                        1 x {formatCurrency(orderDetails.product.from_price)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div>
-                  <h3 className="font-medium mb-4">Shipping Address</h3>
-                  <div className="bg-muted/50 p-4 rounded-lg">
-                    <p>{orderDetails.shipping_address}</p>
-                    <p>
-                      {orderDetails.shipping_city}, {orderDetails.shipping_state}{" "}
-                      {orderDetails.shipping_zip}
-                    </p>
-                    <p>United States</p>
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div>
-                  <h3 className="font-medium mb-4">Payment Details</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Subtotal</span>
-                      <span>{formatCurrency(orderDetails.product.from_price)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Shipping</span>
-                      <span>{formatCurrency(shippingCost)}</span>
-                    </div>
-                    <Separator className="my-2" />
-                    <div className="flex justify-between font-medium">
-                      <span>Total</span>
-                      <span>
-                        {formatCurrency(orderDetails.product.from_price + shippingCost)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <>
+              <OrderDetails orderDetails={orderDetails} />
+              <OrderSummary orderDetails={orderDetails} />
+            </>
           )}
 
           <div className="mt-8 flex justify-between">
