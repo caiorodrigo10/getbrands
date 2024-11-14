@@ -1,6 +1,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -45,7 +47,14 @@ const ProjectSelectionDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-4">
+        <div className="space-y-4">
+          <Alert variant="warning" className="bg-yellow-50 border-yellow-200">
+            <AlertTriangle className="h-4 w-4 text-yellow-600" />
+            <AlertDescription className="text-yellow-800">
+              Warning: Once you confirm this selection, points will be consumed and this action cannot be undone.
+            </AlertDescription>
+          </Alert>
+
           <Select
             value={selectedProject}
             onValueChange={setSelectedProject}
