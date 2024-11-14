@@ -15,6 +15,7 @@ interface AddressFormSectionProps {
   onSubmit: (values: ShippingFormData) => Promise<void>;
   onCancel: () => void;
   onContinue: () => void;
+  setIsAddressSaved: (value: boolean) => void;
 }
 
 export const AddressFormSection = ({
@@ -23,12 +24,18 @@ export const AddressFormSection = ({
   onSubmit,
   onCancel,
   onContinue,
+  setIsAddressSaved,
 }: AddressFormSectionProps) => {
   const useSameForBilling = form.watch("useSameForBilling");
 
+  const handleSubmit = async (values: ShippingFormData) => {
+    await onSubmit(values);
+    setIsAddressSaved(true);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <PersonalInfoFields form={form} />
         <AddressFields form={form} />
         <ContactFields form={form} />
@@ -39,6 +46,9 @@ export const AddressFormSection = ({
             checked={useSameForBilling}
             onCheckedChange={(checked) => {
               form.setValue("useSameForBilling", checked as boolean);
+              if (!checked) {
+                setIsAddressSaved(false);
+              }
             }}
           />
           <label

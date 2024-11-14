@@ -1,8 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -109,12 +106,19 @@ const Shipping = () => {
         if (billingAddressError) throw billingAddressError;
       }
 
+      // Save form data to localStorage for payment processing
+      localStorage.setItem('firstName', values.firstName);
+      localStorage.setItem('lastName', values.lastName);
+      localStorage.setItem('phone', values.phone);
+      localStorage.setItem('shipping_address', values.address1);
+      localStorage.setItem('shipping_city', values.city);
+      localStorage.setItem('shipping_state', values.state);
+      localStorage.setItem('shipping_zip', values.zipCode);
+
       toast({
         title: "Success",
         description: "Address saved successfully",
       });
-
-      setIsAddressSaved(true);
     } catch (error) {
       console.error("Error saving address:", error);
       toast({
@@ -148,6 +152,7 @@ const Shipping = () => {
           onSubmit={saveAddress}
           onCancel={handleCancel}
           onContinue={handleContinue}
+          setIsAddressSaved={setIsAddressSaved}
         />
       </div>
     </div>
