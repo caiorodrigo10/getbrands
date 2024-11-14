@@ -1,4 +1,4 @@
 project_id = "skrvprmnncxpkojraoem"
 
-[functions.create-payment-intent]
+[functions.create-checkout]
 verify_jwt = false
