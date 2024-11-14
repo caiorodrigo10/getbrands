@@ -174,28 +174,46 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address_city: string | null
+          address_state: string | null
+          address_street: string | null
+          address_zip: string | null
           avatar_url: string | null
           created_at: string
           email: string | null
+          first_name: string | null
           id: string
+          last_name: string | null
           name: string | null
           phone: string | null
           updated_at: string
         }
         Insert: {
+          address_city?: string | null
+          address_state?: string | null
+          address_street?: string | null
+          address_zip?: string | null
           avatar_url?: string | null
           created_at?: string
           email?: string | null
+          first_name?: string | null
           id: string
+          last_name?: string | null
           name?: string | null
           phone?: string | null
           updated_at?: string
         }
         Update: {
+          address_city?: string | null
+          address_state?: string | null
+          address_street?: string | null
+          address_zip?: string | null
           avatar_url?: string | null
           created_at?: string
           email?: string | null
+          first_name?: string | null
           id?: string
+          last_name?: string | null
           name?: string | null
           phone?: string | null
           updated_at?: string
