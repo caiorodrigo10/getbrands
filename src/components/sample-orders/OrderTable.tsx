@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import OrderStatusBadge from "./OrderStatusBadge";
 import OrderExpandedDetails from "./OrderExpandedDetails";
+import { formatCurrency } from "@/lib/utils";
 
 interface OrderTableProps {
   orders: any[];
