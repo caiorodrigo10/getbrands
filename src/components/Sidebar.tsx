@@ -19,7 +19,7 @@ const Sidebar = () => {
         <img 
           src="https://content.app-sources.com/s/97257455971736356/uploads/Logos/Logotipo_4-7282325.png?format=webp"
           alt="Mainer Logo"
-          className="w-[250px] h-auto object-contain"
+          className="w-[180px] h-auto object-contain"
         />
       </div>
       <nav className="flex-1">

@@ -60,28 +60,32 @@ const SampleOrders = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 md:px-0">
       <div>
-        <h1 className="text-4xl font-bold">My Sample Orders</h1>
+        <h1 className="text-3xl md:text-4xl font-bold">My Sample Orders</h1>
         <p className="text-gray-600 mt-2">View and track your sample orders</p>
       </div>
 
-      <OrderFilters
-        selectedStatus={selectedStatus}
-        setSelectedStatus={setSelectedStatus}
-        showOnHold={showOnHold}
-        setShowOnHold={setShowOnHold}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-      />
+      <div className="overflow-x-auto">
+        <OrderFilters
+          selectedStatus={selectedStatus}
+          setSelectedStatus={setSelectedStatus}
+          showOnHold={showOnHold}
+          setShowOnHold={setShowOnHold}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
 
-      {filteredOrders && filteredOrders.length > 0 ? (
-        <OrderTable orders={filteredOrders} />
-      ) : (
-        <div className="text-center py-12">
-          <p className="text-lg text-gray-600">No orders found.</p>
-        </div>
-      )}
+        {filteredOrders && filteredOrders.length > 0 ? (
+          <div className="mt-6 overflow-x-auto">
+            <OrderTable orders={filteredOrders} />
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-lg text-gray-600">No orders found.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

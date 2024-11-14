@@ -52,12 +52,12 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg">
+      <div className="max-w-md w-full space-y-8 p-8 bg-secondary rounded-xl shadow-lg">
         <div className="flex flex-col items-center">
           <img
             src="https://content.app-sources.com/s/97257455971736356/uploads/Logos/Logotipo_4-7282325.png?format=webp"
             alt="Mainer Logo"
-            className="w-[250px] h-auto mb-6"
+            className="w-[200px] h-auto mb-6"
           />
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
