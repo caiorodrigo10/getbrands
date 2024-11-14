@@ -24,7 +24,7 @@ export function ProfileForm() {
       
       const { data: profile } = await supabase
         .from("profiles")
-        .select("*")
+        .select()
         .eq("id", user.id)
         .single();
 
