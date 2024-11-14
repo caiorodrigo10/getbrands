@@ -9,21 +9,21 @@ interface AddressFieldsProps {
   form: UseFormReturn<ShippingFormData>;
   prefix?: string;
   formFields?: {
-    address1: string;
-    address2: string;
-    city: string;
-    state: string;
-    zipCode: string;
+    address1: keyof ShippingFormData;
+    address2: keyof ShippingFormData;
+    city: keyof ShippingFormData;
+    state: keyof ShippingFormData;
+    zipCode: keyof ShippingFormData;
   };
 }
 
 export const AddressFields = ({ form, prefix = "", formFields }: AddressFieldsProps) => {
   const fields = formFields || {
-    address1: "address1",
-    address2: "address2",
-    city: "city",
-    state: "state",
-    zipCode: "zipCode",
+    address1: "address1" as keyof ShippingFormData,
+    address2: "address2" as keyof ShippingFormData,
+    city: "city" as keyof ShippingFormData,
+    state: "state" as keyof ShippingFormData,
+    zipCode: "zipCode" as keyof ShippingFormData,
   };
 
   return (
@@ -35,12 +35,13 @@ export const AddressFields = ({ form, prefix = "", formFields }: AddressFieldsPr
           <FormItem>
             <FormLabel>Address Line 1</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} placeholder="Street address" />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
+
       <FormField
         control={form.control}
         name={fields.address2}
@@ -48,12 +49,13 @@ export const AddressFields = ({ form, prefix = "", formFields }: AddressFieldsPr
           <FormItem>
             <FormLabel>Address Line 2 (Optional)</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} placeholder="Apartment, suite, etc." />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <FormField
           control={form.control}
@@ -75,7 +77,7 @@ export const AddressFields = ({ form, prefix = "", formFields }: AddressFieldsPr
             <FormItem>
               <FormLabel>State</FormLabel>
               <FormControl>
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select onValueChange={field.onChange} value={field.value as string}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select state" />
                   </SelectTrigger>
@@ -109,3 +111,5 @@ export const AddressFields = ({ form, prefix = "", formFields }: AddressFieldsPr
     </div>
   );
 };
+
+export default AddressFields;
