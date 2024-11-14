@@ -1,8 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 import { Address } from "@/types/shipping";
+import { useToast } from "@/hooks/use-toast";
 
 interface SavedAddressSelectProps {
   userId: string;
@@ -16,6 +19,9 @@ export const SavedAddressSelect = ({
   selectedAddressId,
   onAddressSelect,
 }: SavedAddressSelectProps) => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
   const { data: addresses } = useQuery({
     queryKey: ["addresses", userId],
     queryFn: async () => {
@@ -32,6 +38,30 @@ export const SavedAddressSelect = ({
     },
     enabled: !!userId,
   });
+
+  const handleDelete = async (addressId: string) => {
+    const { error } = await supabase
+      .from("addresses")
+      .delete()
+      .eq("id", addressId);
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete address. Please try again.",
+      });
+      return;
+    }
+
+    toast({
+      title: "Success",
+      description: "Address deleted successfully.",
+    });
+
+    // Refresh the addresses list
+    queryClient.invalidateQueries({ queryKey: ["addresses", userId] });
+  };
 
   if (!addresses?.length) {
     return null;
@@ -61,6 +91,17 @@ export const SavedAddressSelect = ({
                 </p>
               </div>
             </Label>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete(address.id);
+              }}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </div>
         ))}
       </RadioGroup>
