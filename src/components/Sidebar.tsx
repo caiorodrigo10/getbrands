@@ -28,10 +28,10 @@ const Sidebar = () => {
             <li key={item.path}>
               <Link
                 to={item.path}
-                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition-all duration-200 hover:bg-primary hover:text-primary-foreground ${
+                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition-all duration-200 hover:bg-primary/10 hover:text-primary ${
                   location.pathname === item.path
-                    ? "bg-primary text-primary-foreground font-medium"
-                    : "text-white hover:text-primary-foreground"
+                    ? "bg-primary/20 text-primary font-medium"
+                    : "text-white hover:text-primary"
                 }`}
               >
                 <item.icon className="h-5 w-5" />
