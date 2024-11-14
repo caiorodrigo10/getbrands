@@ -33,7 +33,9 @@ const Perfil = () => {
   });
 
   useEffect(() => {
-    loadProfile();
+    if (user) {
+      loadProfile();
+    }
   }, [user]);
 
   const loadProfile = async () => {
@@ -41,85 +43,49 @@ const Perfil = () => {
 
     try {
       setIsLoading(true);
+      
+      // Load profile data
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("name, email, phone, avatar_url")
+        .select("*")
         .eq("id", user.id)
         .single();
 
       if (profileError) throw profileError;
 
-      const { data: addresses, error: addressError } = await supabase
+      // Load address data
+      const { data: address, error: addressError } = await supabase
         .from("addresses")
         .select("*")
         .eq("user_id", user.id)
-        .maybeSingle();
+        .single();
 
-      if (addressError) throw addressError;
+      if (addressError && addressError.code !== 'PGRST116') throw addressError;
 
       const [firstName, lastName] = (profile?.name || "").split(" ");
-      setAvatarUrl(profile?.avatar_url);
-
+      
       form.reset({
         firstName: firstName || "",
         lastName: lastName || "",
         email: profile?.email || "",
         phone: profile?.phone || "",
-        address1: addresses?.street_address1 || "",
-        address2: addresses?.street_address2 || "",
-        city: addresses?.city || "",
-        state: addresses?.state || "",
-        zipCode: addresses?.zip_code || "",
+        address1: address?.street_address1 || "",
+        address2: address?.street_address2 || "",
+        city: address?.city || "",
+        state: address?.state || "",
+        zipCode: address?.zip_code || "",
       });
+
+      setAvatarUrl(profile?.avatar_url);
     } catch (error) {
       console.error("Error loading profile:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to load profile information. Please try again.",
+        description: "Failed to load profile information",
       });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !user) return;
-
-    try {
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${user.id}/${Math.random()}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('profile-pictures')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('profile-pictures')
-        .getPublicUrl(filePath);
-
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: publicUrl })
-        .eq('id', user.id);
-
-      if (updateError) throw updateError;
-
-      setAvatarUrl(publicUrl);
-      toast({
-        title: "Success",
-        description: "Profile picture updated successfully.",
-      });
-    } catch (error) {
-      console.error("Error uploading avatar:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to upload profile picture. Please try again.",
-      });
     }
   };
 
@@ -140,6 +106,7 @@ const Perfil = () => {
 
       if (profileError) throw profileError;
 
+      // Prepare address data
       const addressData = {
         user_id: user.id,
         street_address1: data.address1,
@@ -154,36 +121,38 @@ const Perfil = () => {
         .from("addresses")
         .select("id")
         .eq("user_id", user.id)
-        .maybeSingle();
+        .single();
 
-      let addressError;
       if (existingAddress) {
         // Update existing address
-        const { error } = await supabase
+        const { error: updateError } = await supabase
           .from("addresses")
           .update(addressData)
           .eq("user_id", user.id);
-        addressError = error;
+
+        if (updateError) throw updateError;
       } else {
         // Insert new address
-        const { error } = await supabase
+        const { error: insertError } = await supabase
           .from("addresses")
           .insert([addressData]);
-        addressError = error;
-      }
 
-      if (addressError) throw addressError;
+        if (insertError) throw insertError;
+      }
 
       toast({
         title: "Success",
-        description: "Your profile has been updated successfully.",
+        description: "Profile updated successfully",
       });
+      
+      // Reload profile data
+      await loadProfile();
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update profile. Please try again.",
+        description: "Failed to update profile",
       });
     } finally {
       setIsSaving(false);
@@ -200,7 +169,42 @@ const Perfil = () => {
             <ProfileAvatar
               avatarUrl={avatarUrl}
               userEmail={user.email}
-              onAvatarUpload={handleAvatarUpload}
+              onAvatarUpload={async (file) => {
+                try {
+                  const fileExt = file.name.split('.').pop();
+                  const filePath = `${user.id}/${Math.random()}.${fileExt}`;
+
+                  const { error: uploadError } = await supabase.storage
+                    .from('profile-pictures')
+                    .upload(filePath, file);
+
+                  if (uploadError) throw uploadError;
+
+                  const { data: { publicUrl } } = supabase.storage
+                    .from('profile-pictures')
+                    .getPublicUrl(filePath);
+
+                  const { error: updateError } = await supabase
+                    .from('profiles')
+                    .update({ avatar_url: publicUrl })
+                    .eq('id', user.id);
+
+                  if (updateError) throw updateError;
+
+                  setAvatarUrl(publicUrl);
+                  toast({
+                    title: "Success",
+                    description: "Profile picture updated successfully",
+                  });
+                } catch (error) {
+                  console.error("Error uploading avatar:", error);
+                  toast({
+                    variant: "destructive",
+                    title: "Error",
+                    description: "Failed to upload profile picture",
+                  });
+                }
+              }}
             />
             <div>
               <CardTitle>My Profile</CardTitle>
@@ -209,15 +213,19 @@ const Perfil = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <ProfileForm
-            form={form}
-            onSubmit={onSubmit}
-            isSaving={isSaving}
-          />
+          {!isLoading && (
+            <ProfileForm
+              form={form}
+              onSubmit={onSubmit}
+              isSaving={isSaving}
+            />
+          )}
         </CardContent>
       </Card>
       
-      <PasswordChangeForm />
+      <div className="mt-6">
+        <PasswordChangeForm />
+      </div>
     </div>
   );
 };
