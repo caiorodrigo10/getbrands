@@ -5,19 +5,24 @@ import { ptBR } from "date-fns/locale";
 import ProjectProgress from "@/components/ProjectProgress";
 import StagesTimeline from "@/components/StagesTimeline";
 import { Card } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Projetos = () => {
+  const { user } = useAuth();
+  
   const { data: projects, isLoading } = useQuery({
     queryKey: ["projects"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("projects")
         .select("*")
+        .eq('user_id', user?.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
       return data;
     },
+    enabled: !!user?.id,
   });
 
   if (isLoading) {
@@ -67,7 +72,7 @@ const Projetos = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Produtos selecionados:</span>
-                      <span className="font-medium">3 produtos</span>
+                      <span className="font-medium">1</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Etapa atual:</span>
