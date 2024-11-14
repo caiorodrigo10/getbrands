@@ -26,7 +26,7 @@ export const SavedAddressSelect = ({
         .from("addresses")
         .select("*")
         .eq("user_id", userId)
-        .or('type.eq.shipping,type.eq.both')
+        .in('type', ['shipping', 'both'])
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -56,7 +56,7 @@ export const SavedAddressSelect = ({
             <RadioGroupItem value={address.id} id={address.id} />
             <Label htmlFor={address.id} className="flex-1 cursor-pointer">
               <div>
-                <p className="font-medium">{address.name}</p>
+                <p className="font-medium">{address.name || 'Shipping Address'}</p>
                 <p className="text-sm text-muted-foreground">
                   {address.street_address1}
                   {address.street_address2 && `, ${address.street_address2}`}

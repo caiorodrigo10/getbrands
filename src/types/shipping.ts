@@ -14,13 +14,12 @@ export interface ShippingFormData {
 export interface Address {
   id: string;
   user_id: string;
-  name: string;
+  name?: string;
   street_address1: string;
-  street_address2?: string;
+  street_address2?: string | null;
   city: string;
   state: string;
   zip_code: string;
-  is_default: boolean;
   type: 'shipping' | 'billing' | 'both';
   created_at: string;
   updated_at: string;

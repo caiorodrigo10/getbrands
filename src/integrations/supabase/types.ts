@@ -17,6 +17,7 @@ export type Database = {
           state: string
           street_address1: string
           street_address2: string | null
+          type: string | null
           updated_at: string
           user_id: string
           zip_code: string
@@ -28,6 +29,7 @@ export type Database = {
           state: string
           street_address1: string
           street_address2?: string | null
+          type?: string | null
           updated_at?: string
           user_id: string
           zip_code: string
@@ -39,6 +41,7 @@ export type Database = {
           state?: string
           street_address1?: string
           street_address2?: string | null
+          type?: string | null
           updated_at?: string
           user_id?: string
           zip_code?: string
