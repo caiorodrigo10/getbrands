@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import OrderDetails from "@/components/checkout/OrderDetails";
 import OrderSummary from "@/components/checkout/OrderSummary";
+import Sidebar from "@/components/Sidebar";
 
 const Success = () => {
   const navigate = useNavigate();
@@ -74,7 +75,8 @@ const Success = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-screen bg-background">
-        <main className="flex-1 p-8">
+        <Sidebar />
+        <main className="flex-1 ml-64 p-8">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center justify-center p-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -87,7 +89,8 @@ const Success = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <main className="flex-1 p-8">
+      <Sidebar />
+      <main className="flex-1 ml-64 p-8">
         <div className="max-w-3xl mx-auto">
           <Card className="mb-8 border-green-200 bg-green-50">
             <CardHeader className="text-center pb-6">
