@@ -91,36 +91,36 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
       
       <div className="flex flex-col flex-1 p-4">
         <div className="text-sm text-gray-600 mb-2">{product.category}</div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 min-h-[3.5rem] line-clamp-2">
+        <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4 min-h-[3rem] md:min-h-[3.5rem] line-clamp-2">
           {product.name}
         </h3>
         
         <div className="grid grid-cols-3 gap-2 mb-4">
           <div>
-            <p className="text-sm text-gray-600">From</p>
-            <p className="font-semibold text-gray-900">${product.from_price.toFixed(2)}</p>
+            <p className="text-xs md:text-sm text-gray-600">From</p>
+            <p className="text-sm md:text-base font-semibold text-gray-900">${product.from_price.toFixed(2)}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">SRP</p>
-            <p className="font-semibold text-gray-900">${product.srp.toFixed(2)}</p>
+            <p className="text-xs md:text-sm text-gray-600">SRP</p>
+            <p className="text-sm md:text-base font-semibold text-gray-900">${product.srp.toFixed(2)}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Profit</p>
-            <p className="font-semibold text-green-600">${profit.toFixed(2)}</p>
+            <p className="text-xs md:text-sm text-gray-600">Profit</p>
+            <p className="text-sm md:text-base font-semibold text-green-600">${profit.toFixed(2)}</p>
           </div>
         </div>
 
         <div className="flex flex-col gap-2 mt-auto">
           <Button 
             variant="outline" 
-            className="w-full text-primary hover:text-primary border-primary hover:bg-primary/10"
+            className="w-full text-primary hover:text-primary border-primary hover:bg-primary/10 text-sm md:text-base py-1 md:py-2"
             onClick={handleRequestSample}
             disabled={isLoading}
           >
             {isLoading ? "Adding to cart..." : "Request Sample"}
           </Button>
           <Button 
-            className="w-full bg-primary hover:bg-primary-dark text-white"
+            className="w-full bg-primary hover:bg-primary-dark text-white text-sm md:text-base py-1 md:py-2"
             onClick={() => onSelectProduct(product.id)}
           >
             Select
