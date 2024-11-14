@@ -72,18 +72,18 @@ const ProductCard = ({
           <div className="absolute inset-0 bg-gray-100 animate-pulse" />
         )}
         {product.is_new && (
-          <Badge className="absolute top-4 right-4 z-10 bg-primary">
+          <Badge className="absolute top-6 right-6 z-10 bg-primary">
             NEW
           </Badge>
         )}
         {product.is_tiktok && (
-          <Badge className="absolute top-4 right-4 z-10 bg-pink-600">
+          <Badge className="absolute top-6 right-6 z-10 bg-pink-600">
             TIKTOK
           </Badge>
         )}
         <Badge 
           variant="outline" 
-          className="absolute top-4 left-4 z-10 bg-white/80 backdrop-blur-sm text-xs font-normal"
+          className="absolute top-6 left-6 z-10 bg-white/80 backdrop-blur-sm text-xs font-normal"
         >
           1000 points
         </Badge>
