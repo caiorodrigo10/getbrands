@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,6 +8,11 @@ import { Form } from "@/components/ui/form";
 import { PersonalInfoFields } from "@/components/shipping/PersonalInfoFields";
 import { AddressFields } from "@/components/shipping/AddressFields";
 import { ContactFields } from "@/components/shipping/ContactFields";
+import { SavedAddressSelect } from "@/components/shipping/SavedAddressSelect";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 import type { ShippingFormData } from "@/types/shipping";
 
 const formSchema = z.object({
@@ -18,10 +24,17 @@ const formSchema = z.object({
   state: z.string().min(2, "Invalid state"),
   zipCode: z.string().min(5, "Invalid ZIP code"),
   phone: z.string().min(10, "Invalid phone number"),
+  useSameForBilling: z.boolean().default(true),
+  savedAddressId: z.string().optional(),
 });
 
 const Shipping = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [showNewAddressForm, setShowNewAddressForm] = useState(true);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+
   const form = useForm<ShippingFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -33,12 +46,45 @@ const Shipping = () => {
       state: "",
       zipCode: "",
       phone: "",
+      useSameForBilling: true,
     },
   });
 
-  const onSubmit = (values: ShippingFormData) => {
-    console.log(values);
-    navigate("/checkout/payment");
+  const onSubmit = async (values: ShippingFormData) => {
+    try {
+      if (!user?.id) throw new Error("User not authenticated");
+
+      // If adding a new address, save it
+      if (showNewAddressForm) {
+        const { error } = await supabase.from("addresses").insert({
+          user_id: user.id,
+          name: `${values.firstName} ${values.lastName}`,
+          street_address1: values.address1,
+          street_address2: values.address2,
+          city: values.city,
+          state: values.state,
+          zip_code: values.zipCode,
+          type: values.useSameForBilling ? "both" : "shipping",
+        });
+
+        if (error) throw error;
+      }
+
+      // Store shipping info in session storage for the next step
+      sessionStorage.setItem("shippingInfo", JSON.stringify({
+        ...values,
+        addressId: selectedAddressId,
+      }));
+
+      navigate("/checkout/payment");
+    } catch (error) {
+      console.error("Error saving address:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to save address. Please try again.",
+      });
+    }
   };
 
   return (
@@ -46,11 +92,49 @@ const Shipping = () => {
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <h2 className="text-xl font-semibold mb-6">Shipping Information</h2>
         
+        {user && (
+          <div className="mb-8">
+            <h3 className="text-lg font-medium mb-4">Select Shipping Address</h3>
+            <SavedAddressSelect
+              userId={user.id}
+              selectedAddressId={selectedAddressId}
+              onAddressSelect={(id) => {
+                setSelectedAddressId(id);
+                setShowNewAddressForm(false);
+              }}
+              onAddNew={() => {
+                setSelectedAddressId(null);
+                setShowNewAddressForm(true);
+              }}
+            />
+          </div>
+        )}
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <PersonalInfoFields form={form} />
-            <AddressFields form={form} />
-            <ContactFields form={form} />
+            {showNewAddressForm && (
+              <>
+                <PersonalInfoFields form={form} />
+                <AddressFields form={form} />
+                <ContactFields form={form} />
+              </>
+            )}
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="useSameForBilling"
+                checked={form.watch("useSameForBilling")}
+                onCheckedChange={(checked) => {
+                  form.setValue("useSameForBilling", checked as boolean);
+                }}
+              />
+              <label
+                htmlFor="useSameForBilling"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Use same address for billing
+              </label>
+            </div>
 
             <div className="flex justify-end pt-6">
               <Button 
