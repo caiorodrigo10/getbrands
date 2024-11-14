@@ -7,14 +7,30 @@ import { US_STATES } from "@/lib/constants";
 
 interface AddressFieldsProps {
   form: UseFormReturn<ShippingFormData>;
+  prefix?: string;
+  formFields?: {
+    address1: string;
+    address2: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  };
 }
 
-export const AddressFields = ({ form }: AddressFieldsProps) => {
+export const AddressFields = ({ form, prefix = "", formFields }: AddressFieldsProps) => {
+  const fields = formFields || {
+    address1: "address1",
+    address2: "address2",
+    city: "city",
+    state: "state",
+    zipCode: "zipCode",
+  };
+
   return (
     <div className="space-y-4">
       <FormField
         control={form.control}
-        name="address1"
+        name={fields.address1}
         render={({ field }) => (
           <FormItem>
             <FormLabel>Address Line 1</FormLabel>
@@ -27,7 +43,7 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
       />
       <FormField
         control={form.control}
-        name="address2"
+        name={fields.address2}
         render={({ field }) => (
           <FormItem>
             <FormLabel>Address Line 2 (Optional)</FormLabel>
@@ -41,7 +57,7 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <FormField
           control={form.control}
-          name="city"
+          name={fields.city}
           render={({ field }) => (
             <FormItem>
               <FormLabel>City</FormLabel>
@@ -54,7 +70,7 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
         />
         <FormField
           control={form.control}
-          name="state"
+          name={fields.state}
           render={({ field }) => (
             <FormItem>
               <FormLabel>State</FormLabel>
@@ -78,7 +94,7 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
         />
         <FormField
           control={form.control}
-          name="zipCode"
+          name={fields.zipCode}
           render={({ field }) => (
             <FormItem>
               <FormLabel>ZIP Code</FormLabel>

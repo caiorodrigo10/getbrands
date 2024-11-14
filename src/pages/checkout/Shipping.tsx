@@ -25,7 +25,11 @@ const formSchema = z.object({
   zipCode: z.string().min(5, "Invalid ZIP code"),
   phone: z.string().min(10, "Invalid phone number"),
   useSameForBilling: z.boolean().default(true),
-  savedAddressId: z.string().optional(),
+  billingAddress1: z.string().min(5, "Billing address is too short").optional(),
+  billingAddress2: z.string().optional(),
+  billingCity: z.string().min(2, "Billing city is too short").optional(),
+  billingState: z.string().min(2, "Invalid billing state").optional(),
+  billingZipCode: z.string().min(5, "Invalid billing ZIP code").optional(),
 });
 
 const Shipping = () => {
@@ -47,36 +51,66 @@ const Shipping = () => {
       zipCode: "",
       phone: "",
       useSameForBilling: true,
+      billingAddress1: "",
+      billingAddress2: "",
+      billingCity: "",
+      billingState: "",
+      billingZipCode: "",
     },
   });
 
-  const onSubmit = async (values: ShippingFormData) => {
+  const useSameForBilling = form.watch("useSameForBilling");
+
+  const saveAddress = async (values: ShippingFormData) => {
     try {
       if (!user?.id) throw new Error("User not authenticated");
 
-      // If adding a new address, save it
-      if (showNewAddressForm) {
-        const { error } = await supabase.from("addresses").insert({
+      const { error: shippingError } = await supabase.from("addresses").insert({
+        user_id: user.id,
+        name: `${values.firstName} ${values.lastName}`,
+        street_address1: values.address1,
+        street_address2: values.address2,
+        city: values.city,
+        state: values.state,
+        zip_code: values.zipCode,
+        type: values.useSameForBilling ? 'both' : 'shipping',
+      });
+
+      if (shippingError) throw shippingError;
+
+      if (!values.useSameForBilling) {
+        const { error: billingError } = await supabase.from("addresses").insert({
           user_id: user.id,
-          name: `${values.firstName} ${values.lastName}`,
-          street_address1: values.address1,
-          street_address2: values.address2,
-          city: values.city,
-          state: values.state,
-          zip_code: values.zipCode,
-          type: values.useSameForBilling ? "both" : "shipping",
+          name: `${values.firstName} ${values.lastName} (Billing)`,
+          street_address1: values.billingAddress1!,
+          street_address2: values.billingAddress2,
+          city: values.billingCity!,
+          state: values.billingState!,
+          zip_code: values.billingZipCode!,
+          type: 'billing',
         });
 
-        if (error) throw error;
+        if (billingError) throw billingError;
       }
 
-      // Store shipping info in session storage for the next step
-      sessionStorage.setItem("shippingInfo", JSON.stringify({
-        ...values,
-        addressId: selectedAddressId,
-      }));
-
-      navigate("/checkout/payment");
+      toast({
+        title: "Success",
+        description: "Address saved successfully",
+      });
+      
+      setShowNewAddressForm(false);
+      // Refresh the addresses list
+      const { data } = await supabase
+        .from("addresses")
+        .select("*")
+        .eq("user_id", user.id)
+        .in('type', ['shipping', 'both'])
+        .order('created_at', { ascending: false })
+        .single();
+      
+      if (data) {
+        setSelectedAddressId(data.id);
+      }
     } catch (error) {
       console.error("Error saving address:", error);
       toast({
@@ -85,6 +119,30 @@ const Shipping = () => {
         description: "Failed to save address. Please try again.",
       });
     }
+  };
+
+  const onSubmit = async (values: ShippingFormData) => {
+    if (showNewAddressForm) {
+      await saveAddress(values);
+      return;
+    }
+
+    if (!selectedAddressId) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please select or save an address to continue.",
+      });
+      return;
+    }
+
+    // Store shipping info in session storage for the next step
+    sessionStorage.setItem("shippingInfo", JSON.stringify({
+      ...values,
+      addressId: selectedAddressId,
+    }));
+
+    navigate("/checkout/payment");
   };
 
   return (
@@ -115,31 +173,63 @@ const Shipping = () => {
             {showNewAddressForm && (
               <>
                 <PersonalInfoFields form={form} />
-                <AddressFields form={form} />
-                <ContactFields form={form} />
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-medium mb-4">Shipping Address</h3>
+                    <AddressFields form={form} />
+                  </div>
+                  <ContactFields form={form} />
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="useSameForBilling"
+                    checked={form.watch("useSameForBilling")}
+                    onCheckedChange={(checked) => {
+                      form.setValue("useSameForBilling", checked as boolean);
+                    }}
+                  />
+                  <label
+                    htmlFor="useSameForBilling"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Use same address for billing
+                  </label>
+                </div>
+
+                {!useSameForBilling && (
+                  <div className="space-y-6 pt-4">
+                    <h3 className="text-lg font-medium">Billing Address</h3>
+                    <AddressFields 
+                      form={form} 
+                      prefix="billing"
+                      formFields={{
+                        address1: "billingAddress1",
+                        address2: "billingAddress2",
+                        city: "billingCity",
+                        state: "billingState",
+                        zipCode: "billingZipCode",
+                      }}
+                    />
+                  </div>
+                )}
               </>
             )}
 
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="useSameForBilling"
-                checked={form.watch("useSameForBilling")}
-                onCheckedChange={(checked) => {
-                  form.setValue("useSameForBilling", checked as boolean);
-                }}
-              />
-              <label
-                htmlFor="useSameForBilling"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Use same address for billing
-              </label>
-            </div>
-
-            <div className="flex justify-end pt-6">
+            <div className="flex flex-col gap-4 pt-6">
+              {showNewAddressForm && (
+                <Button 
+                  type="submit"
+                  className="w-full"
+                >
+                  Save Address
+                </Button>
+              )}
               <Button 
-                type="submit"
-                className="w-full md:w-auto"
+                type="button"
+                onClick={() => form.handleSubmit(onSubmit)()}
+                className={`w-full ${selectedAddressId ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-400'}`}
+                disabled={!selectedAddressId && !showNewAddressForm}
               >
                 Continue to Payment
               </Button>

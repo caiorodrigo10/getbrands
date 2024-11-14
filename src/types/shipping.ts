@@ -8,6 +8,11 @@ export interface ShippingFormData {
   zipCode: string;
   phone: string;
   useSameForBilling: boolean;
+  billingAddress1?: string;
+  billingAddress2?: string;
+  billingCity?: string;
+  billingState?: string;
+  billingZipCode?: string;
   savedAddressId?: string;
 }
 
