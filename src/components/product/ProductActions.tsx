@@ -73,15 +73,13 @@ export const ProductActions = ({
 
       if (projectError) throw projectError;
 
-      // Update project points using a direct update
+      // Update project points
       const { error: pointsError } = await supabase
         .from('projects')
         .update({ 
           points_used: supabase.rpc('increment', { x: 1000 })
         })
-        .eq('id', projectId)
-        .select()
-        .single();
+        .eq('id', projectId);
 
       if (pointsError) throw pointsError;
 
