@@ -83,6 +83,27 @@ export const ProductActions = ({
 
   const handleProjectSelection = async (projectId: string) => {
     try {
+      // First check if product already exists in project
+      const { data: existingProduct, error: checkError } = await supabase
+        .from('project_products')
+        .select('*')
+        .eq('project_id', projectId)
+        .eq('product_id', productId)
+        .single();
+
+      if (existingProduct) {
+        toast({
+          variant: "destructive",
+          title: "Product already selected",
+          description: "This product is already in your project.",
+        });
+        return;
+      }
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        throw checkError;
+      }
+
       // Add product to project
       const { error: projectError } = await supabase
         .from('project_products')
