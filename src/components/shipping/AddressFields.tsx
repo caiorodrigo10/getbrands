@@ -24,10 +24,10 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
         name="address1"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Endereço Linha 1</FormLabel>
+            <FormLabel>Address Line 1</FormLabel>
             <FormControl>
               <Input 
-                placeholder="Rua Principal, 123" 
+                placeholder="123 Main St" 
                 autoComplete="street-address"
                 {...field} 
               />
@@ -42,10 +42,10 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
         name="address2"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Endereço Linha 2 (opcional)</FormLabel>
+            <FormLabel>Address Line 2 (optional)</FormLabel>
             <FormControl>
               <Input 
-                placeholder="Apartamento 4B" 
+                placeholder="Apt 4B" 
                 autoComplete="address-line2"
                 {...field} 
               />
@@ -61,10 +61,10 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
           name="city"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Cidade</FormLabel>
+              <FormLabel>City</FormLabel>
               <FormControl>
                 <Input 
-                  placeholder="São Paulo" 
+                  placeholder="New York" 
                   autoComplete="address-level2"
                   {...field} 
                 />
@@ -78,11 +78,11 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
           name="state"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Estado</FormLabel>
+              <FormLabel>State</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione o estado" />
+                    <SelectValue placeholder="Select state" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>

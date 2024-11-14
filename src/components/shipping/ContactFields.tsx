@@ -19,7 +19,7 @@ export const ContactFields = ({ form }: ContactFieldsProps) => {
             <FormControl>
               <Input 
                 type="email" 
-                placeholder="joao@exemplo.com" 
+                placeholder="john@example.com" 
                 autoComplete="email"
                 {...field} 
               />
@@ -33,10 +33,10 @@ export const ContactFields = ({ form }: ContactFieldsProps) => {
         name="phone"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Telefone</FormLabel>
+            <FormLabel>Phone</FormLabel>
             <FormControl>
               <Input 
-                placeholder="(11) 98765-4321" 
+                placeholder="(555) 123-4567" 
                 autoComplete="tel"
                 {...field} 
               />
