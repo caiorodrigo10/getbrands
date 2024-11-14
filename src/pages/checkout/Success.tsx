@@ -57,10 +57,6 @@ const Success = () => {
         
         if (data) {
           setOrderDetails(data);
-          toast({
-            description: "We'll keep you updated on your sample's status via email.",
-            duration: 6000,
-          });
         } else {
           toast({
             variant: "destructive",
