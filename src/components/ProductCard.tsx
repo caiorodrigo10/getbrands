@@ -62,7 +62,7 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
   const profit = product.srp - product.from_price;
 
   return (
-    <Card className="flex flex-col h-full bg-white border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200">
+    <Card className="bg-white border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200">
       <div className="relative aspect-square bg-gray-50">
         {!imageLoaded && (
           <div className="absolute inset-0 bg-gray-100 animate-pulse" />
@@ -88,39 +88,38 @@ const ProductCard = ({ product, onRequestSample, onSelectProduct }: ProductCardP
           loading="lazy"
         />
       </div>
-      
-      <div className="flex flex-col flex-1 p-4">
+      <div className="p-4">
         <div className="text-sm text-gray-600 mb-2">{product.category}</div>
-        <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4 min-h-[3rem] md:min-h-[3.5rem] line-clamp-2">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 min-h-[3.5rem] line-clamp-2">
           {product.name}
         </h3>
         
         <div className="grid grid-cols-3 gap-2 mb-4">
           <div>
-            <p className="text-xs md:text-sm text-gray-600">From</p>
-            <p className="text-sm md:text-base font-semibold text-gray-900">${product.from_price.toFixed(2)}</p>
+            <p className="text-sm text-gray-600">From</p>
+            <p className="font-semibold text-gray-900">${product.from_price.toFixed(2)}</p>
           </div>
           <div>
-            <p className="text-xs md:text-sm text-gray-600">SRP</p>
-            <p className="text-sm md:text-base font-semibold text-gray-900">${product.srp.toFixed(2)}</p>
+            <p className="text-sm text-gray-600">SRP</p>
+            <p className="font-semibold text-gray-900">${product.srp.toFixed(2)}</p>
           </div>
           <div>
-            <p className="text-xs md:text-sm text-gray-600">Profit</p>
-            <p className="text-sm md:text-base font-semibold text-green-600">${profit.toFixed(2)}</p>
+            <p className="text-sm text-gray-600">Profit</p>
+            <p className="font-semibold text-green-600">${profit.toFixed(2)}</p>
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 mt-auto">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Button 
             variant="outline" 
-            className="w-full text-primary hover:text-primary border-primary hover:bg-primary/10 text-sm md:text-base py-1 md:py-2"
+            className="flex-1 text-primary hover:text-primary border-primary hover:bg-primary/10"
             onClick={handleRequestSample}
             disabled={isLoading}
           >
             {isLoading ? "Adding to cart..." : "Request Sample"}
           </Button>
           <Button 
-            className="w-full bg-primary hover:bg-primary-dark text-white text-sm md:text-base py-1 md:py-2"
+            className="flex-1 bg-primary hover:bg-primary-dark text-white"
             onClick={() => onSelectProduct(product.id)}
           >
             Select

@@ -30,38 +30,36 @@ const CatalogLayout = ({ onRequestSample, onSelectProduct }: CatalogLayoutProps)
   if (error) {
     toast({
       variant: "destructive",
-      title: "Error loading products",
-      description: "An error occurred while loading products. Please try again.",
+      title: "Erro ao carregar produtos",
+      description: "Ocorreu um erro ao carregar os produtos. Por favor, tente novamente.",
     });
   }
 
   return (
-    <div className="space-y-6 px-4 md:px-6 lg:px-8">
-      <div className="flex flex-col space-y-6">
+    <div className="space-y-8 px-4 md:px-0">
+      <div className="flex flex-col space-y-8">
         <div>
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">
-            Welcome, Caio Rodrigo!
-          </h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Welcome, Caio Rodrigo!</h1>
           <p className="text-gray-600 mt-2">Choose a product to customize</p>
         </div>
 
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-          <div className="w-full lg:flex-1 overflow-x-auto">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="w-full md:flex-1 overflow-x-auto">
             <CatalogFilters />
           </div>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">
+          <div className="flex items-center gap-4 w-full md:w-auto">
             <CatalogHeader />
             <CartButton />
           </div>
         </div>
 
-        <div className="overflow-hidden">
+        <div>
           <FeaturedSlider />
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-            {Array.from({ length: 8 }).map((_, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {Array.from({ length: 9 }).map((_, i) => (
               <div key={i} className="space-y-4">
                 <Skeleton className="h-[200px] w-full" />
                 <Skeleton className="h-4 w-[250px]" />
@@ -77,7 +75,7 @@ const CatalogLayout = ({ onRequestSample, onSelectProduct }: CatalogLayoutProps)
           />
         ) : (
           <div className="text-center py-12">
-            <p className="text-lg text-gray-600">No products found.</p>
+            <p className="text-lg text-gray-600">Nenhum produto encontrado.</p>
           </div>
         )}
         
