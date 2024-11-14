@@ -4,7 +4,7 @@ import Stripe from "https://esm.sh/stripe@12.4.0?target=deno"
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') as string, {
   apiVersion: '2023-10-16',
   httpClient: Stripe.createFetchHttpClient(),
-})
+});
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,16 +14,16 @@ const corsHeaders = {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { amount, currency = 'usd', shipping_amount } = await req.json()
+    const { amount, currency = 'usd', shipping_amount } = await req.json();
 
-    console.log('Creating payment intent with:', { amount, currency, shipping_amount })
+    console.log('Creating payment intent with:', { amount, currency, shipping_amount });
 
     // Calculate total amount including shipping
-    const totalAmount = amount + (shipping_amount || 0)
+    const totalAmount = amount + (shipping_amount || 0);
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: totalAmount,
@@ -34,7 +34,7 @@ serve(async (req) => {
       metadata: {
         shipping_amount: shipping_amount || 0,
       }
-    })
+    });
 
     return new Response(
       JSON.stringify({ clientSecret: paymentIntent.client_secret }),
@@ -42,15 +42,15 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       },
-    )
+    );
   } catch (error) {
-    console.error('Error creating payment intent:', error)
+    console.error('Error creating payment intent:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
       },
-    )
+    );
   }
-})
+});
