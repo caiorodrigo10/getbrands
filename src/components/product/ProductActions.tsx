@@ -143,7 +143,8 @@ export const ProductActions = ({
           project: {
             name: currentProject.name
           }
-        }
+        },
+        replace: true // Use replace to prevent back navigation to this state
       });
 
     } catch (error) {
