@@ -12,4 +12,4 @@ export const addressSchema = z.object({
   zipCode: z.string().regex(/^\d{5}(-\d{4})?$/, "Invalid ZIP code format"),
 });
 
-export type AddressFormData = z.infer<typeof addressSchema>;
+export type ShippingFormData = z.infer<typeof addressSchema>;

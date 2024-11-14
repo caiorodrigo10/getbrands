@@ -4,14 +4,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
-import { PersonalInfoFields } from "@/components/shipping/PersonalInfoFields";
-import { AddressFields } from "@/components/shipping/AddressFields";
-import { ContactFields } from "@/components/shipping/ContactFields";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { addressSchema, type AddressFormData } from "@/types/shipping";
+import { addressSchema, type ShippingFormData } from "@/types/shipping";
+import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
+import { ProfileForm } from "@/components/profile/ProfileForm";
 
 const Perfil = () => {
   const { user } = useAuth();
@@ -20,7 +16,7 @@ const Perfil = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
-  const form = useForm<AddressFormData>({
+  const form = useForm<ShippingFormData>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
       firstName: "",
@@ -125,7 +121,7 @@ const Perfil = () => {
     }
   };
 
-  const onSubmit = async (data: AddressFormData) => {
+  const onSubmit = async (data: ShippingFormData) => {
     if (!user) return;
     setIsSaving(true);
 
@@ -199,19 +195,11 @@ const Perfil = () => {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-4">
-            <label htmlFor="avatar-upload" className="cursor-pointer">
-              <Avatar className="h-20 w-20">
-                <AvatarImage src={avatarUrl || undefined} />
-                <AvatarFallback>{user.email?.[0].toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleAvatarUpload}
-              />
-            </label>
+            <ProfileAvatar
+              avatarUrl={avatarUrl}
+              userEmail={user.email}
+              onAvatarUpload={handleAvatarUpload}
+            />
             <div>
               <CardTitle>My Profile</CardTitle>
               <CardDescription>Update your profile information and shipping address.</CardDescription>
@@ -219,16 +207,11 @@ const Perfil = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <PersonalInfoFields form={form} />
-              <ContactFields form={form} />
-              <AddressFields form={form} />
-              <Button type="submit" disabled={isSaving} className="w-full">
-                {isSaving ? "Saving..." : "Save Changes"}
-              </Button>
-            </form>
-          </Form>
+          <ProfileForm
+            form={form}
+            onSubmit={onSubmit}
+            isSaving={isSaving}
+          />
         </CardContent>
       </Card>
     </div>
