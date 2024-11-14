@@ -50,7 +50,7 @@ export const ProductActions = ({
 
     // Check if user has any projects with enough points
     const availableProjects = userProjects?.filter(
-      project => (project.points - project.points_used) >= 1000
+      project => (project.points - (project.points_used || 0)) >= 1000
     ) || [];
 
     if (availableProjects.length === 0) {
@@ -77,7 +77,7 @@ export const ProductActions = ({
       const { error: pointsError } = await supabase
         .from('projects')
         .update({ 
-          points_used: supabase.rpc('increment', { value: 1000 })
+          points_used: supabase.rpc('increment', { x: 1000 })
         })
         .eq('id', projectId);
 
