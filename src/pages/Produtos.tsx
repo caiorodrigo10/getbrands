@@ -7,6 +7,29 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Confetti from 'react-confetti';
 import { useLocation, useNavigate } from "react-router-dom";
 
+interface ProjectSpecificProduct {
+  id: string;
+  name: string | null;
+  description: string | null;
+  image_url: string | null;
+}
+
+interface ProjectProduct {
+  id: string;
+  project: {
+    id: string;
+    name: string;
+    description: string | null;
+  } | null;
+  product: {
+    id: string;
+    name: string;
+    category: string;
+    image_url: string | null;
+  };
+  specific: ProjectSpecificProduct[] | null;
+}
+
 const Produtos = () => {
   const { user } = useAuth();
   const location = useLocation();
@@ -36,7 +59,7 @@ const Produtos = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as ProjectProduct[];
     },
     enabled: !!user,
   });
