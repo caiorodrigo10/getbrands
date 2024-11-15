@@ -43,13 +43,18 @@ export const CalendarStage = () => {
       scheduled_for: string;
       meeting_link?: string;
     }) => {
+      if (!user?.id || !projectId) {
+        throw new Error("User or project ID not found");
+      }
+
       const { data, error } = await supabase
         .from("project_meetings")
         .insert({
           project_id: projectId,
-          user_id: user?.id,
+          user_id: user.id,
           scheduled_for: meetingData.scheduled_for,
           meeting_link: meetingData.meeting_link,
+          status: "scheduled",
         })
         .select()
         .single();
@@ -66,17 +71,6 @@ export const CalendarStage = () => {
       toast.error("Failed to log meeting. Please try again.");
     },
   });
-
-  // Handle successful booking
-  const handleCalendarEvent = (e: any) => {
-    if (e.detail.type === "booking_successful") {
-      const booking = e.detail.data;
-      logMeetingMutation.mutate({
-        scheduled_for: booking.startTime,
-        meeting_link: booking.meetingLink,
-      });
-    }
-  };
 
   // Query to fetch existing meetings
   const { data: meetings } = useQuery({
@@ -111,6 +105,13 @@ export const CalendarStage = () => {
             }}
             data-cal-namespace="lovable-calendar"
             data-cal-theme="light"
+            onBookingSuccessful={(e: any) => {
+              const booking = e.detail;
+              logMeetingMutation.mutate({
+                scheduled_for: booking.startTime,
+                meeting_link: booking.meetingLink,
+              });
+            }}
           />
         </div>
       </div>
