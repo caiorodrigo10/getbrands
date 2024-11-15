@@ -46,12 +46,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const redirectBasedOnRole = async (userId: string) => {
+    if (!userId) return;
+    
     try {
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', userId)
         .single();
+
+      if (error) throw error;
 
       if (profile?.role === 'admin') {
         navigate('/admin');
@@ -75,7 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           return;
         }
         
-        if (initialSession) {
+        if (initialSession?.user) {
           setSession(initialSession);
           setUser(initialSession.user);
           identifyUserInGleap(initialSession.user);
@@ -109,7 +113,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
 
-      if (currentSession) {
+      if (currentSession?.user) {
         setSession(currentSession);
         setUser(currentSession.user);
         identifyUserInGleap(currentSession.user);
