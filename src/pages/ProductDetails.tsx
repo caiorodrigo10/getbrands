@@ -6,11 +6,21 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Icons } from "@/components/icons";
+import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ProductDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { addItem } = useCart();
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { data: product, isLoading } = useQuery({
+  const { data: product, isLoading: productLoading } = useQuery({
     queryKey: ["product", id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -24,7 +34,76 @@ const ProductDetails = () => {
     },
   });
 
-  if (isLoading) {
+  const handleRequestSample = async () => {
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "You need to be logged in to request samples.",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      if (product) {
+        await addItem(product);
+        toast({
+          title: "Success",
+          description: "Product added to cart successfully.",
+        });
+        navigate("/checkout/confirmation");
+      }
+    } catch (error) {
+      console.error('Error adding product to cart:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to add product to cart. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSelectProduct = async () => {
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "You must be logged in to select products.",
+      });
+      return;
+    }
+
+    // Fetch user's projects
+    const { data: userProjects, error: projectsError } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('user_id', user.id);
+
+    if (projectsError) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load projects. Please try again.",
+      });
+      return;
+    }
+
+    // Check if user has any projects with enough points
+    const availableProjects = userProjects?.filter(
+      project => (project.points - (project.points_used || 0)) >= 1000
+    ) || [];
+
+    if (availableProjects.length === 0) {
+      navigate("/checkout/points");
+    } else {
+      navigate("/projects/select", { state: { productId: id } });
+    }
+  };
+
+  if (productLoading) {
     return (
       <div className="space-y-8">
         <Skeleton className="h-[400px] w-full" />
@@ -117,11 +196,21 @@ const ProductDetails = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="flex-1">
-                  Customize and sell
+                <Button 
+                  size="lg" 
+                  className="flex-1"
+                  onClick={handleSelectProduct}
+                >
+                  Select Product
                 </Button>
-                <Button variant="outline" size="lg" className="flex-1">
-                  Save to drafts
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="flex-1"
+                  onClick={handleRequestSample}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Adding to cart..." : "Request Sample"}
                 </Button>
               </div>
             </div>

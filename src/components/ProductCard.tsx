@@ -2,76 +2,24 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Product } from "@/types/product";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "@/contexts/CartContext";
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
-import ProductActions from "./product/ProductActions";
 
 interface ProductCardProps {
   product: Product;
-  onRequestSample: (id: string) => void;
-  onSelectProduct: (id: string) => void;
 }
 
-const ProductCard = ({ 
-  product, 
-  onRequestSample, 
-  onSelectProduct,
-}: ProductCardProps) => {
+const ProductCard = ({ product }: ProductCardProps) => {
   const navigate = useNavigate();
-  const { addItem } = useCart();
-  const { toast } = useToast();
-  const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  const handleRequestSample = async () => {
-    if (!user) {
-      toast({
-        variant: "destructive",
-        title: "Erro",
-        description: "Você precisa estar logado para solicitar amostras.",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      await addItem(product);
-      onRequestSample(product.id);
-      toast({
-        title: "Sucesso",
-        description: "Produto adicionado ao carrinho com sucesso.",
-      });
-      navigate("/checkout/confirmation");
-    } catch (error) {
-      console.error('Error adding product to cart:', error);
-      toast({
-        variant: "destructive",
-        title: "Erro",
-        description: "Falha ao adicionar produto ao carrinho. Tente novamente.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleCardClick = () => {
+    navigate(`/products/${product.id}`);
   };
 
   const handleImageError = () => {
     setImageError(true);
     setImageLoaded(true);
-  };
-
-  const handleCardClick = (e: React.MouseEvent) => {
-    // Prevent navigation if clicking on buttons or links inside the card
-    if (
-      (e.target as HTMLElement).tagName === 'BUTTON' ||
-      (e.target as HTMLElement).closest('button')
-    ) {
-      return;
-    }
-    navigate(`/catalog/${product.id}`);
   };
 
   const profit = product.srp - product.from_price;
@@ -132,12 +80,6 @@ const ProductCard = ({
             <p className="font-semibold text-white text-lg">${profit.toFixed(2)}</p>
           </div>
         </div>
-
-        <ProductActions
-          productId={product.id}
-          onRequestSample={handleRequestSample}
-          isLoading={isLoading}
-        />
       </div>
     </Card>
   );
