@@ -147,17 +147,17 @@ const Success = () => {
             </>
           )}
 
-          <div className="mt-8 flex justify-between">
+          <div className="mt-8 flex flex-col sm:flex-row gap-4 sm:gap-6 sm:justify-between">
             <Button
               variant="outline"
               onClick={() => navigate("/sample-orders")}
-              className="px-6"
+              className="w-full sm:w-auto px-6"
             >
               View All Orders
             </Button>
             <Button
               onClick={() => navigate("/catalogo")}
-              className="px-6 bg-primary hover:bg-primary-dark"
+              className="w-full sm:w-auto px-6 bg-primary hover:bg-primary-dark"
             >
               Continue Shopping
             </Button>
