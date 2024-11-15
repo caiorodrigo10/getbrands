@@ -1,7 +1,6 @@
 import { Product } from "@/types/product";
 import CatalogHeader from "@/components/CatalogHeader";
 import CatalogFilters from "@/components/CatalogFilters";
-import FeaturedSlider from "@/components/FeaturedSlider";
 import ProductGrid from "@/components/ProductGrid";
 import CatalogPagination from "./CatalogPagination";
 import { CartButton } from "@/components/CartButton";
@@ -46,10 +45,6 @@ const CatalogLayout = () => {
             <CatalogHeader />
             <CartButton />
           </div>
-        </div>
-
-        <div>
-          <FeaturedSlider />
         </div>
 
         {isLoading ? (
