@@ -11,6 +11,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -111,6 +112,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser({ ...currentSession.user, role: profile?.role || 'member' });
         identifyUserInGleap(currentSession.user);
       }
+      
+      setIsLoading(false);
     });
 
     return () => {
@@ -166,13 +169,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <AuthContext.Provider
-      value={{ user, session, login, logout, isAuthenticated: !!session }}
+      value={{ 
+        user, 
+        session, 
+        login, 
+        logout, 
+        isAuthenticated: !!session,
+        isLoading 
+      }}
     >
       {children}
     </AuthContext.Provider>
