@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { AuthContextType, AuthProviderProps } from "./auth/types";
 import { useAuthRedirect } from "./auth/useAuthRedirect";
 import { useGleapIdentity } from "./auth/useGleapIdentity";
-import { useLocation } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,7 +14,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const { redirectBasedOnRole, handleAuthError } = useAuthRedirect();
   const { identifyUserInGleap } = useGleapIdentity();
-  const location = useLocation();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -31,6 +29,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             description: "There was a problem with your session. Please try logging in again.",
           });
           handleAuthError();
+          setIsLoading(false);
           return;
         }
 
@@ -38,15 +37,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setSession(currentSession);
           setUser(currentSession.user);
           identifyUserInGleap(currentSession.user);
-          // Only check role on initial load, not on every pathname change
           if (isLoading) {
             await redirectBasedOnRole(currentSession.user.id);
           }
         }
+        setIsLoading(false);
       } catch (error) {
         console.error('Error initializing auth:', error);
         handleAuthError();
-      } finally {
         setIsLoading(false);
       }
     };
@@ -75,7 +73,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setSession(currentSession);
         setUser(currentSession.user);
         identifyUserInGleap(currentSession.user);
-        // Only check role on sign in
         if (event === 'SIGNED_IN') {
           await redirectBasedOnRole(currentSession.user.id);
         }
@@ -85,9 +82,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [isLoading]); // Remove location.pathname dependency
+  }, [isLoading]);
 
   const login = async (email: string, password: string) => {
+    setIsLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -112,10 +110,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } catch (error: any) {
       console.error('Login error:', error);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const logout = async () => {
+    setIsLoading(true);
     try {
       await supabase.auth.signOut();
       setUser(null);
@@ -129,11 +130,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         title: "Logout Error",
         description: "There was a problem signing out. Please try again.",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <p className="text-sm text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
