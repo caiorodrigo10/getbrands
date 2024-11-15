@@ -56,24 +56,6 @@ export const ProductPricing = ({
     <div className="space-y-4 mt-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label>Cost Price</Label>
-          <Input
-            type="number"
-            value={costPrice.toFixed(2)}
-            disabled
-            className="bg-gray-50"
-          />
-        </div>
-        <div>
-          <Label>Suggested Price</Label>
-          <Input
-            type="number"
-            value={suggestedPrice.toFixed(2)}
-            disabled
-            className="bg-gray-50"
-          />
-        </div>
-        <div>
           <Label>Your Selling Price</Label>
           <Input
             type="number"

@@ -97,26 +97,13 @@ const Products = () => {
               className="p-6 animate-fade-in"
               style={{ animationDelay: `${index * 150}ms` }}
             >
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                {/* Custom Product Image */}
-                <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                  <img
-                    src={displayImage || "/placeholder.svg"}
-                    alt={displayName}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                {/* Original Product Image */}
-                <div 
-                  className="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity"
-                  onClick={() => navigateToOriginalProduct(item.product.id)}
-                >
-                  <img
-                    src={item.product.image_url || "/placeholder.svg"}
-                    alt={item.product.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+              {/* Custom Product Image */}
+              <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
+                <img
+                  src={displayImage || "/placeholder.svg"}
+                  alt={displayName}
+                  className="w-full h-full object-cover"
+                />
               </div>
               
               <div className="space-y-4">
@@ -129,12 +116,30 @@ const Products = () => {
                   <p className="text-sm text-gray-600 mt-1">{item.product.category}</p>
                 </div>
                 
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-700 mb-2">Original Product:</p>
+                <div className="p-4 bg-gray-50 rounded-lg space-y-3">
+                  <p className="text-sm font-medium text-gray-700">Original Product:</p>
+                  <div 
+                    className="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity"
+                    onClick={() => navigateToOriginalProduct(item.product.id)}
+                  >
+                    <img
+                      src={item.product.image_url || "/placeholder.svg"}
+                      alt={item.product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                   <p className="text-sm text-gray-600 hover:text-primary cursor-pointer"
                      onClick={() => navigateToOriginalProduct(item.product.id)}>
                     {item.product.name}
                   </p>
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-600">
+                      Cost Price: ${item.product.from_price.toFixed(2)}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Suggested Price: ${item.product.srp.toFixed(2)}
+                    </p>
+                  </div>
                 </div>
 
                 <ProductPricing
