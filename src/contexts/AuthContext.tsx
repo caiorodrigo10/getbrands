@@ -71,22 +71,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
+        const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
         
-        if (error) {
-          console.error('Session error:', error);
+        if (sessionError) {
+          console.error('Session error:', sessionError);
           handleAuthError();
           return;
         }
-
-        if (currentSession?.user) {
-          setSession(currentSession);
-          setUser(currentSession.user);
-          identifyUserInGleap(currentSession.user);
-          
-          if (window.location.pathname === '/login') {
-            await redirectBasedOnRole(currentSession.user.id);
-          }
+        
+        if (initialSession?.user) {
+          setSession(initialSession);
+          setUser(initialSession.user);
+          identifyUserInGleap(initialSession.user);
+          await redirectBasedOnRole(initialSession.user.id);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
