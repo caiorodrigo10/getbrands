@@ -21,6 +21,7 @@ import PackageQuizPage from "@/pages/PackageQuizPage";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminProjects from "@/pages/admin/AdminProjects";
 import AdminOrders from "@/pages/admin/AdminOrders";
+import AdminCatalog from "@/pages/admin/AdminCatalog";
 
 export const AppRoutes = () => (
   <Routes>
@@ -48,6 +49,14 @@ export const AppRoutes = () => (
       <ProtectedRoute>
         <AdminLayout>
           <AdminOrders />
+        </AdminLayout>
+      </ProtectedRoute>
+    } />
+
+    <Route path="/admin/catalog" element={
+      <ProtectedRoute>
+        <AdminLayout>
+          <AdminCatalog />
         </AdminLayout>
       </ProtectedRoute>
     } />
