@@ -1,11 +1,14 @@
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Product } from "@/types/product";
+import { ProductActions } from "./ProductActions";
 
 interface ProductHeaderProps {
   product: Product;
+  onSelectProduct: () => void;
 }
 
-export const ProductHeader = ({ product }: ProductHeaderProps) => {
+export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
       <div className="space-y-6">
@@ -70,29 +73,15 @@ export const ProductHeader = ({ product }: ProductHeaderProps) => {
             <div className="col-span-2">
               <p className="text-gray-600">Potential profit</p>
               <p className="text-lg text-green-600 font-semibold">
-                ${product.srp - product.from_price.toFixed(2)}
+                ${(product.srp - product.from_price).toFixed(2)}
               </p>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button 
-              size="lg" 
-              className="flex-1"
-              onClick={handleSelectProduct}
-            >
-              Select Product
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="flex-1"
-              onClick={handleRequestSample}
-              disabled={isLoading}
-            >
-              {isLoading ? "Adding to cart..." : "Request Sample"}
-            </Button>
-          </div>
+          <ProductActions 
+            product={product}
+            onSelectProduct={onSelectProduct}
+          />
         </div>
       </div>
     </div>

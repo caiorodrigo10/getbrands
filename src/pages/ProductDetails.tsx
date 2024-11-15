@@ -1,11 +1,10 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types/product";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import ProjectSelectionDialog from "@/components/dialogs/ProjectSelectionDialog";
 import { ProductHeader } from "@/components/products/ProductHeader";
 import { ProductBenefits } from "@/components/products/ProductBenefits";
@@ -17,6 +16,7 @@ const ProductDetails = () => {
   const { user } = useAuth();
   const [showProjectDialog, setShowProjectDialog] = useState(false);
   const [projects, setProjects] = useState<any[]>([]);
+  const { toast } = useToast();
 
   const { data: product, isLoading: productLoading } = useQuery({
     queryKey: ["product", id],
@@ -28,41 +28,9 @@ const ProductDetails = () => {
         .single();
 
       if (error) throw error;
-      return data as Product;
+      return data;
     },
   });
-
-  const handleRequestSample = async () => {
-    if (!user) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "You need to be logged in to request samples.",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      if (product) {
-        await addItem(product);
-        toast({
-          title: "Success",
-          description: "Product added to cart successfully.",
-        });
-        navigate("/checkout/confirmation");
-      }
-    } catch (error) {
-      console.error('Error adding product to cart:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to add product to cart. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleSelectProduct = async () => {
     if (!user) {
@@ -183,7 +151,10 @@ const ProductDetails = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <ProductHeader product={product} />
+      <ProductHeader 
+        product={product} 
+        onSelectProduct={handleSelectProduct}
+      />
       
       <div className="mt-16">
         <ProductBenefits />
