@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { User, Session, AuthChangeEvent } from "@supabase/supabase-js";
+import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import Gleap from "gleap";
 
 interface AuthContextType {
-  user: (User & { role?: string }) | null;
+  user: User | null;
   session: Session | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -17,7 +17,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<(User & { role?: string }) | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
@@ -34,53 +34,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const handleAuthError = () => {
-    setSession(null);
-    setUser(null);
-    identifyUserInGleap(null);
-    navigate('/login');
-    toast({
-      variant: "destructive",
-      title: "Session Expired",
-      description: "Please sign in again to continue.",
-    });
-  };
-
-  const fetchUserProfile = async (userId: string) => {
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
-      .single();
-
-    if (error) {
-      console.error('Error fetching user profile:', error);
-      return null;
-    }
-
-    return profile;
-  };
-
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error('Session error:', sessionError);
-          handleAuthError();
-          return;
-        }
-        
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
         if (initialSession) {
-          const profile = await fetchUserProfile(initialSession.user.id);
           setSession(initialSession);
-          setUser({ ...initialSession.user, role: profile?.role || 'member' });
+          setUser(initialSession.user);
           identifyUserInGleap(initialSession.user);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-        handleAuthError();
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to initialize authentication.",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -88,38 +57,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     initializeAuth();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, currentSession) => {
-      console.log('Auth event:', event);
-      
-      if (['SIGNED_OUT', 'USER_DELETED'].includes(event)) {
-        setSession(null);
-        setUser(null);
-        identifyUserInGleap(null);
-        navigate('/login');
-        return;
-      }
-
-      if (event === 'TOKEN_REFRESHED' && !currentSession) {
-        handleAuthError();
-        return;
-      }
-
-      if (currentSession) {
-        const profile = await fetchUserProfile(currentSession.user.id);
-        setSession(currentSession);
-        setUser({ ...currentSession.user, role: profile?.role || 'member' });
-        identifyUserInGleap(currentSession.user);
-      }
-      
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+      identifyUserInGleap(currentSession?.user ?? null);
       setIsLoading(false);
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [toast]);
 
   const login = async (email: string, password: string) => {
     try {
@@ -132,7 +80,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         toast({
           variant: "destructive",
           title: "Error",
-          description: error.message || "Invalid email or password. Please try again.",
+          description: error.message || "Invalid email or password.",
         });
         throw error;
       }
@@ -141,6 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(data.user);
         setSession(data.session);
         identifyUserInGleap(data.user);
+        navigate("/");
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -171,13 +120,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ 
-        user, 
-        session, 
-        login, 
-        logout, 
+      value={{
+        user,
+        session,
+        login,
+        logout,
         isAuthenticated: !!session,
-        isLoading 
+        isLoading
       }}
     >
       {children}
