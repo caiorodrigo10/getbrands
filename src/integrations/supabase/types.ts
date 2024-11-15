@@ -300,6 +300,7 @@ export type Database = {
           image_url: string | null
           name: string | null
           project_product_id: string | null
+          selling_price: number | null
           updated_at: string
         }
         Insert: {
@@ -309,6 +310,7 @@ export type Database = {
           image_url?: string | null
           name?: string | null
           project_product_id?: string | null
+          selling_price?: number | null
           updated_at?: string
         }
         Update: {
@@ -318,6 +320,7 @@ export type Database = {
           image_url?: string | null
           name?: string | null
           project_product_id?: string | null
+          selling_price?: number | null
           updated_at?: string
         }
         Relationships: [

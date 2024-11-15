@@ -8,32 +8,7 @@ import Confetti from 'react-confetti';
 import { useLocation, useNavigate } from "react-router-dom";
 import { ProductNameEdit } from "@/components/products/ProductNameEdit";
 import { ProductPricing } from "@/components/products/ProductPricing";
-
-interface ProjectSpecificProduct {
-  id: string;
-  name: string | null;
-  description: string | null;
-  image_url: string | null;
-  selling_price: number | null;
-}
-
-interface ProjectProduct {
-  id: string;
-  project: {
-    id: string;
-    name: string;
-    description: string | null;
-  } | null;
-  product: {
-    id: string;
-    name: string;
-    category: string;
-    image_url: string | null;
-    from_price: number;
-    srp: number;
-  };
-  specific: ProjectSpecificProduct[] | null;
-}
+import { ProjectProduct } from "@/types/product";
 
 const Products = () => {
   const { user } = useAuth();
