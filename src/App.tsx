@@ -47,10 +47,10 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => (
 );
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <CartProvider>
-        <BrowserRouter>
+  <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <CartProvider>
           <TooltipProvider>
             <Routes>
               <Route path="/login" element={<Login />} />
@@ -172,10 +172,10 @@ const App = () => (
             <Toaster />
             <Sonner />
           </TooltipProvider>
-        </BrowserRouter>
-      </CartProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+        </CartProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </BrowserRouter>
 );
 
 export default App;
