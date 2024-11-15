@@ -82,7 +82,6 @@ export const CalendarStage = () => {
           // Pre-fill user data when available
           if (profile) {
             cal("preload", {
-              email: profile.email,
               name: `${profile.first_name} ${profile.last_name}`.trim(),
               notes: `Project ID: ${projectId}`,
             });
