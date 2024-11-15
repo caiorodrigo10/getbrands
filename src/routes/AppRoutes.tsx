@@ -23,202 +23,39 @@ import AdminProjects from "@/pages/admin/AdminProjects";
 
 export const AppRoutes = () => (
   <Routes>
+    {/* Public Routes */}
     <Route path="/login" element={<Login />} />
     
-    {/* Admin Routes */}
-    <Route
-      path="/admin"
-      element={
-        <ProtectedRoute>
-          <AdminLayout>
-            <AdminDashboard />
-          </AdminLayout>
-        </ProtectedRoute>
-      }
-    />
-    
-    <Route
-      path="/admin/projects"
-      element={
-        <ProtectedRoute>
-          <AdminLayout>
-            <AdminProjects />
-          </AdminLayout>
-        </ProtectedRoute>
-      }
-    />
-    
-    {/* Client Routes */}
-    <Route
-      path="/"
-      element={
-        <ProtectedRoute>
-          <AppLayout>
-            <Dashboard />
-          </AppLayout>
-        </ProtectedRoute>
-      }
-    />
-    
-    <Route
-      path="/profile"
-      element={
-        <ProtectedRoute>
-          <AppLayout>
-            <Profile />
-          </AppLayout>
-        </ProtectedRoute>
-      }
-    />
-    
-    <Route
-      path="/projects"
-      element={
-        <ProtectedRoute>
-          <AppLayout>
-            <Projects />
-          </AppLayout>
-        </ProtectedRoute>
-      }
-    />
-    
-    <Route
-      path="/projects/:id"
-      element={
-        <ProtectedRoute>
-          <AppLayout>
-            <ProjectDetails />
-          </AppLayout>
-        </ProtectedRoute>
-      }
-    />
+    {/* Protected Routes */}
+    <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+      <Route path="/" element={<Dashboard />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/projects" element={<Projects />} />
+      <Route path="/projects/:id" element={<ProjectDetails />} />
+      <Route path="/package-quiz/:projectId" element={<PackageQuizPage />} />
+      <Route path="/catalog" element={<Catalog />} />
+      <Route path="/catalog/:id" element={<ProductDetails />} />
+      <Route path="/products" element={<Products />} />
+      <Route path="/products/:id" element={<ProductDetails />} />
+      <Route path="/products/success" element={<ProductSelectedSuccess />} />
+      <Route path="/documents" element={<Documents />} />
+      <Route path="/sample-orders" element={<SampleOrders />} />
+      <Route path="/profit-calculator" element={<ProfitCalculator />} />
+    </Route>
 
-    <Route
-      path="/package-quiz/:projectId"
-      element={
-        <ProtectedRoute>
-          <AppLayout>
-            <PackageQuizPage />
-          </AppLayout>
-        </ProtectedRoute>
-      }
-    />
-    
-    <Route
-      path="/catalog"
-      element={
-        <ProtectedRoute>
-          <AppLayout>
-            <Catalog />
-          </AppLayout>
-        </ProtectedRoute>
-      }
-    />
+    {/* Protected Checkout Routes */}
+    <Route element={<ProtectedRoute />}>
+      <Route path="/checkout/*" element={<Checkout />} />
+      <Route path="/checkout/success" element={<Success />} />
+    </Route>
 
-    <Route
-      path="/catalog/:id"
-      element={
-        <ProtectedRoute>
-          <AppLayout>
-            <ProductDetails />
-          </AppLayout>
-        </ProtectedRoute>
-      }
-    />
-    
-    <Route
-      path="/products"
-      element={
-        <ProtectedRoute>
-          <AppLayout>
-            <Products />
-          </AppLayout>
-        </ProtectedRoute>
-      }
-    />
-    
-    <Route
-      path="/products/:id"
-      element={
-        <ProtectedRoute>
-          <AppLayout>
-            <ProductDetails />
-          </AppLayout>
-        </ProtectedRoute>
-      }
-    />
-    
-    <Route
-      path="/products/success"
-      element={
-        <ProtectedRoute>
-          <AppLayout>
-            <ProductSelectedSuccess />
-          </AppLayout>
-        </ProtectedRoute>
-      }
-    />
-    
-    <Route
-      path="/documents"
-      element={
-        <ProtectedRoute>
-          <AppLayout>
-            <Documents />
-          </AppLayout>
-        </ProtectedRoute>
-      }
-    />
-    
-    <Route
-      path="/sample-orders"
-      element={
-        <ProtectedRoute>
-          <AppLayout>
-            <SampleOrders />
-          </AppLayout>
-        </ProtectedRoute>
-      }
-    />
-    
-    <Route
-      path="/profit-calculator"
-      element={
-        <ProtectedRoute>
-          <AppLayout>
-            <ProfitCalculator />
-          </AppLayout>
-        </ProtectedRoute>
-      }
-    />
-    
-    <Route
-      path="/checkout/*"
-      element={
-        <ProtectedRoute>
-          <Checkout />
-        </ProtectedRoute>
-      }
-    />
-    
-    <Route
-      path="/checkout/success"
-      element={
-        <ProtectedRoute>
-          <Success />
-        </ProtectedRoute>
-      }
-    />
-    
-    <Route
-      path="*"
-      element={
-        <ProtectedRoute>
-          <AppLayout>
-            <Error404 />
-          </AppLayout>
-        </ProtectedRoute>
-      }
-    />
+    {/* Protected Admin Routes */}
+    <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+      <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/admin/projects" element={<AdminProjects />} />
+    </Route>
+
+    {/* Catch-all route for 404 */}
+    <Route path="*" element={<Error404 />} />
   </Routes>
 );
