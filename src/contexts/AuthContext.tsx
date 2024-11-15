@@ -1,31 +1,70 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { User, Session, AuthChangeEvent } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { AuthContextType, AuthProviderProps } from "./auth/types";
-import { useAuthRedirect } from "./auth/useAuthRedirect";
-import { useGleapIdentity } from "./auth/useGleapIdentity";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
+import Gleap from "gleap";
+
+interface AuthContextType {
+  user: User | null;
+  session: Session | null;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+  isAuthenticated: boolean;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { redirectBasedOnRole, handleAuthError } = useAuthRedirect();
-  const { identifyUserInGleap } = useGleapIdentity();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleSession = async (currentSession: Session | null) => {
-    if (currentSession?.user) {
-      setSession(currentSession);
-      setUser(currentSession.user);
-      identifyUserInGleap(currentSession.user);
-      await redirectBasedOnRole(currentSession.user.id);
+  const identifyUserInGleap = (currentUser: User | null) => {
+    if (currentUser) {
+      Gleap.identify(currentUser.id, {
+        email: currentUser.email,
+        name: currentUser.email?.split('@')[0] || 'User',
+      });
     } else {
-      setSession(null);
-      setUser(null);
-      identifyUserInGleap(null);
+      Gleap.clearIdentity();
+    }
+  };
+
+  const handleAuthError = () => {
+    setSession(null);
+    setUser(null);
+    identifyUserInGleap(null);
+    navigate('/login');
+    toast({
+      variant: "destructive",
+      title: "Session Expired",
+      description: "Please sign in again to continue.",
+    });
+  };
+
+  const redirectBasedOnRole = async (userId: string) => {
+    if (!userId) return;
+    
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+
+      if (profile?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+      navigate('/');
     }
   };
 
@@ -36,17 +75,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         
         if (error) {
           console.error('Session error:', error);
-          toast({
-            variant: "destructive",
-            title: "Authentication Error",
-            description: "There was a problem with your session. Please try logging in again.",
-          });
           handleAuthError();
-          setIsLoading(false);
           return;
         }
 
-        await handleSession(currentSession);
+        if (currentSession?.user) {
+          setSession(currentSession);
+          setUser(currentSession.user);
+          identifyUserInGleap(currentSession.user);
+          
+          if (window.location.pathname === '/login') {
+            await redirectBasedOnRole(currentSession.user.id);
+          }
+        }
       } catch (error) {
         console.error('Error initializing auth:', error);
         handleAuthError();
@@ -63,8 +104,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       console.log('Auth event:', event);
       
       if (['SIGNED_OUT', 'USER_DELETED'].includes(event)) {
-        await handleSession(null);
-        handleAuthError();
+        setSession(null);
+        setUser(null);
+        identifyUserInGleap(null);
+        navigate('/login');
         return;
       }
 
@@ -73,17 +116,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return;
       }
 
-      await handleSession(currentSession);
+      if (currentSession?.user) {
+        setSession(currentSession);
+        setUser(currentSession.user);
+        identifyUserInGleap(currentSession.user);
+        if (event === 'SIGNED_IN') {
+          await redirectBasedOnRole(currentSession.user.id);
+        }
+      }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [navigate]);
 
   const login = async (email: string, password: string) => {
     try {
-      setIsLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -92,47 +141,47 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (error) {
         toast({
           variant: "destructive",
-          title: "Login Error",
-          description: error.message,
+          title: "Error",
+          description: error.message || "Invalid email or password. Please try again.",
         });
         throw error;
       }
 
-      await handleSession(data.session);
-    } catch (error: any) {
+      if (data.user) {
+        setUser(data.user);
+        setSession(data.session);
+        identifyUserInGleap(data.user);
+        await redirectBasedOnRole(data.user.id);
+      }
+    } catch (error) {
       console.error('Login error:', error);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const logout = async () => {
     try {
-      setIsLoading(true);
       await supabase.auth.signOut();
-      await handleSession(null);
+      setUser(null);
+      setSession(null);
+      identifyUserInGleap(null);
+      navigate('/login');
+      toast({
+        title: "Success",
+        description: "Logged out successfully!",
+      });
     } catch (error) {
       console.error('Logout error:', error);
       toast({
         variant: "destructive",
-        title: "Logout Error",
-        description: "There was a problem signing out. Please try again.",
+        title: "Error",
+        description: "Failed to log out. Please try again.",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          <p className="text-sm text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
+    return <div>Loading...</div>;
   }
 
   return (
