@@ -50,7 +50,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(null);
         setUser(null);
         if (event === 'TOKEN_REFRESHED') {
-          // Token refresh failed, redirect to login
           navigate('/login');
         }
       }
@@ -80,10 +79,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       if (error) {
+        const errorMessage = error.message || "Invalid email or password. Please try again.";
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Invalid email or password. Please try again.",
+          description: errorMessage,
         });
         throw error;
       }
