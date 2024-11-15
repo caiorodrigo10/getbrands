@@ -1,6 +1,5 @@
 import * as React from "react"
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 import { ButtonProps, buttonVariants } from "@/components/ui/button"
 
@@ -66,14 +65,28 @@ const PaginationPrevious = ({
   <PaginationLink
     aria-label="Go to previous page"
     size="default"
-    className={cn("gap-1 pl-2.5", className)}
+    className={cn("hidden sm:flex gap-1 pl-2.5", className)}
     {...props}
   >
     <ChevronLeft className="h-4 w-4" />
     <span>Previous</span>
   </PaginationLink>
 )
-PaginationPrevious.displayName = "PaginationPrevious"
+
+// Mobile version of Previous
+const PaginationPreviousMobile = ({
+  className,
+  ...props
+}: React.ComponentProps<typeof PaginationLink>) => (
+  <PaginationLink
+    aria-label="Go to previous page"
+    size="icon"
+    className={cn("sm:hidden", className)}
+    {...props}
+  >
+    <ChevronLeft className="h-4 w-4" />
+  </PaginationLink>
+)
 
 const PaginationNext = ({
   className,
@@ -82,14 +95,28 @@ const PaginationNext = ({
   <PaginationLink
     aria-label="Go to next page"
     size="default"
-    className={cn("gap-1 pr-2.5", className)}
+    className={cn("hidden sm:flex gap-1 pr-2.5", className)}
     {...props}
   >
     <span>Next</span>
     <ChevronRight className="h-4 w-4" />
   </PaginationLink>
 )
-PaginationNext.displayName = "PaginationNext"
+
+// Mobile version of Next
+const PaginationNextMobile = ({
+  className,
+  ...props
+}: React.ComponentProps<typeof PaginationLink>) => (
+  <PaginationLink
+    aria-label="Go to next page"
+    size="icon"
+    className={cn("sm:hidden", className)}
+    {...props}
+  >
+    <ChevronRight className="h-4 w-4" />
+  </PaginationLink>
+)
 
 const PaginationEllipsis = ({
   className,
@@ -104,7 +131,6 @@ const PaginationEllipsis = ({
     <span className="sr-only">More pages</span>
   </span>
 )
-PaginationEllipsis.displayName = "PaginationEllipsis"
 
 export {
   Pagination,
@@ -113,5 +139,7 @@ export {
   PaginationItem,
   PaginationLink,
   PaginationNext,
+  PaginationNextMobile,
   PaginationPrevious,
+  PaginationPreviousMobile,
 }

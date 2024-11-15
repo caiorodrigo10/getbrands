@@ -11,8 +11,10 @@ import {
   PaginationContent, 
   PaginationItem, 
   PaginationLink, 
-  PaginationNext, 
-  PaginationPrevious 
+  PaginationNext,
+  PaginationNextMobile,
+  PaginationPrevious,
+  PaginationPreviousMobile
 } from "@/components/ui/pagination";
 
 const ITEMS_PER_PAGE = 9;
@@ -131,10 +133,14 @@ const SampleOrders = () => {
                         onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                         className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                       />
+                      <PaginationPreviousMobile
+                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
                     </PaginationItem>
                     
                     {Array.from({ length: ordersData.totalPages }, (_, i) => i + 1).map((page) => (
-                      <PaginationItem key={page}>
+                      <PaginationItem key={page} className="hidden sm:block">
                         <PaginationLink
                           onClick={() => setCurrentPage(page)}
                           isActive={currentPage === page}
@@ -147,6 +153,10 @@ const SampleOrders = () => {
                     
                     <PaginationItem>
                       <PaginationNext
+                        onClick={() => setCurrentPage(Math.min(ordersData.totalPages, currentPage + 1))}
+                        className={currentPage === ordersData.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                      <PaginationNextMobile
                         onClick={() => setCurrentPage(Math.min(ordersData.totalPages, currentPage + 1))}
                         className={currentPage === ordersData.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                       />
