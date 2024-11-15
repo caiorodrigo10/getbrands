@@ -96,11 +96,10 @@ export const CalendarStage = () => {
             calLink="caio-apfelbaum/cafe-com-caio"
             style={{ width: "100%", height: "100%" }}
             config={{
-              layout: "month_view",
               theme: "light",
               styles: {
-                branding: { brandColor: "#4c1e6c" },
-                body: { background: "#ffffff" }
+                branding: "#4c1e6c",
+                body: "#ffffff"
               }
             }}
             data-cal-namespace="lovable-calendar"
