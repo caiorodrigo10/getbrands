@@ -32,7 +32,11 @@ export const AddressSelectionSection = ({
       <div className="flex justify-end mb-4">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline" size="sm" className="w-auto">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-auto sm:w-auto sm:text-base text-xs px-2 sm:px-4 h-7 sm:h-9"
+            >
               Select Previous Address
             </Button>
           </DialogTrigger>
