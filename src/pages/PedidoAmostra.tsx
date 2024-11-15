@@ -80,7 +80,7 @@ const PedidoAmostra = () => {
                   <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
-              <p className="font-semibold text-gray-900 w-20 text-right">
+              <p className="hidden sm:block font-semibold text-gray-900 w-20 text-right">
                 ${(item.from_price * item.quantity).toFixed(2)}
               </p>
               <Button
