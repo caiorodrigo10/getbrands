@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { Product } from "@/types/product";
+import { useNavigate } from "react-router-dom";
 
 interface ProductActionsProps {
   product: Product;
@@ -13,6 +14,7 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
   const [isLoading, setIsLoading] = useState(false);
   const { addItem } = useCart();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleRequestSample = async () => {
     setIsLoading(true);
@@ -22,6 +24,7 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
         title: "Success",
         description: "Product added to cart successfully.",
       });
+      navigate("/checkout/confirmation");
     } catch (error) {
       console.error('Error adding product to cart:', error);
       toast({
