@@ -1,4 +1,4 @@
-import Cal, { getCalApi } from "@calcom/embed-react";
+import Cal from "@calcom/embed-react";
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,18 +23,44 @@ export const CalendarStage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Initialize Cal.com
+  // Initialize Cal.com and handle booking events
   useEffect(() => {
-    (async function () {
-      const cal = await getCalApi();
-      cal?.on("bookingSuccessful", (e: any) => {
-        const booking = e.detail;
-        logMeetingMutation.mutate({
-          scheduled_for: booking.startTime,
-          meeting_link: booking.meetingLink,
-        });
+    (async function initCalendar() {
+      const cal = (window as any).Cal;
+      if (!cal) return;
+
+      // Wait for Cal to be ready
+      await new Promise((resolve) => {
+        const checkCal = setInterval(() => {
+          if (cal.loaded) {
+            clearInterval(checkCal);
+            resolve(true);
+          }
+        }, 100);
+      });
+
+      // Add event listener
+      cal("on", {
+        action: "bookingSuccessful",
+        callback: (event: any) => {
+          const booking = event.detail;
+          logMeetingMutation.mutate({
+            scheduled_for: booking.startTime,
+            meeting_link: booking.meetingLink,
+          });
+        },
       });
     })();
+
+    // Cleanup
+    return () => {
+      const cal = (window as any).Cal;
+      if (cal) {
+        cal("off", {
+          action: "bookingSuccessful",
+        });
+      }
+    };
   }, []);
 
   // Fetch user profile data
@@ -112,11 +138,11 @@ export const CalendarStage = () => {
             style={{ width: "100%", height: "100%" }}
             config={{
               theme: "light",
-              hideEventTypeDetails: false,
+              hideEventTypeDetails: "false",
               layout: "month_view",
               styles: {
-                branding: { brandColor: "#4c1e6c" },
-                body: { background: "#ffffff" }
+                branding: "#4c1e6c",
+                body: "#ffffff"
               }
             }}
             data-cal-namespace="lovable-calendar"
