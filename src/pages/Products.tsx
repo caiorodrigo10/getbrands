@@ -97,6 +97,7 @@ const Products = () => {
               className="p-6 animate-fade-in"
               style={{ animationDelay: `${index * 150}ms` }}
             >
+              {/* Custom Product Image */}
               <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
                 <img
                   src={displayImage || "/placeholder.svg"}
@@ -117,12 +118,20 @@ const Products = () => {
                 
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <div className="flex items-start justify-between gap-4">
-                    <div className="flex-grow">
+                    <div className="flex-grow space-y-3">
                       <p className="text-sm font-medium text-gray-700">Original Product:</p>
-                      <p className="text-sm text-gray-600 hover:text-primary cursor-pointer mt-2"
+                      <p className="text-sm text-gray-600 hover:text-primary cursor-pointer"
                          onClick={() => navigateToOriginalProduct(item.product.id)}>
                         {item.product.name}
                       </p>
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600">
+                          Cost Price: ${item.product.from_price.toFixed(2)}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Suggested Price: ${item.product.srp.toFixed(2)}
+                        </p>
+                      </div>
                     </div>
                     <div 
                       className="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity"
@@ -135,11 +144,6 @@ const Products = () => {
                       />
                     </div>
                   </div>
-                </div>
-
-                <div className="flex justify-between items-center text-sm text-gray-600">
-                  <p>Cost Price: ${item.product.from_price.toFixed(2)}</p>
-                  <p>Suggested Price: ${item.product.srp.toFixed(2)}</p>
                 </div>
 
                 <ProductPricing
