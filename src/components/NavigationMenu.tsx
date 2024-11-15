@@ -15,39 +15,49 @@ export const NavigationMenu = () => {
   ];
 
   return (
-    <header className="border-b border-border/40 bg-[#131313]">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between gap-4">
-          <div className="flex items-center gap-6">
+    <header className="border-r border-border/40 bg-[#131313] fixed left-0 top-0 h-screen hidden md:block w-64">
+      <div className="flex flex-col h-full">
+        <div className="p-6">
+          <img 
+            src="https://content.app-sources.com/s/97257455971736356/uploads/Logos/Logotipo_4-7282325.png?format=webp"
+            alt="Mainer Logo"
+            className="h-8 w-auto"
+          />
+        </div>
+        
+        <nav className="flex-1 px-3">
+          {menuItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`flex items-center gap-2 px-4 py-2.5 my-1 text-sm rounded-md transition-all duration-200 ${
+                location.pathname === item.path
+                  ? "bg-primary/20 text-primary-foreground font-medium"
+                  : "text-gray-300 hover:bg-gray-800 hover:text-white"
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="p-4 border-t border-border/40">
+          <UserMenu isMobile={false} />
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      <div className="md:hidden fixed top-0 left-0 right-0 border-b border-border/40 bg-[#131313]">
+        <div className="container mx-auto px-4">
+          <div className="flex h-16 items-center justify-between gap-4">
             <img 
               src="https://content.app-sources.com/s/97257455971736356/uploads/Logos/Logotipo_4-7282325.png?format=webp"
               alt="Mainer Logo"
               className="h-8 w-auto"
             />
-            <nav className="hidden md:flex items-center gap-2">
-              {menuItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`px-4 py-2 text-sm rounded-md transition-all duration-200 ${
-                    location.pathname === item.path
-                      ? "bg-primary/20 text-primary-foreground font-medium"
-                      : "text-gray-300 hover:bg-gray-800 hover:text-white"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex">
-              <UserMenu isMobile={false} />
-            </div>
 
             <Sheet>
-              <SheetTrigger className="md:hidden">
+              <SheetTrigger>
                 <Menu className="h-6 w-6 text-gray-300" />
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] bg-[#131313] p-0">
