@@ -6,6 +6,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
+interface ProjectMeeting {
+  id: string;
+  project_id: string;
+  user_id: string;
+  scheduled_for: string;
+  scheduled_at: string;
+  meeting_link?: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export const CalendarStage = () => {
   const { id: projectId } = useParams();
   const { user } = useAuth();
@@ -113,7 +125,7 @@ export const CalendarStage = () => {
         .order("scheduled_for", { ascending: true });
 
       if (error) throw error;
-      return data;
+      return data as ProjectMeeting[];
     },
   });
 

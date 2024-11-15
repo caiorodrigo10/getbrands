@@ -253,6 +253,57 @@ export type Database = {
         }
         Relationships: []
       }
+      project_meetings: {
+        Row: {
+          created_at: string | null
+          id: string
+          meeting_link: string | null
+          project_id: string
+          scheduled_at: string | null
+          scheduled_for: string
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          meeting_link?: string | null
+          project_id: string
+          scheduled_at?: string | null
+          scheduled_for: string
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          meeting_link?: string | null
+          project_id?: string
+          scheduled_at?: string | null
+          scheduled_for?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_meetings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_meetings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_products: {
         Row: {
           created_at: string
