@@ -12,12 +12,10 @@ import {
   PaginationItem, 
   PaginationLink, 
   PaginationNext,
-  PaginationNextMobile,
-  PaginationPrevious,
-  PaginationPreviousMobile
+  PaginationPrevious
 } from "@/components/ui/pagination";
 
-const ITEMS_PER_PAGE = 9;
+const ITEMS_PER_PAGE = 15;
 
 const SampleOrders = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -71,7 +69,7 @@ const SampleOrders = () => {
         ...order,
         products: order.products.map((p: any) => ({
           ...p.product,
-          quantity: 1 // Default quantity, update this if you add quantity to the database
+          quantity: 1
         }))
       }));
 
@@ -133,14 +131,10 @@ const SampleOrders = () => {
                         onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                         className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                       />
-                      <PaginationPreviousMobile
-                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                        className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                      />
                     </PaginationItem>
                     
                     {Array.from({ length: ordersData.totalPages }, (_, i) => i + 1).map((page) => (
-                      <PaginationItem key={page} className="hidden sm:block">
+                      <PaginationItem key={page}>
                         <PaginationLink
                           onClick={() => setCurrentPage(page)}
                           isActive={currentPage === page}
@@ -153,10 +147,6 @@ const SampleOrders = () => {
                     
                     <PaginationItem>
                       <PaginationNext
-                        onClick={() => setCurrentPage(Math.min(ordersData.totalPages, currentPage + 1))}
-                        className={currentPage === ordersData.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                      />
-                      <PaginationNextMobile
                         onClick={() => setCurrentPage(Math.min(ordersData.totalPages, currentPage + 1))}
                         className={currentPage === ordersData.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                       />
