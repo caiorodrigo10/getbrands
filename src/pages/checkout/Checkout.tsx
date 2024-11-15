@@ -24,11 +24,13 @@ const Checkout = () => {
   const currentStep = getCurrentStepIndex();
 
   const goBack = () => {
-    const prevStep = steps[currentStep - 1];
-    if (prevStep) {
-      navigate(prevStep.path);
+    if (currentStep === 0) {
+      navigate("/catalog");
     } else {
-      navigate("/catalogo");
+      const prevStep = steps[currentStep - 1];
+      if (prevStep) {
+        navigate(prevStep.path);
+      }
     }
   };
 

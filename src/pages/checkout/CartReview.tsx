@@ -14,7 +14,7 @@ const CartReview = () => {
   return (
     <div className="space-y-8">
       <div className="bg-white p-6 rounded-lg shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">Revise seu pedido</h2>
+        <h2 className="text-xl font-semibold mb-4">Review your order</h2>
         <div className="space-y-4">
           {items.map((item) => (
             <div key={item.id} className="flex items-center justify-between py-4 border-b">
@@ -27,7 +27,7 @@ const CartReview = () => {
                 <div>
                   <h3 className="font-medium">{item.name}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Quantidade: {item.quantity}
+                    Quantity: {item.quantity}
                   </p>
                 </div>
               </div>
@@ -44,7 +44,7 @@ const CartReview = () => {
           onClick={handleContinue}
           className="w-full md:w-auto"
         >
-          Continuar para envio
+          Continue to shipping
         </Button>
       </div>
     </div>

@@ -48,13 +48,6 @@ export const useCartOperations = (user: User | null) => {
       setItems(formattedItems);
     } catch (error) {
       console.error('Error loading cart items:', error);
-      if (user?.id) {
-        toast({
-          variant: "destructive",
-          title: "Erro ao carregar carrinho",
-          description: "Não foi possível carregar seus itens. Tente novamente mais tarde.",
-        });
-      }
     } finally {
       setIsLoading(false);
     }
@@ -64,8 +57,8 @@ export const useCartOperations = (user: User | null) => {
     if (!user?.id) {
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Você precisa estar logado para adicionar itens ao carrinho.",
+        title: "Error",
+        description: "You must be logged in to add items to cart.",
       });
       throw new Error("User not authenticated");
     }
@@ -73,7 +66,6 @@ export const useCartOperations = (user: User | null) => {
     try {
       setIsLoading(true);
       
-      // Check if the item already exists in the cart
       const { data: existingItems, error: queryError } = await supabase
         .from('cart_items')
         .select('id')
@@ -83,13 +75,9 @@ export const useCartOperations = (user: User | null) => {
       if (queryError) throw queryError;
 
       if (existingItems && existingItems.length > 0) {
-        toast({
-          description: "Este produto já está no seu carrinho.",
-        });
         return;
       }
 
-      // If not, add the item
       const { error } = await supabase
         .from('cart_items')
         .insert({
@@ -100,17 +88,8 @@ export const useCartOperations = (user: User | null) => {
       if (error) throw error;
 
       setItems((currentItems) => [...currentItems, { ...product, quantity: 1 }]);
-
-      toast({
-        description: "Produto adicionado ao carrinho.",
-      });
     } catch (error) {
       console.error('Error adding item to cart:', error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao adicionar item",
-        description: "Não foi possível adicionar o item ao carrinho. Tente novamente mais tarde.",
-      });
       throw error;
     } finally {
       setIsLoading(false);
@@ -131,17 +110,8 @@ export const useCartOperations = (user: User | null) => {
       if (error) throw error;
 
       setItems((currentItems) => currentItems.filter((item) => item.id !== id));
-      
-      toast({
-        description: "Produto removido do carrinho.",
-      });
     } catch (error) {
       console.error('Error removing item from cart:', error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao remover item",
-        description: "Não foi possível remover o item do carrinho. Tente novamente mais tarde.",
-      });
     } finally {
       setIsLoading(false);
     }
@@ -168,21 +138,8 @@ export const useCartOperations = (user: User | null) => {
       if (error) throw error;
 
       setItems([]);
-      
-      if (!silent) {
-        toast({
-          description: "Cart cleared successfully.",
-        });
-      }
     } catch (error) {
       console.error('Error clearing cart:', error);
-      if (!silent) {
-        toast({
-          variant: "destructive",
-          title: "Error clearing cart",
-          description: "Unable to clear cart. Please try again later.",
-        });
-      }
     } finally {
       setIsLoading(false);
     }
