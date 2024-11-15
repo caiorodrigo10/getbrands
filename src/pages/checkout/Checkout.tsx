@@ -5,7 +5,7 @@ import { ChevronLeft, CheckCircle, Truck, CreditCard } from "lucide-react";
 import PedidoAmostra from "../PedidoAmostra";
 import Shipping from "./Shipping";
 import Payment from "./Payment";
-import { Sidebar } from "@/components/Sidebar";
+import { NavigationMenu } from "@/components/NavigationMenu";
 
 const steps = [
   { id: "confirmation", name: "Confirmation", path: "/checkout/confirmation", icon: CheckCircle },
@@ -35,9 +35,9 @@ const Checkout = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <main className="flex-1 ml-64">
+    <div className="min-h-screen bg-background">
+      <NavigationMenu />
+      <main className="flex-1">
         <div className="max-w-3xl mx-auto px-4 py-8">
           <div className="mb-8">
             <Button

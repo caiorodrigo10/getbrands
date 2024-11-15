@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import OrderDetails from "@/components/checkout/OrderDetails";
 import OrderSummary from "@/components/checkout/OrderSummary";
-import { Sidebar } from "@/components/Sidebar";
+import { NavigationMenu } from "@/components/NavigationMenu";
 import Confetti from 'react-confetti';
 
 const Success = () => {
@@ -82,9 +82,9 @@ const Success = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen bg-background">
-        <Sidebar />
-        <main className="flex-1 ml-64 p-8">
+      <div className="min-h-screen bg-background">
+        <NavigationMenu />
+        <main className="p-8">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center justify-center p-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -96,10 +96,10 @@ const Success = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
       {showConfetti && <Confetti />}
-      <Sidebar />
-      <main className="flex-1 ml-64 p-8">
+      <NavigationMenu />
+      <main className="p-8">
         <div className="max-w-3xl mx-auto">
           <Card className="mb-8 border-green-200 bg-green-50">
             <CardHeader className="text-center pb-6">
