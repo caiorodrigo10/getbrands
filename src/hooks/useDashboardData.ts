@@ -107,9 +107,10 @@ export const useDashboardData = () => {
         .from("project_products")
         .select(`
           id,
-          product:products (*)
+          product:products (*),
+          project:projects (*)
         `)
-        .eq("projects.user_id", user.id)
+        .eq("project.user_id", user.id)
         .limit(3);
 
       if (error) {
@@ -123,7 +124,7 @@ export const useDashboardData = () => {
       return data?.map(item => item.product) || [];
     },
     enabled: !!user?.id && isAuthenticated,
-    staleTime: 30000, // Add a staleTime to prevent unnecessary refetches
+    staleTime: 30000,
   });
 
   const { data: catalogProducts } = useQuery({
@@ -145,7 +146,7 @@ export const useDashboardData = () => {
       return data;
     },
     enabled: isAuthenticated,
-    staleTime: 30000, // Add a staleTime to prevent unnecessary refetches
+    staleTime: 30000,
   });
 
   const { data: samples } = useQuery({
