@@ -30,7 +30,7 @@ interface ProjectWithProfile {
     first_name: string | null;
     last_name: string | null;
     email: string | null;
-  } | null;
+  };
 }
 
 export const ProjectsManagement = () => {
@@ -59,7 +59,7 @@ export const ProjectsManagement = () => {
       const { data, error } = await query;
 
       if (error) throw error;
-      return data as ProjectWithProfile[];
+      return data as unknown as ProjectWithProfile[];
     }
   });
 
