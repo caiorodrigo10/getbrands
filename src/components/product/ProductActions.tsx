@@ -10,11 +10,11 @@ export const ProductActions = ({ productId, onSelectProduct }: ProductActionsPro
   const { isLoading, handleRequestSample } = useProductActions(productId);
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 mt-6">
+    <div className="flex flex-col gap-4 sm:flex-row sm:gap-4 mt-6 px-4 sm:px-0">
       <Button 
         variant="outline" 
         size="lg"
-        className="w-full text-primary hover:text-primary border-2 border-primary hover:bg-primary/10 h-12 text-base font-medium rounded-full"
+        className="w-full text-primary hover:text-primary border-2 border-primary hover:bg-primary/10 h-14 sm:h-12 text-base font-medium rounded-full"
         onClick={handleRequestSample}
         disabled={isLoading}
       >
@@ -22,7 +22,7 @@ export const ProductActions = ({ productId, onSelectProduct }: ProductActionsPro
       </Button>
       <Button 
         size="lg"
-        className="w-full bg-primary hover:bg-primary-dark text-white h-12 text-base font-medium rounded-full"
+        className="w-full bg-primary hover:bg-primary-dark text-white h-14 sm:h-12 text-base font-medium rounded-full"
         onClick={onSelectProduct}
         disabled={isLoading}
       >

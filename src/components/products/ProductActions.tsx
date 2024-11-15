@@ -38,10 +38,10 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4">
+    <div className="flex flex-col gap-4 sm:flex-row sm:gap-4 px-4 sm:px-0">
       <Button 
         size="lg" 
-        className="flex-1"
+        className="w-full bg-primary hover:bg-primary-dark text-white h-14 sm:h-12 text-base font-medium rounded-full"
         onClick={onSelectProduct}
       >
         Select Product
@@ -49,7 +49,7 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
       <Button 
         variant="outline" 
         size="lg" 
-        className="flex-1"
+        className="w-full text-primary hover:text-primary border-2 border-primary hover:bg-primary/10 h-14 sm:h-12 text-base font-medium rounded-full"
         onClick={handleRequestSample}
         disabled={isLoading}
       >
