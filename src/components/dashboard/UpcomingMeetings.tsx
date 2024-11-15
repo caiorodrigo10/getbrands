@@ -70,7 +70,7 @@ const UpcomingMeetings = ({ meetings = [] }: UpcomingMeetingsProps) => {
         {displayMeetings.map((meeting) => (
           <div
             key={meeting.id}
-            className="flex items-start gap-4 p-4 bg-white border border-border rounded-lg hover:border-primary/50 transition-colors"
+            className="flex items-start gap-4 p-4 bg-white border border-gray-100 rounded-lg hover:border-primary/50 transition-colors"
           >
             <Calendar className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
             <div className="flex-1 min-w-0">
