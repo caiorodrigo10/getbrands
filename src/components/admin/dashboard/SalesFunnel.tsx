@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { ResponsiveContainer, FunnelChart, Funnel, Cell } from "recharts";
+import { ResponsiveContainer, FunnelChart, Funnel, Cell, Label } from "recharts";
 
 const data = [
   { name: "Members", value: 1200, fill: "#4c1e6c" },
