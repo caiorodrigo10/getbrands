@@ -8,6 +8,7 @@ import { SortableImage } from "./image-upload/SortableImage";
 import { useImageUpload } from "./image-upload/useImageUpload";
 import { useImageSorting } from "./image-upload/useImageSorting";
 import { useToast } from "@/components/ui/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ProductImageUploadProps {
   productId: string;
@@ -17,6 +18,7 @@ interface ProductImageUploadProps {
 
 export function ProductImageUpload({ productId, images, onImagesUpdate }: ProductImageUploadProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { isUploading, handleFileUpload } = useImageUpload(productId, onImagesUpdate);
   const { handleDragEnd } = useImageSorting(images, onImagesUpdate);
   
@@ -56,6 +58,10 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
         }
       }
 
+      // Invalidate all queries that depend on product images
+      queryClient.invalidateQueries({ queryKey: ['product-images'] });
+      queryClient.invalidateQueries({ queryKey: ['product', productId] });
+      
       onImagesUpdate();
       toast({
         title: "Success",
