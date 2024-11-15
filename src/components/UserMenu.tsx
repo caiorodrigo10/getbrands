@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +22,8 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   const { user, logout } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const isInAdminPanel = location.pathname.startsWith('/admin');
 
   useEffect(() => {
     if (user) {
@@ -49,6 +51,14 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : userEmail?.split("@")[0] || "User";
   const userAvatar = profile?.avatar_url;
   const isAdmin = profile?.role === "admin";
+
+  const handleAdminNavigation = () => {
+    if (isInAdminPanel) {
+      navigate('/');
+    } else {
+      navigate('/admin');
+    }
+  };
 
   if (isMobile) {
     return (
@@ -82,11 +92,11 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           </Link>
           {isAdmin && (
             <button
-              onClick={() => navigate("/admin")}
+              onClick={handleAdminNavigation}
               className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-md w-full text-left"
             >
               <LayoutDashboard className="h-4 w-4" />
-              <span>Admin Panel</span>
+              <span>{isInAdminPanel ? 'User View' : 'Admin Panel'}</span>
             </button>
           )}
           <button
@@ -156,11 +166,11 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           </Link>
           {isAdmin && (
             <DropdownMenuItem 
-              onClick={() => navigate("/admin")}
+              onClick={handleAdminNavigation}
               className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md"
             >
               <LayoutDashboard className="h-4 w-4 text-gray-500" />
-              <span>Admin Panel</span>
+              <span>{isInAdminPanel ? 'User View' : 'Admin Panel'}</span>
             </DropdownMenuItem>
           )}
           <DropdownMenuItem 
