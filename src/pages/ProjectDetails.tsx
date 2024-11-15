@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { ProjectStage } from "@/components/project/ProjectStage";
 import { CalendarStage } from "@/components/project/CalendarStage";
 import { ProductSelectionStage } from "@/components/project/ProductSelectionStage";
+import { PackageDesignStage } from "@/components/project/PackageDesignStage";
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -89,11 +90,8 @@ const ProjectDetails = () => {
       title: "Package Design",
       description: "Design of your product packages",
       status: "pending" as const,
-      content: (
-        <div className="space-y-2">
-          <p className="text-muted-foreground">Waiting for previous stage completion.</p>
-        </div>
-      ),
+      content: <PackageDesignStage />,
+      type: "package-quiz" as const,
     },
     {
       title: "E-commerce",
@@ -123,6 +121,7 @@ const ProjectDetails = () => {
             title={stage.title}
             description={stage.description}
             status={stage.status}
+            type={stage.type}
           >
             {stage.content}
           </ProjectStage>
