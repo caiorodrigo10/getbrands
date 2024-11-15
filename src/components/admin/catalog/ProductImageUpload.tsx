@@ -29,14 +29,18 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
         .eq('id', productId)
         .single();
 
+      // Only add the profile image if it's not already in the images array
       if (product?.image_url && !images.some(img => img.image_url === product.image_url)) {
+        // Check if there's already a primary image
+        const hasPrimaryImage = images.some(img => img.is_primary);
+        
         await supabase
           .from('product_images')
           .insert({
             product_id: productId,
             image_url: product.image_url,
             position: 0,
-            is_primary: true
+            is_primary: !hasPrimaryImage // Only set as primary if there isn't one already
           });
         onImagesUpdate();
       }
@@ -47,10 +51,22 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
 
   const handleDeleteImage = async (imageId: string) => {
     try {
+      const imageToDelete = images.find(img => img.id === imageId);
       await supabase
         .from('product_images')
         .delete()
         .eq('id', imageId);
+
+      // If we deleted the primary image, make the first remaining image primary
+      if (imageToDelete?.is_primary && images.length > 1) {
+        const nextImage = images.find(img => img.id !== imageId);
+        if (nextImage) {
+          await supabase
+            .from('product_images')
+            .update({ is_primary: true })
+            .eq('id', nextImage.id);
+        }
+      }
 
       onImagesUpdate();
 
@@ -68,10 +84,16 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
     }
   };
 
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    handleFileUpload(e);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
         <Button
+          type="button"
           variant="outline"
           onClick={() => document.getElementById('image-upload')?.click()}
           disabled={isUploading}
@@ -85,7 +107,7 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
           multiple
           accept="image/*"
           className="hidden"
-          onChange={handleFileUpload}
+          onChange={handleFileInputChange}
           disabled={isUploading}
         />
       </div>

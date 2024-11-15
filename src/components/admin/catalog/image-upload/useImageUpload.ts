@@ -7,11 +7,20 @@ export const useImageUpload = (productId: string, onImagesUpdate: () => void) =>
   const [isUploading, setIsUploading] = useState(false);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
     setIsUploading(true);
     try {
+      // Check if there's already a primary image
+      const { data: existingImages } = await supabase
+        .from('product_images')
+        .select('is_primary')
+        .eq('product_id', productId);
+
+      const hasPrimaryImage = existingImages?.some(img => img.is_primary);
+
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const fileExt = file.name.split('.').pop();
@@ -33,7 +42,7 @@ export const useImageUpload = (productId: string, onImagesUpdate: () => void) =>
             product_id: productId,
             image_url: publicUrl,
             position: i,
-            is_primary: i === 0 && files.length === 1
+            is_primary: !hasPrimaryImage && i === 0 // Only set as primary if there's no primary image and it's the first upload
           });
       }
 
@@ -52,6 +61,9 @@ export const useImageUpload = (productId: string, onImagesUpdate: () => void) =>
       });
     } finally {
       setIsUploading(false);
+      // Reset the input value to allow uploading the same file again
+      const input = document.getElementById('image-upload') as HTMLInputElement;
+      if (input) input.value = '';
     }
   };
 
