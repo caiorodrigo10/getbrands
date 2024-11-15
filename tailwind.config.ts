@@ -14,16 +14,15 @@ export default {
       center: true,
       padding: {
         DEFAULT: '1rem',
-        sm: '1.5rem',
-        lg: '3rem',
-        xl: '4rem',
-        '2xl': '5rem',
+        sm: '1.25rem',
+        lg: '2rem',
+        xl: '2.5rem',
       },
       screens: {
         sm: '640px',
         md: '768px',
-        lg: '1024px',
-        xl: '1100px',
+        lg: '960px',
+        xl: '1000px',
       },
     },
     extend: {
@@ -61,16 +60,16 @@ export default {
         heading: ["Montserrat", "sans-serif"],
       },
       spacing: {
-        'page': '1.75rem',
-        'section': '1.25rem',
+        'page': '1.5rem',
+        'section': '1rem',
       },
       fontSize: {
-        'page-title': ['1.75rem', {
-          lineHeight: '2.25rem',
+        'page-title': ['1.5rem', {
+          lineHeight: '2rem',
           fontWeight: '700',
         }],
-        'section-title': ['1.375rem', {
-          lineHeight: '2rem',
+        'section-title': ['1.25rem', {
+          lineHeight: '1.75rem',
           fontWeight: '600',
         }],
       },
@@ -83,25 +82,10 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "progress-fill": {
-          "0%": { width: "0%" },
-          "100%": { width: "var(--progress-width)" },
-        },
-        "fade-in": {
-          "0%": { opacity: "0", transform: "translateY(10px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        "scale-in": {
-          "0%": { transform: "scale(0.95)", opacity: "0" },
-          "100%": { transform: "scale(1)", opacity: "1" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "progress-fill": "progress-fill 1.5s ease-out forwards",
-        "fade-in": "fade-in 0.3s ease-out",
-        "scale-in": "scale-in 0.2s ease-out",
       },
     },
   },
