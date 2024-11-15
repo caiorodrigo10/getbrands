@@ -14,7 +14,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleCardClick = () => {
-    navigate(`/products/${product.id}`);
+    navigate(`/catalog/${product.id}`);
   };
 
   const handleImageError = () => {
