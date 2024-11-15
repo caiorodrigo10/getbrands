@@ -8,10 +8,10 @@ export const NavigationMenu = () => {
 
   const menuItems = [
     { label: "Dashboard", path: "/" },
-    { label: "Projetos", path: "/projects" },
-    { label: "Catálogo", path: "/catalog" },
-    { label: "Meus Produtos", path: "/products" },
-    { label: "Calculadora de Lucro", path: "/profit-calculator" },
+    { label: "Projects", path: "/projects" },
+    { label: "Catalog", path: "/catalog" },
+    { label: "My Products", path: "/products" },
+    { label: "Profit Calculator", path: "/profit-calculator" },
   ];
 
   return (
