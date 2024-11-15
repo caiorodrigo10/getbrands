@@ -64,7 +64,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   if (!user) return null;
 
   const userEmail = user.email || "";
-  const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : userEmail?.split("@")[0] || "Usuário";
+  const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : userEmail?.split("@")[0] || "User";
   const userAvatar = profile?.avatar_url;
 
   if (isMobile) {
@@ -88,21 +88,21 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
             className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-md"
           >
             <User className="h-4 w-4" />
-            <span>Meu Perfil</span>
+            <span>My Profile</span>
           </Link>
           <Link 
             to="/sample-orders" 
             className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-md"
           >
             <ShoppingBag className="h-4 w-4" />
-            <span>Pedidos</span>
+            <span>Orders</span>
           </Link>
           <button
             onClick={logout}
             className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-gray-800 rounded-md w-full text-left"
           >
             <LogOut className="h-4 w-4" />
-            <span>Sair</span>
+            <span>Sign Out</span>
           </button>
         </div>
       </div>
@@ -151,13 +151,13 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           <Link to="/profile">
             <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md">
               <User className="h-4 w-4 text-gray-500" />
-              <span>Meu Perfil</span>
+              <span>My Profile</span>
             </DropdownMenuItem>
           </Link>
           <Link to="/sample-orders">
             <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md">
               <ShoppingBag className="h-4 w-4 text-gray-500" />
-              <span>Pedidos</span>
+              <span>Orders</span>
             </DropdownMenuItem>
           </Link>
           <DropdownMenuItem 
@@ -165,7 +165,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
             className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 text-red-600 rounded-md"
           >
             <LogOut className="h-4 w-4" />
-            <span>Sair</span>
+            <span>Sign Out</span>
           </DropdownMenuItem>
         </div>
       </DropdownMenuContent>
