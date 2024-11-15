@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export const useDashboardData = () => {
   const { user, isAuthenticated } = useAuth();
@@ -109,8 +109,10 @@ export const useDashboardData = () => {
       const { data, error } = await supabase
         .from("project_products")
         .select(`
+          id,
           product:products (*)
         `)
+        .eq("project:projects.user_id", user.id)
         .limit(3);
 
       if (error) {
