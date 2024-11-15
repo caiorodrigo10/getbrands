@@ -38,7 +38,7 @@ export const NavigationMenu = () => {
                   className={`flex items-center gap-3 px-4 py-2.5 my-1 text-sm rounded-md transition-all duration-200 ${
                     location.pathname === item.path
                       ? "bg-gray-800 text-white font-medium"
-                      : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                      : "text-gray-300 hover:bg-gray-700 hover:text-white"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -85,7 +85,7 @@ export const NavigationMenu = () => {
                           className={`flex items-center gap-3 px-4 py-3 text-sm rounded-md transition-all duration-200 ${
                             location.pathname === item.path
                               ? "bg-gray-800 text-white font-medium"
-                              : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                              : "text-gray-300 hover:bg-gray-700 hover:text-white"
                           }`}
                         >
                           <Icon className="h-4 w-4" />
