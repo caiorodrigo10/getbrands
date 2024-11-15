@@ -79,7 +79,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           </Avatar>
           <div className="flex flex-col">
             <span className="text-sm font-medium text-white">{userName}</span>
-            <span className="text-xs text-white/70">{totalPoints?.toLocaleString() || 0} pts</span>
+            <span className="text-xs text-white/70">{userEmail}</span>
           </div>
         </div>
         <div className="flex flex-col space-y-1">
@@ -114,17 +114,28 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
-          className="relative h-10 w-full flex items-center justify-start gap-3 px-3 hover:bg-white/10"
+          className="relative h-auto w-full flex flex-col items-start gap-1 px-3 py-2 hover:bg-white/10"
         >
-          <Avatar className="h-8 w-8 border border-white/20">
-            <AvatarImage src={userAvatar} alt={userName} />
-            <AvatarFallback className="bg-primary text-primary-foreground">
-              {userName.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col items-start">
-            <span className="text-sm font-medium text-white">{userName}</span>
-            <span className="text-xs text-white/70">{totalPoints?.toLocaleString() || 0} pts</span>
+          <div className="flex items-center justify-between w-full mb-2">
+            <span className="text-xs font-medium text-white/70">{totalPoints?.toLocaleString() || 0} pts</span>
+            <Link 
+              to="/packages"
+              className="text-xs bg-primary hover:bg-primary/90 text-white px-3 py-1 rounded-full"
+            >
+              View Packages
+            </Link>
+          </div>
+          <div className="flex items-center gap-3 w-full">
+            <Avatar className="h-8 w-8 border border-white/20">
+              <AvatarImage src={userAvatar} alt={userName} />
+              <AvatarFallback className="bg-primary text-primary-foreground">
+                {userName.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col items-start">
+              <span className="text-sm font-medium text-white">{userName}</span>
+              <span className="text-xs text-white/70">{userEmail}</span>
+            </div>
           </div>
         </Button>
       </DropdownMenuTrigger>
