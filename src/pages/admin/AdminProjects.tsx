@@ -78,8 +78,7 @@ const demoProjects = [
     registrationDate: "2024-02-20",
     projectStartDate: "2024-03-05",
     points: 1100
-  },
-  // ... Adding more projects with similar structure up to 15 total
+  }
 ].concat(Array.from({ length: 10 }, (_, i) => ({
   id: i + 6,
   name: `Project ${i + 6}`,
@@ -129,7 +128,7 @@ const AdminProjects = () => {
 
         <div className="grid gap-4">
           <ProjectListHeader />
-
+          
           {filteredProjects.map((project) => (
             <ProjectCard
               key={project.id}

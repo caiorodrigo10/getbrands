@@ -33,14 +33,17 @@ export const ProjectCard = ({
   return (
     <Card className="p-4">
       <div className="flex items-start justify-between">
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-6 gap-4">
           <div>
-            <h3 className="font-medium text-sm">{project.name}</h3>
+            <h3 className="text-sm font-medium">{project.name}</h3>
           </div>
           
-          <div>
-            <div className="font-medium">{project.client.name}</div>
-            <div className="text-sm text-muted-foreground">{project.client.email}</div>
+          <div className="col-span-2">
+            <div className="space-y-1">
+              <div className="font-medium">{project.client.name}</div>
+              <div className="text-sm text-muted-foreground">{project.client.email}</div>
+              <div className="text-sm text-muted-foreground">{project.client.phone}</div>
+            </div>
           </div>
 
           <div>
@@ -55,13 +58,15 @@ export const ProjectCard = ({
           </div>
 
           <div>
-            <div className="relative h-2 bg-secondary rounded-full overflow-hidden">
-              <div 
-                className="absolute top-0 left-0 h-full bg-primary rounded-full transition-all duration-300"
-                style={{ width: `${project.completion}%` }}
-              />
+            <div className="flex items-center gap-2">
+              <div className="relative h-1.5 w-24 bg-secondary rounded-full overflow-hidden">
+                <div 
+                  className="absolute top-0 left-0 h-full bg-primary rounded-full transition-all duration-300"
+                  style={{ width: `${project.completion}%` }}
+                />
+              </div>
+              <span className="text-sm">{project.completion}%</span>
             </div>
-            <div className="text-sm mt-1">{project.completion}%</div>
           </div>
         </div>
 
