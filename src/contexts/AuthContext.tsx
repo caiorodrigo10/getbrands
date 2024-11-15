@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Gleap from "gleap";
 
 interface AuthContextType {
-  user: User | null;
+  user: (User & { role?: string }) | null;
   session: Session | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -16,7 +16,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<(User & { role?: string }) | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
@@ -45,6 +45,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
+  const fetchUserProfile = async (userId: string) => {
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching user profile:', error);
+      return null;
+    }
+
+    return profile;
+  };
+
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -57,8 +72,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
         
         if (initialSession) {
+          const profile = await fetchUserProfile(initialSession.user.id);
           setSession(initialSession);
-          setUser(initialSession.user);
+          setUser({ ...initialSession.user, role: profile?.role || 'member' });
           identifyUserInGleap(initialSession.user);
         }
       } catch (error) {
@@ -90,8 +106,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       if (currentSession) {
+        const profile = await fetchUserProfile(currentSession.user.id);
         setSession(currentSession);
-        setUser(currentSession.user);
+        setUser({ ...currentSession.user, role: profile?.role || 'member' });
         identifyUserInGleap(currentSession.user);
       }
     });
