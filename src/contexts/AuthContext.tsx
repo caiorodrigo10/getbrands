@@ -24,22 +24,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const identifyUserInGleap = (currentUser: User | null) => {
     if (currentUser) {
-      Gleap.identify(
-        currentUser.id,
-        {
-          email: currentUser.email,
-          name: currentUser.email?.split('@')[0] || 'User',
-        }
-      );
+      Gleap.identify(currentUser.id, {
+        email: currentUser.email,
+        name: currentUser.email?.split('@')[0] || 'User',
+      });
     } else {
       Gleap.clearIdentity();
     }
   };
 
+  const handleAuthError = () => {
+    setSession(null);
+    setUser(null);
+    identifyUserInGleap(null);
+    navigate('/login');
+    toast({
+      variant: "destructive",
+      title: "Session Expired",
+      description: "Please sign in again to continue.",
+    });
+  };
+
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          handleAuthError();
+          return;
+        }
         
         if (initialSession) {
           setSession(initialSession);
@@ -59,17 +74,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+      console.log('Auth event:', event);
+      
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        setSession(null);
+        setUser(null);
+        identifyUserInGleap(null);
+        navigate('/login');
+        return;
+      }
+
+      if (event === 'TOKEN_REFRESHED' && !currentSession) {
+        handleAuthError();
+        return;
+      }
+
       if (currentSession) {
         setSession(currentSession);
         setUser(currentSession.user);
         identifyUserInGleap(currentSession.user);
-      } else {
-        setSession(null);
-        setUser(null);
-        identifyUserInGleap(null);
-        if (event === 'TOKEN_REFRESHED') {
-          navigate('/login');
-        }
       }
     });
 
@@ -77,18 +100,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       subscription.unsubscribe();
     };
   }, [navigate]);
-
-  const handleAuthError = () => {
-    setSession(null);
-    setUser(null);
-    identifyUserInGleap(null);
-    navigate('/login');
-    toast({
-      variant: "destructive",
-      title: "Authentication Error",
-      description: "Please sign in again to continue.",
-    });
-  };
 
   const login = async (email: string, password: string) => {
     try {
@@ -98,11 +109,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       if (error) {
-        const errorMessage = error.message || "Invalid email or password. Please try again.";
         toast({
           variant: "destructive",
           title: "Error",
-          description: errorMessage,
+          description: error.message || "Invalid email or password. Please try again.",
         });
         throw error;
       }
