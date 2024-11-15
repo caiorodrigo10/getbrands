@@ -68,7 +68,7 @@ export const CalendarStage = () => {
   });
 
   // Handle successful booking
-  const handleCalendarEvent = (e: CustomEvent) => {
+  const handleCalendarEvent = (e: any) => {
     if (e.detail.type === "booking_successful") {
       const booking = e.detail.data;
       logMeetingMutation.mutate({
@@ -103,9 +103,14 @@ export const CalendarStage = () => {
             style={{ width: "100%", height: "100%" }}
             config={{
               layout: "month_view",
+              theme: "light",
+              styles: {
+                branding: { brandColor: "#4c1e6c" },
+                body: { background: "#ffffff" }
+              }
             }}
             data-cal-namespace="lovable-calendar"
-            onEvent={handleCalendarEvent}
+            data-cal-theme="light"
           />
         </div>
       </div>
