@@ -1,12 +1,14 @@
-import { useCallback, useState } from "react";
-import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Button } from "@/components/ui/button";
-import { ImagePlus, X, GripVertical } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { ImagePlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductImage } from "@/types/product";
+import { SortableImage } from "./image-upload/SortableImage";
+import { useImageUpload } from "./image-upload/useImageUpload";
+import { useImageSorting } from "./image-upload/useImageSorting";
+import { useToast } from "@/components/ui/use-toast";
+import { useEffect } from "react";
 
 interface ProductImageUploadProps {
   productId: string;
@@ -14,138 +16,34 @@ interface ProductImageUploadProps {
   onImagesUpdate: () => void;
 }
 
-const SortableImage = ({ image, onDelete }: { image: ProductImage; onDelete: (id: string) => void }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: image.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`relative group ${image.is_primary ? 'col-span-2 row-span-2' : ''}`}
-    >
-      <div {...attributes} {...listeners} className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100">
-        <GripVertical className="w-5 h-5 text-white drop-shadow-lg" />
-      </div>
-      <Button
-        variant="destructive"
-        size="icon"
-        className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100"
-        onClick={() => onDelete(image.id)}
-      >
-        <X className="w-4 h-4" />
-      </Button>
-      <img
-        src={image.image_url}
-        alt={`Product image ${image.position + 1}`}
-        className="w-full h-full object-cover rounded-lg"
-      />
-      {image.is_primary && (
-        <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-sm">
-          Primary Image
-        </div>
-      )}
-    </div>
-  );
-};
-
 export function ProductImageUpload({ productId, images, onImagesUpdate }: ProductImageUploadProps) {
   const { toast } = useToast();
-  const [isUploading, setIsUploading] = useState(false);
+  const { isUploading, handleFileUpload } = useImageUpload(productId, onImagesUpdate);
+  const { handleDragEnd } = useImageSorting(images, onImagesUpdate);
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
+  useEffect(() => {
+    const syncProfileImage = async () => {
+      const { data: product } = await supabase
+        .from('products')
+        .select('image_url')
+        .eq('id', productId)
+        .single();
 
-    setIsUploading(true);
-    try {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const fileExt = file.name.split('.').pop();
-        const filePath = `${productId}/${crypto.randomUUID()}.${fileExt}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from('product-images')
-          .upload(filePath, file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(filePath);
-
+      if (product?.image_url && images.length === 0) {
         await supabase
           .from('product_images')
           .insert({
             product_id: productId,
-            image_url: publicUrl,
-            position: images.length + i,
-            is_primary: images.length === 0 && i === 0
+            image_url: product.image_url,
+            position: 0,
+            is_primary: true
           });
+        onImagesUpdate();
       }
+    };
 
-      onImagesUpdate();
-      
-      toast({
-        title: "Success",
-        description: "Images uploaded successfully",
-      });
-    } catch (error) {
-      console.error('Error uploading images:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to upload images",
-      });
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!active || !over || active.id === over.id) return;
-
-    const oldIndex = images.findIndex(img => img.id === active.id);
-    const newIndex = images.findIndex(img => img.id === over.id);
-
-    const reorderedImages = [...images];
-    const [movedImage] = reorderedImages.splice(oldIndex, 1);
-    reorderedImages.splice(newIndex, 0, movedImage);
-
-    try {
-      const updates = reorderedImages.map((img, index) => ({
-        id: img.id,
-        product_id: img.product_id,
-        image_url: img.image_url,
-        position: index,
-        is_primary: index === 0
-      }));
-
-      await supabase
-        .from('product_images')
-        .upsert(updates);
-
-      onImagesUpdate();
-    } catch (error) {
-      console.error('Error reordering images:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to reorder images",
-      });
-    }
-  }, [images, onImagesUpdate, toast]);
+    syncProfileImage();
+  }, [productId, images.length, onImagesUpdate]);
 
   const handleDeleteImage = async (imageId: string) => {
     try {
