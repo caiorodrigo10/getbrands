@@ -19,6 +19,7 @@ import ProfitCalculator from "@/pages/ProfitCalculator";
 import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminProjects from "@/pages/admin/AdminProjects";
 
 export const AppRoutes = () => (
   <Routes>
@@ -31,6 +32,17 @@ export const AppRoutes = () => (
         <ProtectedRoute>
           <AdminLayout>
             <AdminDashboard />
+          </AdminLayout>
+        </ProtectedRoute>
+      }
+    />
+    
+    <Route
+      path="/admin/projects"
+      element={
+        <ProtectedRoute>
+          <AdminLayout>
+            <AdminProjects />
           </AdminLayout>
         </ProtectedRoute>
       }
