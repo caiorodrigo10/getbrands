@@ -1,9 +1,10 @@
-import Cal from "@calcom/embed-react";
+import Cal, { getCalApi } from "@calcom/embed-react";
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 interface ProjectMeeting {
   id: string;
@@ -21,6 +22,20 @@ export const CalendarStage = () => {
   const { id: projectId } = useParams();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  // Initialize Cal.com
+  useEffect(() => {
+    (async function () {
+      const cal = await getCalApi();
+      cal?.on("bookingSuccessful", (e: any) => {
+        const booking = e.detail;
+        logMeetingMutation.mutate({
+          scheduled_for: booking.startTime,
+          meeting_link: booking.meetingLink,
+        });
+      });
+    })();
+  }, []);
 
   // Fetch user profile data
   const { data: profile } = useQuery({
@@ -97,20 +112,15 @@ export const CalendarStage = () => {
             style={{ width: "100%", height: "100%" }}
             config={{
               theme: "light",
+              hideEventTypeDetails: false,
+              layout: "month_view",
               styles: {
-                branding: "#4c1e6c",
-                body: "#ffffff"
+                branding: { brandColor: "#4c1e6c" },
+                body: { background: "#ffffff" }
               }
             }}
             data-cal-namespace="lovable-calendar"
             data-cal-theme="light"
-            onBookingSuccessful={(e: any) => {
-              const booking = e.detail;
-              logMeetingMutation.mutate({
-                scheduled_for: booking.startTime,
-                meeting_link: booking.meetingLink,
-              });
-            }}
           />
         </div>
       </div>
