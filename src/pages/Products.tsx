@@ -73,9 +73,9 @@ const Products = () => {
     return (
       <div className="space-y-6">
         <h1 className="text-3xl font-bold">My Products</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex flex-col gap-6">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-[500px] w-full" />
+            <Skeleton key={i} className="h-[200px] w-full" />
           ))}
         </div>
       </div>
@@ -86,7 +86,7 @@ const Products = () => {
     <div className="space-y-6">
       {showConfetti && <Confetti />}
       <h1 className="text-3xl font-bold">My Products</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="flex flex-col gap-6">
         {products?.map((item, index) => {
           const specificProduct = item.specific?.[0];
           const displayName = specificProduct?.name || item.product.name;
@@ -98,65 +98,69 @@ const Products = () => {
               className="p-6 animate-fade-in"
               style={{ animationDelay: `${index * 150}ms` }}
             >
-              <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
-                <img
-                  src={displayImage || "/placeholder.svg"}
-                  alt={displayName}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <ProductNameEdit
-                    projectProductId={item.id}
-                    currentName={displayName}
-                    onNameUpdate={handleNameUpdate}
+              <div className="flex gap-6">
+                <div className="w-48 h-48 flex-shrink-0">
+                  <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                    <img
+                      src={displayImage || "/placeholder.svg"}
+                      alt={displayName}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex-grow space-y-4">
+                  <div>
+                    <ProductNameEdit
+                      projectProductId={item.id}
+                      currentName={displayName}
+                      onNameUpdate={handleNameUpdate}
+                    />
+                    <p className="text-sm text-gray-600 mt-1">{item.product.category}</p>
+                  </div>
+                  
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-grow space-y-3">
+                        <p className="text-sm font-medium text-gray-700">Original Product:</p>
+                        <p className="text-sm text-gray-600 hover:text-primary cursor-pointer"
+                           onClick={() => navigateToOriginalProduct(item.product.id)}>
+                          {item.product.name}
+                        </p>
+                      </div>
+                      <div 
+                        className="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity"
+                        onClick={() => navigateToOriginalProduct(item.product.id)}
+                      >
+                        <img
+                          src={item.product.image_url || "/placeholder.svg"}
+                          alt={item.product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <ProductPriceInfo
+                    costPrice={item.product.from_price}
+                    suggestedPrice={item.product.srp}
                   />
-                  <p className="text-sm text-gray-600 mt-1">{item.product.category}</p>
-                </div>
-                
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-grow space-y-3">
-                      <p className="text-sm font-medium text-gray-700">Original Product:</p>
-                      <p className="text-sm text-gray-600 hover:text-primary cursor-pointer"
-                         onClick={() => navigateToOriginalProduct(item.product.id)}>
-                        {item.product.name}
-                      </p>
-                    </div>
-                    <div 
-                      className="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity"
-                      onClick={() => navigateToOriginalProduct(item.product.id)}
-                    >
-                      <img
-                        src={item.product.image_url || "/placeholder.svg"}
-                        alt={item.product.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                </div>
 
-                <ProductPriceInfo
-                  costPrice={item.product.from_price}
-                  suggestedPrice={item.product.srp}
-                />
-
-                <ProductPricing
-                  projectProductId={item.id}
-                  costPrice={item.product.from_price}
-                  suggestedPrice={item.product.srp}
-                  currentSellingPrice={specificProduct?.selling_price || undefined}
-                  onPriceUpdate={handlePriceUpdate}
-                />
-                
-                {item.project && (
-                  <div className="pt-2 border-t">
-                    <p className="text-sm font-medium text-gray-700">Project:</p>
-                    <p className="text-sm text-gray-600">{item.project.name}</p>
-                  </div>
-                )}
+                  <ProductPricing
+                    projectProductId={item.id}
+                    costPrice={item.product.from_price}
+                    suggestedPrice={item.product.srp}
+                    currentSellingPrice={specificProduct?.selling_price || undefined}
+                    onPriceUpdate={handlePriceUpdate}
+                  />
+                  
+                  {item.project && (
+                    <div className="pt-2 border-t">
+                      <p className="text-sm font-medium text-gray-700">Project:</p>
+                      <p className="text-sm text-gray-600">{item.project.name}</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </Card>
           );
