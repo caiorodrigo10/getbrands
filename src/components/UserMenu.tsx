@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const UserMenu = () => {
@@ -81,19 +81,6 @@ const UserMenu = () => {
             </div>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator className="bg-gray-100" />
-        <div className="p-1">
-          <Link to="/profile">
-            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md">
-              <User className="h-4 w-4 text-gray-500" />
-              <span>My Profile</span>
-            </DropdownMenuItem>
-          </Link>
-          <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md">
-            <Settings className="h-4 w-4 text-gray-500" />
-            <span>Settings</span>
-          </DropdownMenuItem>
-        </div>
         <DropdownMenuSeparator className="bg-gray-100" />
         <div className="p-1">
           <DropdownMenuItem 
