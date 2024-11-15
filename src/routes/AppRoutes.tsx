@@ -1,19 +1,19 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
-import AppLayout from "./AppLayout";
+import { AppLayout } from "./AppLayout";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AdminDashboard } from "@/pages/admin/AdminDashboard";
 import { UsersManagement } from "@/pages/admin/UsersManagement";
 import { ProjectsManagement } from "@/pages/admin/ProjectsManagement";
 import Login from "@/pages/Login";
-import Home from "@/pages/Home";
+import { Home } from "@/pages/Home";
 import Profile from "@/pages/Profile";
-import SampleRequest from "@/pages/SampleRequest";
+import { SampleRequest } from "@/pages/SampleRequest";
 import SampleOrders from "@/pages/SampleOrders";
 import Projects from "@/pages/Projects";
-import Project from "@/pages/Project";
-import ProjectQuiz from "@/pages/ProjectQuiz";
+import { Project } from "@/pages/Project";
+import { ProjectQuiz } from "@/pages/ProjectQuiz";
 
 export const AppRoutes = () => {
   const { user, isAuthenticated } = useAuth();
