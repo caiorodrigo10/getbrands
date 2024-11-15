@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import UserMenu from "./UserMenu";
-import { Menu, LayoutDashboard, FolderGit2, Grid3X3, Cream, Calculator, Package2 } from "lucide-react";
+import { Menu, LayoutDashboard, FolderGit2, Grid3X3, Palette, Calculator, Package2 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export const NavigationMenu = () => {
@@ -10,7 +10,7 @@ export const NavigationMenu = () => {
     { label: "Dashboard", path: "/", icon: LayoutDashboard },
     { label: "Projects", path: "/projects", icon: FolderGit2 },
     { label: "Catalog", path: "/catalog", icon: Grid3X3 },
-    { label: "My Products", path: "/products", icon: Cream },
+    { label: "My Products", path: "/products", icon: Palette },
     { label: "Orders", path: "/sample-orders", icon: Package2 },
     { label: "Profit Calculator", path: "/profit-calculator", icon: Calculator },
   ];
