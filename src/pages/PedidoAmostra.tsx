@@ -41,7 +41,7 @@ const PedidoAmostra = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 space-y-6">
-      <div className="flex-1 max-w-lg">
+      <div className="flex-1">
         <ProductSearch addToCart />
       </div>
 
@@ -53,31 +53,41 @@ const PedidoAmostra = () => {
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-gray-900 text-lg mb-1">{item.name}</h3>
                 <p className="text-sm text-gray-600 sm:hidden mb-2">${item.from_price.toFixed(2)} per unit</p>
-                <div className="flex items-center justify-between sm:hidden">
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                    >
-                      <Minus className="h-3 w-3" />
-                    </Button>
-                    <span className="w-8 text-center text-sm">{item.quantity}</span>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                    >
-                      <Plus className="h-3 w-3" />
-                    </Button>
-                  </div>
-                  <p className="font-semibold text-gray-900">
-                    ${(item.from_price * item.quantity).toFixed(2)}
-                  </p>
-                </div>
               </div>
+            </div>
+            
+            {/* Mobile controls - Rearranged layout */}
+            <div className="sm:hidden flex items-center justify-between w-full mt-2">
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                >
+                  <Minus className="h-3 w-3" />
+                </Button>
+                <span className="w-8 text-center text-sm">{item.quantity}</span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </div>
+              <p className="font-semibold text-gray-900">
+                ${(item.from_price * item.quantity).toFixed(2)}
+              </p>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => removeItem(item.id)}
+                className="text-red-500 hover:text-red-700 h-7 w-7"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
             
             {/* Desktop controls */}
@@ -113,16 +123,6 @@ const PedidoAmostra = () => {
                 <Trash2 className="h-5 w-5" />
               </Button>
             </div>
-            
-            {/* Mobile delete button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => removeItem(item.id)}
-              className="sm:hidden text-red-500 hover:text-red-700 h-9 w-9 self-end"
-            >
-              <Trash2 className="h-5 w-5" />
-            </Button>
           </div>
         ))}
       </div>
