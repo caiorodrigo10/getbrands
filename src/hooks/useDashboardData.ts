@@ -104,13 +104,13 @@ export const useDashboardData = () => {
     queryFn: async () => {
       if (!user?.id) return null;
       const { data, error } = await supabase
-        .from("project_products")
+        .from("projects")
         .select(`
-          id,
-          product:products (*),
-          project:projects (*)
+          project_products!project_products_project_id_fkey (
+            product:products (*)
+          )
         `)
-        .eq("project.user_id", user.id)
+        .eq("user_id", user.id)
         .limit(3);
 
       if (error) {
@@ -121,7 +121,14 @@ export const useDashboardData = () => {
         });
         throw error;
       }
-      return data?.map(item => item.product) || [];
+      
+      // Flatten the nested structure and extract just the products
+      const flattenedProducts = data?.flatMap(project => 
+        project.project_products.map(pp => pp.product)
+      ) || [];
+      
+      // Take only the first 3 products
+      return flattenedProducts.slice(0, 3);
     },
     enabled: !!user?.id && isAuthenticated,
     staleTime: 30000,
