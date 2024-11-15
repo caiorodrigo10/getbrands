@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AppLayout } from "./AppLayout";
 import Login from "@/pages/Login";
-import Index from "@/pages/Index";
+import Dashboard from "@/pages/Dashboard";
 import Profile from "@/pages/Profile";
 import Projects from "@/pages/Projects";
 import ProjectDetails from "@/pages/ProjectDetails";
@@ -27,7 +27,7 @@ export const AppRoutes = () => (
       element={
         <ProtectedRoute>
           <AppLayout>
-            <Index />
+            <Dashboard />
           </AppLayout>
         </ProtectedRoute>
       }
