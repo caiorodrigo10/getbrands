@@ -29,7 +29,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
     window.open(`/profit-calculator?productId=${product.id}`, '_blank');
   };
 
-  const profit = product.srp - product.from_price;
+  // Ensure we have valid numbers for calculations
+  const fromPrice = typeof product.from_price === 'number' ? product.from_price : 0;
+  const srp = typeof product.srp === 'number' ? product.srp : 0;
+  const profit = srp - fromPrice;
 
   return (
     <Card 
@@ -86,11 +89,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <div className="grid grid-cols-3 gap-2 mb-4">
           <div className="flex flex-col justify-between h-full">
             <p className="text-sm text-gray-600">From</p>
-            <p className="font-semibold text-gray-900 text-lg">${product.from_price.toFixed(2)}</p>
+            <p className="font-semibold text-gray-900 text-lg">${fromPrice.toFixed(2)}</p>
           </div>
           <div className="flex flex-col justify-between h-full">
             <p className="text-sm text-gray-600">SRP</p>
-            <p className="font-semibold text-gray-900 text-lg">${product.srp.toFixed(2)}</p>
+            <p className="font-semibold text-gray-900 text-lg">${srp.toFixed(2)}</p>
           </div>
           <div className="bg-green-500 rounded-lg flex flex-col justify-center items-center h-full p-2">
             <p className="text-sm text-white">Profit</p>
