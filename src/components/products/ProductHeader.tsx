@@ -67,7 +67,7 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
               <p className="text-lg">From ${(4.50).toFixed(2)}</p>
             </div>
             <div>
-              <p className="text-gray-600">Suggested retail price</p>
+              <p className="text-gray-600">SRP</p>
               <p className="text-lg">${product.srp.toFixed(2)}</p>
             </div>
             <div className="col-span-2">
