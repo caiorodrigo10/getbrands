@@ -3,6 +3,7 @@ import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import Gleap from "gleap";
 
 interface AuthContextType {
   user: User | null;
@@ -21,6 +22,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  const identifyUserInGleap = (currentUser: User | null) => {
+    if (currentUser) {
+      Gleap.identify(
+        currentUser.id,
+        {
+          email: currentUser.email,
+          name: currentUser.email?.split('@')[0] || 'User',
+        }
+      );
+    } else {
+      Gleap.clearIdentity();
+    }
+  };
+
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -29,6 +44,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (initialSession) {
           setSession(initialSession);
           setUser(initialSession.user);
+          identifyUserInGleap(initialSession.user);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
@@ -46,9 +62,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (currentSession) {
         setSession(currentSession);
         setUser(currentSession.user);
+        identifyUserInGleap(currentSession.user);
       } else {
         setSession(null);
         setUser(null);
+        identifyUserInGleap(null);
         if (event === 'TOKEN_REFRESHED') {
           navigate('/login');
         }
@@ -63,6 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const handleAuthError = () => {
     setSession(null);
     setUser(null);
+    identifyUserInGleap(null);
     navigate('/login');
     toast({
       variant: "destructive",
@@ -91,6 +110,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
+        identifyUserInGleap(data.user);
         toast({
           title: "Success",
           description: "Logged in successfully!",
@@ -107,6 +127,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await supabase.auth.signOut();
       setUser(null);
       setSession(null);
+      identifyUserInGleap(null);
       navigate('/login');
       toast({
         title: "Success",
