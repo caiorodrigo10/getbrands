@@ -43,10 +43,15 @@ export const CalendarStage = () => {
       cal("on", {
         action: "bookingSuccessful",
         callback: (event: any) => {
-          const booking = event.detail;
+          if (!event.detail?.startTime) {
+            console.error("No start time provided in booking event:", event);
+            toast.error("Failed to schedule meeting. Please try again.");
+            return;
+          }
+
           logMeetingMutation.mutate({
-            scheduled_for: booking.startTime,
-            meeting_link: booking.meetingLink,
+            scheduled_for: new Date(event.detail.startTime).toISOString(),
+            meeting_link: event.detail.meetingLink,
           });
         },
       });
