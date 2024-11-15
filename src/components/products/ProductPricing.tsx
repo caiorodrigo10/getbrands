@@ -57,13 +57,17 @@ export const ProductPricing = ({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label>Your Selling Price</Label>
-          <Input
-            type="number"
-            value={sellingPrice}
-            onChange={(e) => handlePriceChange(e.target.value)}
-            min={0}
-            step="0.01"
-          />
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+            <Input
+              type="number"
+              value={sellingPrice}
+              onChange={(e) => handlePriceChange(e.target.value)}
+              min={0}
+              step="0.01"
+              className="pl-7"
+            />
+          </div>
         </div>
         <div>
           <Label>Profit</Label>

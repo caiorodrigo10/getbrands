@@ -8,6 +8,7 @@ import Confetti from 'react-confetti';
 import { useLocation, useNavigate } from "react-router-dom";
 import { ProductNameEdit } from "@/components/products/ProductNameEdit";
 import { ProductPricing } from "@/components/products/ProductPricing";
+import { ProductPriceInfo } from "@/components/products/ProductPriceInfo";
 import { ProjectProduct } from "@/types/product";
 
 const Products = () => {
@@ -97,7 +98,6 @@ const Products = () => {
               className="p-6 animate-fade-in"
               style={{ animationDelay: `${index * 150}ms` }}
             >
-              {/* Custom Product Image */}
               <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
                 <img
                   src={displayImage || "/placeholder.svg"}
@@ -124,14 +124,6 @@ const Products = () => {
                          onClick={() => navigateToOriginalProduct(item.product.id)}>
                         {item.product.name}
                       </p>
-                      <div className="space-y-2">
-                        <p className="text-sm text-gray-600">
-                          Cost Price: ${item.product.from_price.toFixed(2)}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Suggested Price: ${item.product.srp.toFixed(2)}
-                        </p>
-                      </div>
                     </div>
                     <div 
                       className="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity"
@@ -145,6 +137,11 @@ const Products = () => {
                     </div>
                   </div>
                 </div>
+
+                <ProductPriceInfo
+                  costPrice={item.product.from_price}
+                  suggestedPrice={item.product.srp}
+                />
 
                 <ProductPricing
                   projectProductId={item.id}
