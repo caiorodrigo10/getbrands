@@ -105,15 +105,15 @@ const ProductCard = ({
         </h3>
         
         <div className="grid grid-cols-3 gap-2 mb-4">
-          <div>
+          <div className="flex flex-col justify-between">
             <p className="text-sm text-gray-600">From</p>
             <p className="font-semibold text-gray-900 text-lg">${product.from_price.toFixed(2)}</p>
           </div>
-          <div>
+          <div className="flex flex-col justify-between">
             <p className="text-sm text-gray-600">SRP</p>
             <p className="font-semibold text-gray-900 text-lg">${product.srp.toFixed(2)}</p>
           </div>
-          <div className="bg-green-500 rounded-lg p-2">
+          <div className="bg-green-500 rounded-lg flex flex-col justify-between p-2">
             <p className="text-sm text-white">Profit</p>
             <p className="font-semibold text-white text-lg">${profit.toFixed(2)}</p>
           </div>
