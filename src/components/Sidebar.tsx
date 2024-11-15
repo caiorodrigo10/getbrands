@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { UserRound, Briefcase, BookOpen, Package, FileText, Box, Calculator } from "lucide-react";
+import { UserRound, Briefcase, BookOpen, Package, FileText, Box, Calculator, PlusCircle } from "lucide-react";
 import UserMenu from "./UserMenu";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
