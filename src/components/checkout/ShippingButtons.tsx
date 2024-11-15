@@ -45,10 +45,11 @@ export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue, onSave }
         </Button>
       </div>
       
-      <div className="flex justify-end gap-4">
+      <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
         <Button
           type="button"
           variant="destructive"
+          className="text-sm sm:text-base px-3 sm:px-4 h-10 sm:h-11 w-full sm:w-auto"
           onClick={handleCancel}
         >
           Cancel Order
@@ -56,7 +57,9 @@ export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue, onSave }
         <Button
           type="button"
           variant={isAddressSaved ? "default" : "secondary"}
-          className={isAddressSaved ? "bg-green-600 hover:bg-green-700" : ""}
+          className={`text-sm sm:text-base px-3 sm:px-4 h-10 sm:h-11 w-full sm:w-auto ${
+            isAddressSaved ? "bg-green-600 hover:bg-green-700" : ""
+          }`}
           disabled={!isAddressSaved}
           onClick={onContinue}
         >
