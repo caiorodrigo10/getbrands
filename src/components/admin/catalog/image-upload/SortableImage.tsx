@@ -17,23 +17,29 @@ export const SortableImage = ({ image, onDelete }: SortableImageProps) => {
     setNodeRef,
     transform,
     transition,
+    isDragging,
   } = useSortable({ id: image.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: transition || "transform 200ms cubic-bezier(0.25, 1, 0.5, 1)",
+    zIndex: isDragging ? 2 : 1,
+    position: "relative" as const,
   };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="relative group aspect-square"
+      className={cn(
+        "relative group aspect-square",
+        isDragging && "opacity-80"
+      )}
     >
       <div 
         className="w-full h-full rounded-lg border border-gray-200 overflow-hidden"
       >
-        <div {...attributes} {...listeners} className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100">
+        <div {...attributes} {...listeners} className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
           <GripVertical className="w-5 h-5 text-white drop-shadow-lg cursor-grab" />
         </div>
         
@@ -42,7 +48,7 @@ export const SortableImage = ({ image, onDelete }: SortableImageProps) => {
             type="button"
             variant="destructive"
             size="icon"
-            className="opacity-0 group-hover:opacity-100"
+            className="opacity-0 group-hover:opacity-100 transition-opacity"
             onClick={(e) => onDelete(image.id, e)}
           >
             <X className="w-4 h-4" />

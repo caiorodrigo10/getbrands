@@ -1,5 +1,5 @@
-import { DndContext, closestCenter } from "@dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { DndContext, DragOverlay, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 import { Button } from "@/components/ui/button";
 import { ImagePlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +19,14 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
   const { toast } = useToast();
   const { isUploading, handleFileUpload } = useImageUpload(productId, onImagesUpdate);
   const { handleDragEnd } = useImageSorting(images, onImagesUpdate);
+  
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
 
   // Remove duplicates based on image_url
   const uniqueImages = images.filter((image, index, self) =>
@@ -95,12 +103,13 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
       </div>
 
       <DndContext
+        sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
         <SortableContext 
           items={uniqueImages.map(img => img.id)}
-          strategy={verticalListSortingStrategy}
+          strategy={rectSortingStrategy}
         >
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {uniqueImages.map((image) => (
