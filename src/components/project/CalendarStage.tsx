@@ -25,48 +25,59 @@ export const CalendarStage = () => {
 
   // Initialize Cal.com and handle booking events
   useEffect(() => {
-    (async function initCalendar() {
-      const cal = (window as any).Cal;
-      if (!cal) return;
+    const cal = (window as any).Cal;
+    if (!cal) {
+      console.error("Cal.com widget not loaded");
+      return;
+    }
 
-      // Wait for Cal to be ready
-      await new Promise((resolve) => {
-        const checkCal = setInterval(() => {
-          if (cal.loaded) {
-            clearInterval(checkCal);
-            resolve(true);
-          }
-        }, 100);
-      });
+    // Wait for Cal to be ready
+    const initCalendar = async () => {
+      try {
+        // Add event listener
+        cal("on", {
+          action: "bookingSuccessful",
+          callback: (event: any) => {
+            if (!event.detail?.startTime) {
+              console.error("No start time provided in booking event:", event);
+              toast.error("Failed to schedule meeting. Please try again.");
+              return;
+            }
 
-      // Add event listener
-      cal("on", {
-        action: "bookingSuccessful",
-        callback: (event: any) => {
-          if (!event.detail?.startTime) {
-            console.error("No start time provided in booking event:", event);
-            toast.error("Failed to schedule meeting. Please try again.");
-            return;
-          }
+            if (!user?.id || !projectId) {
+              console.error("Missing user ID or project ID");
+              toast.error("Authentication error. Please try again.");
+              return;
+            }
 
-          logMeetingMutation.mutate({
-            scheduled_for: new Date(event.detail.startTime).toISOString(),
-            meeting_link: event.detail.meetingLink,
-          });
-        },
-      });
-    })();
+            logMeetingMutation.mutate({
+              project_id: projectId,
+              user_id: user.id,
+              scheduled_for: new Date(event.detail.startTime).toISOString(),
+              meeting_link: event.detail.meetingLink,
+              status: "scheduled"
+            });
+          },
+        });
+      } catch (error) {
+        console.error("Error initializing calendar:", error);
+        toast.error("Failed to initialize calendar. Please refresh the page.");
+      }
+    };
+
+    initCalendar();
 
     // Cleanup
     return () => {
-      const cal = (window as any).Cal;
-      if (cal) {
+      try {
         cal("off", {
           action: "bookingSuccessful",
         });
+      } catch (error) {
+        console.error("Error cleaning up calendar:", error);
       }
     };
-  }, []);
+  }, [projectId, user]);
 
   // Fetch user profile data
   const { data: profile } = useQuery({
@@ -86,22 +97,15 @@ export const CalendarStage = () => {
   // Mutation to log meetings
   const logMeetingMutation = useMutation({
     mutationFn: async (meetingData: {
+      project_id: string;
+      user_id: string;
       scheduled_for: string;
       meeting_link?: string;
+      status: string;
     }) => {
-      if (!user?.id || !projectId) {
-        throw new Error("User or project ID not found");
-      }
-
       const { data, error } = await supabase
         .from("project_meetings")
-        .insert({
-          project_id: projectId,
-          user_id: user.id,
-          scheduled_for: meetingData.scheduled_for,
-          meeting_link: meetingData.meeting_link,
-          status: "scheduled",
-        })
+        .insert(meetingData)
         .select()
         .single();
 
@@ -114,7 +118,7 @@ export const CalendarStage = () => {
     },
     onError: (error) => {
       console.error("Error logging meeting:", error);
-      toast.error("Failed to log meeting. Please try again.");
+      toast.error("Failed to save meeting details. Please try again.");
     },
   });
 
