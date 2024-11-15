@@ -5,10 +5,14 @@ export const CalendarStage = () => {
   useEffect(() => {
     (async function () {
       const cal = await getCalApi();
-      cal("ui", {
-        theme: "light",
-        styles: { branding: { brandColor: "#4c1e6c" } },
-      });
+      // Only configure UI if cal is available
+      if (cal) {
+        cal("ui", {
+          theme: "light",
+          styles: { branding: { brandColor: "#4c1e6c" } },
+          hideEventTypeDetails: false,
+        });
+      }
     })();
   }, []);
 
@@ -20,7 +24,6 @@ export const CalendarStage = () => {
         style={{ width: "100%", height: "100%", minHeight: "500px" }}
         config={{
           layout: "month_view",
-          hideEventTypeDetails: "false"
         }}
       />
     </div>
