@@ -1,12 +1,12 @@
 import {
   Heart,
-  Male,
-  Female,
+  Mars, // Instead of Male
+  Venus, // Instead of Female
   Wheat,
   Leaf,
   Milk,
   AlertTriangle,
-  Flask,
+  TestTube, // Instead of Flask
   Sprout,
   Pill,
   Syringe,
@@ -15,13 +15,13 @@ import {
 
 export const Icons = {
   skinHealth: Heart,
-  mensHealth: Male,
-  womensHealth: Female,
+  mensHealth: Mars,
+  womensHealth: Venus,
   glutenFree: Wheat,
   vegetarian: Leaf,
   lactoseFree: Milk,
   allergenFree: AlertTriangle,
-  hormoneFree: Flask,
+  hormoneFree: TestTube,
   natural: Sprout,
   antibioticFree: Pill,
   noFillers: Syringe,
