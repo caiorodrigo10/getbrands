@@ -1,72 +1,18 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { User, Session, AuthChangeEvent } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
-import Gleap from "gleap";
-
-interface AuthContextType {
-  user: User | null;
-  session: Session | null;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  isAuthenticated: boolean;
-}
+import { AuthContextType, AuthProviderProps } from "./auth/types";
+import { useAuthRedirect } from "./auth/useAuthRedirect";
+import { useGleapIdentity } from "./auth/useGleapIdentity";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
-  const navigate = useNavigate();
-
-  const identifyUserInGleap = (currentUser: User | null) => {
-    if (currentUser) {
-      Gleap.identify(currentUser.id, {
-        email: currentUser.email,
-        name: currentUser.email?.split('@')[0] || 'User',
-      });
-    } else {
-      Gleap.clearIdentity();
-    }
-  };
-
-  const handleAuthError = () => {
-    setSession(null);
-    setUser(null);
-    identifyUserInGleap(null);
-    navigate('/login');
-    toast({
-      variant: "destructive",
-      title: "Session Expired",
-      description: "Please sign in again to continue.",
-    });
-  };
-
-  const redirectBasedOnRole = async (userId: string) => {
-    if (!userId) return;
-    
-    try {
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .single();
-
-      if (error) throw error;
-
-      if (profile?.role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/');
-      }
-    } catch (error) {
-      console.error('Error fetching user role:', error);
-      navigate('/');
-    }
-  };
+  const { redirectBasedOnRole, handleAuthError } = useAuthRedirect();
+  const { identifyUserInGleap } = useGleapIdentity();
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -83,10 +29,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setSession(currentSession);
           setUser(currentSession.user);
           identifyUserInGleap(currentSession.user);
-          
-          if (window.location.pathname === '/login') {
-            await redirectBasedOnRole(currentSession.user.id);
-          }
+          await redirectBasedOnRole(currentSession.user.id);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
@@ -107,7 +50,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(null);
         setUser(null);
         identifyUserInGleap(null);
-        navigate('/login');
+        handleAuthError();
         return;
       }
 
@@ -129,7 +72,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, []);
 
   const login = async (email: string, password: string) => {
     try {
@@ -138,14 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         password,
       });
 
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: error.message || "Invalid email or password. Please try again.",
-        });
-        throw error;
-      }
+      if (error) throw error;
 
       if (data.user) {
         setUser(data.user);
@@ -153,7 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         identifyUserInGleap(data.user);
         await redirectBasedOnRole(data.user.id);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
       throw error;
     }
@@ -165,18 +101,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(null);
       setSession(null);
       identifyUserInGleap(null);
-      navigate('/login');
-      toast({
-        title: "Success",
-        description: "Logged out successfully!",
-      });
+      handleAuthError();
     } catch (error) {
       console.error('Logout error:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to log out. Please try again.",
-      });
     }
   };
 
