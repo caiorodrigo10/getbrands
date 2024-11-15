@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   user: User | null;
@@ -18,30 +19,58 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setSession(session);
-        setUser(session.user);
+    const initializeAuth = async () => {
+      try {
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        
+        if (initialSession) {
+          setSession(initialSession);
+          setUser(initialSession.user);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        handleAuthError();
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    });
+    };
+
+    initializeAuth();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        setSession(session);
-        setUser(session.user);
+    } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+      if (currentSession) {
+        setSession(currentSession);
+        setUser(currentSession.user);
       } else {
         setSession(null);
         setUser(null);
+        if (event === 'TOKEN_REFRESHED') {
+          // Token refresh failed, redirect to login
+          navigate('/login');
+        }
       }
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
+
+  const handleAuthError = () => {
+    setSession(null);
+    setUser(null);
+    navigate('/login');
+    toast({
+      variant: "destructive",
+      title: "Authentication Error",
+      description: "Please sign in again to continue.",
+    });
+  };
 
   const login = async (email: string, password: string) => {
     try {
@@ -78,6 +107,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await supabase.auth.signOut();
       setUser(null);
       setSession(null);
+      navigate('/login');
       toast({
         title: "Success",
         description: "Logged out successfully!",
