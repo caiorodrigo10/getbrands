@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Package, ArrowRight } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
+import SimpleProductCard from "@/components/SimpleProductCard";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import ProjectsOverview from "@/components/dashboard/ProjectsOverview";
 import UpcomingMeetings from "@/components/dashboard/UpcomingMeetings";
@@ -61,9 +62,14 @@ const Dashboard = () => {
               ...item.product,
               name: specificProduct?.name || item.product?.name,
               image_url: specificProduct?.image_url || item.product?.image_url,
+              id: item.product?.id,
             };
             return (
-              <ProductCard key={item.id} product={displayProduct} />
+              <SimpleProductCard 
+                key={item.id} 
+                product={displayProduct}
+                projectName={item.project?.name}
+              />
             );
           })}
         </div>
