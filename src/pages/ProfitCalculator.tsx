@@ -26,7 +26,7 @@ const ProfitCalculator = () => {
     setCalculationValues(prev => ({
       ...prev,
       costPrice: product.from_price,
-      sellingPrice: product.srp,
+      sellingPrice: product.srp, // Set the selling price to the product's SRP
     }));
   };
 
