@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Briefcase, BookOpen, Package, Box, Calculator, PlusCircle, LayoutDashboard } from "lucide-react";
+import { Briefcase, BookOpen, Pill, ShoppingBag, Calculator, PlusCircle, LayoutDashboard } from "lucide-react";
 import UserMenu from "./UserMenu";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,8 +34,8 @@ const Sidebar = () => {
     { icon: LayoutDashboard, label: "Dashboard", path: "/" },
     { icon: Briefcase, label: "Projects", path: "/projects" },
     { icon: BookOpen, label: "Catalog", path: "/catalog" },
-    { icon: Package, label: "My Products", path: "/products" },
-    { icon: Box, label: "Sample Orders", path: "/sample-orders" },
+    { icon: Pill, label: "My Products", path: "/products" },
+    { icon: ShoppingBag, label: "Orders", path: "/sample-orders" },
     { icon: Calculator, label: "Profit Calculator", path: "/profit-calculator" },
   ];
 
