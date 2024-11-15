@@ -39,8 +39,14 @@ export const NavigationMenu = () => {
                 </Link>
               ))}
             </nav>
+          </div>
 
-            {/* Mobile Menu */}
+          <div className="flex items-center gap-4">
+            <div className="hidden md:flex">
+              <UserMenu isMobile={false} />
+            </div>
+
+            {/* Mobile Menu Button - Now on the right side */}
             <Sheet>
               <SheetTrigger className="md:hidden">
                 <Menu className="h-6 w-6 text-gray-300" />
@@ -68,10 +74,6 @@ export const NavigationMenu = () => {
                 </div>
               </SheetContent>
             </Sheet>
-          </div>
-
-          <div className="hidden md:flex items-center gap-4">
-            <UserMenu isMobile={false} />
           </div>
         </div>
       </div>
