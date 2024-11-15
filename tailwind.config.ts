@@ -14,16 +14,16 @@ export default {
       center: true,
       padding: {
         DEFAULT: '1rem',
-        sm: '2rem',
-        lg: '4rem',
-        xl: '5rem',
-        '2xl': '6rem',
+        sm: '1.5rem',
+        lg: '3rem',
+        xl: '4rem',
+        '2xl': '5rem',
       },
       screens: {
         sm: '640px',
         md: '768px',
         lg: '1024px',
-        xl: '1200px',
+        xl: '1100px',
       },
     },
     extend: {
@@ -61,15 +61,15 @@ export default {
         heading: ["Montserrat", "sans-serif"],
       },
       spacing: {
-        'page': '2rem',
-        'section': '1.5rem',
+        'page': '1.75rem',
+        'section': '1.25rem',
       },
       fontSize: {
-        'page-title': ['1.875rem', {
+        'page-title': ['1.75rem', {
           lineHeight: '2.25rem',
           fontWeight: '700',
         }],
-        'section-title': ['1.5rem', {
+        'section-title': ['1.375rem', {
           lineHeight: '2rem',
           fontWeight: '600',
         }],
