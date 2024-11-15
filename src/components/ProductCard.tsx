@@ -6,9 +6,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Calculator } from "lucide-react";
 import ProductActions from "./product/ProductActions";
-import ProfitCalculator from "./product/ProfitCalculator";
 
 interface ProductCardProps {
   product: Product;
@@ -28,7 +26,6 @@ const ProductCard = ({
   const [isLoading, setIsLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [showCalculator, setShowCalculator] = useState(false);
 
   const handleRequestSample = async () => {
     if (!user) {
@@ -110,26 +107,16 @@ const ProductCard = ({
         <div className="grid grid-cols-3 gap-2 mb-4">
           <div className="flex flex-col justify-between h-full">
             <p className="text-sm text-gray-600">From</p>
-            <p className="font-semibold text-gray-900 text-sm">${product.from_price.toFixed(2)}</p>
+            <p className="font-semibold text-gray-900 text-lg">${product.from_price.toFixed(2)}</p>
           </div>
           <div className="flex flex-col justify-between h-full">
             <p className="text-sm text-gray-600">SRP</p>
-            <p className="font-semibold text-gray-900 text-sm">${product.srp.toFixed(2)}</p>
+            <p className="font-semibold text-gray-900 text-lg">${product.srp.toFixed(2)}</p>
           </div>
           <div className="bg-green-500 rounded-lg flex flex-col justify-center items-center h-full p-2">
             <p className="text-sm text-white">Profit</p>
-            <p className="font-semibold text-white text-sm">${profit.toFixed(2)}</p>
+            <p className="font-semibold text-white text-lg">${profit.toFixed(2)}</p>
           </div>
-        </div>
-
-        <div className="flex gap-2 mb-4">
-          <button
-            onClick={() => setShowCalculator(true)}
-            className="flex items-center gap-2 text-sm text-primary hover:text-primary-dark transition-colors"
-          >
-            <Calculator className="w-4 h-4" />
-            Calculate Profit
-          </button>
         </div>
 
         <ProductActions
@@ -138,12 +125,6 @@ const ProductCard = ({
           isLoading={isLoading}
         />
       </div>
-
-      <ProfitCalculator
-        product={product}
-        isOpen={showCalculator}
-        onClose={() => setShowCalculator(false)}
-      />
     </Card>
   );
 };
