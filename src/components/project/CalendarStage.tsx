@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { MeetingsList } from "./MeetingsList";
 import { ProjectMeeting } from "@/types/meetings";
 
@@ -12,6 +12,21 @@ export const CalendarStage = () => {
   const { id: projectId } = useParams();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  // Query to fetch existing meetings
+  const { data: meetings } = useQuery({
+    queryKey: ["project_meetings", projectId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("project_meetings")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("scheduled_for", { ascending: true });
+
+      if (error) throw error;
+      return data as ProjectMeeting[];
+    },
+  });
 
   // Mutation to log meetings
   const logMeetingMutation = useMutation({
@@ -22,8 +37,6 @@ export const CalendarStage = () => {
       meeting_link?: string | null;
       status: string;
     }) => {
-      console.log("Attempting to save meeting:", meetingData);
-
       const { data, error } = await supabase
         .from("project_meetings")
         .insert(meetingData)
@@ -46,6 +59,31 @@ export const CalendarStage = () => {
     },
   });
 
+  // Handle successful booking callback
+  const handleBookingSuccessful = useCallback(async (event: any) => {
+    if (!event?.detail?.startTime) {
+      console.error("No start time provided in booking event:", event);
+      return;
+    }
+
+    if (!user?.id || !projectId) {
+      console.error("Missing user ID or project ID:", { userId: user?.id, projectId });
+      return;
+    }
+
+    try {
+      await logMeetingMutation.mutateAsync({
+        project_id: projectId,
+        user_id: user.id,
+        scheduled_for: new Date(event.detail.startTime).toISOString(),
+        meeting_link: event.detail.meetingLink || null,
+        status: "scheduled"
+      });
+    } catch (error) {
+      console.error("Error in booking callback:", error);
+    }
+  }, [projectId, user, logMeetingMutation]);
+
   // Initialize Cal.com and handle booking events
   useEffect(() => {
     const cal = (window as any).Cal;
@@ -54,75 +92,19 @@ export const CalendarStage = () => {
       return;
     }
 
-    // Wait for Cal to be ready
-    const initCalendar = async () => {
-      try {
-        // Add event listener
-        cal("on", {
-          action: "bookingSuccessful",
-          callback: async (event: any) => {
-            console.log("Booking event received:", event);
-
-            if (!event?.detail?.startTime) {
-              console.error("No start time provided in booking event:", event);
-              toast.error("Failed to schedule meeting. Please try again.");
-              return;
-            }
-
-            if (!user?.id || !projectId) {
-              console.error("Missing user ID or project ID:", { userId: user?.id, projectId });
-              toast.error("Authentication error. Please try again.");
-              return;
-            }
-
-            try {
-              await logMeetingMutation.mutateAsync({
-                project_id: projectId,
-                user_id: user.id,
-                scheduled_for: new Date(event.detail.startTime).toISOString(),
-                meeting_link: event.detail.meetingLink || null,
-                status: "scheduled"
-              });
-            } catch (error) {
-              console.error("Error in booking callback:", error);
-              toast.error("Failed to save meeting details. Please try again.");
-            }
-          },
-        });
-      } catch (error) {
-        console.error("Error initializing calendar:", error);
-        toast.error("Failed to initialize calendar. Please refresh the page.");
-      }
-    };
-
-    initCalendar();
+    // Add event listener
+    cal("on", {
+      action: "bookingSuccessful",
+      callback: handleBookingSuccessful,
+    });
 
     // Cleanup
     return () => {
-      try {
-        cal("off", {
-          action: "bookingSuccessful",
-        });
-      } catch (error) {
-        console.error("Error cleaning up calendar:", error);
-      }
+      cal("off", {
+        action: "bookingSuccessful",
+      });
     };
-  }, [projectId, user, logMeetingMutation]);
-
-  // Query to fetch existing meetings
-  const { data: meetings } = useQuery({
-    queryKey: ["project_meetings", projectId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("project_meetings")
-        .select("*")
-        .eq("project_id", projectId)
-        .order("scheduled_for", { ascending: true });
-
-      if (error) throw error;
-      return data as ProjectMeeting[];
-    },
-  });
+  }, [handleBookingSuccessful]);
 
   return (
     <div className="space-y-6">
