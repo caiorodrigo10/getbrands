@@ -1,5 +1,4 @@
-import Cal, { getCalApi } from "@calcom/embed-react";
-import { useEffect } from "react";
+import Cal from "@calcom/embed-react";
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -68,51 +67,16 @@ export const CalendarStage = () => {
     },
   });
 
-  // Initialize Cal.com
-  useEffect(() => {
-    let calInstance: any = null;
-    
-    const initializeCal = async () => {
-      try {
-        calInstance = await getCalApi();
-        if (calInstance) {
-          calInstance("ui", {
-            styles: { branding: { brandColor: "#4c1e6c" } },
-            hideEventTypeDetails: false,
-          });
-        }
-      } catch (error) {
-        console.error("Error initializing Cal:", error);
-      }
-    };
-
-    initializeCal();
-
-    return () => {
-      if (calInstance) {
-        calInstance("destroy");
-      }
-    };
-  }, []);
-
   // Handle successful booking
-  useEffect(() => {
-    const handleCalendarEvent = (e: CustomEvent) => {
-      if (e.detail.type === "booking_successful") {
-        const booking = e.detail.data;
-        logMeetingMutation.mutate({
-          scheduled_for: booking.startTime,
-          meeting_link: booking.meetingLink,
-        });
-      }
-    };
-
-    window.addEventListener("cal:booking", handleCalendarEvent as EventListener);
-
-    return () => {
-      window.removeEventListener("cal:booking", handleCalendarEvent as EventListener);
-    };
-  }, [logMeetingMutation]);
+  const handleCalendarEvent = (e: CustomEvent) => {
+    if (e.detail.type === "booking_successful") {
+      const booking = e.detail.data;
+      logMeetingMutation.mutate({
+        scheduled_for: booking.startTime,
+        meeting_link: booking.meetingLink,
+      });
+    }
+  };
 
   // Query to fetch existing meetings
   const { data: meetings } = useQuery({
@@ -140,6 +104,8 @@ export const CalendarStage = () => {
             config={{
               layout: "month_view",
             }}
+            data-cal-namespace="lovable-calendar"
+            onEvent={handleCalendarEvent}
           />
         </div>
       </div>
@@ -160,7 +126,7 @@ export const CalendarStage = () => {
                   </p>
                   <p className="text-sm text-muted-foreground">
                     Scheduled on:{" "}
-                    {new Date(meeting.scheduled_at).toLocaleDateString()}
+                    {new Date(meeting.created_at).toLocaleDateString()}
                   </p>
                 </div>
                 {meeting.meeting_link && (
