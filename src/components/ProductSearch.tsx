@@ -8,9 +8,10 @@ import { useNavigate } from "react-router-dom";
 
 interface ProductSearchProps {
   onSelectProduct?: (product: Product) => void;
+  addToCart?: boolean;
 }
 
-export const ProductSearch = ({ onSelectProduct }: ProductSearchProps) => {
+export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSearchProps) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const { data: productsData } = useProducts();
@@ -41,22 +42,26 @@ export const ProductSearch = ({ onSelectProduct }: ProductSearchProps) => {
 
   const handleSelect = async (product: Product) => {
     try {
-      await addItem(product);
-      toast({
-        title: "Success",
-        description: "Product added to sample cart.",
-      });
-      setOpen(false);
-      setQuery("");
-      navigate("/checkout/confirmation");
+      if (addToCart) {
+        await addItem(product);
+        toast({
+          title: "Success",
+          description: "Product added to sample cart.",
+        });
+        navigate("/checkout/confirmation");
+      }
+      
       if (onSelectProduct) {
         onSelectProduct(product);
       }
+      
+      setOpen(false);
+      setQuery("");
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Could not add product to cart.",
+        description: "Could not process your request.",
       });
     }
   };

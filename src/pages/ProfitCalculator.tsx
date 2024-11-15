@@ -26,7 +26,10 @@ const ProfitCalculator = () => {
       <div className="space-y-6">
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h2 className="text-lg font-semibold mb-4">Select a Product</h2>
-          <ProductSearch onSelectProduct={handleProductSelect} />
+          <ProductSearch 
+            onSelectProduct={handleProductSelect}
+            addToCart={false}
+          />
         </div>
 
         {selectedProduct && (
