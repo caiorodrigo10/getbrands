@@ -17,20 +17,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const { toast } = useToast();
 
   const handleSession = async (currentSession: Session | null) => {
-    try {
-      if (currentSession?.user) {
-        setSession(currentSession);
-        setUser(currentSession.user);
-        identifyUserInGleap(currentSession.user);
-        await redirectBasedOnRole(currentSession.user.id);
-      } else {
-        setSession(null);
-        setUser(null);
-        identifyUserInGleap(null);
-      }
-    } catch (error) {
-      console.error('Error handling session:', error);
-      handleAuthError();
+    if (currentSession?.user) {
+      setSession(currentSession);
+      setUser(currentSession.user);
+      identifyUserInGleap(currentSession.user);
+      await redirectBasedOnRole(currentSession.user.id);
+    } else {
+      setSession(null);
+      setUser(null);
+      identifyUserInGleap(null);
     }
   };
 
@@ -47,6 +42,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             description: "There was a problem with your session. Please try logging in again.",
           });
           handleAuthError();
+          setIsLoading(false);
           return;
         }
 
@@ -86,8 +82,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const login = async (email: string, password: string) => {
-    setIsLoading(true);
     try {
+      setIsLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -112,8 +108,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const logout = async () => {
-    setIsLoading(true);
     try {
+      setIsLoading(true);
       await supabase.auth.signOut();
       await handleSession(null);
     } catch (error) {
@@ -130,10 +126,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          <p className="text-sm text-muted-foreground">Carregando...</p>
+          <p className="text-sm text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
