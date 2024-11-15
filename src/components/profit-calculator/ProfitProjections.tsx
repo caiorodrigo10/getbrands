@@ -69,7 +69,7 @@ export const ProfitProjections = ({ product, calculationValues }: ProfitProjecti
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-lg shadow-sm border space-y-6">
+      <div className="bg-white p-6 rounded-lg shadow-sm border space-y-6 profit-projections-chart">
         <h2 className="text-xl font-semibold text-gray-900">12-Month Profit Projections</h2>
         
         <div className="h-[400px]">

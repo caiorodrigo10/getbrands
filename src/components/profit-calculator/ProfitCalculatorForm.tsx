@@ -40,10 +40,12 @@ export const ProfitCalculatorForm = ({ product, onCalculate }: ProfitCalculatorF
       costPrice,
       sellingPrice,
     });
-    toast({
-      title: "Calculations Updated",
-      description: "The profit projections have been updated with your values.",
-    });
+    
+    // Smooth scroll to the chart section
+    const chartElement = document.querySelector('.profit-projections-chart');
+    if (chartElement) {
+      chartElement.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -129,8 +131,8 @@ export const ProfitCalculatorForm = ({ product, onCalculate }: ProfitCalculatorF
         </div>
 
         <Button 
-          className="w-full mt-4" 
-          size="lg"
+          className="w-auto mt-4" 
+          size="default"
           onClick={handleCalculate}
         >
           Calculate Profit Projections
