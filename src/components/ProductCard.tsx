@@ -3,6 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Product } from "@/types/product";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProductCardProps {
   product: Product;
@@ -13,6 +15,20 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
+  const { data: productImages } = useQuery({
+    queryKey: ['product-images', product.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('product_images')
+        .select('*')
+        .eq('product_id', product.id)
+        .order('position');
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const handleCardClick = () => {
     navigate(`/catalog/${product.id}`);
   };
@@ -21,6 +37,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
     setImageError(true);
     setImageLoaded(true);
   };
+
+  // Get the primary image or fall back to the product's main image
+  const displayImage = productImages?.find(img => img.is_primary)?.image_url || 
+                      product.image_url || 
+                      '/placeholder.svg';
 
   // Ensure we have valid numbers for calculations
   const fromPrice = typeof product.from_price === 'number' ? product.from_price : 0;
@@ -53,7 +74,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           1000 points
         </Badge>
         <img
-          src={imageError ? '/placeholder.svg' : (product.image_url || '/placeholder.svg')}
+          src={imageError ? '/placeholder.svg' : displayImage}
           alt={product.name}
           className={`w-full h-full object-cover p-4 transition-opacity duration-200 ${
             imageLoaded ? "opacity-100" : "opacity-0"

@@ -2,6 +2,8 @@ import { Card } from "@/components/ui/card";
 import { Product } from "@/types/product";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SimpleProductCardProps {
   product: Product;
@@ -13,11 +15,30 @@ const SimpleProductCard = ({ product, projectName }: SimpleProductCardProps) => 
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
+  const { data: productImages } = useQuery({
+    queryKey: ['product-images', product.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('product_images')
+        .select('*')
+        .eq('product_id', product.id)
+        .order('position');
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const handleCardClick = () => {
     if (product?.id) {
       navigate(`/catalog/${product.id}`);
     }
   };
+
+  // Get the primary image or fall back to the product's main image
+  const displayImage = productImages?.find(img => img.is_primary)?.image_url || 
+                      product.image_url || 
+                      '/placeholder.svg';
 
   return (
     <Card 
@@ -29,7 +50,7 @@ const SimpleProductCard = ({ product, projectName }: SimpleProductCardProps) => 
           <div className="absolute inset-0 bg-gray-100 animate-pulse" />
         )}
         <img
-          src={imageError ? '/placeholder.svg' : (product.image_url || '/placeholder.svg')}
+          src={imageError ? '/placeholder.svg' : displayImage}
           alt={product.name}
           className={`w-full h-full object-cover p-4 transition-opacity duration-200 ${
             imageLoaded ? "opacity-100" : "opacity-0"
