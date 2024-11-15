@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -54,62 +54,60 @@ export const ProfitProjections = ({ product }: ProfitProjectionsProps) => {
   }, [product]);
 
   return (
-    <div className="bg-[#0A0A0A] p-6 rounded-lg shadow-sm border border-gray-800 space-y-6">
-      <h2 className="text-xl font-semibold text-white">Tendência de Lucratividade Mensal</h2>
+    <div className="bg-white p-6 rounded-lg shadow-sm border space-y-6">
+      <h2 className="text-xl font-semibold text-gray-900">Tendência de Lucratividade Mensal</h2>
       
       <div className="h-[400px]">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart
+          <AreaChart
             data={projections}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
             <CartesianGrid 
               strokeDasharray="3 3" 
-              stroke="rgba(255,255,255,0.1)"
+              stroke="rgba(0,0,0,0.1)"
               vertical={false}
             />
             <XAxis 
               dataKey="month" 
               stroke="#666666"
-              tick={{ fill: '#666666' }}
             />
             <YAxis 
               stroke="#666666"
-              tick={{ fill: '#666666' }}
               tickFormatter={(value) => `${value / 1000}K`}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: '#1A1A1A',
-                border: '1px solid #333333',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E5E7EB',
                 borderRadius: '8px',
-                color: '#FFFFFF'
+                color: '#111827'
               }}
               formatter={(value: number) => formatCurrency(value)}
-              labelStyle={{ color: '#FFFFFF' }}
             />
             <Legend 
               verticalAlign="top" 
               height={36}
-              wrapperStyle={{ color: '#FFFFFF' }}
             />
-            <Line
+            <Area
               type="monotone"
               dataKey="revenue"
-              stroke="#22C55E"
-              strokeWidth={2}
               name="Faturamento"
-              dot={false}
+              stroke="#22C55E"
+              fill="#22C55E"
+              fillOpacity={0.2}
+              strokeWidth={2}
             />
-            <Line
+            <Area
               type="monotone"
               dataKey="costs"
-              stroke="#4C1E6C"
-              strokeWidth={2}
               name="Custos"
-              dot={false}
+              stroke="#4C1E6C"
+              fill="#4C1E6C"
+              fillOpacity={0.2}
+              strokeWidth={2}
             />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       </div>
     </div>
