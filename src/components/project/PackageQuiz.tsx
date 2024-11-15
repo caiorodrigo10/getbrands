@@ -20,8 +20,11 @@ interface QuizStep {
   component: React.ReactNode;
 }
 
-export function PackageQuiz() {
-  const { id: projectId } = useParams();
+interface PackageQuizProps {
+  projectId: string;
+}
+
+export const PackageQuiz = ({ projectId }: PackageQuizProps) => {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const queryClient = useQueryClient();
@@ -30,16 +33,14 @@ export function PackageQuiz() {
   const { data: quizData, isLoading } = useQuery({
     queryKey: ["package_quiz", projectId],
     queryFn: async () => {
-      // First try to find an existing quiz
       const { data: existingQuiz, error: fetchError } = await supabase
         .from("package_quizzes")
         .select("*")
         .eq("project_id", projectId)
-        .maybeSingle(); // Using maybeSingle() instead of single()
+        .maybeSingle();
 
       if (fetchError) throw fetchError;
 
-      // If no quiz exists, create one
       if (!existingQuiz && user?.id) {
         const { data: newQuiz, error: createError } = await supabase
           .from("package_quizzes")
@@ -285,4 +286,4 @@ export function PackageQuiz() {
       </div>
     </div>
   );
-}
+};

@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Package } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export function PackageDesignStage() {
   const navigate = useNavigate();
+  const { id: projectId } = useParams();
 
   return (
     <div className="space-y-6">
@@ -19,7 +20,7 @@ export function PackageDesignStage() {
         </div>
         <Button 
           size="lg"
-          onClick={() => navigate(`/package-quiz`)}
+          onClick={() => navigate(`/package-quiz/${projectId}`)}
           className="mt-4"
         >
           Iniciar Questionário de Design
