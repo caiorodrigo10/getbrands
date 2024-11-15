@@ -6,7 +6,7 @@ import { ProductImage } from "@/types/product";
 
 interface SortableImageProps {
   image: ProductImage;
-  onDelete: (id: string) => void;
+  onDelete: (id: string, event: React.MouseEvent) => void;
 }
 
 export const SortableImage = ({ image, onDelete }: SortableImageProps) => {
@@ -36,10 +36,11 @@ export const SortableImage = ({ image, onDelete }: SortableImageProps) => {
           <GripVertical className="w-5 h-5 text-white drop-shadow-lg cursor-grab" />
         </div>
         <Button
+          type="button"
           variant="destructive"
           size="icon"
           className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100"
-          onClick={() => onDelete(image.id)}
+          onClick={(e) => onDelete(image.id, e)}
         >
           <X className="w-4 h-4" />
         </Button>

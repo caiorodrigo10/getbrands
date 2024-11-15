@@ -29,9 +29,7 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
         .eq('id', productId)
         .single();
 
-      // Only add the profile image if it's not already in the images array
       if (product?.image_url && !images.some(img => img.image_url === product.image_url)) {
-        // Check if there's already a primary image
         const hasPrimaryImage = images.some(img => img.is_primary);
         
         await supabase
@@ -40,7 +38,7 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
             product_id: productId,
             image_url: product.image_url,
             position: 0,
-            is_primary: !hasPrimaryImage // Only set as primary if there isn't one already
+            is_primary: !hasPrimaryImage
           });
         onImagesUpdate();
       }
@@ -49,7 +47,10 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
     syncProfileImage();
   }, [productId, images, onImagesUpdate]);
 
-  const handleDeleteImage = async (imageId: string) => {
+  const handleDeleteImage = async (imageId: string, e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent any default navigation
+    e.stopPropagation(); // Stop event propagation
+    
     try {
       const imageToDelete = images.find(img => img.id === imageId);
       await supabase
@@ -57,7 +58,6 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
         .delete()
         .eq('id', imageId);
 
-      // If we deleted the primary image, make the first remaining image primary
       if (imageToDelete?.is_primary && images.length > 1) {
         const nextImage = images.find(img => img.id !== imageId);
         if (nextImage) {
@@ -95,7 +95,10 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
         <Button
           type="button"
           variant="outline"
-          onClick={() => document.getElementById('image-upload')?.click()}
+          onClick={(e) => {
+            e.preventDefault();
+            document.getElementById('image-upload')?.click();
+          }}
           disabled={isUploading}
         >
           <ImagePlus className="w-4 h-4 mr-2" />
@@ -125,7 +128,7 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
               <SortableImage
                 key={image.id}
                 image={image}
-                onDelete={handleDeleteImage}
+                onDelete={(id) => handleDeleteImage(id, event as React.MouseEvent)}
               />
             ))}
           </div>
