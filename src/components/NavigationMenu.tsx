@@ -50,7 +50,7 @@ export const NavigationMenu = () => {
               <SheetTrigger className="md:hidden">
                 <Menu className="h-6 w-6 text-gray-300" />
               </SheetTrigger>
-              <SheetContent side="left" className="w-[300px] bg-[#131313] p-0">
+              <SheetContent side="right" className="w-[300px] bg-[#131313] p-0">
                 <div className="flex flex-col">
                   <div className="p-4 border-b border-gray-800">
                     <UserMenu isMobile={true} />
