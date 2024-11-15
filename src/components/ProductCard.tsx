@@ -100,22 +100,22 @@ const ProductCard = ({
       </div>
       <div className="p-4">
         <div className="text-sm text-gray-600 mb-2">{product.category}</div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-4 min-h-[3.5rem] line-clamp-2">
+        <h3 className="text-2xl font-semibold text-gray-900 mb-4 min-h-[4rem] line-clamp-2">
           {product.name}
         </h3>
         
         <div className="grid grid-cols-3 gap-2 mb-4">
-          <div className="flex flex-col justify-between">
+          <div className="flex flex-col justify-between h-full">
             <p className="text-sm text-gray-600">From</p>
-            <p className="font-semibold text-gray-900 text-lg">${product.from_price.toFixed(2)}</p>
+            <p className="font-semibold text-gray-900 text-2xl">${product.from_price.toFixed(2)}</p>
           </div>
-          <div className="flex flex-col justify-between">
+          <div className="flex flex-col justify-between h-full">
             <p className="text-sm text-gray-600">SRP</p>
-            <p className="font-semibold text-gray-900 text-lg">${product.srp.toFixed(2)}</p>
+            <p className="font-semibold text-gray-900 text-2xl">${product.srp.toFixed(2)}</p>
           </div>
-          <div className="bg-green-500 rounded-lg flex flex-col justify-between p-2">
+          <div className="bg-green-500 rounded-lg flex flex-col justify-between h-full p-2">
             <p className="text-sm text-white">Profit</p>
-            <p className="font-semibold text-white text-lg">${profit.toFixed(2)}</p>
+            <p className="font-semibold text-white text-2xl">${profit.toFixed(2)}</p>
           </div>
         </div>
 
