@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
 import { ProductSearch } from "@/components/ProductSearch";
 import { ProfitCalculatorForm } from "@/components/profit-calculator/ProfitCalculatorForm";
 import { ProfitProjections } from "@/components/profit-calculator/ProfitProjections";
@@ -16,14 +15,9 @@ interface CalculationValues {
 const ProfitCalculator = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [calculationValues, setCalculationValues] = useState<CalculationValues | null>(null);
-  const { toast } = useToast();
 
   const handleProductSelect = (product: Product) => {
     setSelectedProduct(product);
-    toast({
-      title: "Product Selected",
-      description: `${product.name} has been selected for calculation.`,
-    });
   };
 
   const handleCalculate = (values: CalculationValues) => {

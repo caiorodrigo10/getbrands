@@ -19,13 +19,14 @@ interface ProfitCalculatorFormProps {
 export const ProfitCalculatorForm = ({ product, onCalculate }: ProfitCalculatorFormProps) => {
   const [monthlySales, setMonthlySales] = useState(200);
   const [growthRate, setGrowthRate] = useState(15);
+  const [sellingPrice, setSellingPrice] = useState(product.srp);
   const costPrice = product.from_price;
-  const sellingPrice = product.srp;
   const { toast } = useToast();
 
   const handleReset = () => {
     setMonthlySales(200);
     setGrowthRate(15);
+    setSellingPrice(product.srp);
     toast({
       title: "Values Reset",
       description: "All values have been reset to their defaults.",
@@ -55,71 +56,75 @@ export const ProfitCalculatorForm = ({ product, onCalculate }: ProfitCalculatorF
       </div>
 
       <div className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="monthlySales">Monthly Sales Volume</Label>
-          <div className="pt-2">
-            <Slider
-              id="monthlySales"
-              min={0}
-              max={1000}
-              step={1}
-              value={[monthlySales]}
-              onValueChange={(value) => setMonthlySales(value[0])}
-              className="w-full"
-            />
-          </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            Current value: {monthlySales} units
-          </p>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="growthRate">Monthly Growth Rate (%)</Label>
-          <div className="pt-2">
-            <Slider
-              id="growthRate"
-              min={0}
-              max={100}
-              step={1}
-              value={[growthRate]}
-              onValueChange={(value) => setGrowthRate(value[0])}
-              className="w-full"
-            />
-          </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            Current value: {growthRate}%
-          </p>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="costPrice">Cost Price</Label>
-          <div className="relative">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2">
-              <DollarSign className="h-4 w-4 text-gray-500" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="monthlySales">Monthly Sales Volume</Label>
+            <div className="pt-2">
+              <Slider
+                id="monthlySales"
+                min={0}
+                max={1000}
+                step={1}
+                value={[monthlySales]}
+                onValueChange={(value) => setMonthlySales(value[0])}
+                className="w-full"
+              />
             </div>
-            <input
-              id="costPrice"
-              type="text"
-              value={`${costPrice.toFixed(2)}`}
-              disabled
-              className="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm pl-9 cursor-not-allowed"
-            />
+            <p className="text-sm text-muted-foreground mt-1">
+              Current value: {monthlySales} units
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="growthRate">Monthly Growth Rate (%)</Label>
+            <div className="pt-2">
+              <Slider
+                id="growthRate"
+                min={0}
+                max={100}
+                step={1}
+                value={[growthRate]}
+                onValueChange={(value) => setGrowthRate(value[0])}
+                className="w-full"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Current value: {growthRate}%
+            </p>
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="sellingPrice">Selling Price</Label>
-          <div className="relative">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2">
-              <DollarSign className="h-4 w-4 text-gray-500" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="costPrice">Cost Price</Label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                <DollarSign className="h-4 w-4 text-gray-500" />
+              </div>
+              <input
+                id="costPrice"
+                type="text"
+                value={`${costPrice.toFixed(2)}`}
+                disabled
+                className="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm pl-9 cursor-not-allowed"
+              />
             </div>
-            <input
-              id="sellingPrice"
-              type="text"
-              value={`${sellingPrice.toFixed(2)}`}
-              disabled
-              className="flex h-10 w-full rounded-md border border-input bg-gray-50 px-3 py-2 text-sm pl-9 cursor-not-allowed"
-            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="sellingPrice">Selling Price</Label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                <DollarSign className="h-4 w-4 text-green-600" />
+              </div>
+              <input
+                id="sellingPrice"
+                type="number"
+                value={sellingPrice}
+                onChange={(e) => setSellingPrice(Number(e.target.value))}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm pl-9 font-bold text-green-600"
+              />
+            </div>
           </div>
         </div>
 
