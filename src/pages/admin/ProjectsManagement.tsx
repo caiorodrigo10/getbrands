@@ -19,9 +19,13 @@ import { useToast } from "@/components/ui/use-toast";
 interface ProjectWithProfile {
   id: string;
   name: string;
-  status: string;
-  points: number;
-  points_used: number;
+  status: string | null;
+  points: number | null;
+  points_used: number | null;
+  created_at: string;
+  updated_at: string;
+  description: string | null;
+  user_id: string | null;
   profiles: {
     first_name: string | null;
     last_name: string | null;
@@ -55,7 +59,7 @@ export const ProjectsManagement = () => {
       const { data, error } = await query;
 
       if (error) throw error;
-      return data;
+      return data as ProjectWithProfile[];
     }
   });
 
@@ -63,7 +67,7 @@ export const ProjectsManagement = () => {
     const project = projects?.find(p => p.id === projectId);
     if (!project) return;
 
-    const newPoints = (project.points || 0) + change;
+    const newPoints = ((project.points || 0) + change);
     if (newPoints < 0) return;
 
     const { error } = await supabase
