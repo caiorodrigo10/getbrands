@@ -15,7 +15,11 @@ import { LogOut, User, ShoppingBag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
-const UserMenu = () => {
+interface UserMenuProps {
+  isMobile: boolean;
+}
+
+const UserMenu = ({ isMobile }: UserMenuProps) => {
   const { user, logout } = useAuth();
   const [profile, setProfile] = useState<any>(null);
 
@@ -60,8 +64,52 @@ const UserMenu = () => {
   if (!user) return null;
 
   const userEmail = user.email || "";
-  const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : userEmail?.split("@")[0] || "User";
+  const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : userEmail?.split("@")[0] || "Usuário";
   const userAvatar = profile?.avatar_url;
+
+  const menuContent = (
+    <div className="p-1">
+      <Link to="/profile">
+        <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md">
+          <User className="h-4 w-4 text-gray-500" />
+          <span>Meu Perfil</span>
+        </DropdownMenuItem>
+      </Link>
+      <Link to="/sample-orders">
+        <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md">
+          <ShoppingBag className="h-4 w-4 text-gray-500" />
+          <span>Pedidos</span>
+        </DropdownMenuItem>
+      </Link>
+      <DropdownMenuItem 
+        onClick={logout}
+        className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 text-red-600 rounded-md"
+      >
+        <LogOut className="h-4 w-4" />
+        <span>Sair</span>
+      </DropdownMenuItem>
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <div className="flex flex-col">
+        <div className="flex items-center gap-3 mb-4">
+          <Avatar className="h-10 w-10 border border-white/20">
+            <AvatarImage src={userAvatar} alt={userName} />
+            <AvatarFallback className="bg-primary text-primary-foreground">
+              {userName.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-white">{userName}</span>
+            <span className="text-xs text-white/70">{totalPoints?.toLocaleString() || 0} pts</span>
+          </div>
+        </div>
+        {menuContent}
+      </div>
+    );
+  }
 
   return (
     <DropdownMenu>
@@ -101,27 +149,7 @@ const UserMenu = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-gray-100" />
-        <div className="p-1">
-          <Link to="/profile">
-            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md">
-              <User className="h-4 w-4 text-gray-500" />
-              <span>My Profile</span>
-            </DropdownMenuItem>
-          </Link>
-          <Link to="/sample-orders">
-            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md">
-              <ShoppingBag className="h-4 w-4 text-gray-500" />
-              <span>Orders</span>
-            </DropdownMenuItem>
-          </Link>
-          <DropdownMenuItem 
-            onClick={logout}
-            className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 text-red-600 rounded-md"
-          >
-            <LogOut className="h-4 w-4" />
-            <span>Log out</span>
-          </DropdownMenuItem>
-        </div>
+        {menuContent}
       </DropdownMenuContent>
     </DropdownMenu>
   );

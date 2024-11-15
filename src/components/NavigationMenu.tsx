@@ -8,10 +8,10 @@ export const NavigationMenu = () => {
 
   const menuItems = [
     { label: "Dashboard", path: "/" },
-    { label: "Projects", path: "/projects" },
-    { label: "Catalog", path: "/catalog" },
-    { label: "My Products", path: "/products" },
-    { label: "Profit Calculator", path: "/profit-calculator" },
+    { label: "Projetos", path: "/projects" },
+    { label: "Catálogo", path: "/catalog" },
+    { label: "Meus Produtos", path: "/products" },
+    { label: "Calculadora de Lucro", path: "/profit-calculator" },
   ];
 
   return (
@@ -46,27 +46,32 @@ export const NavigationMenu = () => {
                 <Menu className="h-6 w-6 text-gray-300" />
               </SheetTrigger>
               <SheetContent side="left" className="w-[300px] bg-[#131313] p-0">
-                <nav className="flex flex-col p-4">
-                  {menuItems.map((item) => (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      className={`px-4 py-3 text-sm rounded-md transition-all duration-200 ${
-                        location.pathname === item.path
-                          ? "bg-primary/20 text-primary-foreground font-medium"
-                          : "text-gray-300 hover:bg-gray-800 hover:text-white"
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </nav>
+                <div className="flex flex-col">
+                  <div className="p-4 border-b border-gray-800">
+                    <UserMenu isMobile={true} />
+                  </div>
+                  <nav className="flex flex-col p-4">
+                    {menuItems.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className={`px-4 py-3 text-sm rounded-md transition-all duration-200 ${
+                          location.pathname === item.path
+                            ? "bg-primary/20 text-primary-foreground font-medium"
+                            : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </nav>
+                </div>
               </SheetContent>
             </Sheet>
           </div>
 
-          <div className="flex items-center gap-4">
-            <UserMenu />
+          <div className="hidden md:flex items-center gap-4">
+            <UserMenu isMobile={false} />
           </div>
         </div>
       </div>
