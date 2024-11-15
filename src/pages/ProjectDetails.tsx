@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CalendarIcon, Plus, Package } from "lucide-react";
@@ -9,11 +8,22 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 import { ProjectStage } from "@/components/project/ProjectStage";
+import Cal, { getCalApi } from "@calcom/embed-react";
+import { useEffect } from "react";
 
 const ProjectDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [date, setDate] = useState<Date>();
+
+  useEffect(() => {
+    (async function () {
+      const cal = await getCalApi();
+      cal("ui", {
+        theme: "light",
+        styles: { branding: { brandColor: "#4c1e6c" } },
+      });
+    })();
+  }, []);
 
   const { data: project, isLoading } = useQuery({
     queryKey: ["project", id],
@@ -55,17 +65,16 @@ const ProjectDetails = () => {
       status: "pending" as const,
       content: (
         <div className="space-y-4">
-          <p className="text-muted-foreground">Select a date for the call:</p>
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            className="rounded-md border"
+          <p className="text-muted-foreground">Schedule a call with our team:</p>
+          <Cal
+            calLink="team/your-team"
+            style={{ width: "100%", height: "100%", minHeight: "500px" }}
+            config={{
+              layout: "month_view",
+              hideEventTypeDetails: false,
+              apiKey: "cal_live_64f1358eb9a10e9ec0e6795507e83554",
+            }}
           />
-          <Button className="w-full">
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            Schedule Call
-          </Button>
         </div>
       ),
     },
