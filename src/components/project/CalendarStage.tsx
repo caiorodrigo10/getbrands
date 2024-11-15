@@ -78,20 +78,12 @@ export const CalendarStage = () => {
             styles: { branding: { brandColor: "#4c1e6c" } },
             hideEventTypeDetails: false,
           });
-
-          // Pre-fill user data when available
-          if (profile) {
-            cal("preload", {
-              name: `${profile.first_name} ${profile.last_name}`.trim(),
-              notes: `Project ID: ${projectId}`,
-            });
-          }
         }
       } catch (error) {
         console.error("Error initializing Cal:", error);
       }
     })();
-  }, [profile, projectId]);
+  }, []);
 
   // Handle successful booking
   useEffect(() => {
