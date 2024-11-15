@@ -1,7 +1,7 @@
 import {
   Heart,
-  Mars, // Instead of Male
-  Venus, // Instead of Female
+  User, // Instead of Mars/Male
+  UserRound, // Instead of Venus/Female
   Wheat,
   Leaf,
   Milk,
@@ -15,8 +15,8 @@ import {
 
 export const Icons = {
   skinHealth: Heart,
-  mensHealth: Mars,
-  womensHealth: Venus,
+  mensHealth: User,
+  womensHealth: UserRound,
   glutenFree: Wheat,
   vegetarian: Leaf,
   lactoseFree: Milk,
