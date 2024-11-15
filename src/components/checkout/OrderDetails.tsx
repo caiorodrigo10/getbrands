@@ -33,20 +33,20 @@ const OrderDetails = ({ orderDetails }: OrderDetailsProps) => {
       <CardContent className="p-3 sm:p-6 space-y-4 sm:space-y-6">
         <div>
           <h3 className="text-sm font-medium mb-3">Product Details</h3>
-          <div className="grid gap-3">
+          <div className="grid gap-3 max-w-full">
             {orderDetails.sample_request_products.map(({ product }) => (
-              <div key={product.id} className="flex items-start gap-3 bg-card border rounded-lg p-3">
+              <div key={product.id} className="flex items-start gap-2 sm:gap-3 bg-card border rounded-lg p-2 sm:p-3 overflow-hidden">
                 <img
                   src={product.image_url || "/placeholder.svg"}
                   alt={product.name}
-                  className="w-16 h-16 object-cover rounded-md flex-shrink-0"
+                  className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-md flex-shrink-0"
                 />
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 space-y-1">
                   <h4 className="text-sm font-medium truncate">{product.name}</h4>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-muted-foreground">
                     SKU: {product.id.slice(0, 8)}
                   </p>
-                  <p className="text-sm font-medium mt-1">
+                  <p className="text-sm font-medium">
                     1 x {formatCurrency(product.from_price)}
                   </p>
                 </div>
