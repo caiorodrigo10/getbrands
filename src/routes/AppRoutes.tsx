@@ -44,7 +44,7 @@ export const AppRoutes = () => (
     </Route>
 
     {/* Protected Checkout Routes */}
-    <Route element={<ProtectedRoute />}>
+    <Route element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
       <Route path="/checkout/*" element={<Checkout />} />
       <Route path="/checkout/success" element={<Success />} />
     </Route>
