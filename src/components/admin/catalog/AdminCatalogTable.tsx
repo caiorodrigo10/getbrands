@@ -33,8 +33,7 @@ const AdminCatalogTable = ({ products }: AdminCatalogTableProps) => {
           <TableRow>
             <TableHead>Product</TableHead>
             <TableHead>Category</TableHead>
-            <TableHead>Price Range</TableHead>
-            <TableHead>Profit</TableHead>
+            <TableHead>Cost</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="w-[70px]"></TableHead>
           </TableRow>
@@ -54,23 +53,12 @@ const AdminCatalogTable = ({ products }: AdminCatalogTableProps) => {
                   />
                   <div>
                     <p className="font-medium hover:underline">{product.name}</p>
-                    <p className="text-sm text-muted-foreground line-clamp-1">
-                      {product.description}
-                    </p>
                   </div>
                 </div>
               </TableCell>
               <TableCell>{product.category}</TableCell>
               <TableCell>
-                <div className="space-y-1">
-                  <p>From: {formatCurrency(product.from_price)}</p>
-                  <p>SRP: {formatCurrency(product.srp)}</p>
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="bg-green-500 text-white px-2 py-1 rounded-md inline-block">
-                  {formatCurrency(product.srp - product.from_price)}
-                </div>
+                {formatCurrency(product.from_price)}
               </TableCell>
               <TableCell>
                 <div className="space-x-2">
