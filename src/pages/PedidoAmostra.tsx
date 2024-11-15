@@ -1,143 +1,74 @@
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Minus, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
-import { ProductSearch } from "@/components/ProductSearch";
-import { useShippingCalculation } from "@/hooks/useShippingCalculation";
-import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/contexts/CartContext";
+import { formatCurrency } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
+import { useWindowSize } from "@/hooks/useWindowSize";
 
-const PedidoAmostra = () => {
+const CartReview = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [selectedCountry] = useState("USA");
-  const { items, updateQuantity, removeItem } = useCart();
+  const { items } = useCart();
+  const { width } = useWindowSize();
+  const isMobile = width < 640;
 
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  
-  const { data: shippingCost, isError } = useShippingCalculation(
-    selectedCountry,
-    totalItems
-  );
-
-  const handleQuantityChange = (itemId: string, newQuantity: number) => {
-    updateQuantity(itemId, Math.max(1, newQuantity));
+  const handleContinue = () => {
+    navigate("/checkout/shipping");
   };
 
-  const calculateSubtotal = () => {
-    return items.reduce((total, item) => total + (item.from_price * item.quantity), 0);
-  };
-
-  const calculateTotal = () => {
-    return calculateSubtotal() + (shippingCost || 0);
-  };
-
-  const handleProceedToShipping = () => {
-    if (selectedCountry && items.length > 0) {
-      navigate("/checkout/shipping");
-    }
-  };
+  const total = items.reduce((sum, item) => sum + item.from_price * item.quantity, 0);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 space-y-6">
-      <div className="flex items-center gap-4 mb-6">
-        <div className="flex-1 max-w-lg">
-          <ProductSearch addToCart />
-        </div>
-        <Button className="bg-primary hover:bg-primary-dark text-white whitespace-nowrap">
-          Add Product
-        </Button>
-      </div>
-
-      <div className="space-y-4 mb-6">
-        {items.map((item) => (
-          <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm">
-            <div className="flex items-center gap-4">
-              <img src={item.image_url || '/placeholder.svg'} alt={item.name} className="w-16 h-16 object-contain bg-gray-50 rounded p-2" />
-              <div>
-                <h3 className="font-semibold text-gray-900 text-lg">{item.name}</h3>
-                <p className="text-sm text-gray-600">${item.from_price.toFixed(2)} per unit</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                <span className="w-12 text-center text-gray-900">{item.quantity}</span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-              <p className="font-semibold text-gray-900 w-20 text-right">
-                ${(item.from_price * item.quantity).toFixed(2)}
-              </p>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => removeItem(item.id)}
-                className="text-red-500 hover:text-red-700"
-              >
-                <Trash2 className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex justify-between items-start gap-6">
-        <div className="w-64">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Shipping Country
-          </label>
-          <Select value={selectedCountry} disabled>
-            <SelectTrigger className="bg-white">
-              <SelectValue>United States</SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="USA">United States</SelectItem>
-            </SelectContent>
-          </Select>
+    <div className="space-y-4">
+      <Card className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="p-3 sm:p-4 border-b">
+          <h2 className="text-base font-medium">Review your order</h2>
         </div>
         
-        <div className="w-64 space-y-3 bg-white p-4 rounded-lg shadow-sm">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Subtotal:</span>
-            <span className="font-semibold text-gray-900">${calculateSubtotal().toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Shipping:</span>
-            <span className="font-semibold text-gray-900">${(shippingCost || 0).toFixed(2)}</span>
-          </div>
-          <div className="border-t pt-3 mt-3">
-            <div className="flex justify-between">
-              <span className="font-semibold text-gray-900">Total:</span>
-              <span className="font-semibold text-gray-900">${calculateTotal().toFixed(2)}</span>
+        <div className="divide-y">
+          {items.map((item) => (
+            <div key={item.id} className="p-3 sm:p-4">
+              <div className="flex items-start space-x-3">
+                <img
+                  src={item.image_url || "/placeholder.svg"}
+                  alt={item.name}
+                  className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-md flex-shrink-0"
+                />
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm sm:text-base font-medium line-clamp-2">
+                    {item.name}
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Quantity: {item.quantity}
+                  </p>
+                  {!isMobile && (
+                    <p className="text-sm font-medium mt-1">
+                      {formatCurrency(item.from_price * item.quantity)}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
-      </div>
+      </Card>
 
-      <div className="flex justify-end mt-6">
+      <div className="fixed bottom-0 left-0 right-0 p-3 bg-background border-t sm:relative sm:border-0 sm:p-0 sm:bg-transparent">
+        <div className="mb-2 flex justify-between items-center">
+          <span className="text-sm font-medium">Total:</span>
+          <span className="text-sm font-bold">{formatCurrency(total)}</span>
+        </div>
         <Button
-          onClick={handleProceedToShipping}
-          className="bg-primary hover:bg-primary-dark text-white px-6"
-          disabled={!selectedCountry || items.length === 0}
+          onClick={handleContinue}
+          className="w-full sm:w-auto h-9 sm:h-11 text-sm"
         >
-          Proceed to Shipping
+          Continue to shipping
         </Button>
       </div>
+      
+      {/* Add padding at the bottom on mobile to account for fixed button */}
+      <div className="h-24 sm:h-0"></div>
     </div>
   );
 };
 
-export default PedidoAmostra;
+export default CartReview;
