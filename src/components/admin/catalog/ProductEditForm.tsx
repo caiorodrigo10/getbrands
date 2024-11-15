@@ -12,11 +12,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Product, ProductImage } from "@/types/product";
+import { Product } from "@/types/product";
 import { ProductImageUpload } from "./ProductImageUpload";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { ProductFormSection } from "./ProductFormSection";
+import { RichTextEditor } from "./RichTextEditor";
 
 const productFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -58,7 +59,7 @@ export function ProductEditForm({ product, onSubmit, onCancel }: ProductEditForm
         .order('position');
 
       if (error) throw error;
-      return data as ProductImage[];
+      return data;
     },
   });
 
@@ -71,130 +72,151 @@ export function ProductEditForm({ product, onSubmit, onCancel }: ProductEditForm
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <ProductImageUpload
-          productId={product.id}
-          images={productImages || []}
-          onImagesUpdate={() => refetchImages()}
-        />
-
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Product Name</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Category</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="from_price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>From Price</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    step="0.01"
-                    onChange={e => field.onChange(parseFloat(e.target.value))}
-                    value={field.value}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+        <ProductFormSection title="Media">
+          <ProductImageUpload
+            productId={product.id}
+            images={productImages || []}
+            onImagesUpdate={() => refetchImages()}
           />
+        </ProductFormSection>
 
-          <FormField
-            control={form.control}
-            name="srp"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>SRP</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    step="0.01"
-                    onChange={e => field.onChange(parseFloat(e.target.value))}
-                    value={field.value}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <ProductFormSection 
+          title="Basic Information"
+          description="Add the basic product information"
+        >
+          <div className="grid gap-6">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Product Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} className="max-w-xl" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <div className="flex gap-4">
-          <FormField
-            control={form.control}
-            name="is_new"
-            render={({ field }) => (
-              <FormItem className="flex items-center space-x-2">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <FormLabel className="!mt-0">New Product</FormLabel>
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <RichTextEditor value={field.value || ""} onChange={field.onChange} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </ProductFormSection>
 
-          <FormField
-            control={form.control}
-            name="is_tiktok"
-            render={({ field }) => (
-              <FormItem className="flex items-center space-x-2">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <FormLabel className="!mt-0">TikTok Product</FormLabel>
-              </FormItem>
-            )}
-          />
-        </div>
+        <ProductFormSection 
+          title="Pricing"
+          description="Set the product pricing information"
+        >
+          <div className="grid gap-6 sm:grid-cols-2 max-w-xl">
+            <FormField
+              control={form.control}
+              name="from_price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>From Price</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number" 
+                      step="0.01"
+                      onChange={e => field.onChange(parseFloat(e.target.value))}
+                      value={field.value}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <div className="flex justify-end gap-4">
+            <FormField
+              control={form.control}
+              name="srp"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>SRP</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number" 
+                      step="0.01"
+                      onChange={e => field.onChange(parseFloat(e.target.value))}
+                      value={field.value}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </ProductFormSection>
+
+        <ProductFormSection 
+          title="Organization"
+          description="Organize and categorize the product"
+        >
+          <div className="grid gap-6">
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <FormControl>
+                    <Input {...field} className="max-w-xl" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex gap-6">
+              <FormField
+                control={form.control}
+                name="is_new"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel className="!mt-0">New Product</FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="is_tiktok"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel className="!mt-0">TikTok Product</FormLabel>
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+        </ProductFormSection>
+
+        <div className="flex justify-end gap-4 pt-6 border-t">
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
