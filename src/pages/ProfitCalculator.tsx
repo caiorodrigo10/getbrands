@@ -6,8 +6,16 @@ import { ProfitProjections } from "@/components/profit-calculator/ProfitProjecti
 import { Product } from "@/types/product";
 import { Card } from "@/components/ui/card";
 
+interface CalculationValues {
+  monthlySales: number;
+  growthRate: number;
+  costPrice: number;
+  sellingPrice: number;
+}
+
 const ProfitCalculator = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [calculationValues, setCalculationValues] = useState<CalculationValues | null>(null);
   const { toast } = useToast();
 
   const handleProductSelect = (product: Product) => {
@@ -16,6 +24,10 @@ const ProfitCalculator = () => {
       title: "Product Selected",
       description: `${product.name} has been selected for calculation.`,
     });
+  };
+
+  const handleCalculate = (values: CalculationValues) => {
+    setCalculationValues(values);
   };
 
   return (
@@ -52,8 +64,16 @@ const ProfitCalculator = () => {
                 </div>
               </div>
             </Card>
-            <ProfitCalculatorForm product={selectedProduct} />
-            <ProfitProjections product={selectedProduct} />
+            <ProfitCalculatorForm 
+              product={selectedProduct} 
+              onCalculate={handleCalculate}
+            />
+            {calculationValues && (
+              <ProfitProjections 
+                product={selectedProduct}
+                calculationValues={calculationValues}
+              />
+            )}
           </>
         )}
       </div>
