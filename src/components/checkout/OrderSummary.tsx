@@ -17,24 +17,24 @@ const OrderSummary = ({ orderDetails }: OrderSummaryProps) => {
     (sum, { product }) => sum + product.from_price,
     0
   );
-  const shippingCost = 4.50; // Base shipping rate
+  const shippingCost = 4.50;
   const total = subtotal + shippingCost;
 
   return (
-    <Card className="mt-6">
-      <CardContent className="pt-6">
-        <h3 className="font-medium mb-4">Payment Summary</h3>
+    <Card className="mt-4 sm:mt-6">
+      <CardContent className="pt-4 sm:pt-6">
+        <h3 className="text-base sm:text-lg font-medium mb-3 sm:mb-4">Payment Summary</h3>
         <div className="space-y-2">
-          <div className="flex justify-between">
+          <div className="flex justify-between text-sm sm:text-base">
             <span className="text-muted-foreground">Subtotal</span>
             <span>{formatCurrency(subtotal)}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between text-sm sm:text-base">
             <span className="text-muted-foreground">Shipping</span>
             <span>{formatCurrency(shippingCost)}</span>
           </div>
           <Separator className="my-2" />
-          <div className="flex justify-between font-medium">
+          <div className="flex justify-between font-medium text-sm sm:text-base">
             <span>Total</span>
             <span>{formatCurrency(total)}</span>
           </div>
