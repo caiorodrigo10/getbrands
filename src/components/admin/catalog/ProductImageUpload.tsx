@@ -29,7 +29,7 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
         .eq('id', productId)
         .single();
 
-      if (product?.image_url && images.length === 0) {
+      if (product?.image_url && !images.some(img => img.image_url === product.image_url)) {
         await supabase
           .from('product_images')
           .insert({
@@ -43,7 +43,7 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
     };
 
     syncProfileImage();
-  }, [productId, images.length, onImagesUpdate]);
+  }, [productId, images, onImagesUpdate]);
 
   const handleDeleteImage = async (imageId: string) => {
     try {
@@ -98,7 +98,7 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
           items={images.map(img => img.id)}
           strategy={verticalListSortingStrategy}
         >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {images.map((image) => (
               <SortableImage
                 key={image.id}
