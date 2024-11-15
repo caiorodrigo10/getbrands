@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { ResponsiveContainer, FunnelChart, Funnel, Cell, LabelList } from "recharts";
+import { ResponsiveContainer, FunnelChart, Funnel, Cell } from "recharts";
 
 const data = [
   { name: "Members", value: 1200, fill: "#4c1e6c" },
@@ -8,26 +8,32 @@ const data = [
 ];
 
 const CustomLabel = (props: any) => {
-  const { x, y, width, value, name } = props;
+  const { x, y, width, payload } = props;
   return (
     <g>
+      <rect
+        x={x + width / 4}
+        y={y - 20}
+        width={width / 2}
+        height={40}
+        fill="rgba(255, 255, 255, 0.9)"
+        rx={4}
+      />
       <text
         x={x + width / 2}
-        y={y}
+        y={y - 5}
         textAnchor="middle"
-        dominantBaseline="middle"
-        className="fill-white font-medium text-sm"
+        className="text-sm font-medium fill-gray-900"
       >
-        {name}
+        {payload.name}
       </text>
       <text
         x={x + width / 2}
-        y={y + 20}
+        y={y + 15}
         textAnchor="middle"
-        dominantBaseline="middle"
-        className="fill-white font-bold text-lg"
+        className="text-base font-bold fill-gray-900"
       >
-        {value.toLocaleString()}
+        {payload.value.toLocaleString()}
       </text>
     </g>
   );
@@ -49,10 +55,7 @@ const SalesFunnel = () => {
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}
-              <LabelList
-                position="center"
-                content={CustomLabel}
-              />
+              <Label content={CustomLabel} position="right" />
             </Funnel>
           </FunnelChart>
         </ResponsiveContainer>
