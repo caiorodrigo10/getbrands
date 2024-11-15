@@ -121,10 +121,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(data.user);
         setSession(data.session);
         identifyUserInGleap(data.user);
-        toast({
-          title: "Success",
-          description: "Logged in successfully!",
-        });
       }
     } catch (error) {
       console.error('Login error:', error);
