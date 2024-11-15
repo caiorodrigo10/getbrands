@@ -69,16 +69,13 @@ export const CalendarStage = () => {
   });
 
   useEffect(() => {
-    (async function () {
+    (async function initCal() {
       try {
         const cal = await getCalApi();
-        if (cal) {
-          cal("ui", {
-            theme: "light",
-            styles: { branding: { brandColor: "#4c1e6c" } },
-            hideEventTypeDetails: false,
-          });
-        }
+        cal("ui", {
+          styles: { branding: { brandColor: "#4c1e6c" } },
+          hideEventTypeDetails: false,
+        });
       } catch (error) {
         console.error("Error initializing Cal:", error);
       }
@@ -97,7 +94,6 @@ export const CalendarStage = () => {
       }
     };
 
-    // Add event listener for Cal.com booking events
     window.addEventListener("cal:booking", handleCalendarEvent as EventListener);
 
     return () => {
