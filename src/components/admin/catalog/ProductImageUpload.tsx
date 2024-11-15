@@ -126,6 +126,8 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
     try {
       const updates = reorderedImages.map((img, index) => ({
         id: img.id,
+        product_id: img.product_id,
+        image_url: img.image_url,
         position: index,
         is_primary: index === 0
       }));
