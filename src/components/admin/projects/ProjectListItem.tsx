@@ -41,7 +41,7 @@ const ProjectListItem = ({ project, isExpanded, onToggle }: ProjectListItemProps
         <div className="flex items-center justify-between">
           <div className="grid grid-cols-1 md:grid-cols-6 gap-4 flex-1">
             <div>
-              <h3 className="font-medium">{project.name}</h3>
+              <p className="text-sm text-foreground">{project.name}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">{project.client}</p>
