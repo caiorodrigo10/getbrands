@@ -71,9 +71,9 @@ const Products = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <h1 className="text-3xl font-bold">My Products</h1>
-        <div className="flex flex-col gap-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-3xl font-bold mb-6">My Products</h1>
+        <div className="flex flex-col gap-4">
           {[1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-[200px] w-full" />
           ))}
@@ -83,10 +83,10 @@ const Products = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {showConfetti && <Confetti />}
-      <h1 className="text-3xl font-bold">My Products</h1>
-      <div className="flex flex-col gap-6">
+      <h1 className="text-3xl font-bold mb-6">My Products</h1>
+      <div className="flex flex-col gap-4">
         {products?.map((item, index) => {
           const specificProduct = item.specific?.[0];
           const displayName = specificProduct?.name || item.product.name;
@@ -95,11 +95,11 @@ const Products = () => {
           return (
             <Card 
               key={item.id}
-              className="p-6 animate-fade-in"
+              className="p-4 animate-fade-in"
               style={{ animationDelay: `${index * 150}ms` }}
             >
-              <div className="flex gap-6">
-                <div className="w-48 h-48 flex-shrink-0">
+              <div className="flex gap-4">
+                <div className="w-40 h-40 flex-shrink-0">
                   <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
                     <img
                       src={displayImage || "/placeholder.svg"}
@@ -119,9 +119,9 @@ const Products = () => {
                     <p className="text-sm text-gray-600 mt-1">{item.product.category}</p>
                   </div>
                   
-                  <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="bg-gray-50 rounded-lg p-3">
                     <div className="flex items-start justify-between gap-4">
-                      <div className="flex-grow space-y-3">
+                      <div className="flex-grow space-y-2">
                         <p className="text-sm font-medium text-gray-700">Original Product:</p>
                         <p className="text-sm text-gray-600 hover:text-primary cursor-pointer"
                            onClick={() => navigateToOriginalProduct(item.product.id)}>
@@ -129,7 +129,7 @@ const Products = () => {
                         </p>
                       </div>
                       <div 
-                        className="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity"
+                        className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity"
                         onClick={() => navigateToOriginalProduct(item.product.id)}
                       >
                         <img
@@ -166,7 +166,7 @@ const Products = () => {
           );
         })}
         {products?.length === 0 && (
-          <div className="col-span-full text-center py-12">
+          <div className="text-center py-8">
             <p className="text-lg text-gray-600">No products selected yet.</p>
           </div>
         )}
