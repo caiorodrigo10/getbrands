@@ -145,6 +145,75 @@ export type Database = {
           },
         ]
       }
+      package_quizzes: {
+        Row: {
+          additional_notes: string | null
+          created_at: string
+          current_step: number | null
+          id: string
+          label_style: string | null
+          logo_placement: string | null
+          primary_color: string | null
+          project_id: string
+          reference_labels: string[] | null
+          secondary_color: string | null
+          status: string | null
+          typography_choice: string | null
+          updated_at: string
+          user_id: string
+          visual_elements: string[] | null
+        }
+        Insert: {
+          additional_notes?: string | null
+          created_at?: string
+          current_step?: number | null
+          id?: string
+          label_style?: string | null
+          logo_placement?: string | null
+          primary_color?: string | null
+          project_id: string
+          reference_labels?: string[] | null
+          secondary_color?: string | null
+          status?: string | null
+          typography_choice?: string | null
+          updated_at?: string
+          user_id: string
+          visual_elements?: string[] | null
+        }
+        Update: {
+          additional_notes?: string | null
+          created_at?: string
+          current_step?: number | null
+          id?: string
+          label_style?: string | null
+          logo_placement?: string | null
+          primary_color?: string | null
+          project_id?: string
+          reference_labels?: string[] | null
+          secondary_color?: string | null
+          status?: string | null
+          typography_choice?: string | null
+          updated_at?: string
+          user_id?: string
+          visual_elements?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "package_quizzes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_quizzes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category: string

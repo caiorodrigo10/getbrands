@@ -1,4 +1,4 @@
-export interface BrandQuiz {
+export interface PackageQuiz {
   id: string;
   project_id: string;
   user_id: string;
@@ -16,7 +16,7 @@ export interface BrandQuiz {
   updated_at: string;
 }
 
-export interface BrandQuizFile {
+export interface PackageQuizFile {
   id: string;
   quiz_id: string;
   file_url: string;

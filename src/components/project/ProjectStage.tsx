@@ -2,14 +2,14 @@ import { Card } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { BrandQuiz } from "./BrandQuiz";
+import { PackageQuiz } from "./PackageQuiz";
 
 interface ProjectStageProps {
   title: string;
   description: string;
   status: "pending" | "completed" | "in-progress";
   children: React.ReactNode;
-  type?: "default" | "brand-quiz";
+  type?: "default" | "package-quiz";
 }
 
 export function ProjectStage({ 
@@ -38,7 +38,7 @@ export function ProjectStage({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="border-t px-6 pb-6 pt-4">
-            {type === "brand-quiz" ? <BrandQuiz /> : children}
+            {type === "package-quiz" ? <PackageQuiz /> : children}
           </div>
         </CollapsibleContent>
       </Card>
