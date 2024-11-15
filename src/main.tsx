@@ -8,7 +8,7 @@ import Gleap from 'gleap'
 Gleap.initialize("qqAquIhEn19VOadZnGz2Xg48r3NoXdas");
 
 // Configure Gleap widget appearance
-Gleap.getInstance().setUIConfig({
+Gleap.setStyles({
   primaryColor: "#4c1e6c",
   headerColor: "#4c1e6c",
   buttonColor: "#4c1e6c",
