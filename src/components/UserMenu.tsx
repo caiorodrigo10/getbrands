@@ -67,8 +67,8 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : userEmail?.split("@")[0] || "Usuário";
   const userAvatar = profile?.avatar_url;
 
-  const menuContent = (
-    <div className="p-1">
+  const menuItems = (
+    <>
       <Link to="/profile">
         <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md">
           <User className="h-4 w-4 text-gray-500" />
@@ -88,7 +88,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
         <LogOut className="h-4 w-4" />
         <span>Sair</span>
       </DropdownMenuItem>
-    </div>
+    </>
   );
 
   if (isMobile) {
@@ -106,7 +106,9 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
             <span className="text-xs text-white/70">{totalPoints?.toLocaleString() || 0} pts</span>
           </div>
         </div>
-        {menuContent}
+        <div className="flex flex-col space-y-1">
+          {menuItems}
+        </div>
       </div>
     );
   }
@@ -149,7 +151,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-gray-100" />
-        {menuContent}
+        {menuItems}
       </DropdownMenuContent>
     </DropdownMenu>
   );
