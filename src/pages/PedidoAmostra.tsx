@@ -52,46 +52,82 @@ const PedidoAmostra = () => {
 
       <div className="space-y-4 mb-6">
         {items.map((item) => (
-          <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm">
-            <div className="flex items-center gap-4">
+          <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-white shadow-sm">
+            <div className="flex items-start gap-4 mb-4 sm:mb-0">
               <img src={item.image_url || '/placeholder.svg'} alt={item.name} className="w-16 h-16 object-contain bg-gray-50 rounded p-2" />
-              <div>
-                <h3 className="font-semibold text-gray-900 text-lg">{item.name}</h3>
-                <p className="text-sm text-gray-600">${item.from_price.toFixed(2)} per unit</p>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-gray-900 text-lg mb-1">{item.name}</h3>
+                <p className="text-sm text-gray-600 sm:hidden mb-2">${item.from_price.toFixed(2)} per unit</p>
+                <div className="flex items-center justify-between sm:hidden">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                    >
+                      <Minus className="h-3 w-3" />
+                    </Button>
+                    <span className="w-8 text-center text-sm">{item.quantity}</span>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                    >
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <p className="font-semibold text-gray-900">
+                    ${(item.from_price * item.quantity).toFixed(2)}
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-4 sm:gap-6">
-              <div className="flex items-center gap-1 sm:gap-2">
+            
+            {/* Desktop controls */}
+            <div className="hidden sm:flex items-center gap-6">
+              <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-7 w-7 sm:h-9 sm:w-9"
+                  className="h-9 w-9"
                   onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
                 >
-                  <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <Minus className="h-4 w-4" />
                 </Button>
-                <span className="w-8 text-center text-sm sm:text-base text-gray-900">{item.quantity}</span>
+                <span className="w-8 text-center text-base">{item.quantity}</span>
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-7 w-7 sm:h-9 sm:w-9"
+                  className="h-9 w-9"
                   onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                 >
-                  <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <Plus className="h-4 w-4" />
                 </Button>
               </div>
-              <p className="hidden sm:block font-semibold text-gray-900 w-20 text-right">
+              <p className="font-semibold text-gray-900 w-20 text-right">
                 ${(item.from_price * item.quantity).toFixed(2)}
               </p>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => removeItem(item.id)}
-                className="text-red-500 hover:text-red-700 h-7 w-7 sm:h-9 sm:w-9"
+                className="text-red-500 hover:text-red-700 h-9 w-9"
               >
-                <Trash2 className="h-4 w-4 sm:h-5 sm:w-5" />
+                <Trash2 className="h-5 w-5" />
               </Button>
             </div>
+            
+            {/* Mobile delete button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => removeItem(item.id)}
+              className="sm:hidden text-red-500 hover:text-red-700 h-9 w-9 self-end"
+            >
+              <Trash2 className="h-5 w-5" />
+            </Button>
           </div>
         ))}
       </div>
