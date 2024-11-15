@@ -10,17 +10,19 @@ export const ProductActions = ({ productId, onSelectProduct }: ProductActionsPro
   const { isLoading, handleRequestSample } = useProductActions(productId);
 
   return (
-    <div className="flex flex-col sm:flex-row gap-2">
+    <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 mt-6">
       <Button 
         variant="outline" 
-        className="flex-1 text-primary hover:text-primary border-primary hover:bg-primary/10"
+        size="lg"
+        className="w-full text-primary hover:text-primary border-2 border-primary hover:bg-primary/10 h-12 text-base font-medium rounded-full"
         onClick={handleRequestSample}
         disabled={isLoading}
       >
         {isLoading ? "Adding to cart..." : "Request Sample"}
       </Button>
       <Button 
-        className="flex-1 bg-primary hover:bg-primary-dark text-white"
+        size="lg"
+        className="w-full bg-primary hover:bg-primary-dark text-white h-12 text-base font-medium rounded-full"
         onClick={onSelectProduct}
         disabled={isLoading}
       >
