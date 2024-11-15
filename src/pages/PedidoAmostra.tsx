@@ -60,22 +60,24 @@ const PedidoAmostra = () => {
                 <p className="text-sm text-gray-600">${item.from_price.toFixed(2)} per unit</p>
               </div>
             </div>
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4 sm:gap-6">
+              <div className="flex items-center gap-1 sm:gap-2">
                 <Button
                   variant="outline"
                   size="icon"
+                  className="h-7 w-7 sm:h-9 sm:w-9"
                   onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
                 >
-                  <Minus className="h-4 w-4" />
+                  <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
-                <span className="w-12 text-center text-gray-900">{item.quantity}</span>
+                <span className="w-8 text-center text-sm sm:text-base text-gray-900">{item.quantity}</span>
                 <Button
                   variant="outline"
                   size="icon"
+                  className="h-7 w-7 sm:h-9 sm:w-9"
                   onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
               <p className="font-semibold text-gray-900 w-20 text-right">
@@ -85,9 +87,9 @@ const PedidoAmostra = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => removeItem(item.id)}
-                className="text-red-500 hover:text-red-700"
+                className="text-red-500 hover:text-red-700 h-7 w-7 sm:h-9 sm:w-9"
               >
-                <Trash2 className="h-5 w-5" />
+                <Trash2 className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </div>
           </div>
