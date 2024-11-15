@@ -37,26 +37,33 @@ export const CalendarStage = () => {
         // Add event listener
         cal("on", {
           action: "bookingSuccessful",
-          callback: (event: any) => {
-            if (!event.detail?.startTime) {
+          callback: async (event: any) => {
+            console.log("Booking event received:", event); // Debug log
+
+            if (!event?.detail?.startTime) {
               console.error("No start time provided in booking event:", event);
               toast.error("Failed to schedule meeting. Please try again.");
               return;
             }
 
             if (!user?.id || !projectId) {
-              console.error("Missing user ID or project ID");
+              console.error("Missing user ID or project ID:", { userId: user?.id, projectId });
               toast.error("Authentication error. Please try again.");
               return;
             }
 
-            logMeetingMutation.mutate({
-              project_id: projectId,
-              user_id: user.id,
-              scheduled_for: new Date(event.detail.startTime).toISOString(),
-              meeting_link: event.detail.meetingLink,
-              status: "scheduled"
-            });
+            try {
+              await logMeetingMutation.mutateAsync({
+                project_id: projectId,
+                user_id: user.id,
+                scheduled_for: new Date(event.detail.startTime).toISOString(),
+                meeting_link: event.detail.meetingLink || null,
+                status: "scheduled"
+              });
+            } catch (error) {
+              console.error("Error in booking callback:", error);
+              toast.error("Failed to save meeting details. Please try again.");
+            }
           },
         });
       } catch (error) {
@@ -77,7 +84,7 @@ export const CalendarStage = () => {
         console.error("Error cleaning up calendar:", error);
       }
     };
-  }, [projectId, user]);
+  }, [projectId, user, logMeetingMutation]);
 
   // Fetch user profile data
   const { data: profile } = useQuery({
@@ -100,16 +107,21 @@ export const CalendarStage = () => {
       project_id: string;
       user_id: string;
       scheduled_for: string;
-      meeting_link?: string;
+      meeting_link?: string | null;
       status: string;
     }) => {
+      console.log("Attempting to save meeting:", meetingData); // Debug log
+
       const { data, error } = await supabase
         .from("project_meetings")
         .insert(meetingData)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error); // Debug log
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
