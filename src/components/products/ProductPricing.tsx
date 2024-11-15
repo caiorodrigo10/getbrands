@@ -3,6 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { PencilIcon, CheckIcon, XIcon } from "lucide-react";
 
 interface ProductPricingProps {
   projectProductId: string;
@@ -20,14 +22,22 @@ export const ProductPricing = ({
   onPriceUpdate,
 }: ProductPricingProps) => {
   const [sellingPrice, setSellingPrice] = useState(currentSellingPrice || suggestedPrice);
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempPrice, setTempPrice] = useState(sellingPrice.toString());
   const { toast } = useToast();
   const profit = sellingPrice - costPrice;
 
-  const handlePriceChange = async (newPrice: string) => {
-    const price = parseFloat(newPrice);
-    if (isNaN(price)) return;
+  const handlePriceChange = async () => {
+    const price = parseFloat(tempPrice);
+    if (isNaN(price)) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid price",
+        variant: "destructive",
+      });
+      return;
+    }
     
-    setSellingPrice(price);
     try {
       const { error } = await supabase
         .from('project_specific_products')
@@ -38,7 +48,9 @@ export const ProductPricing = ({
 
       if (error) throw error;
 
+      setSellingPrice(price);
       onPriceUpdate(price);
+      setIsEditing(false);
       toast({
         title: "Success",
         description: "Selling price updated successfully",
@@ -52,18 +64,60 @@ export const ProductPricing = ({
     }
   };
 
+  const cancelEdit = () => {
+    setTempPrice(sellingPrice.toString());
+    setIsEditing(false);
+  };
+
   return (
     <div className="space-y-4 mt-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label>Your Selling Price</Label>
-          <Input
-            type="number"
-            value={sellingPrice}
-            onChange={(e) => handlePriceChange(e.target.value)}
-            min={0}
-            step="0.01"
-          />
+          <div className="flex items-center justify-between mb-2">
+            <Label>Your Selling Price</Label>
+            {!isEditing ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+                className="h-8 px-2"
+              >
+                <PencilIcon className="h-4 w-4" />
+              </Button>
+            ) : (
+              <div className="flex gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handlePriceChange}
+                  className="h-8 px-2"
+                >
+                  <CheckIcon className="h-4 w-4 text-green-600" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={cancelEdit}
+                  className="h-8 px-2"
+                >
+                  <XIcon className="h-4 w-4 text-red-600" />
+                </Button>
+              </div>
+            )}
+          </div>
+          {isEditing ? (
+            <Input
+              type="number"
+              value={tempPrice}
+              onChange={(e) => setTempPrice(e.target.value)}
+              min={0}
+              step="0.01"
+            />
+          ) : (
+            <div className="p-2 border rounded-md">
+              ${sellingPrice.toFixed(2)}
+            </div>
+          )}
         </div>
         <div>
           <Label>Profit</Label>
