@@ -6,7 +6,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -15,6 +14,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Product } from "@/types/product";
+import { ProductImageUpload } from "./ProductImageUpload";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const productFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -46,6 +48,20 @@ export function ProductEditForm({ product, onSubmit, onCancel }: ProductEditForm
     },
   });
 
+  const { data: productImages, refetch: refetchImages } = useQuery({
+    queryKey: ['product-images', product.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('product_images')
+        .select('*')
+        .eq('product_id', product.id)
+        .order('position');
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const handleSubmit = (values: z.infer<typeof productFormSchema>) => {
     onSubmit({
       ...product,
@@ -56,6 +72,12 @@ export function ProductEditForm({ product, onSubmit, onCancel }: ProductEditForm
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        <ProductImageUpload
+          productId={product.id}
+          images={productImages || []}
+          onImagesUpdate={() => refetchImages()}
+        />
+
         <FormField
           control={form.control}
           name="name"
