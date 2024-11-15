@@ -55,9 +55,17 @@ const Dashboard = () => {
           </Button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products?.slice(0, 3).map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {products?.slice(0, 3).map((item) => {
+            const specificProduct = item.specific?.[0];
+            const displayProduct = {
+              ...item.product,
+              name: specificProduct?.name || item.product?.name,
+              image_url: specificProduct?.image_url || item.product?.image_url,
+            };
+            return (
+              <ProductCard key={item.id} product={displayProduct} />
+            );
+          })}
         </div>
       </div>
 

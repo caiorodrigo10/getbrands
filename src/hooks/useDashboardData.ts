@@ -104,31 +104,35 @@ export const useDashboardData = () => {
     queryFn: async () => {
       if (!user?.id) return null;
       const { data, error } = await supabase
-        .from("projects")
+        .from('project_products')
         .select(`
-          project_products!project_products_project_id_fkey (
-            product:products (*)
+          id,
+          project:projects (
+            id,
+            name,
+            description
+          ),
+          product:products (*),
+          specific:project_specific_products (
+            id,
+            name,
+            description,
+            image_url,
+            selling_price
           )
         `)
-        .eq("user_id", user.id)
+        .order('created_at', { ascending: false })
         .limit(3);
 
       if (error) {
         toast({
           variant: "destructive",
           title: "Error loading products",
-          description: error.message,
+          description: error.message
         });
         throw error;
       }
-      
-      // Flatten the nested structure and extract just the products
-      const flattenedProducts = data?.flatMap(project => 
-        project.project_products.map(pp => pp.product)
-      ) || [];
-      
-      // Take only the first 3 products
-      return flattenedProducts.slice(0, 3);
+      return data;
     },
     enabled: !!user?.id && isAuthenticated,
     staleTime: 30000,
