@@ -5,7 +5,7 @@ import { ChevronLeft, CheckCircle, Truck, CreditCard } from "lucide-react";
 import PedidoAmostra from "../PedidoAmostra";
 import Shipping from "./Shipping";
 import Payment from "./Payment";
-import Sidebar from "@/components/Sidebar";
+import { Sidebar } from "@/components/Sidebar";
 
 const steps = [
   { id: "confirmation", name: "Confirmation", path: "/checkout/confirmation", icon: CheckCircle },

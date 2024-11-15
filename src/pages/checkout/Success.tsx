@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import OrderDetails from "@/components/checkout/OrderDetails";
 import OrderSummary from "@/components/checkout/OrderSummary";
-import Sidebar from "@/components/Sidebar";
+import { Sidebar } from "@/components/Sidebar";
 import Confetti from 'react-confetti';
 
 const Success = () => {
