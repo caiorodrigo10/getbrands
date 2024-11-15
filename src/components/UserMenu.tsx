@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User, ShoppingBag } from "lucide-react";
+import { LogOut, User, ShoppingBag, LayoutDashboard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
@@ -22,6 +22,7 @@ interface UserMenuProps {
 const UserMenu = ({ isMobile }: UserMenuProps) => {
   const { user, logout } = useAuth();
   const [profile, setProfile] = useState<any>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
@@ -48,6 +49,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   const userEmail = user.email || "";
   const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : userEmail?.split("@")[0] || "User";
   const userAvatar = profile?.avatar_url;
+  const isAdmin = profile?.role === "admin";
 
   if (isMobile) {
     return (
@@ -79,6 +81,15 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
             <ShoppingBag className="h-4 w-4" />
             <span>Orders</span>
           </Link>
+          {isAdmin && (
+            <button
+              onClick={() => navigate("/admin")}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-md w-full text-left"
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              <span>Admin Panel</span>
+            </button>
+          )}
           <button
             onClick={logout}
             className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-gray-800 rounded-md w-full text-left"
@@ -144,6 +155,15 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
               <span>Orders</span>
             </DropdownMenuItem>
           </Link>
+          {isAdmin && (
+            <DropdownMenuItem 
+              onClick={() => navigate("/admin")}
+              className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md"
+            >
+              <LayoutDashboard className="h-4 w-4 text-gray-500" />
+              <span>Admin Panel</span>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem 
             onClick={logout}
             className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 text-red-600 rounded-md"
