@@ -154,8 +154,8 @@ const ProductDetails = () => {
 
       if (insertError) throw insertError;
 
-      // Navigate to success page with product and project info
-      navigate("/produtos/success", {
+      // Navigate to success page with product and project info - FIXED PATH
+      navigate("/products/success", {
         state: {
           product: {
             name: product?.name,
