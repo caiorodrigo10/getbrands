@@ -43,10 +43,10 @@ const PedidoAmostra = () => {
     <div className="max-w-4xl mx-auto px-4 space-y-6">
       <div className="flex items-center gap-4 mb-6">
         <div className="flex-1 max-w-lg">
-          <ProductSearch />
+          <ProductSearch addToCart />
         </div>
         <Button className="bg-primary hover:bg-primary-dark text-white whitespace-nowrap">
-          Adicionar Produto
+          Add Product
         </Button>
       </div>
 
@@ -57,7 +57,7 @@ const PedidoAmostra = () => {
               <img src={item.image_url || '/placeholder.svg'} alt={item.name} className="w-16 h-16 object-contain bg-gray-50 rounded p-2" />
               <div>
                 <h3 className="font-semibold text-gray-900 text-lg">{item.name}</h3>
-                <p className="text-sm text-gray-600">${item.from_price.toFixed(2)} por unidade</p>
+                <p className="text-sm text-gray-600">${item.from_price.toFixed(2)} per unit</p>
               </div>
             </div>
             <div className="flex items-center gap-6">
@@ -115,7 +115,7 @@ const PedidoAmostra = () => {
             <span className="font-semibold text-gray-900">${calculateSubtotal().toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Frete:</span>
+            <span className="text-gray-600">Shipping:</span>
             <span className="font-semibold text-gray-900">${(shippingCost || 0).toFixed(2)}</span>
           </div>
           <div className="border-t pt-3 mt-3">
@@ -133,7 +133,7 @@ const PedidoAmostra = () => {
           className="bg-primary hover:bg-primary-dark text-white px-6"
           disabled={!selectedCountry || items.length === 0}
         >
-          Prosseguir para Envio
+          Proceed to Shipping
         </Button>
       </div>
     </div>

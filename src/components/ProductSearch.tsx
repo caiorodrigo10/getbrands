@@ -41,28 +41,22 @@ export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSea
   ) || [];
 
   const handleSelect = async (product: Product) => {
-    try {
-      if (addToCart) {
+    if (addToCart) {
+      try {
         await addItem(product);
+        setOpen(false);
+        setQuery("");
+      } catch (error) {
         toast({
-          title: "Success",
-          description: "Product added to sample cart.",
+          variant: "destructive",
+          title: "Error",
+          description: "Could not add product to cart.",
         });
-        navigate("/checkout/confirmation");
       }
-      
-      if (onSelectProduct) {
-        onSelectProduct(product);
-      }
-      
+    } else if (onSelectProduct) {
+      onSelectProduct(product);
       setOpen(false);
       setQuery("");
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not process your request.",
-      });
     }
   };
 
@@ -116,7 +110,7 @@ export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSea
                   <div className="flex-1 text-left">
                     <p className="font-medium text-gray-900">{product.name}</p>
                     <p className="text-sm text-gray-500">
-                      R$ {product.from_price.toFixed(2)}
+                      ${product.from_price.toFixed(2)}
                     </p>
                   </div>
                 </button>
