@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ProjectSelectionDialog from "@/components/dialogs/ProjectSelectionDialog";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -19,6 +20,8 @@ const ProductDetails = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [showProjectDialog, setShowProjectDialog] = useState(false);
+  const [projects, setProjects] = useState<any[]>([]);
 
   const { data: product, isLoading: productLoading } = useQuery({
     queryKey: ["product", id],
@@ -99,7 +102,79 @@ const ProductDetails = () => {
     if (availableProjects.length === 0) {
       navigate("/checkout/points");
     } else {
-      navigate("/projects/select", { state: { productId: id } });
+      setProjects(availableProjects);
+      setShowProjectDialog(true);
+    }
+  };
+
+  const handleProjectSelection = async (projectId: string) => {
+    try {
+      // First check if product already exists in project
+      const { data: existingProduct, error: checkError } = await supabase
+        .from('project_products')
+        .select('*')
+        .eq('project_id', projectId)
+        .eq('product_id', id)
+        .maybeSingle();
+
+      if (existingProduct) {
+        toast({
+          variant: "destructive",
+          title: "Product already selected",
+          description: "This product is already in your project.",
+        });
+        return;
+      }
+
+      // Get current project points
+      const { data: currentProject, error: projectError } = await supabase
+        .from('projects')
+        .select('points_used, name')
+        .eq('id', projectId)
+        .single();
+
+      if (projectError) throw projectError;
+
+      // Update project points (add 1000 to points_used)
+      const newPointsUsed = (currentProject?.points_used || 0) + 1000;
+      const { error: updateError } = await supabase
+        .from('projects')
+        .update({ points_used: newPointsUsed })
+        .eq('id', projectId);
+
+      if (updateError) throw updateError;
+
+      // Add product to project
+      const { error: insertError } = await supabase
+        .from('project_products')
+        .insert({
+          project_id: projectId,
+          product_id: id
+        });
+
+      if (insertError) throw insertError;
+
+      // Navigate to success page with product and project info
+      navigate("/produtos/success", {
+        state: {
+          product: {
+            name: product?.name,
+            image_url: product?.image_url
+          },
+          project: {
+            name: currentProject.name
+          }
+        },
+        replace: true
+      });
+
+    } catch (error) {
+      console.error('Error selecting product:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to select product. Please try again.",
+      });
     }
   };
 
@@ -263,6 +338,16 @@ const ProductDetails = () => {
           </div>
         </div>
       </div>
+
+      {product && (
+        <ProjectSelectionDialog 
+          open={showProjectDialog}
+          onOpenChange={setShowProjectDialog}
+          projects={projects}
+          onConfirm={handleProjectSelection}
+          product={product}
+        />
+      )}
     </div>
   );
 };
