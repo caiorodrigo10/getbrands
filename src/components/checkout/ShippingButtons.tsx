@@ -38,7 +38,7 @@ export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue, onSave }
         <Button 
           type="button"
           variant="default"
-          className="w-[150px]"
+          className="w-[150px] h-8 sm:h-9"
           onClick={onSave}
         >
           Save Address
@@ -57,7 +57,7 @@ export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue, onSave }
         <Button
           type="button"
           variant={isAddressSaved ? "default" : "secondary"}
-          className={`text-sm sm:text-base px-3 sm:px-4 h-10 sm:h-11 w-full sm:w-auto ${
+          className={`text-sm sm:text-base px-3 sm:px-4 h-12 sm:h-14 w-full sm:w-auto ${
             isAddressSaved ? "bg-green-600 hover:bg-green-700" : ""
           }`}
           disabled={!isAddressSaved}
