@@ -21,31 +21,48 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
   const { isUploading, handleFileUpload } = useImageUpload(productId, onImagesUpdate);
   const { handleDragEnd } = useImageSorting(images, onImagesUpdate);
 
-  useEffect(() => {
-    const syncProfileImage = async () => {
-      const { data: product } = await supabase
-        .from('products')
-        .select('image_url')
-        .eq('id', productId)
-        .single();
+  // Remove duplicates based on image_url
+  const uniqueImages = images.filter((image, index, self) =>
+    index === self.findIndex((t) => t.image_url === image.image_url)
+  );
 
-      if (product?.image_url && !images.some(img => img.image_url === product.image_url)) {
-        const hasPrimaryImage = images.some(img => img.is_primary);
-        
+  const handleSetPrimary = async (imageId: string) => {
+    try {
+      // First, set all images as non-primary
+      await supabase
+        .from('product_images')
+        .update({ is_primary: false })
+        .eq('product_id', productId);
+
+      // Then set the selected image as primary
+      await supabase
+        .from('product_images')
+        .update({ is_primary: true })
+        .eq('id', imageId);
+
+      // Update the product's main image_url
+      const selectedImage = images.find(img => img.id === imageId);
+      if (selectedImage) {
         await supabase
-          .from('product_images')
-          .insert({
-            product_id: productId,
-            image_url: product.image_url,
-            position: 0,
-            is_primary: !hasPrimaryImage
-          });
-        onImagesUpdate();
+          .from('products')
+          .update({ image_url: selectedImage.image_url })
+          .eq('id', productId);
       }
-    };
 
-    syncProfileImage();
-  }, [productId, images, onImagesUpdate]);
+      onImagesUpdate();
+      toast({
+        title: "Success",
+        description: "Primary image updated successfully",
+      });
+    } catch (error) {
+      console.error('Error setting primary image:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to set primary image",
+      });
+    }
+  };
 
   const handleDeleteImage = async (imageId: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -69,7 +86,6 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
       }
 
       onImagesUpdate();
-
       toast({
         title: "Success",
         description: "Image deleted successfully",
@@ -120,15 +136,16 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
         onDragEnd={handleDragEnd}
       >
         <SortableContext 
-          items={images.map(img => img.id)}
+          items={uniqueImages.map(img => img.id)}
           strategy={verticalListSortingStrategy}
         >
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {images.map((image) => (
+            {uniqueImages.map((image) => (
               <SortableImage
                 key={image.id}
                 image={image}
                 onDelete={handleDeleteImage}
+                onSetPrimary={handleSetPrimary}
               />
             ))}
           </div>

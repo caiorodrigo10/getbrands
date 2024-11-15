@@ -1,15 +1,17 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
-import { X, GripVertical } from "lucide-react";
+import { X, GripVertical, Star } from "lucide-react";
 import { ProductImage } from "@/types/product";
+import { cn } from "@/lib/utils";
 
 interface SortableImageProps {
   image: ProductImage;
   onDelete: (id: string, event: React.MouseEvent) => void;
+  onSetPrimary: (id: string) => void;
 }
 
-export const SortableImage = ({ image, onDelete }: SortableImageProps) => {
+export const SortableImage = ({ image, onDelete, onSetPrimary }: SortableImageProps) => {
   const {
     attributes,
     listeners,
@@ -35,25 +37,39 @@ export const SortableImage = ({ image, onDelete }: SortableImageProps) => {
         <div {...attributes} {...listeners} className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100">
           <GripVertical className="w-5 h-5 text-white drop-shadow-lg cursor-grab" />
         </div>
-        <Button
-          type="button"
-          variant="destructive"
-          size="icon"
-          className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100"
-          onClick={(e) => onDelete(image.id, e)}
-        >
-          <X className="w-4 h-4" />
-        </Button>
+        
+        <div className="absolute top-2 right-2 z-10 flex gap-2">
+          <Button
+            type="button"
+            size="icon"
+            variant={image.is_primary ? "default" : "secondary"}
+            className={cn(
+              "opacity-0 group-hover:opacity-100 transition-opacity",
+              image.is_primary && "opacity-100"
+            )}
+            onClick={() => onSetPrimary(image.id)}
+          >
+            <Star className={cn(
+              "w-4 h-4",
+              image.is_primary ? "fill-current" : "fill-none"
+            )} />
+          </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            size="icon"
+            className="opacity-0 group-hover:opacity-100"
+            onClick={(e) => onDelete(image.id, e)}
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+
         <img
           src={image.image_url}
           alt={`Product image ${image.position + 1}`}
           className="w-full h-full object-cover"
         />
-        {image.is_primary && (
-          <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-sm">
-            Primary Image
-          </div>
-        )}
       </div>
     </div>
   );
