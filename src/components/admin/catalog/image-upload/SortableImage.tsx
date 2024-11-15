@@ -1,17 +1,16 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
-import { X, GripVertical, Star } from "lucide-react";
+import { X, GripVertical } from "lucide-react";
 import { ProductImage } from "@/types/product";
 import { cn } from "@/lib/utils";
 
 interface SortableImageProps {
   image: ProductImage;
   onDelete: (id: string, event: React.MouseEvent) => void;
-  onSetPrimary: (id: string) => void;
 }
 
-export const SortableImage = ({ image, onDelete, onSetPrimary }: SortableImageProps) => {
+export const SortableImage = ({ image, onDelete }: SortableImageProps) => {
   const {
     attributes,
     listeners,
@@ -38,22 +37,7 @@ export const SortableImage = ({ image, onDelete, onSetPrimary }: SortableImagePr
           <GripVertical className="w-5 h-5 text-white drop-shadow-lg cursor-grab" />
         </div>
         
-        <div className="absolute top-2 right-2 z-10 flex gap-2">
-          <Button
-            type="button"
-            size="icon"
-            variant={image.is_primary ? "default" : "secondary"}
-            className={cn(
-              "opacity-0 group-hover:opacity-100 transition-opacity",
-              image.is_primary && "opacity-100"
-            )}
-            onClick={() => onSetPrimary(image.id)}
-          >
-            <Star className={cn(
-              "w-4 h-4",
-              image.is_primary ? "fill-current" : "fill-none"
-            )} />
-          </Button>
+        <div className="absolute top-2 right-2 z-10">
           <Button
             type="button"
             variant="destructive"

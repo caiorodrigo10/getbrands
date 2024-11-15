@@ -8,7 +8,6 @@ import { SortableImage } from "./image-upload/SortableImage";
 import { useImageUpload } from "./image-upload/useImageUpload";
 import { useImageSorting } from "./image-upload/useImageSorting";
 import { useToast } from "@/components/ui/use-toast";
-import { useEffect } from "react";
 
 interface ProductImageUploadProps {
   productId: string;
@@ -26,44 +25,6 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
     index === self.findIndex((t) => t.image_url === image.image_url)
   );
 
-  const handleSetPrimary = async (imageId: string) => {
-    try {
-      // First, set all images as non-primary
-      await supabase
-        .from('product_images')
-        .update({ is_primary: false })
-        .eq('product_id', productId);
-
-      // Then set the selected image as primary
-      await supabase
-        .from('product_images')
-        .update({ is_primary: true })
-        .eq('id', imageId);
-
-      // Update the product's main image_url
-      const selectedImage = images.find(img => img.id === imageId);
-      if (selectedImage) {
-        await supabase
-          .from('products')
-          .update({ image_url: selectedImage.image_url })
-          .eq('id', productId);
-      }
-
-      onImagesUpdate();
-      toast({
-        title: "Success",
-        description: "Primary image updated successfully",
-      });
-    } catch (error) {
-      console.error('Error setting primary image:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to set primary image",
-      });
-    }
-  };
-
   const handleDeleteImage = async (imageId: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -75,13 +36,15 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
         .delete()
         .eq('id', imageId);
 
-      if (imageToDelete?.is_primary && images.length > 1) {
+      // If we're deleting the first image and there are other images,
+      // update the product's main image_url with the next available image
+      if (imageToDelete?.position === 0 && images.length > 1) {
         const nextImage = images.find(img => img.id !== imageId);
         if (nextImage) {
           await supabase
-            .from('product_images')
-            .update({ is_primary: true })
-            .eq('id', nextImage.id);
+            .from('products')
+            .update({ image_url: nextImage.image_url })
+            .eq('id', productId);
         }
       }
 
@@ -145,7 +108,6 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
                 key={image.id}
                 image={image}
                 onDelete={handleDeleteImage}
-                onSetPrimary={handleSetPrimary}
               />
             ))}
           </div>
