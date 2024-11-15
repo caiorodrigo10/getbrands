@@ -1,22 +1,63 @@
 import { useCallback, useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "@dnd-kit/core";
+import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { ImagePlus, X, GripVertical } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-
-interface ProductImage {
-  id: string;
-  image_url: string;
-  position: number;
-  is_primary: boolean;
-}
+import { ProductImage } from "@/types/product";
 
 interface ProductImageUploadProps {
   productId: string;
   images: ProductImage[];
-  onImagesUpdate: (images: ProductImage[]) => void;
+  onImagesUpdate: () => void;
 }
+
+const SortableImage = ({ image, onDelete }: { image: ProductImage; onDelete: (id: string) => void }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: image.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`relative group ${image.is_primary ? 'col-span-2 row-span-2' : ''}`}
+    >
+      <div {...attributes} {...listeners} className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100">
+        <GripVertical className="w-5 h-5 text-white drop-shadow-lg" />
+      </div>
+      <Button
+        variant="destructive"
+        size="icon"
+        className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100"
+        onClick={() => onDelete(image.id)}
+      >
+        <X className="w-4 h-4" />
+      </Button>
+      <img
+        src={image.image_url}
+        alt={`Product image ${image.position + 1}`}
+        className="w-full h-full object-cover rounded-lg"
+      />
+      {image.is_primary && (
+        <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-sm">
+          Primary Image
+        </div>
+      )}
+    </div>
+  );
+};
 
 export function ProductImageUpload({ productId, images, onImagesUpdate }: ProductImageUploadProps) {
   const { toast } = useToast();
@@ -28,8 +69,6 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
 
     setIsUploading(true);
     try {
-      const newImages: ProductImage[] = [];
-      
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const fileExt = file.name.split('.').pop();
@@ -45,22 +84,17 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
           .from('product-images')
           .getPublicUrl(filePath);
 
-        const { data, error } = await supabase
+        await supabase
           .from('product_images')
           .insert({
             product_id: productId,
             image_url: publicUrl,
             position: images.length + i,
             is_primary: images.length === 0 && i === 0
-          })
-          .select()
-          .single();
-
-        if (error) throw error;
-        if (data) newImages.push(data as ProductImage);
+          });
       }
 
-      onImagesUpdate([...images, ...newImages]);
+      onImagesUpdate();
       
       toast({
         title: "Success",
@@ -78,7 +112,7 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
     }
   };
 
-  const handleDragEnd = useCallback(async (event: any) => {
+  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!active || !over || active.id === over.id) return;
 
@@ -89,7 +123,6 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
     const [movedImage] = reorderedImages.splice(oldIndex, 1);
     reorderedImages.splice(newIndex, 0, movedImage);
 
-    // Update positions in the database
     try {
       const updates = reorderedImages.map((img, index) => ({
         id: img.id,
@@ -97,13 +130,11 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
         is_primary: index === 0
       }));
 
-      const { error } = await supabase
+      await supabase
         .from('product_images')
         .upsert(updates);
 
-      if (error) throw error;
-
-      onImagesUpdate(reorderedImages);
+      onImagesUpdate();
     } catch (error) {
       console.error('Error reordering images:', error);
       toast({
@@ -116,26 +147,12 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
 
   const handleDeleteImage = async (imageId: string) => {
     try {
-      const { error } = await supabase
+      await supabase
         .from('product_images')
         .delete()
         .eq('id', imageId);
 
-      if (error) throw error;
-
-      const updatedImages = images.filter(img => img.id !== imageId);
-      // Update positions after deletion
-      const reorderedImages = updatedImages.map((img, index) => ({
-        ...img,
-        position: index,
-        is_primary: index === 0
-      }));
-
-      await supabase
-        .from('product_images')
-        .upsert(reorderedImages);
-
-      onImagesUpdate(reorderedImages);
+      onImagesUpdate();
 
       toast({
         title: "Success",
@@ -173,52 +190,25 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
         />
       </div>
 
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="images">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="grid grid-cols-2 md:grid-cols-4 gap-4"
-            >
-              {images.map((image, index) => (
-                <Draggable key={image.id} draggableId={image.id} index={index}>
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      className={`relative group ${index === 0 ? 'col-span-2 row-span-2' : ''}`}
-                    >
-                      <div {...provided.dragHandleProps} className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100">
-                        <GripVertical className="w-5 h-5 text-white drop-shadow-lg" />
-                      </div>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100"
-                        onClick={() => handleDeleteImage(image.id)}
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                      <img
-                        src={image.image_url}
-                        alt={`Product image ${index + 1}`}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                      {index === 0 && (
-                        <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-sm">
-                          Primary Image
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <DndContext
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext 
+          items={images.map(img => img.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {images.map((image) => (
+              <SortableImage
+                key={image.id}
+                image={image}
+                onDelete={handleDeleteImage}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 }

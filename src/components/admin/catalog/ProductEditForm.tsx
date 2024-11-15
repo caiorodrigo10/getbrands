@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Product } from "@/types/product";
+import { Product, ProductImage } from "@/types/product";
 import { ProductImageUpload } from "./ProductImageUpload";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -58,7 +58,7 @@ export function ProductEditForm({ product, onSubmit, onCancel }: ProductEditForm
         .order('position');
 
       if (error) throw error;
-      return data;
+      return data as ProductImage[];
     },
   });
 
