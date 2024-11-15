@@ -15,6 +15,12 @@ import { Card } from "@/components/ui/card";
 
 interface ProfitProjectionsProps {
   product: Product;
+  calculationValues?: {
+    monthlySales: number;
+    growthRate: number;
+    costPrice: number;
+    sellingPrice: number;
+  };
 }
 
 interface MonthlyProjection {
@@ -23,7 +29,7 @@ interface MonthlyProjection {
   costs: number;
 }
 
-export const ProfitProjections = ({ product }: ProfitProjectionsProps) => {
+export const ProfitProjections = ({ product, calculationValues }: ProfitProjectionsProps) => {
   const [projections, setProjections] = useState<MonthlyProjection[]>([]);
   const [totalAnnualProfit, setTotalAnnualProfit] = useState(0);
   const [averageMonthlyProfit, setAverageMonthlyProfit] = useState(0);
@@ -37,8 +43,8 @@ export const ProfitProjections = ({ product }: ProfitProjectionsProps) => {
 
       let annualProfit = 0;
       const monthlyData = months.map((month, index) => {
-        const growthFactor = Math.pow(1.15, index); // 15% monthly growth
-        const baseSales = 100; // Example base sales
+        const growthFactor = Math.pow(1 + (calculationValues?.growthRate || 15) / 100, index);
+        const baseSales = calculationValues?.monthlySales || 200;
         const monthlySales = baseSales * growthFactor;
 
         const revenue = monthlySales * product.srp;
@@ -59,7 +65,7 @@ export const ProfitProjections = ({ product }: ProfitProjectionsProps) => {
     };
 
     calculateProjections();
-  }, [product]);
+  }, [product, calculationValues]);
 
   return (
     <div className="space-y-6">
