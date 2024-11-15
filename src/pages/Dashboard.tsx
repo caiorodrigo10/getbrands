@@ -1,138 +1,39 @@
-import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Package, ArrowRight } from "lucide-react";
+import ProductCard from "@/components/ProductCard";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import ProjectsOverview from "@/components/dashboard/ProjectsOverview";
+import UpcomingMeetings from "@/components/dashboard/UpcomingMeetings";
+import { useDashboardData } from "@/hooks/useDashboardData";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
   CarouselPrevious,
+  CarouselNext,
 } from "@/components/ui/carousel";
-import { Package, ArrowRight } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import ProductCard from "@/components/ProductCard";
-import { Product } from "@/types/product";
-import { useNavigate } from "react-router-dom";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import ProjectsOverview from "@/components/dashboard/ProjectsOverview";
-import UpcomingMeetings from "@/components/dashboard/UpcomingMeetings";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const {
+    profile,
+    projects,
+    meetings,
+    products,
+    catalogProducts,
+    samples,
+    isAuthenticated,
+  } = useDashboardData();
 
-  const { data: profile } = useQuery({
-    queryKey: ["profile", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-      return data;
-    },
-    enabled: !!user?.id,
-  });
-
-  const { data: projects } = useQuery({
-    queryKey: ["projects", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data } = await supabase
-        .from("projects")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(3);
-      return data;
-    },
-    enabled: !!user?.id,
-  });
-
-  const { data: meetings } = useQuery({
-    queryKey: ["meetings", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data: meetingsData } = await supabase
-        .from("project_meetings")
-        .select(`
-          *,
-          project:projects (
-            name
-          )
-        `)
-        .eq("user_id", user.id)
-        .gte("scheduled_for", new Date().toISOString())
-        .order("scheduled_for", { ascending: true })
-        .limit(3);
-
-      // Add example participants for each meeting
-      return meetingsData?.map(meeting => ({
-        ...meeting,
-        participants: [
-          {
-            id: "1",
-            name: "Sarah Johnson",
-            avatar_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-          },
-          {
-            id: "2",
-            name: "Michael Chen",
-            avatar_url: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
-          }
-        ]
-      }));
-    },
-    enabled: !!user?.id,
-  });
-
-  const { data: products } = useQuery({
-    queryKey: ["my-products", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data } = await supabase
-        .from("project_products")
-        .select(`
-          product:products (*)
-        `)
-        .limit(3);
-      return data?.map(item => item.product) as Product[];
-    },
-    enabled: !!user?.id,
-  });
-
-  const { data: catalogProducts } = useQuery({
-    queryKey: ["catalog-products"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("products")
-        .select("*")
-        .limit(8);
-      return data as Product[];
-    },
-  });
-
-  const { data: samples } = useQuery({
-    queryKey: ["samples", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data } = await supabase
-        .from("sample_requests")
-        .select(`
-          *,
-          products:sample_request_products (
-            product:products (*)
-          )
-        `)
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(3);
-      return data;
-    },
-    enabled: !!user?.id,
-  });
+  if (!isAuthenticated) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-lg text-gray-600">Please log in to view your dashboard.</p>
+      </div>
+    );
+  }
 
   const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : "there";
 
