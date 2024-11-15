@@ -83,7 +83,7 @@ const UserMenu = () => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-gray-100" />
         <div className="p-1">
-          <Link to="/perfil">
+          <Link to="/profile">
             <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md">
               <User className="h-4 w-4 text-gray-500" />
               <span>My Profile</span>
