@@ -13,10 +13,11 @@ import { useQueryClient } from "@tanstack/react-query";
 interface ProductImageUploadProps {
   productId: string;
   images: ProductImage[];
+  mainImageUrl?: string | null;
   onImagesUpdate: () => void;
 }
 
-export function ProductImageUpload({ productId, images, onImagesUpdate }: ProductImageUploadProps) {
+export function ProductImageUpload({ productId, images, mainImageUrl, onImagesUpdate }: ProductImageUploadProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isUploading, handleFileUpload } = useImageUpload(productId, onImagesUpdate);
@@ -30,8 +31,21 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
     })
   );
 
+  // Include the main image if it exists and isn't already in the images array
+  const allImages = mainImageUrl && !images.some(img => img.image_url === mainImageUrl)
+    ? [{ 
+        id: 'main-image', 
+        product_id: productId, 
+        image_url: mainImageUrl, 
+        position: -1,
+        is_primary: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }, ...images]
+    : images;
+
   // Remove duplicates based on image_url
-  const uniqueImages = images.filter((image, index, self) =>
+  const uniqueImages = allImages.filter((image, index, self) =>
     index === self.findIndex((t) => t.image_url === image.image_url)
   );
 
@@ -40,6 +54,16 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
     e.stopPropagation();
     
     try {
+      // Don't allow deletion of the main image through this interface
+      if (imageId === 'main-image') {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Cannot delete the main product image here",
+        });
+        return;
+      }
+
       const imageToDelete = images.find(img => img.id === imageId);
       await supabase
         .from('product_images')

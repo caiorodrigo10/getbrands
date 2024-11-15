@@ -69,6 +69,7 @@ export function ProductEditForm({ product, onSubmit, onCancel }: ProductEditForm
         <MediaSection 
           productId={product.id}
           images={productImages || []}
+          mainImageUrl={product.image_url}
           onImagesUpdate={() => refetchImages()}
         />
         <PricingSection form={form} />
