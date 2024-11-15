@@ -70,12 +70,12 @@ const UpcomingMeetings = ({ meetings = [] }: UpcomingMeetingsProps) => {
         {displayMeetings.map((meeting) => (
           <div
             key={meeting.id}
-            className="flex items-start gap-4 p-4 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+            className="flex items-start gap-4 p-4 bg-white border border-border rounded-lg hover:border-primary/50 transition-colors"
           >
-            <Calendar className="h-5 w-5 text-white mt-1 flex-shrink-0" />
+            <Calendar className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="font-medium truncate text-white">{meeting.project?.name}</p>
-              <p className="text-sm text-white/80">
+              <p className="font-medium truncate text-foreground">{meeting.project?.name}</p>
+              <p className="text-sm text-muted-foreground">
                 {new Date(meeting.scheduled_for).toLocaleDateString()} at{" "}
                 {new Date(meeting.scheduled_for).toLocaleTimeString([], { 
                   hour: '2-digit', 
@@ -85,7 +85,7 @@ const UpcomingMeetings = ({ meetings = [] }: UpcomingMeetingsProps) => {
               <div className="mt-2 flex items-center gap-2">
                 <div className="flex -space-x-2">
                   {meeting.participants.map((participant) => (
-                    <Avatar key={participant.id} className="border-2 border-primary">
+                    <Avatar key={participant.id} className="border-2 border-background">
                       <AvatarImage src={participant.avatar_url} alt={participant.name} />
                       <AvatarFallback>
                         {participant.name.split(' ').map(n => n[0]).join('')}
@@ -93,15 +93,15 @@ const UpcomingMeetings = ({ meetings = [] }: UpcomingMeetingsProps) => {
                     </Avatar>
                   ))}
                 </div>
-                <span className="text-sm text-white/80 ml-2">
+                <span className="text-sm text-muted-foreground ml-2">
                   {meeting.participants.map(p => p.name).join(', ')}
                 </span>
               </div>
               {meeting.meeting_link && (
                 <Button
-                  variant="secondary"
+                  variant="outline"
                   size="sm"
-                  className="mt-3 bg-white text-primary hover:bg-white/90"
+                  className="mt-3 border-primary text-primary hover:bg-primary/5"
                   asChild
                 >
                   <a
