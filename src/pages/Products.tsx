@@ -116,29 +116,33 @@ const Products = () => {
                   <p className="text-sm text-gray-600 mt-1">{item.product.category}</p>
                 </div>
                 
-                <div className="p-4 bg-gray-50 rounded-lg space-y-3">
-                  <p className="text-sm font-medium text-gray-700">Original Product:</p>
-                  <div 
-                    className="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity"
-                    onClick={() => navigateToOriginalProduct(item.product.id)}
-                  >
-                    <img
-                      src={item.product.image_url || "/placeholder.svg"}
-                      alt={item.product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <p className="text-sm text-gray-600 hover:text-primary cursor-pointer"
-                     onClick={() => navigateToOriginalProduct(item.product.id)}>
-                    {item.product.name}
-                  </p>
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600">
-                      Cost Price: ${item.product.from_price.toFixed(2)}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Suggested Price: ${item.product.srp.toFixed(2)}
-                    </p>
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-grow space-y-3">
+                      <p className="text-sm font-medium text-gray-700">Original Product:</p>
+                      <p className="text-sm text-gray-600 hover:text-primary cursor-pointer"
+                         onClick={() => navigateToOriginalProduct(item.product.id)}>
+                        {item.product.name}
+                      </p>
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600">
+                          Cost Price: ${item.product.from_price.toFixed(2)}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Suggested Price: ${item.product.srp.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                    <div 
+                      className="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity"
+                      onClick={() => navigateToOriginalProduct(item.product.id)}
+                    >
+                      <img
+                        src={item.product.image_url || "/placeholder.svg"}
+                        alt={item.product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   </div>
                 </div>
 
