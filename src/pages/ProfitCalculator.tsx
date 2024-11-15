@@ -4,13 +4,10 @@ import { ProductSearch } from "@/components/ProductSearch";
 import { ProfitCalculatorForm } from "@/components/profit-calculator/ProfitCalculatorForm";
 import { ProfitProjections } from "@/components/profit-calculator/ProfitProjections";
 import { Product } from "@/types/product";
-import { X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 const ProfitCalculator = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const handleProductSelect = (product: Product) => {
     setSelectedProduct(product);
@@ -24,13 +21,6 @@ const ProfitCalculator = () => {
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Profit Calculator</h1>
-        <button
-          onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          aria-label="Close"
-        >
-          <X className="h-6 w-6" />
-        </button>
       </div>
 
       <div className="space-y-6">
