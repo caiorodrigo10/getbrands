@@ -4,14 +4,17 @@ import { useEffect } from "react";
 export const CalendarStage = () => {
   useEffect(() => {
     (async function () {
-      const cal = await getCalApi();
-      // Only configure UI if cal is available
-      if (cal) {
-        cal("ui", {
-          theme: "light",
-          styles: { branding: { brandColor: "#4c1e6c" } },
-          hideEventTypeDetails: false,
-        });
+      try {
+        const cal = await getCalApi();
+        if (cal) {
+          cal("ui", {
+            theme: "light",
+            styles: { branding: { brandColor: "#4c1e6c" } },
+            hideEventTypeDetails: false,
+          });
+        }
+      } catch (error) {
+        console.error("Error initializing Cal:", error);
       }
     })();
   }, []);
@@ -19,13 +22,15 @@ export const CalendarStage = () => {
   return (
     <div className="space-y-4">
       <p className="text-muted-foreground">Schedule a call with our team:</p>
-      <Cal
-        calLink="caio-apfelbaum/cafe-com-caio"
-        style={{ width: "100%", height: "100%", minHeight: "500px" }}
-        config={{
-          layout: "month_view",
-        }}
-      />
+      <div className="h-[600px] w-full">
+        <Cal
+          calLink="caio-apfelbaum/cafe-com-caio"
+          style={{ width: "100%", height: "100%" }}
+          config={{
+            layout: "month_view",
+          }}
+        />
+      </div>
     </div>
   );
 };
