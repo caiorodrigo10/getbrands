@@ -4,8 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import Confetti from 'react-confetti';
 import { useLocation, useNavigate } from "react-router-dom";
+import { ProductNameEdit } from "@/components/products/ProductNameEdit";
 
 interface ProjectSpecificProduct {
   id: string;
@@ -30,13 +32,13 @@ interface ProjectProduct {
   specific: ProjectSpecificProduct[] | null;
 }
 
-const Produtos = () => {
+const Products = () => {
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [showConfetti, setShowConfetti] = useState(false);
 
-  const { data: products, isLoading } = useQuery({
+  const { data: products, isLoading, refetch } = useQuery({
     queryKey: ['my-products', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -75,6 +77,10 @@ const Produtos = () => {
     }
   }, [location.state, navigate, location.pathname]);
 
+  const handleNameUpdate = () => {
+    refetch();
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -94,9 +100,9 @@ const Produtos = () => {
       <h1 className="text-3xl font-bold">My Products</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {products?.map((item, index) => {
-          // Use project-specific data if available, otherwise use original product data
-          const displayName = item.specific?.[0]?.name || item.product.name;
-          const displayImage = item.specific?.[0]?.image_url || item.product.image_url;
+          const specificProduct = item.specific?.[0];
+          const displayName = specificProduct?.name || item.product.name;
+          const displayImage = specificProduct?.image_url || item.product.image_url;
           
           return (
             <Card 
@@ -113,8 +119,17 @@ const Produtos = () => {
               </div>
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">{displayName}</h3>
-                  <p className="text-sm text-gray-600">{item.product.category}</p>
+                  <ProductNameEdit
+                    projectProductId={item.id}
+                    currentName={displayName}
+                    onNameUpdate={handleNameUpdate}
+                  />
+                  <p className="text-sm text-gray-600 mt-1">{item.product.category}</p>
+                  
+                  <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Original Product:</p>
+                    <p className="text-sm text-gray-600">{item.product.name}</p>
+                  </div>
                 </div>
                 
                 {item.project && (
@@ -137,4 +152,4 @@ const Produtos = () => {
   );
 };
 
-export default Produtos;
+export default Products;
