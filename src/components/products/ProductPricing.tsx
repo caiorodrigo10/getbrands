@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { SellingPriceEdit } from "@/components/profit-calculator/SellingPriceEdit";
 
 interface ProductPricingProps {
   projectProductId: string;
@@ -20,36 +18,11 @@ export const ProductPricing = ({
   onPriceUpdate,
 }: ProductPricingProps) => {
   const [sellingPrice, setSellingPrice] = useState(currentSellingPrice || suggestedPrice);
-  const { toast } = useToast();
   const profit = sellingPrice - costPrice;
 
-  const handlePriceChange = async (newPrice: string) => {
-    const price = parseFloat(newPrice);
-    if (isNaN(price)) return;
-    
-    setSellingPrice(price);
-    try {
-      const { error } = await supabase
-        .from('project_specific_products')
-        .upsert({
-          project_product_id: projectProductId,
-          selling_price: price,
-        });
-
-      if (error) throw error;
-
-      onPriceUpdate(price);
-      toast({
-        title: "Success",
-        description: "Selling price updated successfully",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update selling price",
-        variant: "destructive",
-      });
-    }
+  const handlePriceUpdate = (newPrice: number) => {
+    setSellingPrice(newPrice);
+    onPriceUpdate(newPrice);
   };
 
   return (
@@ -57,17 +30,11 @@ export const ProductPricing = ({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label>Your Selling Price</Label>
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-            <Input
-              type="number"
-              value={sellingPrice}
-              onChange={(e) => handlePriceChange(e.target.value)}
-              min={0}
-              step="0.01"
-              className="pl-7"
-            />
-          </div>
+          <SellingPriceEdit
+            projectProductId={projectProductId}
+            currentPrice={sellingPrice}
+            onPriceUpdate={handlePriceUpdate}
+          />
         </div>
         <div>
           <Label>Profit</Label>
