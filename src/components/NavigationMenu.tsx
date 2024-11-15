@@ -1,16 +1,15 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Briefcase, BookOpen, Pill, Calculator } from "lucide-react";
 import UserMenu from "./UserMenu";
 
 export const NavigationMenu = () => {
   const location = useLocation();
 
   const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-    { icon: Briefcase, label: "Projects", path: "/projects" },
-    { icon: BookOpen, label: "Catalog", path: "/catalog" },
-    { icon: Pill, label: "My Products", path: "/products" },
-    { icon: Calculator, label: "Profit Calculator", path: "/profit-calculator" },
+    { label: "Dashboard", path: "/" },
+    { label: "Projects", path: "/projects" },
+    { label: "Catalog", path: "/catalog" },
+    { label: "My Products", path: "/products" },
+    { label: "Profit Calculator", path: "/profit-calculator" },
   ];
 
   return (
@@ -24,23 +23,19 @@ export const NavigationMenu = () => {
               className="h-8 w-auto"
             />
             <nav className="hidden md:flex items-center gap-2">
-              {menuItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={`flex items-center gap-2 px-4 py-2 text-sm rounded-md transition-all duration-200 ${
-                      location.pathname === item.path
-                        ? "bg-primary/20 text-primary-foreground font-medium"
-                        : "text-gray-300 hover:bg-white/10 hover:text-white"
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
+              {menuItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`px-4 py-2 text-sm rounded-md transition-all duration-200 ${
+                    location.pathname === item.path
+                      ? "bg-primary/20 text-primary-foreground font-medium"
+                      : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
             </nav>
           </div>
 
