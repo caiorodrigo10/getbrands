@@ -19,35 +19,42 @@ export const useAuthRedirect = () => {
 
       if (error) throw error;
 
-      // If user is admin and not already in admin area, redirect to admin
+      // Se o usuário é admin e não está na área admin, redireciona para admin
       if (profile?.role === 'admin' && !location.pathname.startsWith('/admin')) {
         navigate('/admin');
         return;
       }
       
-      // If user is not admin and trying to access admin area, redirect to root
+      // Se o usuário não é admin e está tentando acessar área admin, redireciona para root
       if (profile?.role !== 'admin' && location.pathname.startsWith('/admin')) {
         navigate('/');
         return;
       }
 
-      // For non-admin users on login page, redirect to root
+      // Para usuários não-admin na página de login, redireciona para root
       if (profile?.role !== 'admin' && location.pathname === '/login') {
         navigate('/');
       }
     } catch (error) {
       console.error('Error fetching user role:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "There was a problem checking your permissions. Please try again.",
+      });
       navigate('/');
     }
   };
 
   const handleAuthError = () => {
-    navigate('/login');
-    toast({
-      variant: "destructive",
-      title: "Session Expired",
-      description: "Please sign in again to continue.",
-    });
+    if (location.pathname !== '/login') {
+      navigate('/login');
+      toast({
+        variant: "destructive",
+        title: "Authentication Required",
+        description: "Please sign in to continue.",
+      });
+    }
   };
 
   return { redirectBasedOnRole, handleAuthError };

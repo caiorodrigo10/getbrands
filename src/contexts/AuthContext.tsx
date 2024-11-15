@@ -5,6 +5,7 @@ import { AuthContextType, AuthProviderProps } from "./auth/types";
 import { useAuthRedirect } from "./auth/useAuthRedirect";
 import { useGleapIdentity } from "./auth/useGleapIdentity";
 import { useLocation } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -15,6 +16,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const { redirectBasedOnRole, handleAuthError } = useAuthRedirect();
   const { identifyUserInGleap } = useGleapIdentity();
   const location = useLocation();
+  const { toast } = useToast();
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -23,6 +25,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         
         if (error) {
           console.error('Session error:', error);
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "There was a problem with your session. Please try logging in again.",
+          });
           handleAuthError();
           return;
         }
@@ -72,7 +79,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [location.pathname]); // Add location.pathname as dependency
+  }, [location.pathname]);
 
   const login = async (email: string, password: string) => {
     try {
@@ -81,7 +88,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Login Error",
+          description: error.message,
+        });
+        throw error;
+      }
 
       if (data.user) {
         setUser(data.user);
@@ -104,6 +118,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       handleAuthError();
     } catch (error) {
       console.error('Logout error:', error);
+      toast({
+        variant: "destructive",
+        title: "Logout Error",
+        description: "There was a problem signing out. Please try again.",
+      });
     }
   };
 
