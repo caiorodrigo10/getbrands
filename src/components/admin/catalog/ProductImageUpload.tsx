@@ -48,8 +48,8 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
   }, [productId, images, onImagesUpdate]);
 
   const handleDeleteImage = async (imageId: string, e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent any default navigation
-    e.stopPropagation(); // Stop event propagation
+    e.preventDefault();
+    e.stopPropagation();
     
     try {
       const imageToDelete = images.find(img => img.id === imageId);
@@ -128,7 +128,7 @@ export function ProductImageUpload({ productId, images, onImagesUpdate }: Produc
               <SortableImage
                 key={image.id}
                 image={image}
-                onDelete={(id) => handleDeleteImage(id, event as React.MouseEvent)}
+                onDelete={handleDeleteImage}
               />
             ))}
           </div>
