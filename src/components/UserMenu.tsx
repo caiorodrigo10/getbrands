@@ -179,7 +179,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           >
             <LogOut className="h-4 w-4" />
             <span>Sign Out</span>
-          </button>
+          </DropdownMenuItem>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
