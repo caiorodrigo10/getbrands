@@ -14,6 +14,7 @@ import Projects from "./pages/Projects";
 import ProjectDetails from "./pages/ProjectDetails";
 import Catalog from "./pages/Catalog";
 import Products from "./pages/Products";
+import ProductDetails from "./pages/ProductDetails";
 import ProductSelectedSuccess from "./pages/products/ProductSelectedSuccess";
 import Documents from "./pages/Documents";
 import SampleOrders from "./pages/SampleOrders";
@@ -106,21 +107,21 @@ const App = () => (
                 }
               />
               <Route
-                path="/profit-calculator"
-                element={
-                  <ProtectedRoute>
-                    <AppLayout>
-                      <ProfitCalculator />
-                    </AppLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
                 path="/products"
                 element={
                   <ProtectedRoute>
                     <AppLayout>
                       <Products />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/products/:id"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <ProductDetails />
                     </AppLayout>
                   </ProtectedRoute>
                 }
@@ -149,6 +150,16 @@ const App = () => (
                   <ProtectedRoute>
                     <AppLayout>
                       <SampleOrders />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profit-calculator"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <ProfitCalculator />
                     </AppLayout>
                   </ProtectedRoute>
                 }

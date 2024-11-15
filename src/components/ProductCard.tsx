@@ -63,8 +63,15 @@ const ProductCard = ({
     setImageLoaded(true);
   };
 
-  const handleCardClick = () => {
-    navigate(`/products/${product.id}`);
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent navigation if clicking on buttons or links inside the card
+    if (
+      (e.target as HTMLElement).tagName === 'BUTTON' ||
+      (e.target as HTMLElement).closest('button')
+    ) {
+      return;
+    }
+    navigate(`/catalog/${product.id}`);
   };
 
   const profit = product.srp - product.from_price;
