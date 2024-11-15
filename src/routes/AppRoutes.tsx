@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AppLayout } from "./AppLayout";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import Profile from "@/pages/Profile";
@@ -17,11 +18,25 @@ import Success from "@/pages/checkout/Success";
 import ProfitCalculator from "@/pages/ProfitCalculator";
 import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
 
 export const AppRoutes = () => (
   <Routes>
     <Route path="/login" element={<Login />} />
     
+    {/* Admin Routes */}
+    <Route
+      path="/admin"
+      element={
+        <ProtectedRoute>
+          <AdminLayout>
+            <AdminDashboard />
+          </AdminLayout>
+        </ProtectedRoute>
+      }
+    />
+    
+    {/* Client Routes */}
     <Route
       path="/"
       element={
