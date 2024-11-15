@@ -8,13 +8,17 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Upload, Palette } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
-type QuizStep = {
+interface QuizStep {
   id: number;
   title: string;
   description: string;
   component: React.ReactNode;
-};
+}
 
 export function PackageQuiz() {
   const { id: projectId } = useParams();
@@ -59,6 +63,13 @@ export function PackageQuiz() {
     },
   });
 
+  const handleSaveAndExit = () => {
+    saveMutation.mutate({
+      current_step: currentStep,
+      status: "in_progress",
+    });
+  };
+
   const steps: QuizStep[] = [
     {
       id: 1,
@@ -67,10 +78,10 @@ export function PackageQuiz() {
       component: (
         <div className="text-center space-y-6">
           <h3 className="text-2xl font-semibold">Welcome to Your Package Design Quiz</h3>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground max-w-2xl mx-auto">
             This quiz will help us understand how you'd like your brand identity to be
             represented in your product labels. We'll guide you through several questions
-            about your preferences.
+            about your preferences to ensure your labels perfectly align with your brand.
           </p>
           <Button 
             onClick={() => setCurrentStep(2)}
@@ -81,7 +92,97 @@ export function PackageQuiz() {
         </div>
       ),
     },
-    // Additional steps will be implemented here
+    {
+      id: 2,
+      title: "Label Style",
+      description: "How do you want the label style to reflect your brand's visual identity?",
+      component: (
+        <div className="space-y-6">
+          <RadioGroup
+            defaultValue={quizData?.label_style || "match"}
+            onValueChange={(value) => 
+              saveMutation.mutate({ label_style: value })
+            }
+          >
+            <div className="grid gap-4">
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="match" id="match" />
+                <Label htmlFor="match" className="text-base">
+                  Match brand identity closely
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="complement" id="complement" />
+                <Label htmlFor="complement" className="text-base">
+                  Complement brand identity
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="key-elements" id="key-elements" />
+                <Label htmlFor="key-elements" className="text-base">
+                  Include key elements only
+                </Label>
+              </div>
+            </div>
+          </RadioGroup>
+        </div>
+      ),
+    },
+    {
+      id: 3,
+      title: "Brand Colors",
+      description: "Select the primary and secondary colors for your label design.",
+      component: (
+        <div className="space-y-6">
+          <div className="grid gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="primary-color">Primary Color</Label>
+              <div className="flex space-x-2">
+                <Input
+                  type="color"
+                  id="primary-color"
+                  defaultValue={quizData?.primary_color || "#000000"}
+                  className="w-16 h-10"
+                  onChange={(e) => 
+                    saveMutation.mutate({ primary_color: e.target.value })
+                  }
+                />
+                <Input
+                  type="text"
+                  value={quizData?.primary_color || "#000000"}
+                  className="flex-1"
+                  onChange={(e) => 
+                    saveMutation.mutate({ primary_color: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="secondary-color">Secondary Color</Label>
+              <div className="flex space-x-2">
+                <Input
+                  type="color"
+                  id="secondary-color"
+                  defaultValue={quizData?.secondary_color || "#000000"}
+                  className="w-16 h-10"
+                  onChange={(e) => 
+                    saveMutation.mutate({ secondary_color: e.target.value })
+                  }
+                />
+                <Input
+                  type="text"
+                  value={quizData?.secondary_color || "#000000"}
+                  className="flex-1"
+                  onChange={(e) => 
+                    saveMutation.mutate({ secondary_color: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      ),
+    },
   ];
 
   const totalSteps = steps.length;
@@ -109,27 +210,60 @@ export function PackageQuiz() {
           transition={{ duration: 0.2 }}
         >
           <Card className="p-6">
-            {steps.find(step => step.id === currentStep)?.component}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <h2 className="text-xl font-semibold">
+                  {steps[currentStep - 1].title}
+                </h2>
+                <p className="text-muted-foreground">
+                  {steps[currentStep - 1].description}
+                </p>
+              </div>
+              {steps[currentStep - 1].component}
+            </div>
           </Card>
         </motion.div>
       </AnimatePresence>
 
-      {currentStep > 1 && (
-        <div className="flex justify-between">
+      <div className="flex justify-between">
+        {currentStep > 1 && (
           <Button
             variant="outline"
             onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
           >
+            <ChevronLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
+        )}
+        <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={() => saveMutation.mutate({ current_step: currentStep })}
+            onClick={handleSaveAndExit}
           >
             Save Progress
           </Button>
+          {currentStep < totalSteps && (
+            <Button
+              onClick={() => setCurrentStep(prev => Math.min(totalSteps, prev + 1))}
+            >
+              Next
+              <ChevronRight className="w-4 h-4 ml-2" />
+            </Button>
+          )}
+          {currentStep === totalSteps && (
+            <Button
+              onClick={() => {
+                saveMutation.mutate({ 
+                  status: "completed",
+                  current_step: currentStep 
+                });
+              }}
+            >
+              Submit
+            </Button>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
