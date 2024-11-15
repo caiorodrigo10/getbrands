@@ -1,113 +1,95 @@
-import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
+import { UserRound, Briefcase, BookOpen, Package, FileText, Box, PlusCircle } from "lucide-react";
+import UserMenu from "./UserMenu";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  Home,
-  User,
-  FolderOpen,
-  ShoppingBag,
-  FileText,
-  Package,
-  Calculator,
-  LogOut,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { useState } from "react";
+import PackSelectionDialog from "./dialogs/PackSelectionDialog";
 
 const Sidebar = () => {
   const location = useLocation();
-  const { signOut } = useAuth();
+  const { user } = useAuth();
+  const [isPackDialogOpen, setIsPackDialogOpen] = useState(false);
+
+  const { data: totalPoints } = useQuery({
+    queryKey: ["userPoints", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+      const { data: projects } = await supabase
+        .from("projects")
+        .select("points, points_used")
+        .eq("user_id", user.id);
+
+      if (!projects) return 0;
+      
+      return projects.reduce((acc, project) => {
+        return acc + (project.points - (project.points_used || 0));
+      }, 0);
+    },
+    enabled: !!user?.id,
+  });
 
   const menuItems = [
-    {
-      title: "Home",
-      href: "/",
-      icon: Home,
-    },
-    {
-      title: "Profile",
-      href: "/profile",
-      icon: User,
-    },
-    {
-      title: "Projects",
-      href: "/projects",
-      icon: FolderOpen,
-    },
-    {
-      title: "Products",
-      href: "/products",
-      icon: ShoppingBag,
-    },
-    {
-      title: "Documents",
-      href: "/documents",
-      icon: FileText,
-    },
-    {
-      title: "Sample Orders",
-      href: "/sample-orders",
-      icon: Package,
-    },
-    {
-      title: "Profit Calculator",
-      href: "/profit-calculator",
-      icon: Calculator,
-    },
+    { icon: UserRound, label: "My Profile", path: "/profile" },
+    { icon: Briefcase, label: "Projects", path: "/projects" },
+    { icon: BookOpen, label: "Catalog", path: "/catalog" },
+    { icon: Package, label: "My Products", path: "/products" },
+    { icon: Box, label: "Sample Orders", path: "/sample-orders" },
+    { icon: FileText, label: "Documents", path: "/documents" },
   ];
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r bg-background">
-      <div className="flex h-full flex-col justify-between">
-        <div className="flex flex-col gap-6">
-          <div className="border-b p-6">
-            <img
-              src="/logo.svg"
-              alt="Logo"
-              className="h-8"
-            />
-          </div>
-
-          <nav className="flex flex-col gap-2 px-4">
-            {menuItems.map((item) => (
-              <Tooltip key={item.href}>
-                <TooltipTrigger asChild>
-                  <Link
-                    to={item.href}
-                    className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
-                      location.pathname === item.href
-                        ? "bg-accent text-accent-foreground"
-                        : "text-muted-foreground"
-                    )}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    {item.title}
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  {item.title}
-                </TooltipContent>
-              </Tooltip>
-            ))}
-          </nav>
-        </div>
-
-        <div className="p-4">
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 text-muted-foreground"
-            onClick={signOut}
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-secondary p-6 flex flex-col shadow-xl">
+      <div className="mb-8 flex justify-center">
+        <img 
+          src="https://content.app-sources.com/s/97257455971736356/uploads/Logos/Logotipo_4-7282325.png?format=webp"
+          alt="Mainer Logo"
+          className="w-[180px] h-auto object-contain"
+        />
+      </div>
+      <nav className="flex-1">
+        <ul className="space-y-2">
+          {menuItems.map((item) => (
+            <li key={item.path}>
+              <Link
+                to={item.path}
+                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition-all duration-200 hover:bg-gray-100/10 ${
+                  location.pathname === item.path
+                    ? "bg-gray-100/20 text-white font-medium"
+                    : "text-white hover:text-white"
+                }`}
+              >
+                <item.icon className="h-5 w-5" />
+                <span className="font-medium">{item.label}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      
+      <div className="mt-auto space-y-4">
+        <div className="p-4 bg-white/10 rounded-lg">
+          <p className="text-white text-sm mb-1">Available Points</p>
+          <p className="text-white font-bold text-xl">{totalPoints || 0} pts</p>
+          <button
+            onClick={() => setIsPackDialogOpen(true)}
+            className="mt-2 w-full flex items-center justify-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
           >
-            <LogOut className="h-4 w-4" />
-            Sign Out
-          </Button>
+            <PlusCircle className="h-4 w-4" />
+            <span className="text-sm font-medium">Get Pack</span>
+          </button>
+        </div>
+        
+        <div className="pt-6 border-t border-white/10">
+          <UserMenu />
         </div>
       </div>
+
+      <PackSelectionDialog 
+        open={isPackDialogOpen} 
+        onOpenChange={setIsPackDialogOpen}
+      />
     </aside>
   );
 };

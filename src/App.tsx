@@ -20,7 +20,6 @@ import SampleOrders from "./pages/SampleOrders";
 import Checkout from "./pages/checkout/Checkout";
 import Error404 from "./pages/Error404";
 import Success from "./pages/checkout/Success";
-import ProfitCalculator from "./pages/ProfitCalculator";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -156,16 +155,6 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Success />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/profit-calculator"
-                element={
-                  <ProtectedRoute>
-                    <AppLayout>
-                      <ProfitCalculator />
-                    </AppLayout>
                   </ProtectedRoute>
                 }
               />
