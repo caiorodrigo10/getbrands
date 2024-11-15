@@ -3,6 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Product } from "@/types/product";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { Calculator } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface ProductCardProps {
   product: Product;
@@ -22,11 +24,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
     setImageLoaded(true);
   };
 
+  const handleCalculatorClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click event
+    window.open(`/profit-calculator?productId=${product.id}`, '_blank');
+  };
+
   const profit = product.srp - product.from_price;
 
   return (
     <Card 
-      className="bg-white border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer"
+      className="bg-white border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer relative"
       onClick={handleCardClick}
     >
       <div className="relative aspect-square bg-gray-50">
@@ -61,7 +68,17 @@ const ProductCard = ({ product }: ProductCardProps) => {
         />
       </div>
       <div className="p-4">
-        <div className="text-sm text-gray-600 mb-2">{product.category}</div>
+        <div className="flex justify-between items-start mb-2">
+          <div className="text-sm text-gray-600">{product.category}</div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-gray-500 hover:text-primary"
+            onClick={handleCalculatorClick}
+          >
+            <Calculator className="h-4 w-4" />
+          </Button>
+        </div>
         <h3 className="text-2xl font-semibold text-gray-900 mb-4 min-h-[4rem] line-clamp-2">
           {product.name}
         </h3>
