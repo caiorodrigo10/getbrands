@@ -5,9 +5,11 @@ import { Product } from "@/types/product";
 import { useToast } from "@/components/ui/use-toast";
 import { Slider } from "@/components/ui/slider";
 import { DollarSign } from "lucide-react";
+import { SellingPriceEdit } from "./SellingPriceEdit";
 
 interface ProfitCalculatorFormProps {
   product: Product | null;
+  projectProductId?: string;
   onCalculate: (values: {
     monthlySales: number;
     growthRate: number;
@@ -16,7 +18,7 @@ interface ProfitCalculatorFormProps {
   }) => void;
 }
 
-export const ProfitCalculatorForm = ({ product, onCalculate }: ProfitCalculatorFormProps) => {
+export const ProfitCalculatorForm = ({ product, projectProductId, onCalculate }: ProfitCalculatorFormProps) => {
   const [monthlySales, setMonthlySales] = useState(200);
   const [growthRate, setGrowthRate] = useState(15);
   const [sellingPrice, setSellingPrice] = useState(0);
@@ -53,6 +55,10 @@ export const ProfitCalculatorForm = ({ product, onCalculate }: ProfitCalculatorF
     if (chartElement) {
       chartElement.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const handlePriceUpdate = (newPrice: number) => {
+    setSellingPrice(newPrice);
   };
 
   return (
@@ -122,18 +128,26 @@ export const ProfitCalculatorForm = ({ product, onCalculate }: ProfitCalculatorF
 
           <div className="space-y-2">
             <Label htmlFor="sellingPrice">Selling Price</Label>
-            <div className="relative">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                <DollarSign className="h-4 w-4 text-green-600" />
-              </div>
-              <input
-                id="sellingPrice"
-                type="number"
-                value={sellingPrice}
-                onChange={(e) => setSellingPrice(Number(e.target.value))}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm pl-9 font-bold text-green-600"
+            {projectProductId ? (
+              <SellingPriceEdit
+                projectProductId={projectProductId}
+                currentPrice={sellingPrice}
+                onPriceUpdate={handlePriceUpdate}
               />
-            </div>
+            ) : (
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                  <DollarSign className="h-4 w-4 text-green-600" />
+                </div>
+                <input
+                  id="sellingPrice"
+                  type="number"
+                  value={sellingPrice}
+                  onChange={(e) => setSellingPrice(Number(e.target.value))}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm pl-9 font-bold text-green-600"
+                />
+              </div>
+            )}
           </div>
         </div>
 
