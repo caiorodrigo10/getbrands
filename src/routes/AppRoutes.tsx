@@ -6,12 +6,12 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AdminDashboard } from "@/pages/admin/AdminDashboard";
 import { UsersManagement } from "@/pages/admin/UsersManagement";
 import { ProjectsManagement } from "@/pages/admin/ProjectsManagement";
-import Login from "@/pages/Login";
+import { Login } from "@/pages/Login";
 import { Home } from "@/pages/Home";
-import Profile from "@/pages/Profile";
+import { Profile } from "@/pages/Profile";
 import { SampleRequest } from "@/pages/SampleRequest";
-import SampleOrders from "@/pages/SampleOrders";
-import Projects from "@/pages/Projects";
+import { SampleOrders } from "@/pages/SampleOrders";
+import { Projects } from "@/pages/Projects";
 import { Project } from "@/pages/Project";
 import { ProjectQuiz } from "@/pages/ProjectQuiz";
 
