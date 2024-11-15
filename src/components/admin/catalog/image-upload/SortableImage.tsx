@@ -18,11 +18,17 @@ export const SortableImage = ({ image, onDelete }: SortableImageProps) => {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: image.id });
+  } = useSortable({ 
+    id: image.id,
+    transition: {
+      duration: 150,
+      easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+    },
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition: transition || "transform 200ms cubic-bezier(0.25, 1, 0.5, 1)",
+    transition,
     zIndex: isDragging ? 2 : 1,
     position: "relative" as const,
   };
