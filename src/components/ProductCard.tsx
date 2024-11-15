@@ -31,8 +31,8 @@ const ProductCard = ({
     if (!user) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "You must be logged in to request samples.",
+        title: "Erro",
+        description: "Você precisa estar logado para solicitar amostras.",
       });
       return;
     }
@@ -42,16 +42,16 @@ const ProductCard = ({
       await addItem(product);
       onRequestSample(product.id);
       toast({
-        title: "Success",
-        description: "Product added to cart successfully.",
+        title: "Sucesso",
+        description: "Produto adicionado ao carrinho com sucesso.",
       });
       navigate("/checkout/confirmation");
     } catch (error) {
       console.error('Error adding product to cart:', error);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to add product to cart. Please try again.",
+        title: "Erro",
+        description: "Falha ao adicionar produto ao carrinho. Tente novamente.",
       });
     } finally {
       setIsLoading(false);
@@ -63,10 +63,17 @@ const ProductCard = ({
     setImageLoaded(true);
   };
 
+  const handleCardClick = () => {
+    navigate(`/products/${product.id}`);
+  };
+
   const profit = product.srp - product.from_price;
 
   return (
-    <Card className="bg-white border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200">
+    <Card 
+      className="bg-white border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer"
+      onClick={handleCardClick}
+    >
       <div className="relative aspect-square bg-gray-50">
         {!imageLoaded && (
           <div className="absolute inset-0 bg-gray-100 animate-pulse" />
