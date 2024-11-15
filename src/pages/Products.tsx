@@ -4,16 +4,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import Confetti from 'react-confetti';
 import { useLocation, useNavigate } from "react-router-dom";
 import { ProductNameEdit } from "@/components/products/ProductNameEdit";
+import { ProductPricing } from "@/components/products/ProductPricing";
 
 interface ProjectSpecificProduct {
   id: string;
   name: string | null;
   description: string | null;
   image_url: string | null;
+  selling_price: number | null;
 }
 
 interface ProjectProduct {
@@ -28,6 +29,8 @@ interface ProjectProduct {
     name: string;
     category: string;
     image_url: string | null;
+    from_price: number;
+    srp: number;
   };
   specific: ProjectSpecificProduct[] | null;
 }
@@ -55,7 +58,8 @@ const Products = () => {
             id,
             name,
             description,
-            image_url
+            image_url,
+            selling_price
           )
         `)
         .order('created_at', { ascending: false });
@@ -81,13 +85,21 @@ const Products = () => {
     refetch();
   };
 
+  const handlePriceUpdate = () => {
+    refetch();
+  };
+
+  const navigateToOriginalProduct = (productId: string) => {
+    navigate(`/catalog/${productId}`);
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6">
         <h1 className="text-3xl font-bold">My Products</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-[300px] w-full" />
+            <Skeleton key={i} className="h-[500px] w-full" />
           ))}
         </div>
       </div>
@@ -110,13 +122,28 @@ const Products = () => {
               className="p-6 animate-fade-in"
               style={{ animationDelay: `${index * 150}ms` }}
             >
-              <div className="aspect-square mb-4 bg-gray-100 rounded-lg overflow-hidden">
-                <img
-                  src={displayImage || "/placeholder.svg"}
-                  alt={displayName}
-                  className="w-full h-full object-cover"
-                />
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                {/* Custom Product Image */}
+                <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                  <img
+                    src={displayImage || "/placeholder.svg"}
+                    alt={displayName}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                {/* Original Product Image */}
+                <div 
+                  className="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity"
+                  onClick={() => navigateToOriginalProduct(item.product.id)}
+                >
+                  <img
+                    src={item.product.image_url || "/placeholder.svg"}
+                    alt={item.product.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
+              
               <div className="space-y-4">
                 <div>
                   <ProductNameEdit
@@ -125,12 +152,23 @@ const Products = () => {
                     onNameUpdate={handleNameUpdate}
                   />
                   <p className="text-sm text-gray-600 mt-1">{item.product.category}</p>
-                  
-                  <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                    <p className="text-sm font-medium text-gray-700 mb-2">Original Product:</p>
-                    <p className="text-sm text-gray-600">{item.product.name}</p>
-                  </div>
                 </div>
+                
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Original Product:</p>
+                  <p className="text-sm text-gray-600 hover:text-primary cursor-pointer"
+                     onClick={() => navigateToOriginalProduct(item.product.id)}>
+                    {item.product.name}
+                  </p>
+                </div>
+
+                <ProductPricing
+                  projectProductId={item.id}
+                  costPrice={item.product.from_price}
+                  suggestedPrice={item.product.srp}
+                  currentSellingPrice={specificProduct?.selling_price || undefined}
+                  onPriceUpdate={handlePriceUpdate}
+                />
                 
                 {item.project && (
                   <div className="pt-2 border-t">
