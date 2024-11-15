@@ -76,7 +76,7 @@ export const SellingPriceEdit = ({ projectProductId, currentPrice, onPriceUpdate
           type="number"
           value={price}
           onChange={(e) => setPrice(Number(e.target.value))}
-          className="pl-9"
+          className="pl-9 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         />
       </div>
       <Button
