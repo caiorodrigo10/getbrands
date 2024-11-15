@@ -45,29 +45,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  const redirectBasedOnRole = async (userId: string) => {
-    if (!userId) return;
-    
-    try {
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .single();
-
-      if (error) throw error;
-
-      if (profile?.role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/');
-      }
-    } catch (error) {
-      console.error('Error fetching user role:', error);
-      navigate('/');
-    }
-  };
-
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -79,11 +56,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           return;
         }
         
-        if (initialSession?.user) {
+        if (initialSession) {
           setSession(initialSession);
           setUser(initialSession.user);
           identifyUserInGleap(initialSession.user);
-          await redirectBasedOnRole(initialSession.user.id);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
@@ -113,13 +89,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
 
-      if (currentSession?.user) {
+      if (currentSession) {
         setSession(currentSession);
         setUser(currentSession.user);
         identifyUserInGleap(currentSession.user);
-        if (event === 'SIGNED_IN') {
-          await redirectBasedOnRole(currentSession.user.id);
-        }
       }
     });
 
@@ -148,7 +121,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(data.user);
         setSession(data.session);
         identifyUserInGleap(data.user);
-        await redirectBasedOnRole(data.user.id);
       }
     } catch (error) {
       console.error('Login error:', error);
