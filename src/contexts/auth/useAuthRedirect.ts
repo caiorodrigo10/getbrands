@@ -19,19 +19,13 @@ export const useAuthRedirect = () => {
 
       if (error) throw error;
 
-      // Se o usuário é admin e não está na área admin, redireciona para admin
-      if (profile?.role === 'admin' && !location.pathname.startsWith('/admin')) {
-        navigate('/admin');
-        return;
-      }
-      
-      // Se o usuário não é admin e está tentando acessar área admin, redireciona para root
+      // Only redirect if user is not admin and trying to access admin area
       if (profile?.role !== 'admin' && location.pathname.startsWith('/admin')) {
         navigate('/');
         return;
       }
 
-      // Para usuários não-admin na página de login, redireciona para root
+      // For non-admin users on login page, redirect to root
       if (profile?.role !== 'admin' && location.pathname === '/login') {
         navigate('/');
       }

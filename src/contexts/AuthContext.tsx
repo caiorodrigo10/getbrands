@@ -38,7 +38,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setSession(currentSession);
           setUser(currentSession.user);
           identifyUserInGleap(currentSession.user);
-          await redirectBasedOnRole(currentSession.user.id);
+          // Only check role on initial load, not on every pathname change
+          if (isLoading) {
+            await redirectBasedOnRole(currentSession.user.id);
+          }
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
@@ -72,14 +75,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setSession(currentSession);
         setUser(currentSession.user);
         identifyUserInGleap(currentSession.user);
-        await redirectBasedOnRole(currentSession.user.id);
+        // Only check role on sign in
+        if (event === 'SIGNED_IN') {
+          await redirectBasedOnRole(currentSession.user.id);
+        }
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [location.pathname]);
+  }, [isLoading]); // Remove location.pathname dependency
 
   const login = async (email: string, password: string) => {
     try {
