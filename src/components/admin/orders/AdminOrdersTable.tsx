@@ -62,8 +62,8 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
         </TableHeader>
         <TableBody>
           {orders.map((order) => (
-            <>
-              <TableRow key={order.id}>
+            <React.Fragment key={order.id}>
+              <TableRow>
                 <TableCell>
                   <Button
                     variant="ghost"
@@ -130,14 +130,14 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
               </TableRow>
               <AnimatePresence>
                 {expandedOrderId === order.id && (
-                  <TableRow>
+                  <TableRow key={`${order.id}-expanded`}>
                     <TableCell colSpan={8}>
                       <AdminOrderExpandedDetails order={order} />
                     </TableCell>
                   </TableRow>
                 )}
               </AnimatePresence>
-            </>
+            </React.Fragment>
           ))}
         </TableBody>
       </Table>
