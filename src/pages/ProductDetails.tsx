@@ -5,8 +5,8 @@ import { Product } from "@/types/product";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import ProductHeader from "@/components/products/ProductHeader";
-import ProductBenefits from "@/components/products/ProductBenefits";
-import ProductCalculator from "@/components/products/ProductCalculator";
+import { ProductBenefits } from "@/components/products/ProductBenefits";
+import { ProductCalculator } from "@/components/products/ProductCalculator";
 import { useCartOperations } from "@/hooks/useCartOperations";
 
 const ProductDetails = () => {
@@ -89,7 +89,6 @@ const ProductDetails = () => {
 
       <div className="border-t border-gray-200 pt-8">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Profit Calculator</h2>
           <ProductCalculator product={product} />
         </div>
       </div>
