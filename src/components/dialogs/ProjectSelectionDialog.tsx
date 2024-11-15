@@ -53,7 +53,7 @@ const ProjectSelectionDialog = ({
       onOpenChange(false);
       
       // Navigate to success page with product and project info
-      navigate("/produtos/success", { 
+      navigate("/products/success", { 
         state: { 
           product: {
             name: product.name,
