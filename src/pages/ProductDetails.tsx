@@ -42,13 +42,13 @@ const ProductDetails = () => {
   const profit = product.srp - product.from_price;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
-      {/* Seção Principal */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+      {/* Main Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
         <div className="space-y-6">
           <div className="relative">
             {product.is_new && (
-              <Badge className="absolute top-4 right-4 bg-primary">NOVO</Badge>
+              <Badge className="absolute top-4 right-4 bg-primary">NEW</Badge>
             )}
             {product.is_tiktok && (
               <Badge className="absolute top-4 right-4 bg-pink-600">TIKTOK</Badge>
@@ -64,7 +64,7 @@ const ProductDetails = () => {
               <img
                 key={i}
                 src={product.image_url || "/placeholder.svg"}
-                alt={`${product.name} - Vista ${i}`}
+                alt={`${product.name} - View ${i}`}
                 className="w-full aspect-square object-cover rounded-lg cursor-pointer hover:ring-2 ring-primary"
               />
             ))}
@@ -73,98 +73,98 @@ const ProductDetails = () => {
 
         <div className="space-y-8">
           <div>
-            <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-4">{product.name}</h1>
             <p className="text-gray-600">{product.description}</p>
           </div>
 
           <div className="space-y-4">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <p className="text-sm text-gray-600">Preço base</p>
-                <p className="text-3xl font-bold">R$ {product.from_price.toFixed(2)}</p>
+                <p className="text-sm text-gray-600">Base Price</p>
+                <p className="text-2xl sm:text-3xl font-bold">$ {product.from_price.toFixed(2)}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Preço sugerido</p>
-                <p className="text-3xl font-bold">R$ {product.srp.toFixed(2)}</p>
+                <p className="text-sm text-gray-600">Suggested Price</p>
+                <p className="text-2xl sm:text-3xl font-bold">$ {product.srp.toFixed(2)}</p>
               </div>
-              <div className="bg-green-500 p-4 rounded-lg text-white">
-                <p className="text-sm">Lucro potencial</p>
-                <p className="text-2xl font-bold">R$ {profit.toFixed(2)}</p>
+              <div className="bg-green-500 p-4 rounded-lg text-white w-full sm:w-auto">
+                <p className="text-sm">Potential Profit</p>
+                <p className="text-xl sm:text-2xl font-bold">$ {profit.toFixed(2)}</p>
               </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <Button className="flex-1" variant="outline">
-                Ver descontos por volume
+                View Volume Discounts
               </Button>
               <Button className="flex-1">
-                Desbloquear preço especial
+                Unlock Special Price
               </Button>
             </div>
           </div>
 
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="text-center">
-              <Icons.skinHealth className="w-12 h-12 mx-auto mb-2" />
-              <p className="text-sm">Saúde da Pele</p>
+              <Icons.skinHealth className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2" />
+              <p className="text-sm">Skin Health</p>
             </div>
             <div className="text-center">
-              <Icons.vegetarian className="w-12 h-12 mx-auto mb-2" />
-              <p className="text-sm">Vegetariano</p>
+              <Icons.vegetarian className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2" />
+              <p className="text-sm">Vegetarian</p>
             </div>
             <div className="text-center">
-              <Icons.natural className="w-12 h-12 mx-auto mb-2" />
+              <Icons.natural className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2" />
               <p className="text-sm">100% Natural</p>
             </div>
             <div className="text-center">
-              <Icons.noGmo className="w-12 h-12 mx-auto mb-2" />
-              <p className="text-sm">Sem OGM</p>
+              <Icons.noGmo className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2" />
+              <p className="text-sm">No GMO</p>
             </div>
           </div>
 
           <div className="space-y-4">
             <Button className="w-full" size="lg">
-              Personalizar e vender
+              Customize and Sell
             </Button>
             <Button variant="outline" className="w-full" size="lg">
-              Salvar para depois
+              Save for Later
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Seção de Benefícios */}
+      {/* Benefits Section */}
       <div className="space-y-8">
-        <h2 className="text-3xl font-bold">Benefícios do Produto</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold">Product Benefits</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Ingredientes Principais</h3>
+            <h3 className="text-xl font-semibold">Key Ingredients</h3>
             <ul className="list-disc list-inside space-y-2">
-              <li>Aloe Vera: Hidratação profunda</li>
-              <li>Óleo de Tea Tree: Propriedades purificantes</li>
-              <li>Extrato de Pepino: Efeito calmante</li>
+              <li>Aloe Vera: Deep hydration</li>
+              <li>Tea Tree Oil: Purifying properties</li>
+              <li>Cucumber Extract: Soothing effect</li>
             </ul>
           </div>
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Benefícios</h3>
+            <h3 className="text-xl font-semibold">Benefits</h3>
             <ul className="list-disc list-inside space-y-2">
-              <li>Reduz vermelhidão</li>
-              <li>Equilibra a pele</li>
-              <li>Hidrata profundamente</li>
+              <li>Reduces redness</li>
+              <li>Balances skin</li>
+              <li>Deep hydration</li>
             </ul>
           </div>
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Modo de Uso</h3>
-            <p>Aplique sobre a pele limpa e seca, massageando suavemente. Use duas vezes ao dia para melhores resultados.</p>
+            <h3 className="text-xl font-semibold">How to Use</h3>
+            <p>Apply to clean, dry skin, gently massaging. Use twice daily for best results.</p>
           </div>
         </div>
       </div>
 
-      {/* Produtos Relacionados */}
+      {/* Related Products */}
       <div className="space-y-8">
-        <h2 className="text-3xl font-bold">Produtos Relacionados</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Implementar componente de produtos relacionados aqui */}
+        <h2 className="text-2xl sm:text-3xl font-bold">Related Products</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Implement related products component here */}
         </div>
       </div>
     </div>
