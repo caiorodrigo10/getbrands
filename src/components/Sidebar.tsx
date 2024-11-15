@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import PackSelectionDialog from "./dialogs/PackSelectionDialog";
 
-const Sidebar = () => {
+export const Sidebar = () => {
   const location = useLocation();
   const { user } = useAuth();
   const [isPackDialogOpen, setIsPackDialogOpen] = useState(false);
@@ -93,5 +93,3 @@ const Sidebar = () => {
     </aside>
   );
 };
-
-export default Sidebar;
