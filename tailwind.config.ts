@@ -12,9 +12,18 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: {
+        DEFAULT: '1rem',
+        sm: '2rem',
+        lg: '4rem',
+        xl: '5rem',
+        '2xl': '6rem',
+      },
       screens: {
-        "2xl": "1400px",
+        sm: '640px',
+        md: '768px',
+        lg: '1024px',
+        xl: '1200px',
       },
     },
     extend: {
@@ -50,6 +59,20 @@ export default {
       fontFamily: {
         sans: ["Inter", "sans-serif"],
         heading: ["Montserrat", "sans-serif"],
+      },
+      spacing: {
+        'page': '2rem',
+        'section': '1.5rem',
+      },
+      fontSize: {
+        'page-title': ['1.875rem', {
+          lineHeight: '2.25rem',
+          fontWeight: '700',
+        }],
+        'section-title': ['1.5rem', {
+          lineHeight: '2rem',
+          fontWeight: '600',
+        }],
       },
       keyframes: {
         "accordion-down": {
