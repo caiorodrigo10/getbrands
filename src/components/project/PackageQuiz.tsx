@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Upload, Palette } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -30,14 +30,33 @@ export function PackageQuiz() {
   const { data: quizData, isLoading } = useQuery({
     queryKey: ["package_quiz", projectId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First try to find an existing quiz
+      const { data: existingQuiz, error: fetchError } = await supabase
         .from("package_quizzes")
         .select("*")
         .eq("project_id", projectId)
-        .single();
+        .maybeSingle(); // Using maybeSingle() instead of single()
 
-      if (error) throw error;
-      return data;
+      if (fetchError) throw fetchError;
+
+      // If no quiz exists, create one
+      if (!existingQuiz && user?.id) {
+        const { data: newQuiz, error: createError } = await supabase
+          .from("package_quizzes")
+          .insert({
+            project_id: projectId,
+            user_id: user.id,
+            status: "not_started",
+            current_step: 1
+          })
+          .select()
+          .single();
+
+        if (createError) throw createError;
+        return newQuiz;
+      }
+
+      return existingQuiz;
     },
   });
 
