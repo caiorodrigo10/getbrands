@@ -43,13 +43,18 @@ const Dashboard = () => {
     <div className="space-y-8 animate-fade-in">
       <DashboardHeader userName={userName} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ProjectsOverview projects={projects || []} />
-        <UpcomingMeetings meetings={meetings || []} />
+      <div className="grid grid-cols-12 gap-6">
+        {/* Left Column */}
+        <div className="col-span-12 lg:col-span-7 space-y-6">
+          <ProjectsOverview projects={projects || []} />
+          <UpcomingMeetings meetings={meetings || []} />
+        </div>
+        
+        {/* Right Column */}
+        <div className="col-span-12 lg:col-span-5">
+          <ProjectDetails />
+        </div>
       </div>
-
-      {/* Project Details */}
-      <ProjectDetails />
 
       {/* Your Products */}
       <div>
