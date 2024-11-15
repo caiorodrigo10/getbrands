@@ -1,5 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import UserMenu from "./UserMenu";
+import { Menu } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export const NavigationMenu = () => {
   const location = useLocation();
@@ -37,6 +39,30 @@ export const NavigationMenu = () => {
                 </Link>
               ))}
             </nav>
+
+            {/* Mobile Menu */}
+            <Sheet>
+              <SheetTrigger className="md:hidden">
+                <Menu className="h-6 w-6 text-gray-300" />
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[300px] bg-[#131313] p-0">
+                <nav className="flex flex-col p-4">
+                  {menuItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={`px-4 py-3 text-sm rounded-md transition-all duration-200 ${
+                        location.pathname === item.path
+                          ? "bg-primary/20 text-primary-foreground font-medium"
+                          : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
 
           <div className="flex items-center gap-4">
