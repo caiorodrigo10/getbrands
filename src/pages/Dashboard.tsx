@@ -55,7 +55,7 @@ const Dashboard = () => {
     queryKey: ["meetings", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const { data } = await supabase
+      const { data: meetingsData } = await supabase
         .from("project_meetings")
         .select(`
           *,
@@ -67,7 +67,23 @@ const Dashboard = () => {
         .gte("scheduled_for", new Date().toISOString())
         .order("scheduled_for", { ascending: true })
         .limit(3);
-      return data;
+
+      // Add example participants for each meeting
+      return meetingsData?.map(meeting => ({
+        ...meeting,
+        participants: [
+          {
+            id: "1",
+            name: "Sarah Johnson",
+            avatar_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+          },
+          {
+            id: "2",
+            name: "Michael Chen",
+            avatar_url: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
+          }
+        ]
+      }));
     },
     enabled: !!user?.id,
   });

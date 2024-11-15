@@ -89,8 +89,8 @@ const Products = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {products?.map((item, index) => {
           const specificProduct = item.specific?.[0];
-          const displayName = specificProduct?.name || item.product.name;
-          const displayImage = specificProduct?.image_url || item.product.image_url;
+          const displayName = specificProduct?.name || item.product?.name || 'Unnamed Product';
+          const displayImage = specificProduct?.image_url || item.product?.image_url;
           
           return (
             <Card 
@@ -113,7 +113,7 @@ const Products = () => {
                     currentName={displayName}
                     onNameUpdate={handleNameUpdate}
                   />
-                  <p className="text-sm text-gray-600 mt-1">{item.product.category}</p>
+                  <p className="text-sm text-gray-600 mt-1">{item.product?.category || 'Uncategorized'}</p>
                 </div>
                 
                 <div className="p-4 bg-gray-50 rounded-lg">
@@ -121,17 +121,17 @@ const Products = () => {
                     <div className="flex-grow space-y-3">
                       <p className="text-sm font-medium text-gray-700">Original Product:</p>
                       <p className="text-sm text-gray-600 hover:text-primary cursor-pointer"
-                         onClick={() => navigateToOriginalProduct(item.product.id)}>
-                        {item.product.name}
+                         onClick={() => item.product?.id && navigateToOriginalProduct(item.product.id)}>
+                        {item.product?.name || 'Product name not available'}
                       </p>
                     </div>
                     <div 
                       className="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity"
-                      onClick={() => navigateToOriginalProduct(item.product.id)}
+                      onClick={() => item.product?.id && navigateToOriginalProduct(item.product.id)}
                     >
                       <img
-                        src={item.product.image_url || "/placeholder.svg"}
-                        alt={item.product.name}
+                        src={item.product?.image_url || "/placeholder.svg"}
+                        alt={item.product?.name || 'Product image'}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -139,14 +139,14 @@ const Products = () => {
                 </div>
 
                 <ProductPriceInfo
-                  costPrice={item.product.from_price}
-                  suggestedPrice={item.product.srp}
+                  costPrice={item.product?.from_price || 0}
+                  suggestedPrice={item.product?.srp || 0}
                 />
 
                 <ProductPricing
                   projectProductId={item.id}
-                  costPrice={item.product.from_price}
-                  suggestedPrice={item.product.srp}
+                  costPrice={item.product?.from_price || 0}
+                  suggestedPrice={item.product?.srp || 0}
                   currentSellingPrice={specificProduct?.selling_price || undefined}
                   onPriceUpdate={handlePriceUpdate}
                 />
