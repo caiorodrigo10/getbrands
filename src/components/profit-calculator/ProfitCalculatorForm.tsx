@@ -7,7 +7,7 @@ import { Slider } from "@/components/ui/slider";
 import { DollarSign } from "lucide-react";
 
 interface ProfitCalculatorFormProps {
-  product: Product;
+  product: Product | null;
   onCalculate: (values: {
     monthlySales: number;
     growthRate: number;
@@ -19,14 +19,14 @@ interface ProfitCalculatorFormProps {
 export const ProfitCalculatorForm = ({ product, onCalculate }: ProfitCalculatorFormProps) => {
   const [monthlySales, setMonthlySales] = useState(200);
   const [growthRate, setGrowthRate] = useState(15);
-  const [sellingPrice, setSellingPrice] = useState(product.srp);
-  const costPrice = product.from_price;
+  const [sellingPrice, setSellingPrice] = useState(product?.srp || 0);
+  const costPrice = product?.from_price || 0;
   const { toast } = useToast();
 
   const handleReset = () => {
     setMonthlySales(200);
     setGrowthRate(15);
-    setSellingPrice(product.srp);
+    setSellingPrice(product?.srp || 0);
     toast({
       title: "Values Reset",
       description: "All values have been reset to their defaults.",
@@ -130,13 +130,15 @@ export const ProfitCalculatorForm = ({ product, onCalculate }: ProfitCalculatorF
           </div>
         </div>
 
-        <Button 
-          className="w-auto mt-4" 
-          size="default"
-          onClick={handleCalculate}
-        >
-          Calculate Profit Projections
-        </Button>
+        <div className="flex justify-center">
+          <Button 
+            className="w-auto mt-4" 
+            size="default"
+            onClick={handleCalculate}
+          >
+            Calculate Profit Projections
+          </Button>
+        </div>
       </div>
     </div>
   );

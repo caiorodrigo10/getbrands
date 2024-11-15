@@ -14,8 +14,8 @@ import { formatCurrency } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 
 interface ProfitProjectionsProps {
-  product: Product;
-  calculationValues?: {
+  product: Product | null;
+  calculationValues: {
     monthlySales: number;
     growthRate: number;
     costPrice: number;
@@ -43,12 +43,11 @@ export const ProfitProjections = ({ product, calculationValues }: ProfitProjecti
 
       let annualProfit = 0;
       const monthlyData = months.map((month, index) => {
-        const growthFactor = Math.pow(1 + (calculationValues?.growthRate || 15) / 100, index);
-        const baseSales = calculationValues?.monthlySales || 200;
-        const monthlySales = baseSales * growthFactor;
+        const growthFactor = Math.pow(1 + (calculationValues.growthRate) / 100, index);
+        const monthlySales = calculationValues.monthlySales * growthFactor;
 
-        const revenue = monthlySales * product.srp;
-        const costs = monthlySales * product.from_price;
+        const revenue = monthlySales * calculationValues.sellingPrice;
+        const costs = monthlySales * calculationValues.costPrice;
         const monthlyProfit = revenue - costs;
         annualProfit += monthlyProfit;
 
@@ -65,7 +64,7 @@ export const ProfitProjections = ({ product, calculationValues }: ProfitProjecti
     };
 
     calculateProjections();
-  }, [product, calculationValues]);
+  }, [calculationValues]);
 
   return (
     <div className="space-y-6">
