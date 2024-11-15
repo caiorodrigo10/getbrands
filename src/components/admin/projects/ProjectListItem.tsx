@@ -39,19 +39,19 @@ const ProjectListItem = ({ project, isExpanded, onToggle }: ProjectListItemProps
       <div className="p-4">
         <div className="flex items-center justify-between">
           <div className="grid grid-cols-1 md:grid-cols-7 gap-4 w-full">
-            <div className="flex items-center">
+            <div className="md:col-span-1">
               <p className="text-sm text-foreground truncate">{project.name}</p>
             </div>
-            <div className="flex items-center">
+            <div className="md:col-span-1">
               <p className="text-sm text-muted-foreground truncate">{project.client}</p>
             </div>
-            <div className="flex items-center">
+            <div className="md:col-span-1">
               <p className="text-sm text-muted-foreground truncate">{project.email}</p>
             </div>
-            <div className="flex items-center">
+            <div className="md:col-span-1">
               <p className="text-sm text-muted-foreground truncate">{project.phone}</p>
             </div>
-            <div className="flex items-center">
+            <div className="md:col-span-1">
               <span className={cn(
                 "px-2.5 py-0.5 rounded-full text-xs font-medium",
                 getStatusColor(project.status)
@@ -59,18 +59,20 @@ const ProjectListItem = ({ project, isExpanded, onToggle }: ProjectListItemProps
                 {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="h-1.5 w-full bg-muted/15 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-primary transition-all duration-1000 ease-out rounded-full"
-                  style={{ width: `${project.progress}%` }}
-                />
+            <div className="md:col-span-1">
+              <div className="flex items-center gap-2">
+                <div className="h-1.5 w-full bg-muted/15 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary transition-all duration-1000 ease-out rounded-full"
+                    style={{ width: `${project.progress}%` }}
+                  />
+                </div>
+                <span className="text-sm text-muted-foreground whitespace-nowrap">
+                  {project.progress}%
+                </span>
               </div>
-              <span className="text-sm text-muted-foreground whitespace-nowrap">
-                {project.progress}%
-              </span>
             </div>
-            <div className="flex items-center">
+            <div className="md:col-span-1">
               <p className="text-sm text-muted-foreground truncate">{project.accountManager}</p>
             </div>
           </div>
