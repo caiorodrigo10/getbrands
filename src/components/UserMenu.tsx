@@ -11,12 +11,31 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, ShoppingBag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 const UserMenu = () => {
   const { user, logout } = useAuth();
   const [profile, setProfile] = useState<any>(null);
+
+  const { data: totalPoints } = useQuery({
+    queryKey: ["userPoints", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+      const { data: projects } = await supabase
+        .from("projects")
+        .select("points, points_used")
+        .eq("user_id", user.id);
+
+      if (!projects) return 0;
+      
+      return projects.reduce((acc, project) => {
+        return acc + (project.points - (project.points_used || 0));
+      }, 0);
+    },
+    enabled: !!user?.id,
+  });
 
   useEffect(() => {
     if (user) {
@@ -59,7 +78,7 @@ const UserMenu = () => {
           </Avatar>
           <div className="flex flex-col items-start">
             <span className="text-sm font-medium text-white">{userName}</span>
-            <span className="text-xs text-white/70">{userEmail}</span>
+            <span className="text-xs text-white/70">{totalPoints?.toLocaleString() || 0} pts</span>
           </div>
         </Button>
       </DropdownMenuTrigger>
@@ -87,6 +106,12 @@ const UserMenu = () => {
             <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md">
               <User className="h-4 w-4 text-gray-500" />
               <span>My Profile</span>
+            </DropdownMenuItem>
+          </Link>
+          <Link to="/sample-orders">
+            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md">
+              <ShoppingBag className="h-4 w-4 text-gray-500" />
+              <span>Orders</span>
             </DropdownMenuItem>
           </Link>
           <DropdownMenuItem 
