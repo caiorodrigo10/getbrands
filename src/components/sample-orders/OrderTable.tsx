@@ -75,13 +75,13 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
         <TableHeader>
           <TableRow>
             <TableHead className="w-12"></TableHead>
-            <TableHead>Order Type</TableHead>
-            <TableHead>Order Number</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Items</TableHead>
-            <TableHead>Tracking #</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Total</TableHead>
+            <TableHead className="whitespace-nowrap">Order Type</TableHead>
+            <TableHead className="whitespace-nowrap">Order Number</TableHead>
+            <TableHead className="whitespace-nowrap">Date</TableHead>
+            <TableHead className="whitespace-nowrap">Items</TableHead>
+            <TableHead className="whitespace-nowrap">Tracking #</TableHead>
+            <TableHead className="whitespace-nowrap">Status</TableHead>
+            <TableHead className="whitespace-nowrap">Total</TableHead>
             <TableHead className="w-12"></TableHead>
           </TableRow>
         </TableHeader>
@@ -103,13 +103,13 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
                   </Button>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Package className="h-4 w-4" />
+                  <div className="flex items-center gap-2 whitespace-nowrap">
+                    <Package className="h-4 w-4 flex-shrink-0" />
                     <span>SAMPLE ORDER</span>
                   </div>
                 </TableCell>
-                <TableCell>SPL{order.id.slice(0, 6)}</TableCell>
-                <TableCell>
+                <TableCell className="whitespace-nowrap">SPL{order.id.slice(0, 6)}</TableCell>
+                <TableCell className="whitespace-nowrap">
                   {new Date(order.created_at).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
@@ -117,11 +117,11 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
                     minute: "2-digit",
                   })}
                 </TableCell>
-                <TableCell>{order.products?.length || 0} items</TableCell>
+                <TableCell className="whitespace-nowrap">{order.products?.length || 0} items</TableCell>
                 <TableCell>
                   {order.tracking_number ? (
-                    <div className="flex items-center gap-2">
-                      <Truck className="h-4 w-4" />
+                    <div className="flex items-center gap-2 whitespace-nowrap">
+                      <Truck className="h-4 w-4 flex-shrink-0" />
                       <span>{order.tracking_number}</span>
                     </div>
                   ) : (
@@ -131,7 +131,7 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
                 <TableCell>
                   <OrderStatusBadge status={order.status} />
                 </TableCell>
-                <TableCell>
+                <TableCell className="whitespace-nowrap">
                   {formatCurrency(calculateOrderTotal(order))}
                 </TableCell>
                 <TableCell>
