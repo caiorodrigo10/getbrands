@@ -68,44 +68,6 @@ export type Database = {
           },
         ]
       }
-      audit_logs: {
-        Row: {
-          action_type: string
-          admin_id: string
-          created_at: string
-          details: Json | null
-          entity_id: string
-          entity_type: string
-          id: string
-        }
-        Insert: {
-          action_type: string
-          admin_id: string
-          created_at?: string
-          details?: Json | null
-          entity_id: string
-          entity_type: string
-          id?: string
-        }
-        Update: {
-          action_type?: string
-          admin_id?: string
-          created_at?: string
-          details?: Json | null
-          entity_id?: string
-          entity_type?: string
-          id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "audit_logs_admin_id_fkey"
-            columns: ["admin_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       cart_items: {
         Row: {
           created_at: string
@@ -309,7 +271,6 @@ export type Database = {
           last_name: string | null
           name: string | null
           phone: string | null
-          role: string
           shipping_address_city: string | null
           shipping_address_state: string | null
           shipping_address_street: string | null
@@ -331,7 +292,6 @@ export type Database = {
           last_name?: string | null
           name?: string | null
           phone?: string | null
-          role?: string
           shipping_address_city?: string | null
           shipping_address_state?: string | null
           shipping_address_street?: string | null
@@ -353,7 +313,6 @@ export type Database = {
           last_name?: string | null
           name?: string | null
           phone?: string | null
-          role?: string
           shipping_address_city?: string | null
           shipping_address_state?: string | null
           shipping_address_street?: string | null

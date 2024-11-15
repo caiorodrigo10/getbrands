@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { User, Session } from "@supabase/supabase-js";
+import { User, Session, AuthChangeEvent } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +11,6 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
-  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,10 +33,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const handleAuthError = () => {
+    setSession(null);
+    setUser(null);
+    identifyUserInGleap(null);
+    navigate('/login');
+    toast({
+      variant: "destructive",
+      title: "Session Expired",
+      description: "Please sign in again to continue.",
+    });
+  };
+
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          handleAuthError();
+          return;
+        }
+        
         if (initialSession) {
           setSession(initialSession);
           setUser(initialSession.user);
@@ -45,11 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to initialize authentication.",
-        });
+        handleAuthError();
       } finally {
         setIsLoading(false);
       }
@@ -57,17 +71,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     initializeAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      identifyUserInGleap(currentSession?.user ?? null);
-      setIsLoading(false);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, currentSession) => {
+      console.log('Auth event:', event);
+      
+      if (['SIGNED_OUT', 'USER_DELETED'].includes(event)) {
+        setSession(null);
+        setUser(null);
+        identifyUserInGleap(null);
+        navigate('/login');
+        return;
+      }
+
+      if (event === 'TOKEN_REFRESHED' && !currentSession) {
+        handleAuthError();
+        return;
+      }
+
+      if (currentSession) {
+        setSession(currentSession);
+        setUser(currentSession.user);
+        identifyUserInGleap(currentSession.user);
+      }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast]);
+  }, [navigate]);
 
   const login = async (email: string, password: string) => {
     try {
@@ -80,7 +112,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         toast({
           variant: "destructive",
           title: "Error",
-          description: error.message || "Invalid email or password.",
+          description: error.message || "Invalid email or password. Please try again.",
         });
         throw error;
       }
@@ -89,7 +121,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(data.user);
         setSession(data.session);
         identifyUserInGleap(data.user);
-        navigate("/");
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -118,16 +149,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <AuthContext.Provider
-      value={{
-        user,
-        session,
-        login,
-        logout,
-        isAuthenticated: !!session,
-        isLoading
-      }}
+      value={{ user, session, login, logout, isAuthenticated: !!session }}
     >
       {children}
     </AuthContext.Provider>
