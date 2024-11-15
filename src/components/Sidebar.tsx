@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Briefcase, BookOpen, Package, Box, Calculator, PlusCircle } from "lucide-react";
+import { Briefcase, BookOpen, Package, Box, Calculator, PlusCircle, LayoutDashboard } from "lucide-react";
 import UserMenu from "./UserMenu";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +31,7 @@ const Sidebar = () => {
   });
 
   const menuItems = [
+    { icon: LayoutDashboard, label: "Dashboard", path: "/" },
     { icon: Briefcase, label: "Projects", path: "/projects" },
     { icon: BookOpen, label: "Catalog", path: "/catalog" },
     { icon: Package, label: "My Products", path: "/products" },
