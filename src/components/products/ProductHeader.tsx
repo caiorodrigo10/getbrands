@@ -32,10 +32,13 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
     setSelectedImage(imageUrl);
   };
 
-  const allImages = [
-    { image_url: product.image_url || "/placeholder.svg", position: -1 },
+  // Create an array of unique images, including the main product image if it exists
+  const uniqueImages = [
+    ...(product.image_url ? [{ image_url: product.image_url, position: -1 }] : []),
     ...(productImages || []).map(img => ({ image_url: img.image_url, position: img.position }))
-  ].filter(img => img.image_url);
+  ].filter((img, index, self) => 
+    index === self.findIndex((t) => t.image_url === img.image_url)
+  );
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
@@ -53,19 +56,21 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
             className="w-full aspect-square object-cover rounded-lg"
           />
         </div>
-        <div className="grid grid-cols-4 gap-4">
-          {allImages.map((image, index) => (
-            <img
-              key={index}
-              src={image.image_url}
-              alt={`${product.name} - View ${index + 1}`}
-              className={`w-full aspect-square object-cover rounded-lg cursor-pointer hover:ring-2 transition-all duration-200 ${
-                selectedImage === image.image_url ? 'ring-2 ring-primary' : 'hover:ring-primary/50'
-              }`}
-              onClick={() => handleThumbnailClick(image.image_url)}
-            />
-          ))}
-        </div>
+        {uniqueImages.length > 1 && (
+          <div className="grid grid-cols-4 gap-4">
+            {uniqueImages.map((image, index) => (
+              <img
+                key={`${image.image_url}-${index}`}
+                src={image.image_url}
+                alt={`${product.name} - View ${index + 1}`}
+                className={`w-full aspect-square object-cover rounded-lg cursor-pointer hover:ring-2 transition-all duration-200 ${
+                  selectedImage === image.image_url ? 'ring-2 ring-primary' : 'hover:ring-primary/50'
+                }`}
+                onClick={() => handleThumbnailClick(image.image_url)}
+              />
+            ))}
+          </div>
+        )}
       </div>
       <div className="space-y-8">
         <div className="space-y-4">
