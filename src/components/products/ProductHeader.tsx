@@ -1,89 +1,96 @@
+import { Product } from "@/types/product";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Product } from "@/types/product";
-import { ProductActions } from "./ProductActions";
+import { useNavigate } from "react-router-dom";
+import { Calculator, ShoppingCart } from "lucide-react";
+import { useState } from "react";
+import { useCartOperations } from "@/hooks/useCartOperations";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ProductHeaderProps {
   product: Product;
-  onSelectProduct: () => void;
 }
 
-export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) => {
+const ProductHeader = ({ product }: ProductHeaderProps) => {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const { addItem } = useCartOperations();
+  const { toast } = useToast();
+  const profit = product.srp - product.from_price;
+
+  const handleAddToCart = async () => {
+    try {
+      setIsLoading(true);
+      await addItem(product.id);
+      toast({
+        title: "Product added to cart",
+        description: "The product has been added to your cart successfully.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to add product to cart. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCalculatorClick = () => {
+    window.open(`/profit-calculator?productId=${product.id}`, '_blank');
+  };
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-      <div className="space-y-6">
-        <div className="relative">
-          {product.is_new && (
-            <Badge className="absolute top-4 left-4 bg-primary">NEW</Badge>
-          )}
-          {product.is_tiktok && (
-            <Badge className="absolute top-4 right-4 bg-pink-600">SELL ON TIKTOK</Badge>
-          )}
-          <img
-            src={product.image_url || "/placeholder.svg"}
-            alt={product.name}
-            className="w-full aspect-square object-cover rounded-lg"
-          />
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-2">
+        {product.is_new && (
+          <Badge variant="default" className="bg-primary">NEW</Badge>
+        )}
+        {product.is_tiktok && (
+          <Badge variant="default" className="bg-pink-600">TIKTOK</Badge>
+        )}
+        <span className="text-sm text-gray-600">{product.category}</span>
+      </div>
+
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
+
+      <div className="grid grid-cols-3 gap-4 py-4">
+        <div className="space-y-1">
+          <p className="text-sm text-gray-600">From</p>
+          <p className="text-2xl font-semibold text-gray-900">${product.from_price.toFixed(2)}</p>
         </div>
-        <div className="grid grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <img
-              key={i}
-              src={product.image_url || "/placeholder.svg"}
-              alt={`${product.name} - View ${i}`}
-              className="w-full aspect-square object-cover rounded-lg cursor-pointer hover:ring-2 ring-primary"
-            />
-          ))}
+        <div className="space-y-1">
+          <p className="text-sm text-gray-600">SRP</p>
+          <p className="text-2xl font-semibold text-gray-900">${product.srp.toFixed(2)}</p>
+        </div>
+        <div className="bg-green-500 rounded-lg p-3 text-center">
+          <p className="text-sm text-white">Profit</p>
+          <p className="text-2xl font-semibold text-white">${profit.toFixed(2)}</p>
         </div>
       </div>
-      <div className="space-y-8">
-        <div className="space-y-4">
-          <h1 className="text-4xl font-bold">{product.name}</h1>
-          <p className="text-xl text-gray-600">Ships exclusively to US</p>
-          <p className="text-gray-700 text-lg">{product.description}</p>
-        </div>
-        <div className="text-4xl font-bold mb-4">
-          ${product.from_price.toFixed(2)}
-        </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between text-lg">
-            <span>Sell more, pay less!</span>
-            <Button variant="link" className="text-primary">
-              View Volume Discounts
-            </Button>
-          </div>
-
-          <div className="flex items-center justify-between text-lg">
-            <span>Large business?</span>
-            <Button variant="link" className="text-primary">
-              Unlock Special Pricing
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 py-4 border-y border-gray-200">
-            <div>
-              <p className="text-gray-600">Shipping cost</p>
-              <p className="text-lg">From ${(4.50).toFixed(2)}</p>
-            </div>
-            <div>
-              <p className="text-gray-600">Suggested retail price</p>
-              <p className="text-lg">${product.srp.toFixed(2)}</p>
-            </div>
-            <div className="col-span-2">
-              <p className="text-gray-600">Potential profit</p>
-              <p className="text-lg text-green-600 font-semibold">
-                ${(product.srp - product.from_price).toFixed(2)}
-              </p>
-            </div>
-          </div>
-
-          <ProductActions 
-            product={product}
-            onSelectProduct={onSelectProduct}
-          />
-        </div>
+      <div className="flex gap-3 pt-2">
+        <Button
+          variant="default"
+          size="lg"
+          className="flex-1"
+          onClick={handleAddToCart}
+          disabled={isLoading}
+        >
+          <ShoppingCart className="w-4 h-4 mr-2" />
+          {isLoading ? "Adding..." : "Add to Cart"}
+        </Button>
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={handleCalculatorClick}
+        >
+          <Calculator className="w-4 h-4" />
+        </Button>
       </div>
     </div>
   );
 };
+
+export default ProductHeader;
