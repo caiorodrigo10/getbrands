@@ -20,7 +20,6 @@ interface MonthlyProjection {
   month: string;
   revenue: number;
   costs: number;
-  profit: number;
 }
 
 export const ProfitProjections = ({ product }: ProfitProjectionsProps) => {
@@ -29,8 +28,8 @@ export const ProfitProjections = ({ product }: ProfitProjectionsProps) => {
   useEffect(() => {
     const calculateProjections = () => {
       const months = [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+        "Jul", "Ago", "Set", "Out", "Nov", "Dez"
       ];
 
       const monthlyData = months.map((month, index) => {
@@ -40,13 +39,11 @@ export const ProfitProjections = ({ product }: ProfitProjectionsProps) => {
 
         const revenue = monthlySales * product.srp;
         const costs = monthlySales * product.from_price;
-        const profit = revenue - costs;
 
         return {
           month,
           revenue: Number(revenue.toFixed(2)),
           costs: Number(costs.toFixed(2)),
-          profit: Number(profit.toFixed(2)),
         };
       });
 
@@ -57,8 +54,8 @@ export const ProfitProjections = ({ product }: ProfitProjectionsProps) => {
   }, [product]);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border space-y-6">
-      <h2 className="text-lg font-semibold">12-Month Projections</h2>
+    <div className="bg-[#0A0A0A] p-6 rounded-lg shadow-sm border border-gray-800 space-y-6">
+      <h2 className="text-xl font-semibold text-white">Tendência de Lucratividade Mensal</h2>
       
       <div className="h-[400px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -66,62 +63,54 @@ export const ProfitProjections = ({ product }: ProfitProjectionsProps) => {
             data={projections}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip
-              formatter={(value: number) => formatCurrency(value)}
+            <CartesianGrid 
+              strokeDasharray="3 3" 
+              stroke="rgba(255,255,255,0.1)"
+              vertical={false}
             />
-            <Legend />
+            <XAxis 
+              dataKey="month" 
+              stroke="#666666"
+              tick={{ fill: '#666666' }}
+            />
+            <YAxis 
+              stroke="#666666"
+              tick={{ fill: '#666666' }}
+              tickFormatter={(value) => `${value / 1000}K`}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1A1A1A',
+                border: '1px solid #333333',
+                borderRadius: '8px',
+                color: '#FFFFFF'
+              }}
+              formatter={(value: number) => formatCurrency(value)}
+              labelStyle={{ color: '#FFFFFF' }}
+            />
+            <Legend 
+              verticalAlign="top" 
+              height={36}
+              wrapperStyle={{ color: '#FFFFFF' }}
+            />
             <Line
               type="monotone"
               dataKey="revenue"
-              stroke="#4c1e6c"
-              name="Revenue"
+              stroke="#22C55E"
+              strokeWidth={2}
+              name="Faturamento"
+              dot={false}
             />
             <Line
               type="monotone"
               dataKey="costs"
-              stroke="#666666"
-              name="Costs"
-            />
-            <Line
-              type="monotone"
-              dataKey="profit"
-              stroke="#6a2b97"
-              name="Profit"
+              stroke="#4C1E6C"
+              strokeWidth={2}
+              name="Custos"
+              dot={false}
             />
           </LineChart>
         </ResponsiveContainer>
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left py-2">Month</th>
-              <th className="text-right py-2">Revenue</th>
-              <th className="text-right py-2">Costs</th>
-              <th className="text-right py-2">Profit</th>
-            </tr>
-          </thead>
-          <tbody>
-            {projections.map((projection) => (
-              <tr key={projection.month} className="border-b">
-                <td className="py-2">{projection.month}</td>
-                <td className="text-right py-2">
-                  {formatCurrency(projection.revenue)}
-                </td>
-                <td className="text-right py-2">
-                  {formatCurrency(projection.costs)}
-                </td>
-                <td className="text-right py-2">
-                  {formatCurrency(projection.profit)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </div>
   );
