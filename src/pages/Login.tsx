@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
@@ -52,13 +51,6 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-purple-50">
       <div className="w-full max-w-md space-y-8 p-8 bg-white rounded-2xl shadow-lg">
-        <button 
-          onClick={() => navigate(-1)} 
-          className="text-gray-600 hover:text-gray-800 transition-colors"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </button>
-
         <div className="flex flex-col items-center space-y-2">
           <img
             src="https://content.app-sources.com/s/97257455971736356/uploads/Logos/Logotipo_4-7282325.png?format=webp"
@@ -69,7 +61,7 @@ const Login = () => {
             Login to Mainer
           </h2>
           <p className="text-gray-600">
-            Transforme suas ideias em produtos incríveis
+            Transform your ideas into amazing products
           </p>
         </div>
 
@@ -83,7 +75,7 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
-                placeholder="seu@email.com"
+                placeholder="your@email.com"
               />
             </div>
             <div>
@@ -105,7 +97,7 @@ const Login = () => {
               className="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
               disabled={isLoading}
             >
-              {isLoading ? "Entrando..." : "Entrar"}
+              {isLoading ? "Signing in..." : "Sign in"}
             </Button>
 
             <div className="relative">
@@ -113,7 +105,7 @@ const Login = () => {
                 <div className="w-full border-t border-gray-200"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">ou continue com</span>
+                <span className="px-2 bg-white text-gray-500">or continue with</span>
               </div>
             </div>
 
@@ -135,11 +127,11 @@ const Login = () => {
 
         <div className="mt-4 text-center text-sm">
           <a href="#" className="text-primary hover:text-primary-dark">
-            Esqueceu sua senha?
+            Forgot password?
           </a>
           <span className="mx-2 text-gray-400">•</span>
           <a href="#" className="text-primary hover:text-primary-dark">
-            Criar uma conta
+            Create an account
           </a>
         </div>
       </div>

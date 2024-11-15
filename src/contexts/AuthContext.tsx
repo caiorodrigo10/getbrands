@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { User, Session } from "@supabase/supabase-js";
+import { User, Session, AuthChangeEvent } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -73,10 +73,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+    } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, currentSession) => {
       console.log('Auth event:', event);
       
-      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+      if (['SIGNED_OUT', 'USER_DELETED'].includes(event)) {
         setSession(null);
         setUser(null);
         identifyUserInGleap(null);
