@@ -10,12 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { useProducts } from "@/hooks/useProducts";
 
-interface CatalogLayoutProps {
-  onRequestSample: (id: string) => void;
-  onSelectProduct: (id: string) => void;
-}
-
-const CatalogLayout = ({ onRequestSample, onSelectProduct }: CatalogLayoutProps) => {
+const CatalogLayout = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
   
@@ -68,11 +63,7 @@ const CatalogLayout = ({ onRequestSample, onSelectProduct }: CatalogLayoutProps)
             ))}
           </div>
         ) : productsData?.data && productsData.data.length > 0 ? (
-          <ProductGrid
-            products={productsData.data}
-            onRequestSample={onRequestSample}
-            onSelectProduct={onSelectProduct}
-          />
+          <ProductGrid products={productsData.data} />
         ) : (
           <div className="text-center py-12">
             <p className="text-lg text-gray-600">No products found.</p>
