@@ -1,14 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Package } from "lucide-react";
-import { PackageQuiz } from "./PackageQuiz";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export function PackageDesignStage() {
-  const [showQuiz, setShowQuiz] = useState(false);
-
-  if (showQuiz) {
-    return <PackageQuiz />;
-  }
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-6">
@@ -17,17 +12,17 @@ export function PackageDesignStage() {
           <Package className="w-8 h-8 text-primary" />
         </div>
         <div className="space-y-2">
-          <h3 className="text-xl font-semibold">Start Your Package Design Journey</h3>
+          <h3 className="text-xl font-semibold">Inicie seu Design de Embalagem</h3>
           <p className="text-muted-foreground max-w-md mx-auto">
-            Complete our package design questionnaire to help us understand your vision and create labels that perfectly align with your brand identity.
+            Complete nosso questionário de design de embalagem para nos ajudar a entender sua visão e criar rótulos que se alinhem perfeitamente com a identidade da sua marca.
           </p>
         </div>
         <Button 
           size="lg"
-          onClick={() => setShowQuiz(true)}
+          onClick={() => navigate(`/package-quiz`)}
           className="mt-4"
         >
-          Start Package Design Quiz
+          Iniciar Questionário de Design
         </Button>
       </div>
     </div>

@@ -16,6 +16,7 @@ import Checkout from "@/pages/checkout/Checkout";
 import Success from "@/pages/checkout/Success";
 import ProfitCalculator from "@/pages/ProfitCalculator";
 import Error404 from "@/pages/Error404";
+import { PackageQuiz } from "@/components/project/PackageQuiz";
 
 export const AppRoutes = () => (
   <Routes>
@@ -60,6 +61,17 @@ export const AppRoutes = () => (
         <ProtectedRoute>
           <AppLayout>
             <ProjectDetails />
+          </AppLayout>
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/package-quiz"
+      element={
+        <ProtectedRoute>
+          <AppLayout>
+            <PackageQuiz />
           </AppLayout>
         </ProtectedRoute>
       }
