@@ -28,7 +28,6 @@ export const useDashboardData = () => {
       return data;
     },
     enabled: !!user?.id && isAuthenticated,
-    retry: 2,
   });
 
   const { data: projects } = useQuery({
@@ -53,7 +52,6 @@ export const useDashboardData = () => {
       return data;
     },
     enabled: !!user?.id && isAuthenticated,
-    retry: 2,
   });
 
   const { data: meetings } = useQuery({
@@ -99,7 +97,6 @@ export const useDashboardData = () => {
       }));
     },
     enabled: !!user?.id && isAuthenticated,
-    retry: 2,
   });
 
   const { data: products } = useQuery({
@@ -110,8 +107,7 @@ export const useDashboardData = () => {
         .from("project_products")
         .select(`
           id,
-          product:products (*),
-          projects!inner (*)
+          product:products (*)
         `)
         .eq("projects.user_id", user.id)
         .limit(3);
@@ -124,10 +120,10 @@ export const useDashboardData = () => {
         });
         throw error;
       }
-      return data?.map(item => item.product);
+      return data?.map(item => item.product) || [];
     },
     enabled: !!user?.id && isAuthenticated,
-    retry: 2,
+    staleTime: 30000, // Add a staleTime to prevent unnecessary refetches
   });
 
   const { data: catalogProducts } = useQuery({
@@ -149,7 +145,7 @@ export const useDashboardData = () => {
       return data;
     },
     enabled: isAuthenticated,
-    retry: 2,
+    staleTime: 30000, // Add a staleTime to prevent unnecessary refetches
   });
 
   const { data: samples } = useQuery({
@@ -179,7 +175,6 @@ export const useDashboardData = () => {
       return data;
     },
     enabled: !!user?.id && isAuthenticated,
-    retry: 2,
   });
 
   return {
