@@ -10,16 +10,20 @@ import { ProductNameEdit } from "@/components/products/ProductNameEdit";
 import { ProductPricing } from "@/components/products/ProductPricing";
 import { ProductPriceInfo } from "@/components/products/ProductPriceInfo";
 import { ProjectProduct } from "@/types/product";
+import { useToast } from "@/components/ui/use-toast";
 
 const Products = () => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [showConfetti, setShowConfetti] = useState(false);
+  const { toast } = useToast();
 
-  const { data: products, isLoading, refetch } = useQuery({
+  const { data: products, isLoading, error, refetch } = useQuery({
     queryKey: ['my-products', user?.id],
     queryFn: async () => {
+      if (!user?.id) throw new Error('User not authenticated');
+      
       const { data, error } = await supabase
         .from('project_products')
         .select(`
@@ -40,10 +44,18 @@ const Products = () => {
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error loading products",
+          description: error.message
+        });
+        throw error;
+      }
       return data as ProjectProduct[];
     },
-    enabled: !!user,
+    enabled: !!user?.id && isAuthenticated,
+    retry: 1,
   });
 
   useEffect(() => {
@@ -57,17 +69,19 @@ const Products = () => {
     }
   }, [location.state, navigate, location.pathname]);
 
-  const handleNameUpdate = () => {
-    refetch();
-  };
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      refetch();
+    }
+  }, [isAuthenticated, user?.id, refetch]);
 
-  const handlePriceUpdate = () => {
-    refetch();
-  };
-
-  const navigateToOriginalProduct = (productId: string) => {
-    navigate(`/catalog/${productId}`);
-  };
+  if (!isAuthenticated) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-lg text-gray-600">Please log in to view your products.</p>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -78,6 +92,14 @@ const Products = () => {
             <Skeleton key={i} className="h-[500px] w-full" />
           ))}
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-lg text-red-600">Error loading products. Please try again.</p>
       </div>
     );
   }
@@ -111,7 +133,7 @@ const Products = () => {
                   <ProductNameEdit
                     projectProductId={item.id}
                     currentName={displayName}
-                    onNameUpdate={handleNameUpdate}
+                    onNameUpdate={() => refetch()}
                   />
                   <p className="text-sm text-gray-600 mt-1">{item.product?.category || 'Uncategorized'}</p>
                 </div>
@@ -121,13 +143,13 @@ const Products = () => {
                     <div className="flex-grow space-y-3">
                       <p className="text-sm font-medium text-gray-700">Original Product:</p>
                       <p className="text-sm text-gray-600 hover:text-primary cursor-pointer"
-                         onClick={() => item.product?.id && navigateToOriginalProduct(item.product.id)}>
+                         onClick={() => item.product?.id && navigate(`/catalog/${item.product.id}`)}>
                         {item.product?.name || 'Product name not available'}
                       </p>
                     </div>
                     <div 
                       className="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity"
-                      onClick={() => item.product?.id && navigateToOriginalProduct(item.product.id)}
+                      onClick={() => item.product?.id && navigate(`/catalog/${item.product.id}`)}
                     >
                       <img
                         src={item.product?.image_url || "/placeholder.svg"}
@@ -148,7 +170,7 @@ const Products = () => {
                   costPrice={item.product?.from_price || 0}
                   suggestedPrice={item.product?.srp || 0}
                   currentSellingPrice={specificProduct?.selling_price || undefined}
-                  onPriceUpdate={handlePriceUpdate}
+                  onPriceUpdate={() => refetch()}
                 />
                 
                 {item.project && (

@@ -10,9 +10,11 @@ import { AppRoutes } from "./routes/AppRoutes";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 60 * 24,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
+      staleTime: 1000 * 60 * 60 * 24, // 24 hours
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+      retry: 2,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     },
   },
 });
