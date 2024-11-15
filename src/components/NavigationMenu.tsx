@@ -2,6 +2,12 @@ import { Link, useLocation } from "react-router-dom";
 import UserMenu from "./UserMenu";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const NavigationMenu = () => {
   const location = useLocation();
@@ -46,7 +52,6 @@ export const NavigationMenu = () => {
               <UserMenu isMobile={false} />
             </div>
 
-            {/* Mobile Menu Button - Now on the right side */}
             <Sheet>
               <SheetTrigger className="md:hidden">
                 <Menu className="h-6 w-6 text-gray-300" />
@@ -58,17 +63,20 @@ export const NavigationMenu = () => {
                   </div>
                   <nav className="flex flex-col p-4">
                     {menuItems.map((item) => (
-                      <Link
-                        key={item.path}
-                        to={item.path}
-                        className={`px-4 py-3 text-sm rounded-md transition-all duration-200 ${
-                          location.pathname === item.path
-                            ? "bg-primary/20 text-primary-foreground font-medium"
-                            : "text-gray-300 hover:bg-gray-800 hover:text-white"
-                        }`}
-                      >
-                        {item.label}
-                      </Link>
+                      <DropdownMenu key={item.path}>
+                        <DropdownMenuTrigger asChild>
+                          <Link
+                            to={item.path}
+                            className={`px-4 py-3 text-sm rounded-md transition-all duration-200 ${
+                              location.pathname === item.path
+                                ? "bg-primary/20 text-primary-foreground font-medium"
+                                : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                            }`}
+                          >
+                            {item.label}
+                          </Link>
+                        </DropdownMenuTrigger>
+                      </DropdownMenu>
                     ))}
                   </nav>
                 </div>
