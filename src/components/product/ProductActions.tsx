@@ -86,7 +86,7 @@ export const ProductActions = ({
   const handleProjectSelection = async (projectId: string) => {
     try {
       // First check if product already exists in project
-      const { data: existingProduct, error: checkError } = await supabase
+      const { data: existingProduct } = await supabase
         .from('project_products')
         .select('*')
         .eq('project_id', projectId)
@@ -94,10 +94,18 @@ export const ProductActions = ({
         .maybeSingle();
 
       if (existingProduct) {
-        toast({
-          variant: "destructive",
-          title: "Product already selected",
-          description: "This product is already in your project.",
+        // Instead of showing a toast, just navigate to success page
+        navigate("/products/success", {
+          state: {
+            product: {
+              name: product?.name,
+              image_url: product?.image_url
+            },
+            project: {
+              name: projects.find(p => p.id === projectId)?.name
+            }
+          },
+          replace: true
         });
         return;
       }
@@ -144,7 +152,7 @@ export const ProductActions = ({
             name: currentProject.name
           }
         },
-        replace: true // Use replace to prevent back navigation to this state
+        replace: true
       });
 
     } catch (error) {
