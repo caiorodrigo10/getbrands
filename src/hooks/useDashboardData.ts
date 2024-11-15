@@ -110,9 +110,10 @@ export const useDashboardData = () => {
         .from("project_products")
         .select(`
           id,
-          product:products (*)
+          product:products (*),
+          projects!inner (*)
         `)
-        .eq("project:projects.user_id", user.id)
+        .eq("projects.user_id", user.id)
         .limit(3);
 
       if (error) {
