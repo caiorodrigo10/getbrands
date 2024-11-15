@@ -6,6 +6,7 @@ import ProductCard from "@/components/ProductCard";
 import SimpleProductCard from "@/components/SimpleProductCard";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import ProjectsOverview from "@/components/dashboard/ProjectsOverview";
+import ProjectDetails from "@/components/dashboard/ProjectDetails";
 import UpcomingMeetings from "@/components/dashboard/UpcomingMeetings";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import {
@@ -46,6 +47,9 @@ const Dashboard = () => {
         <ProjectsOverview projects={projects || []} />
         <UpcomingMeetings meetings={meetings || []} />
       </div>
+
+      {/* Project Details */}
+      <ProjectDetails />
 
       {/* Your Products */}
       <div>
