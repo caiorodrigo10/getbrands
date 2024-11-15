@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import ProjectProgress from "@/components/ProjectProgress";
 
 interface ProjectsOverviewProps {
   projects: any[];
@@ -23,7 +22,17 @@ const ProjectsOverview = ({ projects }: ProjectsOverviewProps) => {
         {projects?.map((project) => (
           <div key={project.id} className="space-y-2">
             <h3 className="font-medium">{project.name}</h3>
-            <ProjectProgress progress={30} />
+            <div className="flex items-center gap-2">
+              <div className="h-1.5 w-full bg-muted/15 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-1000 ease-out rounded-full"
+                  style={{ width: `30%` }}
+                />
+              </div>
+              <span className="text-sm text-muted-foreground whitespace-nowrap">
+                30%
+              </span>
+            </div>
           </div>
         ))}
       </div>

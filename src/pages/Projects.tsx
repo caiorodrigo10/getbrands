@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
-import ProjectProgress from "@/components/ProjectProgress";
 import StagesTimeline from "@/components/StagesTimeline";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
@@ -64,7 +63,17 @@ const Projects = () => {
                   </div>
                 </div>
 
-                <ProjectProgress progress={30} />
+                <div className="flex items-center gap-2">
+                  <div className="h-1.5 w-full bg-muted/15 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary transition-all duration-1000 ease-out rounded-full"
+                      style={{ width: `30%` }}
+                    />
+                  </div>
+                  <span className="text-sm text-muted-foreground whitespace-nowrap">
+                    30%
+                  </span>
+                </div>
 
                 <Button 
                   variant="outline" 
