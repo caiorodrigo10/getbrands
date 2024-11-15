@@ -20,6 +20,7 @@ import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminProjects from "@/pages/admin/AdminProjects";
+import AdminOrders from "@/pages/admin/AdminOrders";
 
 export const AppRoutes = () => (
   <Routes>
@@ -39,6 +40,14 @@ export const AppRoutes = () => (
       <ProtectedRoute>
         <AdminLayout>
           <AdminProjects />
+        </AdminLayout>
+      </ProtectedRoute>
+    } />
+
+    <Route path="/admin/orders" element={
+      <ProtectedRoute>
+        <AdminLayout>
+          <AdminOrders />
         </AdminLayout>
       </ProtectedRoute>
     } />
