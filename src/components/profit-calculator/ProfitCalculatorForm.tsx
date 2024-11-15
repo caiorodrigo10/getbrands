@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Product } from "@/types/product";
@@ -19,9 +19,16 @@ interface ProfitCalculatorFormProps {
 export const ProfitCalculatorForm = ({ product, onCalculate }: ProfitCalculatorFormProps) => {
   const [monthlySales, setMonthlySales] = useState(200);
   const [growthRate, setGrowthRate] = useState(15);
-  const [sellingPrice, setSellingPrice] = useState(product?.srp || 0);
+  const [sellingPrice, setSellingPrice] = useState(0);
   const costPrice = product?.from_price || 0;
   const { toast } = useToast();
+
+  // Update selling price when product changes
+  useEffect(() => {
+    if (product?.srp) {
+      setSellingPrice(product.srp);
+    }
+  }, [product]);
 
   const handleReset = () => {
     setMonthlySales(200);
