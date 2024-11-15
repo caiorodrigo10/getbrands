@@ -7,12 +7,10 @@ import { useToast } from "@/components/ui/use-toast";
 import ProductHeader from "@/components/products/ProductHeader";
 import { ProductBenefits } from "@/components/products/ProductBenefits";
 import { ProductCalculator } from "@/components/products/ProductCalculator";
-import { useCartOperations } from "@/hooks/useCartOperations";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const { toast } = useToast();
-  const { addItem } = useCartOperations();
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
