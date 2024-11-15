@@ -68,18 +68,31 @@ export const CalendarStage = () => {
     },
   });
 
+  // Initialize Cal.com
   useEffect(() => {
-    (async function initCal() {
+    let calInstance: any = null;
+    
+    const initializeCal = async () => {
       try {
-        const cal = await getCalApi();
-        cal("ui", {
-          styles: { branding: { brandColor: "#4c1e6c" } },
-          hideEventTypeDetails: false,
-        });
+        calInstance = await getCalApi();
+        if (calInstance) {
+          calInstance("ui", {
+            styles: { branding: { brandColor: "#4c1e6c" } },
+            hideEventTypeDetails: false,
+          });
+        }
       } catch (error) {
         console.error("Error initializing Cal:", error);
       }
-    })();
+    };
+
+    initializeCal();
+
+    return () => {
+      if (calInstance) {
+        calInstance("destroy");
+      }
+    };
   }, []);
 
   // Handle successful booking
