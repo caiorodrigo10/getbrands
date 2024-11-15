@@ -70,6 +70,17 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   if (isMobile) {
     return (
       <div className="flex flex-col">
+        <div className="bg-gray-800 rounded-lg p-4 mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-lg font-semibold text-white">{totalPoints?.toLocaleString() || 0} pts</span>
+            <Link 
+              to="/packages"
+              className="text-sm bg-primary hover:bg-primary/90 text-white px-4 py-1.5 rounded-full"
+            >
+              View Packages
+            </Link>
+          </div>
+        </div>
         <div className="flex items-center gap-3 mb-4">
           <Avatar className="h-10 w-10 border border-white/20">
             <AvatarImage src={userAvatar} alt={userName} />
@@ -116,14 +127,16 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           variant="ghost" 
           className="relative h-auto w-full flex flex-col items-start gap-1 px-3 py-2 hover:bg-white/10"
         >
-          <div className="flex items-center justify-between w-full mb-2">
-            <span className="text-xs font-medium text-white/70">{totalPoints?.toLocaleString() || 0} pts</span>
-            <Link 
-              to="/packages"
-              className="text-xs bg-primary hover:bg-primary/90 text-white px-3 py-1 rounded-full"
-            >
-              View Packages
-            </Link>
+          <div className="bg-gray-800 w-full rounded-lg p-3 mb-3">
+            <div className="flex items-center justify-between">
+              <span className="text-lg font-semibold text-white">{totalPoints?.toLocaleString() || 0} pts</span>
+              <Link 
+                to="/packages"
+                className="text-sm bg-primary hover:bg-primary/90 text-white px-4 py-1.5 rounded-full"
+              >
+                View Packages
+              </Link>
+            </div>
           </div>
           <div className="flex items-center gap-3 w-full">
             <Avatar className="h-8 w-8 border border-white/20">
