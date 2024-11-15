@@ -2,6 +2,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Product } from "@/types/product";
 import { ProductActions } from "./ProductActions";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProductHeaderProps {
   product: Product;
@@ -9,6 +12,31 @@ interface ProductHeaderProps {
 }
 
 export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) => {
+  const [selectedImage, setSelectedImage] = useState<string>(product.image_url || "/placeholder.svg");
+
+  const { data: productImages } = useQuery({
+    queryKey: ['product-images', product.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('product_images')
+        .select('*')
+        .eq('product_id', product.id)
+        .order('position');
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const handleThumbnailClick = (imageUrl: string) => {
+    setSelectedImage(imageUrl);
+  };
+
+  const allImages = [
+    { image_url: product.image_url || "/placeholder.svg", position: -1 },
+    ...(productImages || []).map(img => ({ image_url: img.image_url, position: img.position }))
+  ].filter(img => img.image_url);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
       <div className="space-y-6">
@@ -20,18 +48,21 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
             <Badge className="absolute top-4 right-4 bg-pink-600">SELL ON TIKTOK</Badge>
           )}
           <img
-            src={product.image_url || "/placeholder.svg"}
+            src={selectedImage}
             alt={product.name}
             className="w-full aspect-square object-cover rounded-lg"
           />
         </div>
         <div className="grid grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
+          {allImages.map((image, index) => (
             <img
-              key={i}
-              src={product.image_url || "/placeholder.svg"}
-              alt={`${product.name} - View ${i}`}
-              className="w-full aspect-square object-cover rounded-lg cursor-pointer hover:ring-2 ring-primary"
+              key={index}
+              src={image.image_url}
+              alt={`${product.name} - View ${index + 1}`}
+              className={`w-full aspect-square object-cover rounded-lg cursor-pointer hover:ring-2 transition-all duration-200 ${
+                selectedImage === image.image_url ? 'ring-2 ring-primary' : 'hover:ring-primary/50'
+              }`}
+              onClick={() => handleThumbnailClick(image.image_url)}
             />
           ))}
         </div>
