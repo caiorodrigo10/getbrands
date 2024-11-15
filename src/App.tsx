@@ -23,13 +23,13 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <AuthProvider>
-        <TooltipProvider>
-          <CartProvider>
+        <CartProvider>
+          <TooltipProvider>
             <AppRoutes />
             <Toaster />
             <Sonner />
-          </CartProvider>
-        </TooltipProvider>
+          </TooltipProvider>
+        </CartProvider>
       </AuthProvider>
     </BrowserRouter>
   </QueryClientProvider>
