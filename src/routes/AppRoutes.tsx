@@ -51,18 +51,20 @@ export const AppRoutes = () => {
         path="/"
         element={
           <ProtectedRoute>
-            <AppLayout />
+            <AppLayout>
+              <Routes>
+                <Route index element={<Home />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="sample-request" element={<SampleRequest />} />
+                <Route path="sample-orders" element={<SampleOrders />} />
+                <Route path="projects" element={<Projects />} />
+                <Route path="projects/:id" element={<Project />} />
+                <Route path="projects/:id/quiz" element={<ProjectQuiz />} />
+              </Routes>
+            </AppLayout>
           </ProtectedRoute>
         }
-      >
-        <Route index element={<Home />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="sample-request" element={<SampleRequest />} />
-        <Route path="sample-orders" element={<SampleOrders />} />
-        <Route path="projects" element={<Projects />} />
-        <Route path="projects/:id" element={<Project />} />
-        <Route path="projects/:id/quiz" element={<ProjectQuiz />} />
-      </Route>
+      />
     </Routes>
   );
 };

@@ -16,11 +16,24 @@ import { Button } from "@/components/ui/button";
 import { Plus, Minus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
+interface ProjectWithProfile {
+  id: string;
+  name: string;
+  status: string;
+  points: number;
+  points_used: number;
+  profiles: {
+    first_name: string | null;
+    last_name: string | null;
+    email: string | null;
+  } | null;
+}
+
 export const ProjectsManagement = () => {
   const { toast } = useToast();
   const [search, setSearch] = useState("");
 
-  const { data: projects, isLoading } = useQuery({
+  const { data: projects, isLoading } = useQuery<ProjectWithProfile[]>({
     queryKey: ['admin-projects', search],
     queryFn: async () => {
       let query = supabase
