@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AppLayout } from "./AppLayout";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import AdminProductEdit from "@/pages/admin/AdminProductEdit";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import Profile from "@/pages/Profile";
@@ -57,6 +58,14 @@ export const AppRoutes = () => (
       <ProtectedRoute>
         <AdminLayout>
           <AdminCatalog />
+        </AdminLayout>
+      </ProtectedRoute>
+    } />
+
+    <Route path="/admin/catalog/:id" element={
+      <ProtectedRoute>
+        <AdminLayout>
+          <AdminProductEdit />
         </AdminLayout>
       </ProtectedRoute>
     } />
