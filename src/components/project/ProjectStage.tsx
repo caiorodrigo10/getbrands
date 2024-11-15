@@ -3,6 +3,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChevronDown } from "lucide-react";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { PackageQuiz } from "./PackageQuiz";
+import { useParams } from "react-router-dom";
 
 interface ProjectStageProps {
   title: string;
@@ -19,6 +20,12 @@ export function ProjectStage({
   children, 
   type = "default" 
 }: ProjectStageProps) {
+  const { id: projectId } = useParams();
+
+  if (type === "package-quiz" && !projectId) {
+    return null;
+  }
+
   return (
     <Collapsible>
       <Card>
@@ -38,7 +45,11 @@ export function ProjectStage({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="border-t px-6 pb-6 pt-4">
-            {type === "package-quiz" ? <PackageQuiz /> : children}
+            {type === "package-quiz" && projectId ? (
+              <PackageQuiz projectId={projectId} />
+            ) : (
+              children
+            )}
           </div>
         </CollapsibleContent>
       </Card>

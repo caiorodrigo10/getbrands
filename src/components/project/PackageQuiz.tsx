@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,13 +11,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-
-interface QuizStep {
-  id: number;
-  title: string;
-  description: string;
-  component: React.ReactNode;
-}
 
 interface PackageQuizProps {
   projectId: string;
@@ -33,6 +25,8 @@ export const PackageQuiz = ({ projectId }: PackageQuizProps) => {
   const { data: quizData, isLoading } = useQuery({
     queryKey: ["package_quiz", projectId],
     queryFn: async () => {
+      if (!projectId) throw new Error("Project ID is required");
+
       const { data: existingQuiz, error: fetchError } = await supabase
         .from("package_quizzes")
         .select("*")
@@ -59,9 +53,9 @@ export const PackageQuiz = ({ projectId }: PackageQuizProps) => {
 
       return existingQuiz;
     },
+    enabled: !!projectId && !!user?.id,
   });
 
-  // Save quiz progress mutation
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
       const { error } = await supabase
@@ -207,6 +201,10 @@ export const PackageQuiz = ({ projectId }: PackageQuizProps) => {
 
   const totalSteps = steps.length;
   const progress = (currentStep / totalSteps) * 100;
+
+  if (!projectId) {
+    return <div>Project ID is required</div>;
+  }
 
   if (isLoading) {
     return <div>Loading...</div>;
