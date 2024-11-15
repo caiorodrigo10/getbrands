@@ -5,23 +5,46 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useEffect } from "react";
-
-interface ProjectMeeting {
-  id: string;
-  project_id: string;
-  user_id: string;
-  scheduled_for: string;
-  scheduled_at: string;
-  meeting_link?: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-}
+import { MeetingsList } from "./MeetingsList";
+import { ProjectMeeting } from "@/types/meetings";
 
 export const CalendarStage = () => {
   const { id: projectId } = useParams();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  // Mutation to log meetings
+  const logMeetingMutation = useMutation({
+    mutationFn: async (meetingData: {
+      project_id: string;
+      user_id: string;
+      scheduled_for: string;
+      meeting_link?: string | null;
+      status: string;
+    }) => {
+      console.log("Attempting to save meeting:", meetingData);
+
+      const { data, error } = await supabase
+        .from("project_meetings")
+        .insert(meetingData)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Meeting scheduled successfully!");
+      queryClient.invalidateQueries({ queryKey: ["project_meetings", projectId] });
+    },
+    onError: (error) => {
+      console.error("Error logging meeting:", error);
+      toast.error("Failed to save meeting details. Please try again.");
+    },
+  });
 
   // Initialize Cal.com and handle booking events
   useEffect(() => {
@@ -38,7 +61,7 @@ export const CalendarStage = () => {
         cal("on", {
           action: "bookingSuccessful",
           callback: async (event: any) => {
-            console.log("Booking event received:", event); // Debug log
+            console.log("Booking event received:", event);
 
             if (!event?.detail?.startTime) {
               console.error("No start time provided in booking event:", event);
@@ -86,54 +109,6 @@ export const CalendarStage = () => {
     };
   }, [projectId, user, logMeetingMutation]);
 
-  // Fetch user profile data
-  const { data: profile } = useQuery({
-    queryKey: ["profile", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-      return data;
-    },
-    enabled: !!user?.id,
-  });
-
-  // Mutation to log meetings
-  const logMeetingMutation = useMutation({
-    mutationFn: async (meetingData: {
-      project_id: string;
-      user_id: string;
-      scheduled_for: string;
-      meeting_link?: string | null;
-      status: string;
-    }) => {
-      console.log("Attempting to save meeting:", meetingData); // Debug log
-
-      const { data, error } = await supabase
-        .from("project_meetings")
-        .insert(meetingData)
-        .select()
-        .single();
-
-      if (error) {
-        console.error("Supabase error:", error); // Debug log
-        throw error;
-      }
-      return data;
-    },
-    onSuccess: () => {
-      toast.success("Meeting scheduled successfully!");
-      queryClient.invalidateQueries({ queryKey: ["project_meetings", projectId] });
-    },
-    onError: (error) => {
-      console.error("Error logging meeting:", error);
-      toast.error("Failed to save meeting details. Please try again.");
-    },
-  });
-
   // Query to fetch existing meetings
   const { data: meetings } = useQuery({
     queryKey: ["project_meetings", projectId],
@@ -172,40 +147,7 @@ export const CalendarStage = () => {
         </div>
       </div>
 
-      {meetings && meetings.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Scheduled Meetings</h3>
-          <div className="space-y-2">
-            {meetings.map((meeting) => (
-              <div
-                key={meeting.id}
-                className="rounded-lg border p-4 flex justify-between items-center"
-              >
-                <div>
-                  <p className="font-medium">
-                    {new Date(meeting.scheduled_for).toLocaleDateString()} at{" "}
-                    {new Date(meeting.scheduled_for).toLocaleTimeString()}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Scheduled on:{" "}
-                    {new Date(meeting.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-                {meeting.meeting_link && (
-                  <a
-                    href={meeting.meeting_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    Join Meeting
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <MeetingsList meetings={meetings || []} />
     </div>
   );
 };
