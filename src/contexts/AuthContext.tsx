@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AuthContextType, AuthProviderProps } from "./auth/types";
 import { useAuthRedirect } from "./auth/useAuthRedirect";
 import { useGleapIdentity } from "./auth/useGleapIdentity";
+import { useLocation } from "react-router-dom";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -13,6 +14,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const { redirectBasedOnRole, handleAuthError } = useAuthRedirect();
   const { identifyUserInGleap } = useGleapIdentity();
+  const location = useLocation();
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -63,16 +65,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setSession(currentSession);
         setUser(currentSession.user);
         identifyUserInGleap(currentSession.user);
-        if (event === 'SIGNED_IN') {
-          await redirectBasedOnRole(currentSession.user.id);
-        }
+        await redirectBasedOnRole(currentSession.user.id);
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [location.pathname]); // Add location.pathname as dependency
 
   const login = async (email: string, password: string) => {
     try {
