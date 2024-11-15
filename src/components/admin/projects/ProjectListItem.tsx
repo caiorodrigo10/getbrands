@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, PlusCircle } from "lucide-react";
-import ProjectProgress from "@/components/ProjectProgress";
 import { cn } from "@/lib/utils";
 
 interface ProjectListItemProps {
@@ -39,7 +38,7 @@ const ProjectListItem = ({ project, isExpanded, onToggle }: ProjectListItemProps
     <div className="border border-border/40 rounded-md mb-4">
       <div className="p-4">
         <div className="flex items-center justify-between">
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-7 gap-4 flex-1">
             <div>
               <p className="text-sm text-foreground">{project.name}</p>
             </div>
@@ -61,6 +60,19 @@ const ProjectListItem = ({ project, isExpanded, onToggle }: ProjectListItemProps
               </span>
             </div>
             <div>
+              <div className="flex items-center gap-2">
+                <div className="h-1.5 w-full bg-muted/15 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary transition-all duration-1000 ease-out rounded-full"
+                    style={{ width: `${project.progress}%` }}
+                  />
+                </div>
+                <span className="text-sm text-muted-foreground whitespace-nowrap">
+                  {project.progress}%
+                </span>
+              </div>
+            </div>
+            <div>
               <p className="text-sm text-muted-foreground">{project.accountManager}</p>
             </div>
           </div>
@@ -76,9 +88,6 @@ const ProjectListItem = ({ project, isExpanded, onToggle }: ProjectListItemProps
               <ChevronDown className="h-5 w-5" />
             )}
           </Button>
-        </div>
-        <div className="mt-4">
-          <ProjectProgress progress={project.progress} />
         </div>
       </div>
 

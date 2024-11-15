@@ -1,6 +1,6 @@
 const ProjectListHeader = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-6 gap-4 py-3 px-4 bg-muted/50 rounded-md mb-4">
+    <div className="grid grid-cols-1 md:grid-cols-7 gap-4 py-3 px-4 bg-muted/50 rounded-md mb-4">
       <div>
         <span className="text-sm font-medium">Project Name</span>
       </div>
@@ -15,6 +15,9 @@ const ProjectListHeader = () => {
       </div>
       <div>
         <span className="text-sm font-medium">Status</span>
+      </div>
+      <div>
+        <span className="text-sm font-medium">Progress</span>
       </div>
       <div>
         <span className="text-sm font-medium">Account Manager</span>
