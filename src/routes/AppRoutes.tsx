@@ -75,6 +75,17 @@ export const AppRoutes = () => (
         </ProtectedRoute>
       }
     />
+
+    <Route
+      path="/catalog/:id"
+      element={
+        <ProtectedRoute>
+          <AppLayout>
+            <ProductDetails />
+          </AppLayout>
+        </ProtectedRoute>
+      }
+    />
     
     <Route
       path="/products"
