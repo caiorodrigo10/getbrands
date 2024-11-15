@@ -16,6 +16,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const { identifyUserInGleap } = useGleapIdentity();
   const { toast } = useToast();
 
+  const handleSession = async (currentSession: Session | null) => {
+    try {
+      if (currentSession?.user) {
+        setSession(currentSession);
+        setUser(currentSession.user);
+        identifyUserInGleap(currentSession.user);
+        await redirectBasedOnRole(currentSession.user.id);
+      } else {
+        setSession(null);
+        setUser(null);
+        identifyUserInGleap(null);
+      }
+    } catch (error) {
+      console.error('Error handling session:', error);
+      handleAuthError();
+    }
+  };
+
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -29,22 +47,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             description: "There was a problem with your session. Please try logging in again.",
           });
           handleAuthError();
-          setIsLoading(false);
           return;
         }
 
-        if (currentSession?.user) {
-          setSession(currentSession);
-          setUser(currentSession.user);
-          identifyUserInGleap(currentSession.user);
-          if (isLoading) {
-            await redirectBasedOnRole(currentSession.user.id);
-          }
-        }
-        setIsLoading(false);
+        await handleSession(currentSession);
       } catch (error) {
         console.error('Error initializing auth:', error);
         handleAuthError();
+      } finally {
         setIsLoading(false);
       }
     };
@@ -57,9 +67,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       console.log('Auth event:', event);
       
       if (['SIGNED_OUT', 'USER_DELETED'].includes(event)) {
-        setSession(null);
-        setUser(null);
-        identifyUserInGleap(null);
+        await handleSession(null);
         handleAuthError();
         return;
       }
@@ -69,20 +77,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return;
       }
 
-      if (currentSession?.user) {
-        setSession(currentSession);
-        setUser(currentSession.user);
-        identifyUserInGleap(currentSession.user);
-        if (event === 'SIGNED_IN') {
-          await redirectBasedOnRole(currentSession.user.id);
-        }
-      }
+      await handleSession(currentSession);
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [isLoading]);
+  }, []);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
@@ -101,12 +102,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         throw error;
       }
 
-      if (data.user) {
-        setUser(data.user);
-        setSession(data.session);
-        identifyUserInGleap(data.user);
-        await redirectBasedOnRole(data.user.id);
-      }
+      await handleSession(data.session);
     } catch (error: any) {
       console.error('Login error:', error);
       throw error;
@@ -119,10 +115,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setIsLoading(true);
     try {
       await supabase.auth.signOut();
-      setUser(null);
-      setSession(null);
-      identifyUserInGleap(null);
-      handleAuthError();
+      await handleSession(null);
     } catch (error) {
       console.error('Logout error:', error);
       toast({
