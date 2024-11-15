@@ -45,6 +45,14 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
   };
 
+  if (orders.length === 0) {
+    return (
+      <div className="text-center py-12 border rounded-md">
+        <p className="text-lg text-muted-foreground">No orders found matching your criteria.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-md border">
       <Table>

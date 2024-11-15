@@ -4,14 +4,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import AdminOrdersTable from "@/components/admin/orders/AdminOrdersTable";
 import { Skeleton } from "@/components/ui/skeleton";
+import OrderStatusFilters from "@/components/sample-orders/OrderStatusFilters";
 
 const AdminOrders = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [showOnHold, setShowOnHold] = useState(false);
 
   const { data: orders, isLoading } = useQuery({
-    queryKey: ["admin-orders"],
+    queryKey: ["admin-orders", selectedStatus],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("sample_requests")
         .select(`
           *,
@@ -32,9 +35,28 @@ const AdminOrders = () => {
         `)
         .order('created_at', { ascending: false });
 
+      if (selectedStatus !== "all") {
+        query = query.eq('status', selectedStatus);
+      }
+
+      const { data, error } = await query;
+
       if (error) throw error;
       return data;
     },
+  });
+
+  const filteredOrders = orders?.filter(order => {
+    if (!searchTerm) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    const customerName = `${order.customer?.first_name} ${order.customer?.last_name}`.toLowerCase();
+    const orderId = `SPL${order.id.slice(0, 6)}`.toLowerCase();
+    const customerEmail = order.customer?.email?.toLowerCase() || '';
+    
+    return customerName.includes(searchLower) || 
+           orderId.includes(searchLower) ||
+           customerEmail.includes(searchLower);
   });
 
   if (isLoading) {
@@ -49,16 +71,6 @@ const AdminOrders = () => {
     );
   }
 
-  const filteredOrders = orders?.filter(order => {
-    const searchLower = searchTerm.toLowerCase();
-    const customerName = `${order.customer?.first_name} ${order.customer?.last_name}`.toLowerCase();
-    const orderId = order.id.toLowerCase();
-    
-    return !searchTerm || 
-      customerName.includes(searchLower) || 
-      orderId.includes(searchLower);
-  });
-
   return (
     <div className="space-y-6 p-6">
       <div>
@@ -68,13 +80,22 @@ const AdminOrders = () => {
         </p>
       </div>
 
-      <div className="flex justify-between items-center">
-        <Input
-          placeholder="Search orders..."
-          className="max-w-xs"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+      <div className="space-y-4">
+        <OrderStatusFilters
+          selectedStatus={selectedStatus}
+          setSelectedStatus={setSelectedStatus}
+          showOnHold={showOnHold}
+          setShowOnHold={setShowOnHold}
         />
+
+        <div className="flex justify-between items-center">
+          <Input
+            placeholder="Search by customer name, email or order number..."
+            className="max-w-md"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
       </div>
 
       <AdminOrdersTable orders={filteredOrders || []} />
