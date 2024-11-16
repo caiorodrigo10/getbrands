@@ -149,7 +149,7 @@ const StagesTimeline = () => {
             <StageHeader name={stage.name} status={stage.status} />
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-3">
-            <div className="pl-8 space-y-2">
+            <div className="space-y-1">
               {stage.tasks.map((task, taskIndex) => (
                 <TaskItem
                   key={taskIndex}

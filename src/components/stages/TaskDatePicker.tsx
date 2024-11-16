@@ -16,7 +16,7 @@ export const TaskDatePicker = ({ date, onDateChange, label }: TaskDatePickerProp
       <span className="text-xs text-muted-foreground whitespace-nowrap">{label}:</span>
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" size="sm" className="h-7 px-2">
+          <Button variant="outline" size="sm" className="h-6 px-2 text-xs">
             <Calendar className="h-3 w-3 mr-1" />
             {date ? format(date, "MM/dd") : "Set"}
           </Button>

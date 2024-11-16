@@ -12,15 +12,15 @@ interface TaskAssigneeSelectProps {
 const ASSIGNEE_DATA = {
   client: {
     name: "Client",
-    image: "/avatars/client.png",
+    image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=100&h=100&fit=crop",
   },
   account_manager: {
     name: "AM",
-    image: "/avatars/account-manager.png",
+    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=100&h=100&fit=crop",
   },
   designer: {
     name: "Designer",
-    image: "/avatars/designer.png",
+    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=100&h=100&fit=crop",
   },
   none: {
     name: "Assign",
@@ -31,18 +31,18 @@ const ASSIGNEE_DATA = {
 export const TaskAssigneeSelect = ({ assignee, onAssigneeChange }: TaskAssigneeSelectProps) => {
   return (
     <Select value={assignee} onValueChange={(value) => onAssigneeChange(value as AssigneeType)}>
-      <SelectTrigger className="h-7 w-[90px]">
-        <div className="flex items-center gap-1">
+      <SelectTrigger className="h-7 w-[100px]">
+        <div className="flex items-center gap-1.5">
           <Avatar className="h-5 w-5">
             <AvatarImage src={ASSIGNEE_DATA[assignee].image} />
             <AvatarFallback>
               <User2 className="h-3 w-3" />
             </AvatarFallback>
           </Avatar>
-          <SelectValue />
+          <SelectValue className="truncate" />
         </div>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent align="end">
         {Object.entries(ASSIGNEE_DATA).map(([key, data]) => (
           <SelectItem key={key} value={key}>
             <div className="flex items-center gap-2">
@@ -52,7 +52,7 @@ export const TaskAssigneeSelect = ({ assignee, onAssigneeChange }: TaskAssigneeS
                   <User2 className="h-3 w-3" />
                 </AvatarFallback>
               </Avatar>
-              <span>{data.name}</span>
+              <span className="truncate">{data.name}</span>
             </div>
           </SelectItem>
         ))}
