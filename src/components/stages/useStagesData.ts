@@ -3,6 +3,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Stage, Task } from "../StagesTimeline";
 
+const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
+  if (tasks.length === 0) return "pending";
+  
+  const allCompleted = tasks.every(task => task.status === "done");
+  if (allCompleted) return "completed";
+  
+  const hasInProgress = tasks.some(task => task.status === "in_progress");
+  if (hasInProgress) return "in-progress";
+  
+  return "pending";
+};
+
 export const useStagesData = (projectId: string) => {
   const [stages, setStages] = useState<Stage[]>([]);
 
@@ -24,7 +36,7 @@ export const useStagesData = (projectId: string) => {
 
       // Group tasks by stage
       const stagesMap = new Map<string, Task[]>();
-      tasks.forEach(task => {
+      tasks?.forEach(task => {
         const stageTasks = stagesMap.get(task.stage_name) || [];
         stagesMap.set(task.stage_name, [...stageTasks, {
           id: task.id,
@@ -49,10 +61,7 @@ export const useStagesData = (projectId: string) => {
     }
   };
 
-  const updateTaskInDatabase = async (
-    taskId: string,
-    updates: Partial<Task>
-  ) => {
+  const updateTaskInDatabase = async (taskId: string, updates: Partial<Task>) => {
     try {
       const { error } = await supabase
         .from('project_tasks')
@@ -66,17 +75,16 @@ export const useStagesData = (projectId: string) => {
         .eq('id', taskId);
 
       if (error) throw error;
+      await fetchProjectTasks(); // Refresh data
       toast.success("Task updated successfully");
     } catch (error) {
       console.error('Error updating task:', error);
       toast.error("Failed to update task");
+      throw error;
     }
   };
 
-  const addTaskToDatabase = async (
-    stageName: string,
-    taskData: Task
-  ) => {
+  const addTaskToDatabase = async (stageName: string, taskData: Task) => {
     try {
       const { error } = await supabase
         .from('project_tasks')
@@ -91,10 +99,12 @@ export const useStagesData = (projectId: string) => {
         });
 
       if (error) throw error;
+      await fetchProjectTasks(); // Refresh data
       toast.success("Task added successfully");
     } catch (error) {
       console.error('Error adding task:', error);
       toast.error("Failed to add task");
+      throw error;
     }
   };
 
@@ -106,10 +116,12 @@ export const useStagesData = (projectId: string) => {
         .eq('id', taskId);
 
       if (error) throw error;
+      await fetchProjectTasks(); // Refresh data
       toast.success("Task deleted successfully");
     } catch (error) {
       console.error('Error deleting task:', error);
       toast.error("Failed to delete task");
+      throw error;
     }
   };
 
@@ -125,6 +137,8 @@ export const useStagesData = (projectId: string) => {
         });
 
       if (error) throw error;
+      await fetchProjectTasks(); // Refresh data
+      toast.success("Stage added successfully");
     } catch (error) {
       console.error('Error adding stage:', error);
       toast.error("Failed to add stage");
@@ -141,6 +155,8 @@ export const useStagesData = (projectId: string) => {
         .eq('stage_name', stageName);
 
       if (error) throw error;
+      await fetchProjectTasks(); // Refresh data
+      toast.success("Stage deleted successfully");
     } catch (error) {
       console.error('Error deleting stage:', error);
       toast.error("Failed to delete stage");
@@ -157,16 +173,4 @@ export const useStagesData = (projectId: string) => {
     addStageToDatabase,
     deleteStageFromDatabase,
   };
-};
-
-const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
-  if (tasks.length === 0) return "pending";
-  
-  const allCompleted = tasks.every(task => task.status === "done");
-  if (allCompleted) return "completed";
-  
-  const hasInProgress = tasks.some(task => task.status === "in_progress");
-  if (hasInProgress) return "in-progress";
-  
-  return "pending";
 };

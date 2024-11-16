@@ -8,7 +8,7 @@ import { TaskStatus, Task } from "../StagesTimeline";
 
 interface AddTaskButtonProps {
   stageName: string;
-  onAddTask: (taskData: Task) => void;
+  onAddTask: (taskData: Task) => Promise<void>;
 }
 
 export const AddTaskButton = ({ stageName, onAddTask }: AddTaskButtonProps) => {
@@ -17,6 +17,10 @@ export const AddTaskButton = ({ stageName, onAddTask }: AddTaskButtonProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!taskName.trim()) {
+      return;
+    }
+    
     const newTask: Task = {
       id: crypto.randomUUID(),
       name: taskName,
@@ -25,9 +29,14 @@ export const AddTaskButton = ({ stageName, onAddTask }: AddTaskButtonProps) => {
       startDate: new Date(),
       endDate: new Date()
     };
-    await onAddTask(newTask);
-    setTaskName("");
-    setOpen(false);
+    
+    try {
+      await onAddTask(newTask);
+      setTaskName("");
+      setOpen(false);
+    } catch (error) {
+      console.error('Failed to add task:', error);
+    }
   };
 
   return (
