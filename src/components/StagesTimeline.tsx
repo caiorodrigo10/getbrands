@@ -10,35 +10,8 @@ import { AssigneeType } from "./stages/TaskAssigneeSelect";
 import { useParams } from "react-router-dom";
 import { getProjectTasks, updateTaskAssignee } from "@/lib/tasks";
 import { useQuery } from "@tanstack/react-query";
-
-type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
-
-interface Task {
-  name: string;
-  status: TaskStatus;
-  date?: string;
-  startDate?: Date;
-  endDate?: Date;
-  assignee?: AssigneeType;
-}
-
-interface Stage {
-  name: string;
-  status: "completed" | "in-progress" | "pending";
-  tasks: Task[];
-}
-
-const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
-  if (tasks.length === 0) return "pending";
-  
-  const allCompleted = tasks.every(task => task.status === "done");
-  if (allCompleted) return "completed";
-  
-  const hasInProgress = tasks.some(task => task.status === "in_progress");
-  if (hasInProgress) return "in-progress";
-  
-  return "pending";
-};
+import { Stage, Task, TaskStatus } from "./stages/types";
+import { calculateStageStatus } from "./stages/StageUtils";
 
 const StagesTimeline = () => {
   const { id: projectId } = useParams<{ id: string }>();
@@ -53,7 +26,7 @@ const StagesTimeline = () => {
   useEffect(() => {
     if (tasks) {
       // Group tasks by stage and convert to our Stage format
-      const groupedTasks = tasks.reduce((acc: Record<string, Task[]>, task) => {
+      const groupedTasks = tasks.reduce((acc: Record<string, Task[]>, task: any) => {
         if (!acc[task.stage_name]) {
           acc[task.stage_name] = [];
         }
