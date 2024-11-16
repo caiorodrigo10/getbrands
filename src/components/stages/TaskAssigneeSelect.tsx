@@ -1,6 +1,8 @@
 import { User2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 type AssigneeType = "client" | "account_manager" | "designer" | "none";
 
@@ -31,6 +33,19 @@ const ASSIGNEE_DATA: Record<AssigneeType, { name: string; image: string }> = {
 export const TaskAssigneeSelect = ({ assignee = "none", onAssigneeChange }: TaskAssigneeSelectProps) => {
   const currentAssignee = ASSIGNEE_DATA[assignee] || ASSIGNEE_DATA.none;
 
+  const { data: adminUsers } = useQuery({
+    queryKey: ['admin-users'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, avatar_url, role')
+        .eq('role', 'admin');
+
+      if (error) throw error;
+      return data;
+    }
+  });
+
   return (
     <Select value={assignee} onValueChange={(value) => onAssigneeChange(value as AssigneeType)}>
       <SelectTrigger className="h-7">
@@ -57,6 +72,19 @@ export const TaskAssigneeSelect = ({ assignee = "none", onAssigneeChange }: Task
                 </AvatarFallback>
               </Avatar>
               <span>{data.name}</span>
+            </div>
+          </SelectItem>
+        ))}
+        {adminUsers?.map((admin) => (
+          <SelectItem key={admin.id} value={admin.id}>
+            <div className="flex items-center gap-2">
+              <Avatar className="h-5 w-5">
+                <AvatarImage src={admin.avatar_url || ''} />
+                <AvatarFallback>
+                  <User2 className="h-3 w-3" />
+                </AvatarFallback>
+              </Avatar>
+              <span>{`${admin.first_name} ${admin.last_name}`}</span>
             </div>
           </SelectItem>
         ))}

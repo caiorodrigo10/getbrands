@@ -7,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Button } from "../ui/button";
 
 type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
-type AssigneeType = "client" | "account_manager" | "designer" | "none";
+type AssigneeType = "client" | "account_manager" | "designer" | "none" | string;
 
 interface TaskItemProps {
   name: string;
