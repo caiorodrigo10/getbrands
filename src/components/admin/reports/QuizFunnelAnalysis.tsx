@@ -1,60 +1,76 @@
-import { useQuery } from "@tanstack/react-query";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FunnelView } from "./funnel/FunnelView";
-import { ConversionRates } from "./funnel/ConversionRates";
-import { TimeAnalysis } from "./funnel/TimeAnalysis";
+import { useQuery } from "@tanstack/react-query"
+import { Card } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
+import { Skeleton } from "@/components/ui/skeleton"
+import { ConversionRates } from "./funnel/ConversionRates"
+import { TimeAnalysis } from "./funnel/TimeAnalysis"
+import { FunnelView } from "./funnel/FunnelView"
 
-const QuizFunnelAnalysis = () => {
-  const { data: analyticsData, isLoading } = useQuery({
-    queryKey: ["quiz-funnel-analytics"],
-    queryFn: async () => {
-      const response = await fetch('/api/quiz-analytics')
-      if (!response.ok) throw new Error('Failed to fetch analytics')
-      return response.json()
-    }
-  });
+const fetchQuizAnalytics = async () => {
+  const response = await fetch('/api/quiz-analytics')
+  if (!response.ok) {
+    throw new Error('Failed to fetch quiz analytics')
+  }
+  return response.json()
+}
+
+export const QuizFunnelAnalysis = () => {
+  const { data: analytics, isLoading, error } = useQuery({
+    queryKey: ['quizAnalytics'],
+    queryFn: fetchQuizAnalytics,
+    refetchInterval: 30000 // Refresh every 30 seconds
+  })
 
   if (isLoading) {
     return (
+      <div className="space-y-4">
+        <Skeleton className="h-[200px] w-full" />
+        <Skeleton className="h-[200px] w-full" />
+        <Skeleton className="h-[200px] w-full" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
       <Card className="p-6">
-        <div className="h-[400px] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
+        <p className="text-red-500">Error loading analytics data</p>
       </Card>
-    );
+    )
   }
 
   return (
-    <Card className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">Quiz Funnel Analysis</h2>
-        <div className="text-sm text-muted-foreground">
-          Total Started: {analyticsData?.totalStarted || 0}
-        </div>
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Start to Completion Rate</h3>
+          <div className="space-y-2">
+            <Progress value={analytics.completionRate} className="h-2" />
+            <p className="text-sm text-muted-foreground">
+              {analytics.completionRate}% completion rate
+            </p>
+          </div>
+        </Card>
+        
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Average Completion Time</h3>
+          <p className="text-2xl font-bold">
+            {analytics.avgCompletionTime} minutes
+          </p>
+        </Card>
+        
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Total Responses</h3>
+          <p className="text-2xl font-bold">{analytics.totalResponses}</p>
+        </Card>
       </div>
 
-      <Tabs defaultValue="funnel" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="funnel">Funnel View</TabsTrigger>
-          <TabsTrigger value="conversion">Conversion Rates</TabsTrigger>
-          <TabsTrigger value="time">Time Analysis</TabsTrigger>
-        </TabsList>
+      <div className="grid gap-6 md:grid-cols-2">
+        <ConversionRates data={analytics.conversionRates} />
+        <TimeAnalysis data={analytics.timeAnalysis} />
+      </div>
 
-        <TabsContent value="funnel">
-          <FunnelView data={analyticsData?.funnelData} />
-        </TabsContent>
-
-        <TabsContent value="conversion">
-          <ConversionRates data={analyticsData?.conversionData} />
-        </TabsContent>
-
-        <TabsContent value="time">
-          <TimeAnalysis data={analyticsData?.timeData} />
-        </TabsContent>
-      </Tabs>
-    </Card>
-  );
-};
-
-export default QuizFunnelAnalysis;
+      <FunnelView data={analytics.funnelData} />
+    </div>
+  )
+}
