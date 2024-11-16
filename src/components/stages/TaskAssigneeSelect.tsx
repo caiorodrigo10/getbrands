@@ -24,19 +24,24 @@ export const TaskAssigneeSelect = ({ assignee = "none", onAssigneeChange }: Task
     }
   });
 
+  // Find the current assignee's name
+  const currentAssignee = adminUsers?.find(admin => admin.id === assignee);
+  const displayName = currentAssignee 
+    ? `${currentAssignee.first_name} ${currentAssignee.last_name}`.trim()
+    : "Unassigned";
+
   return (
     <Select value={assignee} onValueChange={onAssigneeChange}>
       <SelectTrigger className="h-7">
         <SelectValue>
           <div className="flex items-center gap-1.5">
             <Avatar className="h-5 w-5">
+              <AvatarImage src={currentAssignee?.avatar_url || ''} />
               <AvatarFallback>
                 <User2 className="h-3 w-3" />
               </AvatarFallback>
             </Avatar>
-            <span>
-              {assignee === "none" ? "Assign" : assignee}
-            </span>
+            <span>{displayName}</span>
           </div>
         </SelectValue>
       </SelectTrigger>
@@ -60,7 +65,7 @@ export const TaskAssigneeSelect = ({ assignee = "none", onAssigneeChange }: Task
                   <User2 className="h-3 w-3" />
                 </AvatarFallback>
               </Avatar>
-              <span>{`${admin.first_name} ${admin.last_name}`}</span>
+              <span>{`${admin.first_name} ${admin.last_name}`.trim()}</span>
             </div>
           </SelectItem>
         ))}
