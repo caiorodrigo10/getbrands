@@ -133,7 +133,7 @@ export const useStagesData = (projectId: string) => {
           project_id: projectId,
           stage_name: stageName,
           title: 'Initial Task',
-          status: 'todo'
+          status: 'pending' // Changed from 'todo' to 'pending'
         });
 
       if (error) throw error;
