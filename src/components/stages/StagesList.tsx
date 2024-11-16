@@ -3,7 +3,12 @@ import { TaskItem } from "./TaskItem";
 import { StageHeader } from "./StageHeader";
 import { AddTaskButton } from "./AddTaskButton";
 import { StageActions } from "./StageActions";
-import { Accordion, AccordionItem } from "../ui/accordion";
+import { 
+  Accordion, 
+  AccordionItem,
+  AccordionContent,
+  AccordionTrigger 
+} from "../ui/accordion";
 
 interface Stage {
   name: string;
@@ -39,15 +44,15 @@ export const StagesList = ({
           className="border rounded-lg bg-card"
         >
           <div className="flex items-center justify-between px-4">
-            <div 
-              className="flex-1 cursor-pointer py-4"
+            <AccordionTrigger 
+              className="flex-1 py-4 hover:no-underline"
               onClick={() => onToggleStage(stage.name)}
             >
               <StageHeader name={stage.name} status={stage.status} />
-            </div>
+            </AccordionTrigger>
             <StageActions onDeleteStage={() => onDeleteStage(stage.name)} />
           </div>
-          {openStages.includes(stage.name) && (
+          <AccordionContent>
             <div className="pb-3">
               <div className="space-y-1">
                 <div className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 px-4 py-2 text-sm font-medium text-muted-foreground">
@@ -79,7 +84,7 @@ export const StagesList = ({
                 />
               </div>
             </div>
-          )}
+          </AccordionContent>
         </AccordionItem>
       ))}
     </Accordion>

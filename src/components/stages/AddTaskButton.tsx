@@ -1,18 +1,10 @@
-import { Plus } from "lucide-react";
-import { Button } from "../ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
-import { Input } from "../ui/input";
 import { useState } from "react";
-import { TaskStatusSelect } from "./TaskStatusSelect";
-import { TaskAssigneeSelect } from "./TaskAssigneeSelect";
-import { TaskDatePicker } from "./TaskDatePicker";
-import type { Task, TaskStatus } from "../StagesTimeline";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { TaskStatus, Task } from "../StagesTimeline";
 
 interface AddTaskButtonProps {
   stageName: string;
@@ -20,29 +12,28 @@ interface AddTaskButtonProps {
 }
 
 export const AddTaskButton = ({ stageName, onAddTask }: AddTaskButtonProps) => {
+  const [open, setOpen] = useState(false);
   const [taskName, setTaskName] = useState("");
-  const [status, setStatus] = useState<TaskStatus>("todo");
-  const [assignee, setAssignee] = useState<string>("none");
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onAddTask({
-      id: crypto.randomUUID(), // Generate a unique ID for the new task
+    const newTask: Task = {
+      id: crypto.randomUUID(),
       name: taskName,
-      status,
-      assignee,
-      startDate,
-      endDate,
-    });
+      status: "todo" as TaskStatus,
+      assignee: "none",
+      startDate: new Date(),
+      endDate: new Date()
+    };
+    onAddTask(newTask);
     setTaskName("");
+    setOpen(false);
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="w-full justify-start px-4 py-2 hover:bg-accent/50">
+        <Button variant="outline" size="sm" className="w-full">
           <Plus className="h-4 w-4 mr-2" />
           Add Task
         </Button>
@@ -52,42 +43,18 @@ export const AddTaskButton = ({ stageName, onAddTask }: AddTaskButtonProps) => {
           <DialogTitle>Add New Task to {stageName}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
+          <div className="space-y-2">
+            <Label htmlFor="taskName">Task Name</Label>
             <Input
-              placeholder="Task name"
+              id="taskName"
               value={taskName}
               onChange={(e) => setTaskName(e.target.value)}
+              placeholder="Enter task name"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <TaskStatusSelect
-                status={status}
-                onStatusChange={setStatus}
-              />
-            </div>
-            <div>
-              <TaskAssigneeSelect
-                assignee={assignee}
-                onAssigneeChange={setAssignee}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <TaskDatePicker
-                date={startDate}
-                onDateChange={setStartDate}
-              />
-            </div>
-            <div>
-              <TaskDatePicker
-                date={endDate}
-                onDateChange={setEndDate}
-              />
-            </div>
-          </div>
-          <Button type="submit" className="w-full">Add Task</Button>
+          <Button type="submit" className="w-full">
+            Add Task
+          </Button>
         </form>
       </DialogContent>
     </Dialog>
