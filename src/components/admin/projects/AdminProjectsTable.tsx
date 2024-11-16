@@ -51,10 +51,12 @@ const AdminProjectsTable = ({ projects }: AdminProjectsTableProps) => {
         <TableHeader>
           <TableRow>
             <TableHead>Project</TableHead>
-            <TableHead>Client</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Phone</TableHead>
             <TableHead>Progress</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Points</TableHead>
+            <TableHead>Account Manager</TableHead>
             <TableHead className="w-[100px]"></TableHead>
           </TableRow>
         </TableHeader>
@@ -62,16 +64,16 @@ const AdminProjectsTable = ({ projects }: AdminProjectsTableProps) => {
           {projects.map((project) => (
             <TableRow key={project.id}>
               <TableCell>
-                <div>
-                  <p className="font-medium">{project.name}</p>
-                  <p className="text-sm text-muted-foreground">{project.accountManager}</p>
-                </div>
+                <p className="font-medium">{project.name}</p>
               </TableCell>
               <TableCell>
-                <div>
-                  <p className="font-medium">{project.client}</p>
-                  <p className="text-sm text-muted-foreground">{project.email}</p>
-                </div>
+                <p className="font-medium">{project.client}</p>
+              </TableCell>
+              <TableCell>
+                <p className="text-sm text-muted-foreground">{project.email}</p>
+              </TableCell>
+              <TableCell>
+                <p className="text-sm text-muted-foreground">{project.phone}</p>
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2 w-full">
@@ -92,7 +94,7 @@ const AdminProjectsTable = ({ projects }: AdminProjectsTableProps) => {
                 </Badge>
               </TableCell>
               <TableCell>
-                <span>{project.points}</span>
+                <p className="text-sm text-muted-foreground">{project.accountManager}</p>
               </TableCell>
               <TableCell>
                 <Button 
