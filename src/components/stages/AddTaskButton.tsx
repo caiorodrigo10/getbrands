@@ -15,7 +15,7 @@ export const AddTaskButton = ({ stageName, onAddTask }: AddTaskButtonProps) => {
   const [open, setOpen] = useState(false);
   const [taskName, setTaskName] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newTask: Task = {
       id: crypto.randomUUID(),
@@ -25,7 +25,7 @@ export const AddTaskButton = ({ stageName, onAddTask }: AddTaskButtonProps) => {
       startDate: new Date(),
       endDate: new Date()
     };
-    onAddTask(newTask);
+    await onAddTask(newTask);
     setTaskName("");
     setOpen(false);
   };

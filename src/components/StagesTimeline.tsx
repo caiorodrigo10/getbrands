@@ -44,6 +44,8 @@ const StagesTimeline = () => {
     updateTaskInDatabase,
     addTaskToDatabase,
     deleteTaskFromDatabase,
+    addStageToDatabase,
+    deleteStageFromDatabase,
   } = useStagesData(projectId || '');
   
   const [openStages, setOpenStages] = useState<string[]>([]);
@@ -80,6 +82,8 @@ const StagesTimeline = () => {
   };
 
   const handleAddTask = async (stageName: string, taskData: Task) => {
+    if (!projectId) return;
+    
     await addTaskToDatabase(stageName, taskData);
     
     setStages(prevStages =>
@@ -118,7 +122,11 @@ const StagesTimeline = () => {
     );
   };
 
-  const handleAddStage = (stageName: string) => {
+  const handleAddStage = async (stageName: string) => {
+    if (!projectId) return;
+    
+    await addStageToDatabase(stageName);
+    
     setStages(prevStages => [
       ...prevStages,
       {
@@ -130,7 +138,11 @@ const StagesTimeline = () => {
     toast.success("Stage added successfully");
   };
 
-  const handleDeleteStage = (stageName: string) => {
+  const handleDeleteStage = async (stageName: string) => {
+    if (!projectId) return;
+    
+    await deleteStageFromDatabase(stageName);
+    
     setStages(prevStages => prevStages.filter(stage => stage.name !== stageName));
     toast.success("Stage deleted successfully");
   };

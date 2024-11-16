@@ -16,15 +16,17 @@ interface AddStageButtonProps {
 
 export const AddStageButton = ({ onAddStage }: AddStageButtonProps) => {
   const [stageName, setStageName] = useState("");
+  const [open, setOpen] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onAddStage(stageName);
+    await onAddStage(stageName);
     setStageName("");
+    setOpen(false);
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="w-full mt-4">
           <Plus className="h-4 w-4 mr-2" />
