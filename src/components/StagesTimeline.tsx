@@ -34,6 +34,14 @@ const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
   return "pending";
 };
 
+const generateUUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
 const StagesTimeline = () => {
   const [stages, setStages] = useState<Stage[]>([
     {
@@ -41,7 +49,7 @@ const StagesTimeline = () => {
       status: "completed",
       tasks: [
         { 
-          id: "1",
+          id: generateUUID(),
           name: "Welcome Meeting",
           status: "done",
           date: "10/03/2024",
@@ -56,7 +64,7 @@ const StagesTimeline = () => {
       status: "completed",
       tasks: [
         {
-          id: "2",
+          id: generateUUID(),
           name: "Client Successfully Selected Products",
           status: "done",
           date: "15/03/2024",
@@ -71,7 +79,7 @@ const StagesTimeline = () => {
       status: "in-progress",
       tasks: [
         {
-          id: "3",
+          id: generateUUID(),
           name: "Client Fill Naming Brief Form",
           status: "done",
           date: "18/03/2024",
@@ -80,7 +88,7 @@ const StagesTimeline = () => {
           assignee: "none"
         },
         {
-          id: "4",
+          id: generateUUID(),
           name: "Team Archived Name Options for Client",
           status: "in_progress",
           date: "In Progress",
@@ -88,7 +96,7 @@ const StagesTimeline = () => {
           assignee: "none"
         },
         {
-          id: "5",
+          id: generateUUID(),
           name: "Client Approved Name",
           status: "todo",
           assignee: "none"
@@ -100,19 +108,19 @@ const StagesTimeline = () => {
       status: "pending",
       tasks: [
         {
-          id: "6",
+          id: generateUUID(),
           name: "Client Fill Visual Identity Form",
           status: "blocked",
           assignee: "none"
         },
         {
-          id: "7",
+          id: generateUUID(),
           name: "Team Completed Visual Identity and Archived Presentation",
           status: "todo",
           assignee: "none"
         },
         {
-          id: "8",
+          id: generateUUID(),
           name: "Client Approved Visual Identity",
           status: "todo",
           assignee: "none"
@@ -150,10 +158,15 @@ const StagesTimeline = () => {
   };
 
   const handleAddTask = (stageName: string, taskData: Task) => {
+    const taskWithUUID = {
+      ...taskData,
+      id: generateUUID()
+    };
+    
     setStages(prevStages =>
       prevStages.map(stage => {
         if (stage.name === stageName) {
-          const newTasks = [...stage.tasks, taskData];
+          const newTasks = [...stage.tasks, taskWithUUID];
           return {
             ...stage,
             tasks: newTasks,
