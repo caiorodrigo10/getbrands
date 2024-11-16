@@ -48,24 +48,22 @@ export const TaskItem = ({
   const [taskEndDate, setTaskEndDate] = useState<Date | undefined>(endDate);
 
   return (
-    <div className="flex items-center gap-4 p-3 rounded-md bg-background/50 hover:bg-background/80 transition-colors">
-      <div className="flex items-center gap-3 min-w-0">
+    <div className="flex items-center gap-2 p-2 rounded-md bg-background/50 hover:bg-background/80 transition-colors">
+      <div className="flex items-center gap-2 min-w-0 flex-1">
         {getStatusIcon(taskStatus)}
-        <span className="text-sm font-medium truncate">{name}</span>
-      </div>
-      
-      <div className="flex items-center gap-4 ml-auto">
-        <TaskStatusSelect 
-          status={taskStatus} 
-          onStatusChange={setTaskStatus} 
-        />
+        <span className="text-sm font-medium truncate flex-shrink-0 w-48">{name}</span>
         
-        <TaskAssigneeSelect 
-          assignee={taskAssignee} 
-          onAssigneeChange={setTaskAssignee} 
-        />
+        <div className="flex items-center gap-2 ml-auto">
+          <TaskStatusSelect 
+            status={taskStatus} 
+            onStatusChange={setTaskStatus} 
+          />
+          
+          <TaskAssigneeSelect 
+            assignee={taskAssignee} 
+            onAssigneeChange={setTaskAssignee} 
+          />
 
-        <div className="flex items-center gap-4">
           <TaskDatePicker
             label="Start"
             date={taskStartDate}

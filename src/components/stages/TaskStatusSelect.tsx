@@ -23,43 +23,43 @@ export const TaskStatusSelect = ({ status, onStatusChange }: TaskStatusSelectPro
 
   return (
     <Select value={status} onValueChange={(value) => onStatusChange(value as TaskStatus)}>
-      <SelectTrigger className={`h-8 w-[130px] ${getStatusStyles(status)}`}>
+      <SelectTrigger className={`h-7 w-[110px] ${getStatusStyles(status)}`}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="todo" className="text-yellow-500">
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4" />
+            <Clock className="w-3 h-3" />
             <span>To Do</span>
           </div>
         </SelectItem>
         <SelectItem value="in_progress" className="text-blue-500">
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4" />
+            <Clock className="w-3 h-3" />
             <span>In Progress</span>
           </div>
         </SelectItem>
         <SelectItem value="done" className="text-green-500">
           <div className="flex items-center gap-2">
-            <Check className="w-4 h-4" />
+            <Check className="w-3 h-3" />
             <span>Done</span>
           </div>
         </SelectItem>
         <SelectItem value="blocked" className="text-red-500">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4" />
+            <AlertCircle className="w-3 h-3" />
             <span>Blocked</span>
           </div>
         </SelectItem>
         <SelectItem value="scheduled" className="text-purple-500">
           <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
+            <Calendar className="w-3 h-3" />
             <span>Scheduled</span>
           </div>
         </SelectItem>
         <SelectItem value="not_included" className="text-gray-500">
           <div className="flex items-center gap-2">
-            <Ban className="w-4 h-4" />
+            <Ban className="w-3 h-3" />
             <span>Not Included</span>
           </div>
         </SelectItem>

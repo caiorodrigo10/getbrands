@@ -15,7 +15,7 @@ const ASSIGNEE_DATA = {
     image: "/avatars/client.png",
   },
   account_manager: {
-    name: "Account Manager",
+    name: "AM",
     image: "/avatars/account-manager.png",
   },
   designer: {
@@ -23,7 +23,7 @@ const ASSIGNEE_DATA = {
     image: "/avatars/designer.png",
   },
   none: {
-    name: "Unassigned",
+    name: "Assign",
     image: "",
   },
 };
@@ -31,12 +31,12 @@ const ASSIGNEE_DATA = {
 export const TaskAssigneeSelect = ({ assignee, onAssigneeChange }: TaskAssigneeSelectProps) => {
   return (
     <Select value={assignee} onValueChange={(value) => onAssigneeChange(value as AssigneeType)}>
-      <SelectTrigger className="h-8 w-[140px]">
-        <div className="flex items-center gap-2">
-          <Avatar className="h-6 w-6">
+      <SelectTrigger className="h-7 w-[90px]">
+        <div className="flex items-center gap-1">
+          <Avatar className="h-5 w-5">
             <AvatarImage src={ASSIGNEE_DATA[assignee].image} />
             <AvatarFallback>
-              <User2 className="h-4 w-4" />
+              <User2 className="h-3 w-3" />
             </AvatarFallback>
           </Avatar>
           <SelectValue />
@@ -46,10 +46,10 @@ export const TaskAssigneeSelect = ({ assignee, onAssigneeChange }: TaskAssigneeS
         {Object.entries(ASSIGNEE_DATA).map(([key, data]) => (
           <SelectItem key={key} value={key}>
             <div className="flex items-center gap-2">
-              <Avatar className="h-6 w-6">
+              <Avatar className="h-5 w-5">
                 <AvatarImage src={data.image} />
                 <AvatarFallback>
-                  <User2 className="h-4 w-4" />
+                  <User2 className="h-3 w-3" />
                 </AvatarFallback>
               </Avatar>
               <span>{data.name}</span>
