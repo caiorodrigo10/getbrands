@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AppLayout } from "./AppLayout";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { MarketingRoutes } from "./MarketingRoutes";
 import AdminProductEdit from "@/pages/admin/AdminProductEdit";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
@@ -27,6 +28,9 @@ import AdminProjectManage from "@/pages/admin/AdminProjectManage";
 
 export const AppRoutes = () => (
   <Routes>
+    {/* Marketing Routes */}
+    {MarketingRoutes}
+    
     {/* Public Routes */}
     <Route path="/login" element={<Login />} />
     
