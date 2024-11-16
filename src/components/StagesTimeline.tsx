@@ -5,7 +5,7 @@ import { AddStageButton } from "./stages/AddStageButton";
 import { useStagesData } from "./stages/useStagesData";
 import { useParams } from "react-router-dom";
 
-export type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
+export type TaskStatus = "pending" | "in_progress" | "done" | "blocked" | "scheduled" | "not_included";
 export type AssigneeType = "none" | string;
 
 export interface Task {

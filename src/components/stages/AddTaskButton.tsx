@@ -24,7 +24,7 @@ export const AddTaskButton = ({ stageName, onAddTask }: AddTaskButtonProps) => {
     const newTask: Task = {
       id: crypto.randomUUID(),
       name: taskName,
-      status: "todo" as TaskStatus,
+      status: "pending" as TaskStatus,
       assignee: "none",
       startDate: new Date(),
       endDate: new Date()
@@ -36,6 +36,7 @@ export const AddTaskButton = ({ stageName, onAddTask }: AddTaskButtonProps) => {
       setOpen(false);
     } catch (error) {
       console.error('Failed to add task:', error);
+      toast.error("Failed to add task");
     }
   };
 
