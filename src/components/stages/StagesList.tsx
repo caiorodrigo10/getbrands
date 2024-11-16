@@ -1,4 +1,4 @@
-import { Task, TaskStatus } from "../StagesTimeline";
+import { Task } from "../StagesTimeline";
 import { TaskItem } from "./TaskItem";
 import { StageHeader } from "./StageHeader";
 import { AddTaskButton } from "./AddTaskButton";
@@ -20,7 +20,7 @@ interface StagesListProps {
   stages: Stage[];
   openStages: string[];
   onToggleStage: (stageName: string) => void;
-  onTaskUpdate: (stageName: string, taskIndex: number, newName: string) => void;
+  onTaskUpdate: (stageName: string, taskIndex: number, updates: Partial<Task>) => void;
   onAddTask: (stageName: string, taskData: Task) => void;
   onDeleteTask: (stageName: string, taskIndex: number) => void;
   onDeleteStage: (stageName: string) => void;
@@ -66,14 +66,8 @@ export const StagesList = ({
                 {stage.tasks.map((task, taskIndex) => (
                   <TaskItem
                     key={taskIndex}
-                    id={task.id}
-                    name={task.name}
-                    status={task.status}
-                    date={task.date}
-                    startDate={task.startDate}
-                    endDate={task.endDate}
-                    assignee={task.assignee}
-                    onUpdate={(newName) => onTaskUpdate(stage.name, taskIndex, newName)}
+                    {...task}
+                    onUpdate={(updates) => onTaskUpdate(stage.name, taskIndex, updates)}
                     onDelete={() => onDeleteTask(stage.name, taskIndex)}
                   />
                 ))}

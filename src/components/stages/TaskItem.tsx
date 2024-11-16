@@ -5,9 +5,7 @@ import { TaskAssigneeSelect } from "./TaskAssigneeSelect";
 import { TaskDatePicker } from "./TaskDatePicker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "../ui/button";
-import { type TaskStatus, type AssigneeType } from "../StagesTimeline";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { type TaskStatus, type AssigneeType, type Task } from "../StagesTimeline";
 
 interface TaskItemProps {
   id: string;
@@ -17,9 +15,8 @@ interface TaskItemProps {
   startDate?: Date;
   endDate?: Date;
   assignee?: AssigneeType;
-  onUpdate: (newName: string) => void;
+  onUpdate: (updates: Partial<Task>) => void;
   onDelete: () => void;
-  onAssigneeChange?: (newAssignee: AssigneeType) => void;
 }
 
 export const TaskItem = ({ 
@@ -31,7 +28,6 @@ export const TaskItem = ({
   assignee = "none",
   onUpdate,
   onDelete,
-  onAssigneeChange
 }: TaskItemProps) => {
   const [taskStatus, setTaskStatus] = useState<TaskStatus>(status);
   const [taskAssignee, setTaskAssignee] = useState<AssigneeType>(assignee);
@@ -43,7 +39,7 @@ export const TaskItem = ({
     onUpdate({ status: newStatus });
   };
 
-  const handleAssigneeChange = async (newAssignee: AssigneeType) => {
+  const handleAssigneeChange = (newAssignee: AssigneeType) => {
     setTaskAssignee(newAssignee);
     onUpdate({ assignee: newAssignee });
   };

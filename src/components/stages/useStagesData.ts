@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Stage, Task, TaskStatus, AssigneeType } from "../StagesTimeline";
+import { Stage, Task } from "../StagesTimeline";
 
 export const useStagesData = (projectId: string) => {
   const [stages, setStages] = useState<Stage[]>([]);
@@ -16,7 +16,7 @@ export const useStagesData = (projectId: string) => {
         .update({
           status: updates.status,
           assignee_id: updates.assignee === 'none' ? null : updates.assignee,
-          due_date: updates.endDate,
+          due_date: updates.endDate?.toISOString(),
           title: updates.name,
         })
         .eq('id', taskId);
@@ -42,7 +42,7 @@ export const useStagesData = (projectId: string) => {
           title: taskData.name,
           status: taskData.status,
           assignee_id: taskData.assignee === 'none' ? null : taskData.assignee,
-          due_date: taskData.endDate,
+          due_date: taskData.endDate?.toISOString(),
         });
 
       if (error) throw error;
