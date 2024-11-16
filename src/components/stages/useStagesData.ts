@@ -3,18 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Stage, Task } from "../StagesTimeline";
 
-const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
-  if (tasks.length === 0) return "pending";
-  
-  const allCompleted = tasks.every(task => task.status === "done");
-  if (allCompleted) return "completed";
-  
-  const hasInProgress = tasks.some(task => task.status === "in_progress");
-  if (hasInProgress) return "in-progress";
-  
-  return "pending";
-};
-
 export const useStagesData = (projectId: string) => {
   const [stages, setStages] = useState<Stage[]>([]);
 
@@ -59,6 +47,18 @@ export const useStagesData = (projectId: string) => {
       console.error('Error fetching tasks:', error);
       toast.error("Failed to load project tasks");
     }
+  };
+
+  const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
+    if (tasks.length === 0) return "pending";
+    
+    const allCompleted = tasks.every(task => task.status === "done");
+    if (allCompleted) return "completed";
+    
+    const hasInProgress = tasks.some(task => task.status === "in_progress");
+    if (hasInProgress) return "in-progress";
+    
+    return "pending";
   };
 
   const updateTaskInDatabase = async (taskId: string, updates: Partial<Task>) => {
@@ -127,17 +127,14 @@ export const useStagesData = (projectId: string) => {
 
   const addStageToDatabase = async (stageName: string) => {
     try {
-      const { error } = await supabase
-        .from('project_tasks')
-        .insert({
-          project_id: projectId,
-          stage_name: stageName,
-          title: 'Initial Task',
-          status: 'pending' // Changed from 'todo' to 'pending'
-        });
-
-      if (error) throw error;
-      await fetchProjectTasks();
+      setStages(prevStages => [
+        ...prevStages,
+        {
+          name: stageName,
+          status: "pending",
+          tasks: []
+        }
+      ]);
       toast.success("Stage added successfully");
     } catch (error) {
       console.error('Error adding stage:', error);
@@ -155,7 +152,8 @@ export const useStagesData = (projectId: string) => {
         .eq('stage_name', stageName);
 
       if (error) throw error;
-      await fetchProjectTasks();
+      
+      setStages(prevStages => prevStages.filter(stage => stage.name !== stageName));
       toast.success("Stage deleted successfully");
     } catch (error) {
       console.error('Error deleting stage:', error);
