@@ -1,6 +1,8 @@
 import { Route } from "react-router-dom";
-import MarketingQuizPage from "@/pages/MarketingQuizPage";
+import LandingPage from "@/pages/marketing/LandingPage";
 
-export const MarketingRoutes = [
-  <Route key="marketing-quiz" path="/start-your-brand" element={<MarketingQuizPage />} />,
-];
+export const MarketingRoutes = (
+  <Route path="/">
+    <Route index element={<LandingPage />} />
+  </Route>
+);
