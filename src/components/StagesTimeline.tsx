@@ -85,20 +85,6 @@ const StagesTimeline = () => {
     if (!projectId) return;
     
     await addTaskToDatabase(stageName, taskData);
-    
-    setStages(prevStages =>
-      prevStages.map(stage => {
-        if (stage.name === stageName) {
-          const newTasks = [...stage.tasks, taskData];
-          return {
-            ...stage,
-            tasks: newTasks,
-            status: calculateStageStatus(newTasks)
-          };
-        }
-        return stage;
-      })
-    );
   };
 
   const handleDeleteTask = async (stageName: string, taskIndex: number) => {
@@ -106,35 +92,12 @@ const StagesTimeline = () => {
     if (!taskId) return;
 
     await deleteTaskFromDatabase(taskId);
-    
-    setStages(prevStages =>
-      prevStages.map(stage => {
-        if (stage.name === stageName) {
-          const newTasks = stage.tasks.filter((_, index) => index !== taskIndex);
-          return {
-            ...stage,
-            tasks: newTasks,
-            status: calculateStageStatus(newTasks)
-          };
-        }
-        return stage;
-      })
-    );
   };
 
   const handleAddStage = async (stageName: string) => {
     if (!projectId) return;
     
     await addStageToDatabase(stageName);
-    
-    setStages(prevStages => [
-      ...prevStages,
-      {
-        name: stageName,
-        status: "pending",
-        tasks: []
-      }
-    ]);
     toast.success("Stage added successfully");
   };
 
@@ -142,8 +105,6 @@ const StagesTimeline = () => {
     if (!projectId) return;
     
     await deleteStageFromDatabase(stageName);
-    
-    setStages(prevStages => prevStages.filter(stage => stage.name !== stageName));
     toast.success("Stage deleted successfully");
   };
 

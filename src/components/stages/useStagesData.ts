@@ -6,12 +6,6 @@ import { Stage, Task } from "../StagesTimeline";
 export const useStagesData = (projectId: string) => {
   const [stages, setStages] = useState<Stage[]>([]);
 
-  useEffect(() => {
-    if (projectId) {
-      fetchProjectTasks();
-    }
-  }, [projectId]);
-
   const fetchProjectTasks = async () => {
     try {
       const { data: tasks, error } = await supabase
@@ -48,6 +42,12 @@ export const useStagesData = (projectId: string) => {
       toast.error("Failed to load project tasks");
     }
   };
+
+  useEffect(() => {
+    if (projectId) {
+      fetchProjectTasks();
+    }
+  }, [projectId]);
 
   const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
     if (tasks.length === 0) return "pending";
@@ -127,15 +127,22 @@ export const useStagesData = (projectId: string) => {
 
   const addStageToDatabase = async (stageName: string) => {
     try {
-      setStages(prevStages => [
-        ...prevStages,
-        {
-          name: stageName,
-          status: "pending",
-          tasks: []
+      // We don't need to create any database entry for the stage itself
+      // Just update the local state
+      setStages(prevStages => {
+        // Check if stage already exists
+        if (prevStages.some(stage => stage.name === stageName)) {
+          throw new Error("Stage already exists");
         }
-      ]);
-      toast.success("Stage added successfully");
+        return [
+          ...prevStages,
+          {
+            name: stageName,
+            status: "pending",
+            tasks: []
+          }
+        ];
+      });
     } catch (error) {
       console.error('Error adding stage:', error);
       toast.error("Failed to add stage");
@@ -154,7 +161,6 @@ export const useStagesData = (projectId: string) => {
       if (error) throw error;
       
       setStages(prevStages => prevStages.filter(stage => stage.name !== stageName));
-      toast.success("Stage deleted successfully");
     } catch (error) {
       console.error('Error deleting stage:', error);
       toast.error("Failed to delete stage");
