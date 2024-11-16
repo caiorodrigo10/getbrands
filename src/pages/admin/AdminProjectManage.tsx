@@ -1,9 +1,14 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import StagesTimeline from "@/components/StagesTimeline";
 
 const AdminProjectManage = () => {
+  const navigate = useNavigate();
+  
   // Demo data - this would be fetched from the API in a real implementation
   const project = {
     id: 1,
@@ -29,6 +34,17 @@ const AdminProjectManage = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
+          <div className="flex items-center gap-4 mb-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/admin/projects')}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Projects
+            </Button>
+          </div>
           <h1 className="text-2xl font-bold">{project.name}</h1>
           <p className="text-muted-foreground mt-1">{project.description}</p>
         </div>
