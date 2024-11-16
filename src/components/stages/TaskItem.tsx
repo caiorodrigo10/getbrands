@@ -5,9 +5,7 @@ import { TaskAssigneeSelect } from "./TaskAssigneeSelect";
 import { TaskDatePicker } from "./TaskDatePicker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "../ui/button";
-
-type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
-type AssigneeType = "client" | "account_manager" | "designer" | "none" | string;
+import { type TaskStatus, type AssigneeType } from "../StagesTimeline";
 
 interface TaskItemProps {
   name: string;
@@ -19,23 +17,6 @@ interface TaskItemProps {
   onUpdate: (newName: string) => void;
   onDelete: () => void;
 }
-
-const getStatusIcon = (status: TaskStatus) => {
-  switch (status) {
-    case "blocked":
-      return <AlertCircle className="w-4 h-4 text-red-500" />;
-    case "done":
-      return <Check className="w-4 h-4 text-green-500" />;
-    case "in_progress":
-      return <Clock className="w-4 h-4 text-blue-500" />;
-    case "scheduled":
-      return <Calendar className="w-4 h-4 text-purple-500" />;
-    case "not_included":
-      return <Ban className="w-4 h-4 text-gray-500" />;
-    default:
-      return <Clock className="w-4 h-4 text-yellow-500" />;
-  }
-};
 
 export const TaskItem = ({ 
   name, 
@@ -80,7 +61,6 @@ export const TaskItem = ({
   return (
     <div className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 items-center px-4 py-2 rounded-md transition-colors group">
       <div className="flex items-center gap-3">
-        {getStatusIcon(taskStatus)}
         <TaskName />
         <Button
           variant="ghost"

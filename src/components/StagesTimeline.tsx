@@ -7,10 +7,10 @@ import { StageActions } from "./stages/StageActions";
 import { useState } from "react";
 import { toast } from "sonner";
 
-type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
-type AssigneeType = "client" | "account_manager" | "designer" | "none";
+export type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
+export type AssigneeType = "client" | "account_manager" | "designer" | "none" | string;
 
-interface Task {
+export interface Task {
   name: string;
   status: TaskStatus;
   date?: string;
