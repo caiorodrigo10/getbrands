@@ -1,8 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { MoreVertical, Pencil, Package } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface Project {
@@ -17,7 +15,6 @@ interface Project {
   points: number;
   lastUpdate: string;
   updatedAt: string;
-  image: string;
 }
 
 interface AdminProjectsTableProps {
@@ -58,23 +55,16 @@ const AdminProjectsTable = ({ projects }: AdminProjectsTableProps) => {
             <TableHead>Progress</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Points</TableHead>
-            <TableHead className="w-[70px]"></TableHead>
+            <TableHead className="w-[100px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {projects.map((project) => (
             <TableRow key={project.id}>
               <TableCell>
-                <div className="flex items-center gap-3">
-                  <img
-                    src={project.image}
-                    alt={project.name}
-                    className="h-12 w-12 rounded-md object-cover"
-                  />
-                  <div>
-                    <p className="font-medium">{project.name}</p>
-                    <p className="text-sm text-muted-foreground">{project.accountManager}</p>
-                  </div>
+                <div>
+                  <p className="font-medium">{project.name}</p>
+                  <p className="text-sm text-muted-foreground">{project.accountManager}</p>
                 </div>
               </TableCell>
               <TableCell>
@@ -102,25 +92,16 @@ const AdminProjectsTable = ({ projects }: AdminProjectsTableProps) => {
                 </Badge>
               </TableCell>
               <TableCell>
-                <div className="flex items-center gap-1">
-                  <Package className="h-4 w-4 text-primary" />
-                  <span>{project.points}</span>
-                </div>
+                <span>{project.points}</span>
               </TableCell>
               <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => navigate(`/admin/projects/${project.id}`)}>
-                      <Pencil className="h-4 w-4 mr-2" />
-                      Edit Project
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigate(`/admin/projects/${project.id}/manage`)}
+                >
+                  Manage
+                </Button>
               </TableCell>
             </TableRow>
           ))}
