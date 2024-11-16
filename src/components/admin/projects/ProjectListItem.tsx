@@ -38,20 +38,20 @@ const ProjectListItem = ({ project, isExpanded, onToggle }: ProjectListItemProps
     <div className="border border-border/40 rounded-md mb-4">
       <div className="p-4">
         <div className="flex items-center justify-between">
-          <div className="grid grid-cols-1 md:grid-cols-7 gap-4 w-full">
-            <div className="md:col-span-1 flex items-center min-h-[24px]">
+          <div className="grid grid-cols-7 gap-4 w-full">
+            <div className="col-span-1 flex items-center">
               <p className="text-sm text-foreground truncate">{project.name}</p>
             </div>
-            <div className="md:col-span-1 flex items-center min-h-[24px]">
+            <div className="col-span-1 flex items-center">
               <p className="text-sm text-muted-foreground truncate">{project.client}</p>
             </div>
-            <div className="md:col-span-1 flex items-center min-h-[24px]">
+            <div className="col-span-1 flex items-center">
               <p className="text-sm text-muted-foreground truncate">{project.email}</p>
             </div>
-            <div className="md:col-span-1 flex items-center min-h-[24px]">
+            <div className="col-span-1 flex items-center">
               <p className="text-sm text-muted-foreground truncate">{project.phone}</p>
             </div>
-            <div className="md:col-span-1 flex items-center min-h-[24px]">
+            <div className="col-span-1 flex items-center">
               <span className={cn(
                 "px-2.5 py-0.5 rounded-full text-xs font-medium",
                 getStatusColor(project.status)
@@ -59,7 +59,7 @@ const ProjectListItem = ({ project, isExpanded, onToggle }: ProjectListItemProps
                 {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
               </span>
             </div>
-            <div className="md:col-span-1 flex items-center min-h-[24px]">
+            <div className="col-span-1 flex items-center">
               <div className="flex items-center gap-2 w-full">
                 <div className="h-1.5 w-full bg-muted/15 rounded-full overflow-hidden">
                   <div
@@ -72,7 +72,7 @@ const ProjectListItem = ({ project, isExpanded, onToggle }: ProjectListItemProps
                 </span>
               </div>
             </div>
-            <div className="md:col-span-1 flex items-center min-h-[24px]">
+            <div className="col-span-1 flex items-center">
               <p className="text-sm text-muted-foreground truncate">{project.accountManager}</p>
             </div>
           </div>
@@ -93,7 +93,7 @@ const ProjectListItem = ({ project, isExpanded, onToggle }: ProjectListItemProps
 
       {isExpanded && (
         <div className="px-4 pb-4 pt-2 border-t border-border/40">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-6">
             <div>
               <h3 className="text-sm font-medium mb-2">Project Points</h3>
               <div className="flex items-center gap-4">
