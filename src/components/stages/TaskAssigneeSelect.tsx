@@ -9,7 +9,7 @@ interface TaskAssigneeSelectProps {
   onAssigneeChange: (assignee: AssigneeType) => void;
 }
 
-const ASSIGNEE_DATA = {
+const ASSIGNEE_DATA: Record<AssigneeType, { name: string; image: string }> = {
   client: {
     name: "Client",
     image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=100&h=100&fit=crop",
@@ -28,19 +28,21 @@ const ASSIGNEE_DATA = {
   },
 };
 
-export const TaskAssigneeSelect = ({ assignee, onAssigneeChange }: TaskAssigneeSelectProps) => {
+export const TaskAssigneeSelect = ({ assignee = "none", onAssigneeChange }: TaskAssigneeSelectProps) => {
+  const currentAssignee = ASSIGNEE_DATA[assignee] || ASSIGNEE_DATA.none;
+
   return (
     <Select value={assignee} onValueChange={(value) => onAssigneeChange(value as AssigneeType)}>
       <SelectTrigger className="h-7">
         <SelectValue>
           <div className="flex items-center gap-1.5">
             <Avatar className="h-5 w-5">
-              <AvatarImage src={ASSIGNEE_DATA[assignee].image} />
+              <AvatarImage src={currentAssignee.image} />
               <AvatarFallback>
                 <User2 className="h-3 w-3" />
               </AvatarFallback>
             </Avatar>
-            <span>{ASSIGNEE_DATA[assignee].name}</span>
+            <span>{currentAssignee.name}</span>
           </div>
         </SelectValue>
       </SelectTrigger>
