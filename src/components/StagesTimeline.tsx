@@ -2,6 +2,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { StagesList } from "./stages/StagesList";
 import { AddStageButton } from "./stages/AddStageButton";
+import { useStagesData } from "./stages/useStagesData";
+import { useParams } from "react-router-dom";
 
 export type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
 export type AssigneeType = "none" | string;
@@ -16,7 +18,7 @@ export interface Task {
   assignee?: AssigneeType;
 }
 
-interface Stage {
+export interface Stage {
   name: string;
   status: "completed" | "in-progress" | "pending";
   tasks: Task[];
@@ -34,101 +36,16 @@ const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
   return "pending";
 };
 
-const generateUUID = () => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-};
-
 const StagesTimeline = () => {
-  const [stages, setStages] = useState<Stage[]>([
-    {
-      name: "Onboarding",
-      status: "completed",
-      tasks: [
-        { 
-          id: generateUUID(),
-          name: "Welcome Meeting",
-          status: "done",
-          date: "10/03/2024",
-          startDate: new Date("2024-03-10"),
-          endDate: new Date("2024-03-10"),
-          assignee: "none"
-        }
-      ]
-    },
-    {
-      name: "Product Selection",
-      status: "completed",
-      tasks: [
-        {
-          id: generateUUID(),
-          name: "Client Successfully Selected Products",
-          status: "done",
-          date: "15/03/2024",
-          startDate: new Date("2024-03-15"),
-          endDate: new Date("2024-03-15"),
-          assignee: "none"
-        }
-      ]
-    },
-    {
-      name: "Naming",
-      status: "in-progress",
-      tasks: [
-        {
-          id: generateUUID(),
-          name: "Client Fill Naming Brief Form",
-          status: "done",
-          date: "18/03/2024",
-          startDate: new Date("2024-03-18"),
-          endDate: new Date("2024-03-18"),
-          assignee: "none"
-        },
-        {
-          id: generateUUID(),
-          name: "Team Archived Name Options for Client",
-          status: "in_progress",
-          date: "In Progress",
-          startDate: new Date("2024-03-20"),
-          assignee: "none"
-        },
-        {
-          id: generateUUID(),
-          name: "Client Approved Name",
-          status: "todo",
-          assignee: "none"
-        }
-      ]
-    },
-    {
-      name: "Visual Identity",
-      status: "pending",
-      tasks: [
-        {
-          id: generateUUID(),
-          name: "Client Fill Visual Identity Form",
-          status: "blocked",
-          assignee: "none"
-        },
-        {
-          id: generateUUID(),
-          name: "Team Completed Visual Identity and Archived Presentation",
-          status: "todo",
-          assignee: "none"
-        },
-        {
-          id: generateUUID(),
-          name: "Client Approved Visual Identity",
-          status: "todo",
-          assignee: "none"
-        }
-      ]
-    }
-  ]);
-
+  const { id: projectId } = useParams();
+  const {
+    stages,
+    setStages,
+    updateTaskInDatabase,
+    addTaskToDatabase,
+    deleteTaskFromDatabase,
+  } = useStagesData(projectId || '');
+  
   const [openStages, setOpenStages] = useState<string[]>([]);
 
   const toggleStage = (stageName: string) => {
@@ -140,12 +57,17 @@ const StagesTimeline = () => {
     });
   };
 
-  const handleTaskUpdate = (stageName: string, taskIndex: number, newName: string) => {
+  const handleTaskUpdate = async (stageName: string, taskIndex: number, updates: Partial<Task>) => {
+    const taskId = stages.find(s => s.name === stageName)?.tasks[taskIndex]?.id;
+    if (!taskId) return;
+
+    await updateTaskInDatabase(taskId, updates);
+    
     setStages(prevStages => 
       prevStages.map(stage => {
         if (stage.name === stageName) {
           const updatedTasks = [...stage.tasks];
-          updatedTasks[taskIndex] = { ...updatedTasks[taskIndex], name: newName };
+          updatedTasks[taskIndex] = { ...updatedTasks[taskIndex], ...updates };
           return {
             ...stage,
             tasks: updatedTasks,
@@ -157,16 +79,13 @@ const StagesTimeline = () => {
     );
   };
 
-  const handleAddTask = (stageName: string, taskData: Task) => {
-    const taskWithUUID = {
-      ...taskData,
-      id: generateUUID()
-    };
+  const handleAddTask = async (stageName: string, taskData: Task) => {
+    await addTaskToDatabase(stageName, taskData);
     
     setStages(prevStages =>
       prevStages.map(stage => {
         if (stage.name === stageName) {
-          const newTasks = [...stage.tasks, taskWithUUID];
+          const newTasks = [...stage.tasks, taskData];
           return {
             ...stage,
             tasks: newTasks,
@@ -176,10 +95,14 @@ const StagesTimeline = () => {
         return stage;
       })
     );
-    toast.success("Task added successfully");
   };
 
-  const handleDeleteTask = (stageName: string, taskIndex: number) => {
+  const handleDeleteTask = async (stageName: string, taskIndex: number) => {
+    const taskId = stages.find(s => s.name === stageName)?.tasks[taskIndex]?.id;
+    if (!taskId) return;
+
+    await deleteTaskFromDatabase(taskId);
+    
     setStages(prevStages =>
       prevStages.map(stage => {
         if (stage.name === stageName) {
@@ -193,7 +116,6 @@ const StagesTimeline = () => {
         return stage;
       })
     );
-    toast.success("Task deleted successfully");
   };
 
   const handleAddStage = (stageName: string) => {

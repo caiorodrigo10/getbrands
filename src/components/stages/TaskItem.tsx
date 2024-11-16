@@ -1,5 +1,5 @@
 import { Trash2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { TaskStatusSelect } from "./TaskStatusSelect";
 import { TaskAssigneeSelect } from "./TaskAssigneeSelect";
 import { TaskDatePicker } from "./TaskDatePicker";
@@ -38,22 +38,24 @@ export const TaskItem = ({
   const [taskStartDate, setTaskStartDate] = useState<Date | undefined>(startDate);
   const [taskEndDate, setTaskEndDate] = useState<Date | undefined>(endDate);
 
+  const handleStatusChange = (newStatus: TaskStatus) => {
+    setTaskStatus(newStatus);
+    onUpdate({ status: newStatus });
+  };
+
   const handleAssigneeChange = async (newAssignee: AssigneeType) => {
-    try {
-      const { error } = await supabase
-        .from('project_tasks')
-        .update({ assignee_id: newAssignee === 'none' ? null : newAssignee })
-        .eq('id', id);
+    setTaskAssignee(newAssignee);
+    onUpdate({ assignee: newAssignee });
+  };
 
-      if (error) throw error;
+  const handleStartDateChange = (date: Date | undefined) => {
+    setTaskStartDate(date);
+    onUpdate({ startDate: date });
+  };
 
-      setTaskAssignee(newAssignee);
-      if (onAssigneeChange) onAssigneeChange(newAssignee);
-      toast.success("Assignee updated successfully");
-    } catch (error) {
-      console.error('Error updating assignee:', error);
-      toast.error("Failed to update assignee");
-    }
+  const handleEndDateChange = (date: Date | undefined) => {
+    setTaskEndDate(date);
+    onUpdate({ endDate: date });
   };
 
   const isTextTruncated = (text: string) => {
@@ -99,7 +101,7 @@ export const TaskItem = ({
       <div className="min-w-[100px]">
         <TaskStatusSelect 
           status={taskStatus} 
-          onStatusChange={setTaskStatus} 
+          onStatusChange={handleStatusChange} 
         />
       </div>
 
@@ -113,14 +115,14 @@ export const TaskItem = ({
       <div>
         <TaskDatePicker
           date={taskStartDate}
-          onDateChange={setTaskStartDate}
+          onDateChange={handleStartDateChange}
         />
       </div>
 
       <div>
         <TaskDatePicker
           date={taskEndDate}
-          onDateChange={setTaskEndDate}
+          onDateChange={handleEndDateChange}
         />
       </div>
     </div>
