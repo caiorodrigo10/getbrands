@@ -3,6 +3,7 @@ import { useState } from "react";
 import { TaskStatusSelect } from "./TaskStatusSelect";
 import { TaskAssigneeSelect } from "./TaskAssigneeSelect";
 import { TaskDatePicker } from "./TaskDatePicker";
+import { Tooltip } from "@/components/ui/tooltip";
 
 type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
 type AssigneeType = "client" | "account_manager" | "designer" | "none";
@@ -47,12 +48,38 @@ export const TaskItem = ({
   const [taskStartDate, setTaskStartDate] = useState<Date | undefined>(startDate);
   const [taskEndDate, setTaskEndDate] = useState<Date | undefined>(endDate);
 
+  const isTextTruncated = (text: string) => {
+    const tempDiv = document.createElement('div');
+    tempDiv.style.cssText = 'position: absolute; visibility: hidden; width: 200px;'; // Approximate width of task name column
+    tempDiv.textContent = text;
+    document.body.appendChild(tempDiv);
+    const isTruncated = tempDiv.scrollWidth > tempDiv.clientWidth;
+    document.body.removeChild(tempDiv);
+    return isTruncated;
+  };
+
+  const TaskName = () => {
+    if (isTextTruncated(name)) {
+      return (
+        <Tooltip>
+          <Tooltip.Trigger>
+            <span className="text-sm font-medium truncate max-w-[200px]">{name}</span>
+          </Tooltip.Trigger>
+          <Tooltip.Content>
+            <p className="text-sm">{name}</p>
+          </Tooltip.Content>
+        </Tooltip>
+      );
+    }
+    return <span className="text-sm font-medium truncate max-w-[200px]">{name}</span>;
+  };
+
   return (
-    <div className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 items-center px-4 py-2 hover:bg-accent/50 rounded-md transition-colors">
+    <div className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 items-center px-4 py-2 rounded-md transition-colors">
       {/* Task Name and Status Icon Column */}
       <div className="flex items-center gap-3">
         {getStatusIcon(taskStatus)}
-        <span className="text-sm font-medium truncate max-w-[200px]">{name}</span>
+        <TaskName />
       </div>
 
       {/* Status Select Column */}
