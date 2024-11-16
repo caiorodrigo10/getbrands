@@ -4,14 +4,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-type AssigneeType = "client" | "account_manager" | "designer" | "none";
+export type AssigneeType = "client" | "account_manager" | "designer" | "none" | `admin-${string}`;
 
 interface TaskAssigneeSelectProps {
   assignee: AssigneeType;
   onAssigneeChange: (assignee: AssigneeType) => void;
 }
 
-const ASSIGNEE_DATA: Record<AssigneeType, { name: string; image: string }> = {
+const ASSIGNEE_DATA: Record<string, { name: string; image: string }> = {
   client: {
     name: "Client",
     image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=100&h=100&fit=crop",
@@ -31,8 +31,6 @@ const ASSIGNEE_DATA: Record<AssigneeType, { name: string; image: string }> = {
 };
 
 export const TaskAssigneeSelect = ({ assignee = "none", onAssigneeChange }: TaskAssigneeSelectProps) => {
-  const currentAssignee = ASSIGNEE_DATA[assignee] || ASSIGNEE_DATA.none;
-
   const { data: adminUsers } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
@@ -45,6 +43,20 @@ export const TaskAssigneeSelect = ({ assignee = "none", onAssigneeChange }: Task
       return data;
     }
   });
+
+  const getAssigneeData = (assigneeId: AssigneeType) => {
+    if (assigneeId.startsWith('admin-')) {
+      const adminId = assigneeId.replace('admin-', '');
+      const admin = adminUsers?.find(u => u.id === adminId);
+      return admin ? {
+        name: `${admin.first_name} ${admin.last_name}`,
+        image: admin.avatar_url || '',
+      } : ASSIGNEE_DATA.none;
+    }
+    return ASSIGNEE_DATA[assigneeId] || ASSIGNEE_DATA.none;
+  };
+
+  const currentAssignee = getAssigneeData(assignee);
 
   return (
     <Select value={assignee} onValueChange={(value) => onAssigneeChange(value as AssigneeType)}>
@@ -76,7 +88,7 @@ export const TaskAssigneeSelect = ({ assignee = "none", onAssigneeChange }: Task
           </SelectItem>
         ))}
         {adminUsers?.map((admin) => (
-          <SelectItem key={admin.id} value={admin.id}>
+          <SelectItem key={admin.id} value={`admin-${admin.id}`}>
             <div className="flex items-center gap-2">
               <Avatar className="h-5 w-5">
                 <AvatarImage src={admin.avatar_url || ''} />

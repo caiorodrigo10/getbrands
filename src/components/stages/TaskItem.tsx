@@ -1,13 +1,12 @@
 import { Check, Clock, AlertCircle, Ban, Calendar, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { TaskStatusSelect } from "./TaskStatusSelect";
-import { TaskAssigneeSelect } from "./TaskAssigneeSelect";
+import { TaskAssigneeSelect, AssigneeType } from "./TaskAssigneeSelect";
 import { TaskDatePicker } from "./TaskDatePicker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "../ui/button";
 
 type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
-type AssigneeType = "client" | "account_manager" | "designer" | "none" | string;
 
 interface TaskItemProps {
   name: string;
