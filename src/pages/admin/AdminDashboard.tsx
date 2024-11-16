@@ -4,6 +4,7 @@ import StatsCard from "@/components/admin/dashboard/StatsCard";
 import SalesFunnel from "@/components/admin/dashboard/SalesFunnel";
 import MonthlyRevenue from "@/components/admin/dashboard/MonthlyRevenue";
 import ProjectStatus from "@/components/admin/dashboard/ProjectStatus";
+import QuizFunnelAnalysis from "@/components/admin/reports/QuizFunnelAnalysis";
 
 const recentActivities = [
   {
@@ -97,6 +98,8 @@ const AdminDashboard = () => {
         <SalesFunnel />
         <MonthlyRevenue />
       </div>
+
+      <QuizFunnelAnalysis />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ProjectStatus />
