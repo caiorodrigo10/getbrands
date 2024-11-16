@@ -1,9 +1,10 @@
-import { Check, Clock, AlertCircle, Ban, Calendar } from "lucide-react";
+import { Check, Clock, AlertCircle, Ban, Calendar, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { TaskStatusSelect } from "./TaskStatusSelect";
 import { TaskAssigneeSelect } from "./TaskAssigneeSelect";
 import { TaskDatePicker } from "./TaskDatePicker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "../ui/button";
 
 type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
 type AssigneeType = "client" | "account_manager" | "designer" | "none";
@@ -16,6 +17,7 @@ interface TaskItemProps {
   endDate?: Date;
   assignee?: AssigneeType;
   onUpdate: (newName: string) => void;
+  onDelete: () => void;
 }
 
 const getStatusIcon = (status: TaskStatus) => {
@@ -41,7 +43,8 @@ export const TaskItem = ({
   startDate, 
   endDate, 
   assignee = "none",
-  onUpdate 
+  onUpdate,
+  onDelete
 }: TaskItemProps) => {
   const [taskStatus, setTaskStatus] = useState<TaskStatus>(status);
   const [taskAssignee, setTaskAssignee] = useState<AssigneeType>(assignee);
@@ -50,7 +53,7 @@ export const TaskItem = ({
 
   const isTextTruncated = (text: string) => {
     const tempDiv = document.createElement('div');
-    tempDiv.style.cssText = 'position: absolute; visibility: hidden; width: 200px;'; // Approximate width of task name column
+    tempDiv.style.cssText = 'position: absolute; visibility: hidden; width: 200px;';
     tempDiv.textContent = text;
     document.body.appendChild(tempDiv);
     const isTruncated = tempDiv.scrollWidth > tempDiv.clientWidth;
@@ -75,14 +78,20 @@ export const TaskItem = ({
   };
 
   return (
-    <div className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 items-center px-4 py-2 rounded-md transition-colors">
-      {/* Task Name and Status Icon Column */}
+    <div className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 items-center px-4 py-2 rounded-md transition-colors group">
       <div className="flex items-center gap-3">
         {getStatusIcon(taskStatus)}
         <TaskName />
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onDelete}
+          className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 ml-auto"
+        >
+          <Trash2 className="h-4 w-4 text-destructive" />
+        </Button>
       </div>
 
-      {/* Status Select Column */}
       <div className="min-w-[100px]">
         <TaskStatusSelect 
           status={taskStatus} 
@@ -90,7 +99,6 @@ export const TaskItem = ({
         />
       </div>
 
-      {/* Assignee Column */}
       <div>
         <TaskAssigneeSelect 
           assignee={taskAssignee} 
@@ -98,7 +106,6 @@ export const TaskItem = ({
         />
       </div>
 
-      {/* Start Date Column */}
       <div>
         <TaskDatePicker
           date={taskStartDate}
@@ -106,7 +113,6 @@ export const TaskItem = ({
         />
       </div>
 
-      {/* End Date Column */}
       <div>
         <TaskDatePicker
           date={taskEndDate}
