@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 
-interface Project {
-  id: number;
+interface FormattedProject {
+  id: string;
   name: string;
   client: string;
   email: string;
@@ -18,7 +18,7 @@ interface Project {
 }
 
 interface AdminProjectsTableProps {
-  projects: Project[];
+  projects: FormattedProject[];
 }
 
 const AdminProjectsTable = ({ projects }: AdminProjectsTableProps) => {

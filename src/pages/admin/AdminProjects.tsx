@@ -37,6 +37,7 @@ const AdminProjects = () => {
         .select(`
           *,
           profiles:user_id (
+            id,
             first_name,
             last_name,
             email,
@@ -47,7 +48,7 @@ const AdminProjects = () => {
 
       if (error) throw error;
       
-      const formattedProjects: FormattedProject[] = (data as ProjectWithProfile[]).map(project => ({
+      const formattedProjects: FormattedProject[] = (data as unknown as ProjectWithProfile[]).map(project => ({
         id: project.id,
         name: project.name,
         client: `${project.profiles?.first_name || ''} ${project.profiles?.last_name || ''}`.trim(),

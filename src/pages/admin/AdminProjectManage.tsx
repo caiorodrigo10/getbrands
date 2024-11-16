@@ -47,6 +47,7 @@ const AdminProjectManage = () => {
         .select(`
           *,
           profiles:user_id (
+            id,
             first_name,
             last_name,
             email,
@@ -62,7 +63,7 @@ const AdminProjectManage = () => {
 
       if (error) throw error;
       
-      const projectData = data as ProjectWithProfile;
+      const projectData = data as unknown as ProjectWithProfile;
       
       const formattedProject: FormattedProject = {
         id: projectData.id,
