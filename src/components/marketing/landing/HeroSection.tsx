@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button";
 
 export const HeroSection = () => {
   return (
-    <section className="bg-primary relative overflow-hidden py-12">
-      <div className="container mx-auto px-4 flex flex-col lg:flex-row items-center gap-12">
+    <section className="bg-primary relative overflow-hidden py-8">
+      <div className="container mx-auto px-4 flex flex-col lg:flex-row items-center gap-8">
         <div className="flex-1">
           <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">
             Your brand. Our expertise.
