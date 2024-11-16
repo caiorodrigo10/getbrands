@@ -1,11 +1,7 @@
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
-import { TaskItem } from "./stages/TaskItem";
-import { StageHeader } from "./stages/StageHeader";
-import { AddTaskButton } from "./stages/AddTaskButton";
-import { AddStageButton } from "./stages/AddStageButton";
-import { StageActions } from "./stages/StageActions";
 import { useState } from "react";
 import { toast } from "sonner";
+import { StagesList } from "./stages/StagesList";
+import { AddStageButton } from "./stages/AddStageButton";
 
 export type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
 export type AssigneeType = "none" | string;
@@ -206,59 +202,15 @@ const StagesTimeline = () => {
 
   return (
     <div className="space-y-4">
-      <div className="space-y-4">
-        {stages.map((stage) => (
-          <AccordionItem 
-            key={stage.name} 
-            value={stage.name}
-            className="border rounded-lg bg-card"
-          >
-            <div className="flex items-center justify-between px-4">
-              <div 
-                className="flex-1 cursor-pointer py-4"
-                onClick={() => toggleStage(stage.name)}
-              >
-                <StageHeader name={stage.name} status={stage.status} />
-              </div>
-              <StageActions onDeleteStage={() => handleDeleteStage(stage.name)} />
-            </div>
-            {openStages.includes(stage.name) && (
-              <div className="pb-3">
-                <div className="space-y-1">
-                  <div className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 px-4 py-2 text-sm font-medium text-muted-foreground">
-                    <div>Task</div>
-                    <div>Status</div>
-                    <div>Assignee</div>
-                    <div>Start</div>
-                    <div>End</div>
-                  </div>
-                  
-                  {stage.tasks.map((task, taskIndex) => (
-                    <TaskItem
-                      key={taskIndex}
-                      id={task.id}
-                      name={task.name}
-                      status={task.status}
-                      date={task.date}
-                      startDate={task.startDate}
-                      endDate={task.endDate}
-                      assignee={task.assignee}
-                      onUpdate={(newName) => handleTaskUpdate(stage.name, taskIndex, newName)}
-                      onDelete={() => handleDeleteTask(stage.name, taskIndex)}
-                    />
-                  ))}
-                  
-                  <AddTaskButton 
-                    stageName={stage.name}
-                    onAddTask={(taskData) => handleAddTask(stage.name, taskData)}
-                  />
-                </div>
-              </div>
-            )}
-          </AccordionItem>
-        ))}
-      </div>
-      
+      <StagesList
+        stages={stages}
+        openStages={openStages}
+        onToggleStage={toggleStage}
+        onTaskUpdate={handleTaskUpdate}
+        onAddTask={handleAddTask}
+        onDeleteTask={handleDeleteTask}
+        onDeleteStage={handleDeleteStage}
+      />
       <AddStageButton onAddStage={handleAddStage} />
     </div>
   );

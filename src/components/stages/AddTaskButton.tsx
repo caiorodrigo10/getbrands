@@ -29,6 +29,7 @@ export const AddTaskButton = ({ stageName, onAddTask }: AddTaskButtonProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onAddTask({
+      id: crypto.randomUUID(), // Generate a unique ID for the new task
       name: taskName,
       status,
       assignee,
