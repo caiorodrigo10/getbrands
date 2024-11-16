@@ -18,12 +18,13 @@ export const TaskDatePicker = ({ date, onDateChange }: TaskDatePickerProps) => {
           {date ? format(date, "MM/dd") : "Set"}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className="w-auto p-0 bg-white" align="start">
         <CalendarComponent
           mode="single"
           selected={date}
           onSelect={onDateChange}
           initialFocus
+          className="rounded-md border w-[250px]"
         />
       </PopoverContent>
     </Popover>

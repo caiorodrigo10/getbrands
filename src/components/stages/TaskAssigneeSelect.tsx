@@ -15,7 +15,7 @@ const ASSIGNEE_DATA = {
     image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=100&h=100&fit=crop",
   },
   account_manager: {
-    name: "AM",
+    name: "Account Manager",
     image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=100&h=100&fit=crop",
   },
   designer: {
@@ -31,7 +31,7 @@ const ASSIGNEE_DATA = {
 export const TaskAssigneeSelect = ({ assignee, onAssigneeChange }: TaskAssigneeSelectProps) => {
   return (
     <Select value={assignee} onValueChange={(value) => onAssigneeChange(value as AssigneeType)}>
-      <SelectTrigger className="h-7 w-[100px]">
+      <SelectTrigger className="h-7">
         <SelectValue>
           <div className="flex items-center gap-1.5">
             <Avatar className="h-5 w-5">
@@ -40,7 +40,7 @@ export const TaskAssigneeSelect = ({ assignee, onAssigneeChange }: TaskAssigneeS
                 <User2 className="h-3 w-3" />
               </AvatarFallback>
             </Avatar>
-            <span className="truncate">{ASSIGNEE_DATA[assignee].name}</span>
+            <span>{ASSIGNEE_DATA[assignee].name}</span>
           </div>
         </SelectValue>
       </SelectTrigger>
@@ -54,7 +54,7 @@ export const TaskAssigneeSelect = ({ assignee, onAssigneeChange }: TaskAssigneeS
                   <User2 className="h-3 w-3" />
                 </AvatarFallback>
               </Avatar>
-              <span className="truncate">{data.name}</span>
+              <span>{data.name}</span>
             </div>
           </SelectItem>
         ))}

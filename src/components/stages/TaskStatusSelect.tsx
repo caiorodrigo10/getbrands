@@ -38,18 +38,17 @@ const STATUS_DATA = {
 export const TaskStatusSelect = ({ status, onStatusChange }: TaskStatusSelectProps) => {
   return (
     <Select value={status} onValueChange={(value) => onStatusChange(value as TaskStatus)}>
-      <SelectTrigger className="h-7 whitespace-nowrap">
-        <div className="flex items-center gap-1.5">
-          {STATUS_DATA[status].icon}
-          <SelectValue className="whitespace-nowrap" />
-        </div>
+      <SelectTrigger className="h-7">
+        <SelectValue>
+          {STATUS_DATA[status].label}
+        </SelectValue>
       </SelectTrigger>
       <SelectContent>
         {Object.entries(STATUS_DATA).map(([key, data]) => (
           <SelectItem key={key} value={key}>
             <div className="flex items-center gap-2">
               {data.icon}
-              <span className="whitespace-nowrap">{data.label}</span>
+              <span>{data.label}</span>
             </div>
           </SelectItem>
         ))}

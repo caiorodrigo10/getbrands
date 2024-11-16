@@ -49,7 +49,7 @@ export const TaskItem = ({
 
   return (
     <div className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 items-center px-4 py-2 hover:bg-accent/50 rounded-md transition-colors">
-      {/* Task Name and Status Column */}
+      {/* Task Name and Status Icon Column */}
       <div className="flex items-center gap-3">
         {getStatusIcon(taskStatus)}
         <span className="text-sm font-medium truncate max-w-[200px]">{name}</span>
