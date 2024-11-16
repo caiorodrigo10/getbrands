@@ -1,70 +1,62 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { TaskStatus, Task } from "../StagesTimeline";
+import { Button } from "../ui/button";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { Input } from "../ui/input";
+import { useState } from "react";
+import { Task, TaskStatus } from "../StagesTimeline";
 
-interface AddTaskButtonProps {
-  stageName: string;
-  onAddTask: (taskData: Task) => Promise<void>;
+interface AddStageButtonProps {
+  onAddStage: (stageName: string) => Promise<void>;
 }
 
-export const AddTaskButton = ({ stageName, onAddTask }: AddTaskButtonProps) => {
+export const AddStageButton = ({ onAddStage }: AddStageButtonProps) => {
+  const [stageName, setStageName] = useState("");
   const [open, setOpen] = useState(false);
-  const [taskName, setTaskName] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!taskName.trim()) {
+    if (!stageName.trim()) {
       return;
     }
     
-    const newTask: Task = {
-      id: crypto.randomUUID(),
-      name: taskName,
-      status: "pending" as TaskStatus,
-      assignee: "none",
-      startDate: new Date(),
-      endDate: new Date()
-    };
-    
     try {
-      await onAddTask(newTask);
-      setTaskName("");
+      await onAddStage(stageName);
+      setStageName("");
       setOpen(false);
     } catch (error) {
-      console.error('Failed to add task:', error);
-      toast.error("Failed to add task");
+      console.error('Failed to add stage:', error);
+      toast.error("Failed to add stage");
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="w-full">
+        <Button className="w-full mt-4">
           <Plus className="h-4 w-4 mr-2" />
-          Add Task
+          Add New Stage
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Task to {stageName}</DialogTitle>
+          <DialogTitle>Add New Project Stage</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="taskName">Task Name</Label>
+          <div>
             <Input
-              id="taskName"
-              value={taskName}
-              onChange={(e) => setTaskName(e.target.value)}
-              placeholder="Enter task name"
+              placeholder="Stage name"
+              value={stageName}
+              onChange={(e) => setStageName(e.target.value)}
             />
           </div>
-          <Button type="submit" className="w-full">
-            Add Task
-          </Button>
+          <Button type="submit" className="w-full">Add Stage</Button>
         </form>
       </DialogContent>
     </Dialog>
