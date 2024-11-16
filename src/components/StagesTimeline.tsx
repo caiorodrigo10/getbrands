@@ -8,7 +8,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
-export type AssigneeType = "client" | "account_manager" | "designer" | "none" | string;
+export type AssigneeType = "none" | string;
 
 export interface Task {
   name: string;
@@ -49,7 +49,7 @@ const StagesTimeline = () => {
           date: "10/03/2024",
           startDate: new Date("2024-03-10"),
           endDate: new Date("2024-03-10"),
-          assignee: "account_manager"
+          assignee: "none"
         }
       ]
     },
@@ -63,7 +63,7 @@ const StagesTimeline = () => {
           date: "15/03/2024",
           startDate: new Date("2024-03-15"),
           endDate: new Date("2024-03-15"),
-          assignee: "client"
+          assignee: "none"
         }
       ]
     },
@@ -77,19 +77,19 @@ const StagesTimeline = () => {
           date: "18/03/2024",
           startDate: new Date("2024-03-18"),
           endDate: new Date("2024-03-18"),
-          assignee: "client"
+          assignee: "none"
         },
         {
           name: "Team Archived Name Options for Client",
           status: "in_progress",
           date: "In Progress",
           startDate: new Date("2024-03-20"),
-          assignee: "designer"
+          assignee: "none"
         },
         {
           name: "Client Approved Name",
           status: "todo",
-          assignee: "client"
+          assignee: "none"
         }
       ]
     },
@@ -99,51 +99,18 @@ const StagesTimeline = () => {
       tasks: [
         {
           name: "Client Fill Visual Identity Form",
-          status: "blocked"
+          status: "blocked",
+          assignee: "none"
         },
         {
           name: "Team Completed Visual Identity and Archived Presentation",
-          status: "todo"
+          status: "todo",
+          assignee: "none"
         },
         {
           name: "Client Approved Visual Identity",
-          status: "todo"
-        }
-      ]
-    },
-    {
-      name: "Package Design",
-      status: "pending",
-      tasks: [
-        {
-          name: "Client Filled Brief and References",
-          status: "todo"
-        },
-        {
-          name: "Team Completed Packages and Archived Materials",
-          status: "todo"
-        },
-        {
-          name: "Client Approved Packages",
-          status: "todo"
-        }
-      ]
-    },
-    {
-      name: "E-commerce",
-      status: "pending",
-      tasks: [
-        {
-          name: "Client Filled E-commerce Brief",
-          status: "not_included"
-        },
-        {
-          name: "Team Created E-commerce and Configurations",
-          status: "not_included"
-        },
-        {
-          name: "Client Approved E-commerce",
-          status: "not_included"
+          status: "todo",
+          assignee: "none"
         }
       ]
     }
@@ -166,7 +133,7 @@ const StagesTimeline = () => {
     );
   };
 
-  const handleAddTask = (stageName: string, taskData: any) => {
+  const handleAddTask = (stageName: string, taskData: Task) => {
     setStages(prevStages =>
       prevStages.map(stage => {
         if (stage.name === stageName) {

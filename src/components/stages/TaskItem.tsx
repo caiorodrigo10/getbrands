@@ -81,8 +81,8 @@ export const TaskItem = ({
 
       <div>
         <TaskAssigneeSelect 
-          assignee={taskAssignee as AssigneeType} 
-          onAssigneeChange={(value) => setTaskAssignee(value)} 
+          assignee={taskAssignee}
+          onAssigneeChange={setTaskAssignee}
         />
       </div>
 
