@@ -1,12 +1,13 @@
 import { Check, Clock, AlertCircle, Ban, Calendar, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { TaskStatusSelect } from "./TaskStatusSelect";
-import { TaskAssigneeSelect, AssigneeType } from "./TaskAssigneeSelect";
+import { TaskAssigneeSelect } from "./TaskAssigneeSelect";
 import { TaskDatePicker } from "./TaskDatePicker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "../ui/button";
 
 type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
+type AssigneeType = "client" | "account_manager" | "designer" | "none" | string;
 
 interface TaskItemProps {
   name: string;
@@ -17,7 +18,6 @@ interface TaskItemProps {
   assignee?: AssigneeType;
   onUpdate: (newName: string) => void;
   onDelete: () => void;
-  onAssigneeChange: (newAssignee: AssigneeType) => void;
 }
 
 const getStatusIcon = (status: TaskStatus) => {
@@ -44,10 +44,12 @@ export const TaskItem = ({
   endDate, 
   assignee = "none",
   onUpdate,
-  onDelete,
-  onAssigneeChange
+  onDelete
 }: TaskItemProps) => {
   const [taskStatus, setTaskStatus] = useState<TaskStatus>(status);
+  const [taskAssignee, setTaskAssignee] = useState<AssigneeType>(assignee);
+  const [taskStartDate, setTaskStartDate] = useState<Date | undefined>(startDate);
+  const [taskEndDate, setTaskEndDate] = useState<Date | undefined>(endDate);
 
   const isTextTruncated = (text: string) => {
     const tempDiv = document.createElement('div');
@@ -99,22 +101,22 @@ export const TaskItem = ({
 
       <div>
         <TaskAssigneeSelect 
-          assignee={assignee} 
-          onAssigneeChange={onAssigneeChange} 
+          assignee={taskAssignee} 
+          onAssigneeChange={setTaskAssignee} 
         />
       </div>
 
       <div>
         <TaskDatePicker
-          date={startDate}
-          onDateChange={() => {}}
+          date={taskStartDate}
+          onDateChange={setTaskStartDate}
         />
       </div>
 
       <div>
         <TaskDatePicker
-          date={endDate}
-          onDateChange={() => {}}
+          date={taskEndDate}
+          onDateChange={setTaskEndDate}
         />
       </div>
     </div>
