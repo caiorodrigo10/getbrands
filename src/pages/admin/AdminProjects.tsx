@@ -3,6 +3,14 @@ import { Input } from "@/components/ui/input";
 import AdminProjectsTable from "@/components/admin/projects/AdminProjectsTable";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
+type Project = Database['public']['Tables']['projects']['Row'];
+
+interface ProjectWithDetails extends Project {
+  profiles?: Profile | null;
+}
 
 const AdminProjects = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,24 +27,21 @@ const AdminProjects = () => {
             last_name,
             email,
             phone
-          ),
-          project_products (
-            id
           )
         `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       
-      return data?.map(project => ({
+      return data?.map((project: ProjectWithDetails) => ({
         id: project.id,
         name: project.name,
         client: `${project.profiles?.first_name || ''} ${project.profiles?.last_name || ''}`.trim(),
         email: project.profiles?.email || '',
         phone: project.profiles?.phone || '',
         status: project.status === 'em_andamento' ? 'Active' : 'Completed',
-        progress: 65, // We'll keep this static for now as it's calculated from tasks
-        accountManager: "Sarah Johnson", // This could be added to the projects table later
+        progress: 65,
+        accountManager: "Sarah Johnson",
         points: project.points || 0,
         lastUpdate: "Product selection phase completed",
         updatedAt: project.updated_at

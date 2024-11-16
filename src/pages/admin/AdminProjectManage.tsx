@@ -7,6 +7,14 @@ import { ArrowLeft } from "lucide-react";
 import StagesTimeline from "@/components/StagesTimeline";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
+type Project = Database['public']['Tables']['projects']['Row'];
+
+interface ProjectWithDetails extends Project {
+  profiles?: Profile | null;
+}
 
 const AdminProjectManage = () => {
   const navigate = useNavigate();
@@ -38,25 +46,27 @@ const AdminProjectManage = () => {
 
       if (error) throw error;
       
+      const projectData = data as ProjectWithDetails;
+      
       return {
-        ...data,
+        ...projectData,
         client: {
-          name: `${data.profiles?.first_name || ''} ${data.profiles?.last_name || ''}`.trim(),
-          email: data.profiles?.email || '',
-          phone: data.profiles?.phone || '',
+          name: `${projectData.profiles?.first_name || ''} ${projectData.profiles?.last_name || ''}`.trim(),
+          email: projectData.profiles?.email || '',
+          phone: projectData.profiles?.phone || '',
           address: [
-            data.profiles?.shipping_address_street,
-            data.profiles?.shipping_address_city,
-            data.profiles?.shipping_address_state,
-            data.profiles?.shipping_address_zip
+            projectData.profiles?.shipping_address_street,
+            projectData.profiles?.shipping_address_city,
+            projectData.profiles?.shipping_address_state,
+            projectData.profiles?.shipping_address_zip
           ].filter(Boolean).join(', ')
         },
-        status: data.status === 'em_andamento' ? 'Active' : 'Completed',
+        status: projectData.status === 'em_andamento' ? 'Active' : 'Completed',
         progress: 35,
         accountManager: "Michael Anderson",
         lastUpdate: "Naming phase in progress",
-        startDate: new Date(data.created_at).toLocaleDateString('en-US'),
-        expectedCompletion: new Date(new Date(data.created_at).setMonth(new Date(data.created_at).getMonth() + 3)).toLocaleDateString('en-US')
+        startDate: new Date(projectData.created_at).toLocaleDateString('en-US'),
+        expectedCompletion: new Date(new Date(projectData.created_at).setMonth(new Date(projectData.created_at).getMonth() + 3)).toLocaleDateString('en-US')
       };
     },
     enabled: !!id
