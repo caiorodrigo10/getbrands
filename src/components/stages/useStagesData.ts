@@ -75,7 +75,7 @@ export const useStagesData = (projectId: string) => {
         .eq('id', taskId);
 
       if (error) throw error;
-      await fetchProjectTasks(); // Refresh data
+      await fetchProjectTasks();
       toast.success("Task updated successfully");
     } catch (error) {
       console.error('Error updating task:', error);
@@ -84,7 +84,7 @@ export const useStagesData = (projectId: string) => {
     }
   };
 
-  const addTaskToDatabase = async (stageName: string, taskData: Task) => {
+  const addTaskToDatabase = async (stageName: string, taskData: Task): Promise<void> => {
     try {
       const { error } = await supabase
         .from('project_tasks')
@@ -99,7 +99,7 @@ export const useStagesData = (projectId: string) => {
         });
 
       if (error) throw error;
-      await fetchProjectTasks(); // Refresh data
+      await fetchProjectTasks();
       toast.success("Task added successfully");
     } catch (error) {
       console.error('Error adding task:', error);
@@ -116,7 +116,7 @@ export const useStagesData = (projectId: string) => {
         .eq('id', taskId);
 
       if (error) throw error;
-      await fetchProjectTasks(); // Refresh data
+      await fetchProjectTasks();
       toast.success("Task deleted successfully");
     } catch (error) {
       console.error('Error deleting task:', error);
@@ -137,7 +137,7 @@ export const useStagesData = (projectId: string) => {
         });
 
       if (error) throw error;
-      await fetchProjectTasks(); // Refresh data
+      await fetchProjectTasks();
       toast.success("Stage added successfully");
     } catch (error) {
       console.error('Error adding stage:', error);
@@ -155,7 +155,7 @@ export const useStagesData = (projectId: string) => {
         .eq('stage_name', stageName);
 
       if (error) throw error;
-      await fetchProjectTasks(); // Refresh data
+      await fetchProjectTasks();
       toast.success("Stage deleted successfully");
     } catch (error) {
       console.error('Error deleting stage:', error);

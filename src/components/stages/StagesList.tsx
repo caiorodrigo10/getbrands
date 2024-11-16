@@ -21,7 +21,7 @@ interface StagesListProps {
   openStages: string[];
   onToggleStage: (stageName: string) => void;
   onTaskUpdate: (stageName: string, taskIndex: number, updates: Partial<Task>) => void;
-  onAddTask: (stageName: string, taskData: Task) => void;
+  onAddTask: (stageName: string, taskData: Task) => Promise<void>;
   onDeleteTask: (stageName: string, taskIndex: number) => void;
   onDeleteStage: (stageName: string) => void;
 }

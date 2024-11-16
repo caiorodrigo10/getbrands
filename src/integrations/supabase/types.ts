@@ -541,6 +541,7 @@ export type Database = {
           id: string
           project_id: string | null
           stage_name: string
+          start_date: string | null
           status: string | null
           title: string
           updated_at: string
@@ -553,6 +554,7 @@ export type Database = {
           id?: string
           project_id?: string | null
           stage_name: string
+          start_date?: string | null
           status?: string | null
           title: string
           updated_at?: string
@@ -565,6 +567,7 @@ export type Database = {
           id?: string
           project_id?: string | null
           stage_name?: string
+          start_date?: string | null
           status?: string | null
           title?: string
           updated_at?: string
