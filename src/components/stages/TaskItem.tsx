@@ -48,37 +48,34 @@ export const TaskItem = ({
   const [taskEndDate, setTaskEndDate] = useState<Date | undefined>(endDate);
 
   return (
-    <div className="grid grid-cols-[auto_1fr_auto] gap-4 items-center p-2 rounded-md bg-background/50 hover:bg-background/80 transition-colors">
-      <div className="flex items-center gap-2">
-        {getStatusIcon(taskStatus)}
-        <span className="text-sm font-medium">{name}</span>
-      </div>
-
-      <div className="flex items-center justify-center">
+    <div className="grid grid-cols-[1fr_auto_auto] gap-6 items-center p-2 rounded-md bg-background/50 hover:bg-background/80 transition-colors">
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {getStatusIcon(taskStatus)}
+          <span className="text-sm font-medium whitespace-nowrap">{name}</span>
+        </div>
         <TaskStatusSelect 
           status={taskStatus} 
           onStatusChange={setTaskStatus} 
         />
       </div>
       
-      <div className="flex items-center gap-3">
-        <TaskAssigneeSelect 
-          assignee={taskAssignee} 
-          onAssigneeChange={setTaskAssignee} 
-        />
+      <TaskAssigneeSelect 
+        assignee={taskAssignee} 
+        onAssigneeChange={setTaskAssignee} 
+      />
 
-        <div className="flex items-center gap-2">
-          <TaskDatePicker
-            label="Start"
-            date={taskStartDate}
-            onDateChange={setTaskStartDate}
-          />
-          <TaskDatePicker
-            label="End"
-            date={taskEndDate}
-            onDateChange={setTaskEndDate}
-          />
-        </div>
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <TaskDatePicker
+          label="Start"
+          date={taskStartDate}
+          onDateChange={setTaskStartDate}
+        />
+        <TaskDatePicker
+          label="End"
+          date={taskEndDate}
+          onDateChange={setTaskEndDate}
+        />
       </div>
     </div>
   );
