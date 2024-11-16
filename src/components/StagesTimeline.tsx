@@ -11,6 +11,7 @@ export type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "schedule
 export type AssigneeType = "none" | string;
 
 export interface Task {
+  id: string;
   name: string;
   status: TaskStatus;
   date?: string;
@@ -44,6 +45,7 @@ const StagesTimeline = () => {
       status: "completed",
       tasks: [
         { 
+          id: "1",
           name: "Welcome Meeting",
           status: "done",
           date: "10/03/2024",
@@ -58,6 +60,7 @@ const StagesTimeline = () => {
       status: "completed",
       tasks: [
         {
+          id: "2",
           name: "Client Successfully Selected Products",
           status: "done",
           date: "15/03/2024",
@@ -72,6 +75,7 @@ const StagesTimeline = () => {
       status: "in-progress",
       tasks: [
         {
+          id: "3",
           name: "Client Fill Naming Brief Form",
           status: "done",
           date: "18/03/2024",
@@ -80,6 +84,7 @@ const StagesTimeline = () => {
           assignee: "none"
         },
         {
+          id: "4",
           name: "Team Archived Name Options for Client",
           status: "in_progress",
           date: "In Progress",
@@ -87,6 +92,7 @@ const StagesTimeline = () => {
           assignee: "none"
         },
         {
+          id: "5",
           name: "Client Approved Name",
           status: "todo",
           assignee: "none"
@@ -98,16 +104,19 @@ const StagesTimeline = () => {
       status: "pending",
       tasks: [
         {
+          id: "6",
           name: "Client Fill Visual Identity Form",
           status: "blocked",
           assignee: "none"
         },
         {
+          id: "7",
           name: "Team Completed Visual Identity and Archived Presentation",
           status: "todo",
           assignee: "none"
         },
         {
+          id: "8",
           name: "Client Approved Visual Identity",
           status: "todo",
           assignee: "none"
@@ -115,6 +124,17 @@ const StagesTimeline = () => {
       ]
     }
   ]);
+
+  const [openStages, setOpenStages] = useState<string[]>([]);
+
+  const toggleStage = (stageName: string) => {
+    setOpenStages(prev => {
+      if (prev.includes(stageName)) {
+        return prev.filter(name => name !== stageName);
+      }
+      return [...prev, stageName];
+    });
+  };
 
   const handleTaskUpdate = (stageName: string, taskIndex: number, newName: string) => {
     setStages(prevStages => 
@@ -186,7 +206,7 @@ const StagesTimeline = () => {
 
   return (
     <div className="space-y-4">
-      <Accordion type="single" collapsible className="space-y-4">
+      <div className="space-y-4">
         {stages.map((stage) => (
           <AccordionItem 
             key={stage.name} 
@@ -194,44 +214,50 @@ const StagesTimeline = () => {
             className="border rounded-lg bg-card"
           >
             <div className="flex items-center justify-between px-4">
-              <AccordionTrigger className="flex-1 hover:no-underline">
+              <div 
+                className="flex-1 cursor-pointer py-4"
+                onClick={() => toggleStage(stage.name)}
+              >
                 <StageHeader name={stage.name} status={stage.status} />
-              </AccordionTrigger>
+              </div>
               <StageActions onDeleteStage={() => handleDeleteStage(stage.name)} />
             </div>
-            <AccordionContent className="pb-3">
-              <div className="space-y-1">
-                <div className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 px-4 py-2 text-sm font-medium text-muted-foreground">
-                  <div>Task</div>
-                  <div>Status</div>
-                  <div>Assignee</div>
-                  <div>Start</div>
-                  <div>End</div>
-                </div>
-                
-                {stage.tasks.map((task, taskIndex) => (
-                  <TaskItem
-                    key={taskIndex}
-                    name={task.name}
-                    status={task.status}
-                    date={task.date}
-                    startDate={task.startDate}
-                    endDate={task.endDate}
-                    assignee={task.assignee}
-                    onUpdate={(newName) => handleTaskUpdate(stage.name, taskIndex, newName)}
-                    onDelete={() => handleDeleteTask(stage.name, taskIndex)}
+            {openStages.includes(stage.name) && (
+              <div className="pb-3">
+                <div className="space-y-1">
+                  <div className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 px-4 py-2 text-sm font-medium text-muted-foreground">
+                    <div>Task</div>
+                    <div>Status</div>
+                    <div>Assignee</div>
+                    <div>Start</div>
+                    <div>End</div>
+                  </div>
+                  
+                  {stage.tasks.map((task, taskIndex) => (
+                    <TaskItem
+                      key={taskIndex}
+                      id={task.id}
+                      name={task.name}
+                      status={task.status}
+                      date={task.date}
+                      startDate={task.startDate}
+                      endDate={task.endDate}
+                      assignee={task.assignee}
+                      onUpdate={(newName) => handleTaskUpdate(stage.name, taskIndex, newName)}
+                      onDelete={() => handleDeleteTask(stage.name, taskIndex)}
+                    />
+                  ))}
+                  
+                  <AddTaskButton 
+                    stageName={stage.name}
+                    onAddTask={(taskData) => handleAddTask(stage.name, taskData)}
                   />
-                ))}
-                
-                <AddTaskButton 
-                  stageName={stage.name}
-                  onAddTask={(taskData) => handleAddTask(stage.name, taskData)}
-                />
+                </div>
               </div>
-            </AccordionContent>
+            )}
           </AccordionItem>
         ))}
-      </Accordion>
+      </div>
       
       <AddStageButton onAddStage={handleAddStage} />
     </div>

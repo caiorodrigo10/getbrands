@@ -1,13 +1,16 @@
 import { Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TaskStatusSelect } from "./TaskStatusSelect";
 import { TaskAssigneeSelect } from "./TaskAssigneeSelect";
 import { TaskDatePicker } from "./TaskDatePicker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "../ui/button";
 import { type TaskStatus, type AssigneeType } from "../StagesTimeline";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface TaskItemProps {
+  id: string;
   name: string;
   status: TaskStatus;
   date?: string;
@@ -16,21 +19,42 @@ interface TaskItemProps {
   assignee?: AssigneeType;
   onUpdate: (newName: string) => void;
   onDelete: () => void;
+  onAssigneeChange?: (newAssignee: AssigneeType) => void;
 }
 
 export const TaskItem = ({ 
+  id,
   name, 
   status, 
   startDate, 
   endDate, 
   assignee = "none",
   onUpdate,
-  onDelete
+  onDelete,
+  onAssigneeChange
 }: TaskItemProps) => {
   const [taskStatus, setTaskStatus] = useState<TaskStatus>(status);
   const [taskAssignee, setTaskAssignee] = useState<AssigneeType>(assignee);
   const [taskStartDate, setTaskStartDate] = useState<Date | undefined>(startDate);
   const [taskEndDate, setTaskEndDate] = useState<Date | undefined>(endDate);
+
+  const handleAssigneeChange = async (newAssignee: AssigneeType) => {
+    try {
+      const { error } = await supabase
+        .from('project_tasks')
+        .update({ assignee_id: newAssignee === 'none' ? null : newAssignee })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setTaskAssignee(newAssignee);
+      if (onAssigneeChange) onAssigneeChange(newAssignee);
+      toast.success("Assignee updated successfully");
+    } catch (error) {
+      console.error('Error updating assignee:', error);
+      toast.error("Failed to update assignee");
+    }
+  };
 
   const isTextTruncated = (text: string) => {
     const tempDiv = document.createElement('div');
@@ -82,7 +106,7 @@ export const TaskItem = ({
       <div>
         <TaskAssigneeSelect 
           assignee={taskAssignee}
-          onAssigneeChange={setTaskAssignee}
+          onAssigneeChange={handleAssigneeChange}
         />
       </div>
 
