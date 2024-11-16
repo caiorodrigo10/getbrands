@@ -3,7 +3,7 @@ import { useState } from "react";
 import { TaskStatusSelect } from "./TaskStatusSelect";
 import { TaskAssigneeSelect } from "./TaskAssigneeSelect";
 import { TaskDatePicker } from "./TaskDatePicker";
-import { Tooltip } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
 type AssigneeType = "client" | "account_manager" | "designer" | "none";
@@ -62,12 +62,12 @@ export const TaskItem = ({
     if (isTextTruncated(name)) {
       return (
         <Tooltip>
-          <Tooltip.Trigger>
+          <TooltipTrigger asChild>
             <span className="text-sm font-medium truncate max-w-[200px]">{name}</span>
-          </Tooltip.Trigger>
-          <Tooltip.Content>
+          </TooltipTrigger>
+          <TooltipContent>
             <p className="text-sm">{name}</p>
-          </Tooltip.Content>
+          </TooltipContent>
         </Tooltip>
       );
     }
