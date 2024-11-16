@@ -41,7 +41,7 @@ export const TaskStatusSelect = ({ status, onStatusChange }: TaskStatusSelectPro
       <SelectTrigger className="h-7 whitespace-nowrap">
         <div className="flex items-center gap-1.5">
           {STATUS_DATA[status].icon}
-          <SelectValue />
+          <SelectValue className="whitespace-nowrap" />
         </div>
       </SelectTrigger>
       <SelectContent>
@@ -49,7 +49,7 @@ export const TaskStatusSelect = ({ status, onStatusChange }: TaskStatusSelectPro
           <SelectItem key={key} value={key}>
             <div className="flex items-center gap-2">
               {data.icon}
-              <span>{data.label}</span>
+              <span className="whitespace-nowrap">{data.label}</span>
             </div>
           </SelectItem>
         ))}

@@ -74,7 +74,6 @@ export const TaskItem = ({
       {/* Start Date Column */}
       <div>
         <TaskDatePicker
-          label="Start"
           date={taskStartDate}
           onDateChange={setTaskStartDate}
         />
@@ -83,7 +82,6 @@ export const TaskItem = ({
       {/* End Date Column */}
       <div>
         <TaskDatePicker
-          label="End"
           date={taskEndDate}
           onDateChange={setTaskEndDate}
         />
