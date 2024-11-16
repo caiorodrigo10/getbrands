@@ -17,6 +17,7 @@ interface TaskItemProps {
   assignee?: AssigneeType;
   onUpdate: (newName: string) => void;
   onDelete: () => void;
+  onAssigneeChange: (newAssignee: AssigneeType) => void;
 }
 
 const getStatusIcon = (status: TaskStatus) => {
@@ -43,12 +44,10 @@ export const TaskItem = ({
   endDate, 
   assignee = "none",
   onUpdate,
-  onDelete
+  onDelete,
+  onAssigneeChange
 }: TaskItemProps) => {
   const [taskStatus, setTaskStatus] = useState<TaskStatus>(status);
-  const [taskAssignee, setTaskAssignee] = useState<AssigneeType>(assignee);
-  const [taskStartDate, setTaskStartDate] = useState<Date | undefined>(startDate);
-  const [taskEndDate, setTaskEndDate] = useState<Date | undefined>(endDate);
 
   const isTextTruncated = (text: string) => {
     const tempDiv = document.createElement('div');
@@ -100,22 +99,22 @@ export const TaskItem = ({
 
       <div>
         <TaskAssigneeSelect 
-          assignee={taskAssignee} 
-          onAssigneeChange={setTaskAssignee} 
+          assignee={assignee} 
+          onAssigneeChange={onAssigneeChange} 
         />
       </div>
 
       <div>
         <TaskDatePicker
-          date={taskStartDate}
-          onDateChange={setTaskStartDate}
+          date={startDate}
+          onDateChange={() => {}}
         />
       </div>
 
       <div>
         <TaskDatePicker
-          date={taskEndDate}
-          onDateChange={setTaskEndDate}
+          date={endDate}
+          onDateChange={() => {}}
         />
       </div>
     </div>

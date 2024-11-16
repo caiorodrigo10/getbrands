@@ -4,9 +4,12 @@ import { StageHeader } from "./stages/StageHeader";
 import { AddTaskButton } from "./stages/AddTaskButton";
 import { AddStageButton } from "./stages/AddStageButton";
 import { StageActions } from "./stages/StageActions";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { AssigneeType } from "./stages/TaskAssigneeSelect";
+import { useParams } from "react-router-dom";
+import { getProjectTasks, updateTaskAssignee } from "@/lib/tasks";
+import { useQuery } from "@tanstack/react-query";
 
 type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
 
@@ -38,118 +41,43 @@ const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
 };
 
 const StagesTimeline = () => {
-  const [stages, setStages] = useState<Stage[]>([
-    {
-      name: "Onboarding",
-      status: "completed",
-      tasks: [
-        { 
-          name: "Welcome Meeting",
-          status: "done",
-          date: "10/03/2024",
-          startDate: new Date("2024-03-10"),
-          endDate: new Date("2024-03-10"),
-          assignee: "none"
-        }
-      ]
-    },
-    {
-      name: "Product Selection",
-      status: "completed",
-      tasks: [
-        {
-          name: "Client Successfully Selected Products",
-          status: "done",
-          date: "15/03/2024",
-          startDate: new Date("2024-03-15"),
-          endDate: new Date("2024-03-15"),
-          assignee: "none"
-        }
-      ]
-    },
-    {
-      name: "Naming",
-      status: "in-progress",
-      tasks: [
-        {
-          name: "Client Fill Naming Brief Form",
-          status: "done",
-          date: "18/03/2024",
-          startDate: new Date("2024-03-18"),
-          endDate: new Date("2024-03-18"),
-          assignee: "none"
-        },
-        {
-          name: "Team Archived Name Options for Client",
-          status: "in_progress",
-          date: "In Progress",
-          startDate: new Date("2024-03-20"),
-          assignee: "none"
-        },
-        {
-          name: "Client Approved Name",
-          status: "todo",
-          assignee: "none"
-        }
-      ]
-    },
-    {
-      name: "Visual Identity",
-      status: "pending",
-      tasks: [
-        {
-          name: "Client Fill Visual Identity Form",
-          status: "blocked"
-        },
-        {
-          name: "Team Completed Visual Identity and Archived Presentation",
-          status: "todo"
-        },
-        {
-          name: "Client Approved Visual Identity",
-          status: "todo"
-        }
-      ]
-    },
-    {
-      name: "Package Design",
-      status: "pending",
-      tasks: [
-        {
-          name: "Client Filled Brief and References",
-          status: "todo"
-        },
-        {
-          name: "Team Completed Packages and Archived Materials",
-          status: "todo"
-        },
-        {
-          name: "Client Approved Packages",
-          status: "todo"
-        }
-      ]
-    },
-    {
-      name: "E-commerce",
-      status: "pending",
-      tasks: [
-        {
-          name: "Client Filled E-commerce Brief",
-          status: "not_included"
-        },
-        {
-          name: "Team Created E-commerce and Configurations",
-          status: "not_included"
-        },
-        {
-          name: "Client Approved E-commerce",
-          status: "not_included"
-        }
-      ]
-    }
-  ]);
+  const { id: projectId } = useParams<{ id: string }>();
+  const [stages, setStages] = useState<Stage[]>([]);
 
-  const handleTaskUpdate = (stageName: string, taskIndex: number, newName: string) => {
+  const { data: tasks, refetch: refetchTasks } = useQuery({
+    queryKey: ['project-tasks', projectId],
+    queryFn: () => projectId ? getProjectTasks(projectId) : Promise.resolve([]),
+    enabled: !!projectId
+  });
+
+  useEffect(() => {
+    if (tasks) {
+      // Group tasks by stage and convert to our Stage format
+      const groupedTasks = tasks.reduce((acc: Record<string, Task[]>, task) => {
+        if (!acc[task.stage_name]) {
+          acc[task.stage_name] = [];
+        }
+        acc[task.stage_name].push({
+          name: task.title,
+          status: task.status as TaskStatus,
+          startDate: task.start_date ? new Date(task.start_date) : undefined,
+          endDate: task.due_date ? new Date(task.due_date) : undefined,
+          assignee: task.assignee_id ? `admin-${task.assignee_id}` as AssigneeType : 'none'
+        });
+        return acc;
+      }, {});
+
+      const newStages: Stage[] = Object.entries(groupedTasks).map(([name, tasks]) => ({
+        name,
+        status: calculateStageStatus(tasks),
+        tasks
+      }));
+
+      setStages(newStages);
+    }
+  }, [tasks]);
+
+  const handleTaskUpdate = async (stageName: string, taskIndex: number, newName: string) => {
     setStages(prevStages => 
       prevStages.map(stage => {
         if (stage.name === stageName) {
@@ -166,7 +94,25 @@ const StagesTimeline = () => {
     );
   };
 
-  const handleAddTask = (stageName: string, taskData: any) => {
+  const handleTaskAssigneeChange = async (stageName: string, taskName: string, newAssignee: AssigneeType) => {
+    if (!projectId) return;
+
+    try {
+      await updateTaskAssignee(
+        projectId,
+        stageName,
+        taskName,
+        newAssignee === 'none' ? null : newAssignee
+      );
+      await refetchTasks();
+      toast.success("Task assignee updated successfully");
+    } catch (error) {
+      console.error('Error updating task assignee:', error);
+      toast.error("Failed to update task assignee");
+    }
+  };
+
+  const handleAddTask = async (stageName: string, taskData: any) => {
     setStages(prevStages =>
       prevStages.map(stage => {
         if (stage.name === stageName) {
@@ -183,7 +129,7 @@ const StagesTimeline = () => {
     toast.success("Task added successfully");
   };
 
-  const handleDeleteTask = (stageName: string, taskIndex: number) => {
+  const handleDeleteTask = async (stageName: string, taskIndex: number) => {
     setStages(prevStages =>
       prevStages.map(stage => {
         if (stage.name === stageName) {
@@ -200,7 +146,7 @@ const StagesTimeline = () => {
     toast.success("Task deleted successfully");
   };
 
-  const handleAddStage = (stageName: string) => {
+  const handleAddStage = async (stageName: string) => {
     setStages(prevStages => [
       ...prevStages,
       {
@@ -212,7 +158,7 @@ const StagesTimeline = () => {
     toast.success("Stage added successfully");
   };
 
-  const handleDeleteStage = (stageName: string) => {
+  const handleDeleteStage = async (stageName: string) => {
     setStages(prevStages => prevStages.filter(stage => stage.name !== stageName));
     toast.success("Stage deleted successfully");
   };
@@ -253,6 +199,7 @@ const StagesTimeline = () => {
                     assignee={task.assignee}
                     onUpdate={(newName) => handleTaskUpdate(stage.name, taskIndex, newName)}
                     onDelete={() => handleDeleteTask(stage.name, taskIndex)}
+                    onAssigneeChange={(newAssignee) => handleTaskAssigneeChange(stage.name, task.name, newAssignee)}
                   />
                 ))}
                 
