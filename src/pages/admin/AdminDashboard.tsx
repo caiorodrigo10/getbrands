@@ -4,7 +4,7 @@ import StatsCard from "@/components/admin/dashboard/StatsCard";
 import SalesFunnel from "@/components/admin/dashboard/SalesFunnel";
 import MonthlyRevenue from "@/components/admin/dashboard/MonthlyRevenue";
 import ProjectStatus from "@/components/admin/dashboard/ProjectStatus";
-import QuizFunnelAnalysis from "@/components/admin/reports/QuizFunnelAnalysis";
+import { QuizFunnelAnalysis } from "@/components/admin/reports/QuizFunnelAnalysis";
 
 const recentActivities = [
   {

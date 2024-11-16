@@ -1,4 +1,4 @@
-import QuizFunnelAnalysis from "@/components/admin/reports/QuizFunnelAnalysis";
+import { QuizFunnelAnalysis } from "@/components/admin/reports/QuizFunnelAnalysis";
 
 const AdminReports = () => {
   return (
