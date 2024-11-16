@@ -151,11 +151,12 @@ const StagesTimeline = () => {
           <AccordionContent className="pb-3">
             <div className="space-y-1">
               {/* Table Headers */}
-              <div className="grid grid-cols-[2fr,1fr,1.5fr,2fr] gap-4 px-4 py-2 text-sm font-medium text-muted-foreground">
+              <div className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 px-4 py-2 text-sm font-medium text-muted-foreground">
                 <div>Task</div>
                 <div>Status</div>
                 <div>Assignee</div>
-                <div className="text-right">Timeline</div>
+                <div>Start</div>
+                <div>End</div>
               </div>
               
               {/* Tasks */}

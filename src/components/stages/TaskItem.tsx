@@ -48,7 +48,7 @@ export const TaskItem = ({
   const [taskEndDate, setTaskEndDate] = useState<Date | undefined>(endDate);
 
   return (
-    <div className="grid grid-cols-[2fr,1fr,1.5fr,2fr] gap-4 items-center px-4 py-2 hover:bg-accent/50 rounded-md transition-colors">
+    <div className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 items-center px-4 py-2 hover:bg-accent/50 rounded-md transition-colors">
       {/* Task Name and Status Column */}
       <div className="flex items-center gap-3">
         {getStatusIcon(taskStatus)}
@@ -56,7 +56,7 @@ export const TaskItem = ({
       </div>
 
       {/* Status Select Column */}
-      <div>
+      <div className="min-w-[100px]">
         <TaskStatusSelect 
           status={taskStatus} 
           onStatusChange={setTaskStatus} 
@@ -71,13 +71,17 @@ export const TaskItem = ({
         />
       </div>
 
-      {/* Dates Column */}
-      <div className="flex items-center gap-2 justify-end">
+      {/* Start Date Column */}
+      <div>
         <TaskDatePicker
           label="Start"
           date={taskStartDate}
           onDateChange={setTaskStartDate}
         />
+      </div>
+
+      {/* End Date Column */}
+      <div>
         <TaskDatePicker
           label="End"
           date={taskEndDate}
