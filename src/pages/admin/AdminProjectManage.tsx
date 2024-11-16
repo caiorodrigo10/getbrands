@@ -12,8 +12,27 @@ import type { Database } from "@/integrations/supabase/types";
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Project = Database['public']['Tables']['projects']['Row'];
 
-interface ProjectWithDetails extends Project {
-  profiles?: Profile | null;
+interface ProjectWithProfile extends Project {
+  profiles: Profile | null;
+}
+
+interface FormattedProject {
+  id: string;
+  name: string;
+  description: string | null;
+  client: {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+  };
+  status: string;
+  progress: number;
+  accountManager: string;
+  points: number | null;
+  lastUpdate: string;
+  startDate: string;
+  expectedCompletion: string;
 }
 
 const AdminProjectManage = () => {
@@ -36,9 +55,6 @@ const AdminProjectManage = () => {
             shipping_address_city,
             shipping_address_state,
             shipping_address_zip
-          ),
-          project_products (
-            id
           )
         `)
         .eq('id', id)
@@ -46,10 +62,12 @@ const AdminProjectManage = () => {
 
       if (error) throw error;
       
-      const projectData = data as ProjectWithDetails;
+      const projectData = data as ProjectWithProfile;
       
-      return {
-        ...projectData,
+      const formattedProject: FormattedProject = {
+        id: projectData.id,
+        name: projectData.name,
+        description: projectData.description,
         client: {
           name: `${projectData.profiles?.first_name || ''} ${projectData.profiles?.last_name || ''}`.trim(),
           email: projectData.profiles?.email || '',
@@ -64,10 +82,13 @@ const AdminProjectManage = () => {
         status: projectData.status === 'em_andamento' ? 'Active' : 'Completed',
         progress: 35,
         accountManager: "Michael Anderson",
+        points: projectData.points,
         lastUpdate: "Naming phase in progress",
         startDate: new Date(projectData.created_at).toLocaleDateString('en-US'),
         expectedCompletion: new Date(new Date(projectData.created_at).setMonth(new Date(projectData.created_at).getMonth() + 3)).toLocaleDateString('en-US')
       };
+
+      return formattedProject;
     },
     enabled: !!id
   });

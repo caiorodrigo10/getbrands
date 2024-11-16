@@ -8,8 +8,22 @@ import type { Database } from "@/integrations/supabase/types";
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Project = Database['public']['Tables']['projects']['Row'];
 
-interface ProjectWithDetails extends Project {
-  profiles?: Profile | null;
+interface ProjectWithProfile extends Project {
+  profiles: Profile | null;
+}
+
+interface FormattedProject {
+  id: string;
+  name: string;
+  client: string;
+  email: string;
+  phone: string;
+  status: string;
+  progress: number;
+  accountManager: string;
+  points: number;
+  lastUpdate: string;
+  updatedAt: string;
 }
 
 const AdminProjects = () => {
@@ -33,7 +47,7 @@ const AdminProjects = () => {
 
       if (error) throw error;
       
-      return data?.map((project: ProjectWithDetails) => ({
+      const formattedProjects: FormattedProject[] = (data as ProjectWithProfile[]).map(project => ({
         id: project.id,
         name: project.name,
         client: `${project.profiles?.first_name || ''} ${project.profiles?.last_name || ''}`.trim(),
@@ -45,7 +59,9 @@ const AdminProjects = () => {
         points: project.points || 0,
         lastUpdate: "Product selection phase completed",
         updatedAt: project.updated_at
-      })) || [];
+      }));
+
+      return formattedProjects;
     }
   });
 
