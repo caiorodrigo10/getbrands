@@ -6,9 +6,9 @@ import { AddStageButton } from "./stages/AddStageButton";
 import { StageActions } from "./stages/StageActions";
 import { useState } from "react";
 import { toast } from "sonner";
+import { AssigneeType } from "./stages/TaskAssigneeSelect";
 
 type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
-type AssigneeType = "client" | "account_manager" | "designer" | "none";
 
 interface Task {
   name: string;
@@ -49,7 +49,7 @@ const StagesTimeline = () => {
           date: "10/03/2024",
           startDate: new Date("2024-03-10"),
           endDate: new Date("2024-03-10"),
-          assignee: "account_manager"
+          assignee: "none"
         }
       ]
     },
@@ -63,7 +63,7 @@ const StagesTimeline = () => {
           date: "15/03/2024",
           startDate: new Date("2024-03-15"),
           endDate: new Date("2024-03-15"),
-          assignee: "client"
+          assignee: "none"
         }
       ]
     },
@@ -77,19 +77,19 @@ const StagesTimeline = () => {
           date: "18/03/2024",
           startDate: new Date("2024-03-18"),
           endDate: new Date("2024-03-18"),
-          assignee: "client"
+          assignee: "none"
         },
         {
           name: "Team Archived Name Options for Client",
           status: "in_progress",
           date: "In Progress",
           startDate: new Date("2024-03-20"),
-          assignee: "designer"
+          assignee: "none"
         },
         {
           name: "Client Approved Name",
           status: "todo",
-          assignee: "client"
+          assignee: "none"
         }
       ]
     },
