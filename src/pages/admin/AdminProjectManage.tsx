@@ -2,33 +2,81 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import StagesTimeline from "@/components/StagesTimeline";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminProjectManage = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   
-  // Demo data - this would be fetched from the API in a real implementation
-  const project = {
-    id: 1,
-    name: "Eco-Friendly Beauty Brand",
-    description: "Sustainable packaging solutions for beauty products with focus on environmental impact",
-    client: {
-      name: "Sarah Johnson",
-      email: "sarah@greenbeauty.co",
-      phone: "+1 (555) 123-4567",
-      address: "123 Eco Street, Green City, GC 12345"
+  const { data: project, isLoading } = useQuery({
+    queryKey: ["admin-project", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("projects")
+        .select(`
+          *,
+          profiles:user_id (
+            first_name,
+            last_name,
+            email,
+            phone,
+            shipping_address_street,
+            shipping_address_city,
+            shipping_address_state,
+            shipping_address_zip
+          ),
+          project_products (
+            id
+          )
+        `)
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      
+      return {
+        ...data,
+        client: {
+          name: `${data.profiles?.first_name || ''} ${data.profiles?.last_name || ''}`.trim(),
+          email: data.profiles?.email || '',
+          phone: data.profiles?.phone || '',
+          address: [
+            data.profiles?.shipping_address_street,
+            data.profiles?.shipping_address_city,
+            data.profiles?.shipping_address_state,
+            data.profiles?.shipping_address_zip
+          ].filter(Boolean).join(', ')
+        },
+        status: data.status === 'em_andamento' ? 'Active' : 'Completed',
+        progress: 35,
+        accountManager: "Michael Anderson",
+        lastUpdate: "Naming phase in progress",
+        startDate: new Date(data.created_at).toLocaleDateString('en-US'),
+        expectedCompletion: new Date(new Date(data.created_at).setMonth(new Date(data.created_at).getMonth() + 3)).toLocaleDateString('en-US')
+      };
     },
-    status: "Active",
-    progress: 35,
-    accountManager: "Michael Anderson",
-    points: 850,
-    lastUpdate: "Naming phase in progress",
-    updatedAt: "2024-03-19T10:30:00Z",
-    startDate: "2024-03-10",
-    expectedCompletion: "2024-06-10"
-  };
+    enabled: !!id
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <p className="text-muted-foreground">Project not found</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
