@@ -3,11 +3,15 @@ import { TaskItem } from "./stages/TaskItem";
 import { StageHeader } from "./stages/StageHeader";
 
 type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
+type AssigneeType = "client" | "account_manager" | "designer" | "none";
 
 interface Task {
   name: string;
   status: TaskStatus;
   date?: string;
+  startDate?: Date;
+  endDate?: Date;
+  assignee?: AssigneeType;
 }
 
 interface Stage {
@@ -24,7 +28,10 @@ const stages: Stage[] = [
       { 
         name: "Welcome Meeting",
         status: "done",
-        date: "10/03/2024"
+        date: "10/03/2024",
+        startDate: new Date("2024-03-10"),
+        endDate: new Date("2024-03-10"),
+        assignee: "account_manager"
       }
     ]
   },
@@ -35,7 +42,10 @@ const stages: Stage[] = [
       {
         name: "Client Successfully Selected Products",
         status: "done",
-        date: "15/03/2024"
+        date: "15/03/2024",
+        startDate: new Date("2024-03-15"),
+        endDate: new Date("2024-03-15"),
+        assignee: "client"
       }
     ]
   },
@@ -46,16 +56,22 @@ const stages: Stage[] = [
       {
         name: "Client Fill Naming Brief Form",
         status: "done",
-        date: "18/03/2024"
+        date: "18/03/2024",
+        startDate: new Date("2024-03-18"),
+        endDate: new Date("2024-03-18"),
+        assignee: "client"
       },
       {
         name: "Team Archived Name Options for Client",
         status: "in_progress",
-        date: "In Progress"
+        date: "In Progress",
+        startDate: new Date("2024-03-20"),
+        assignee: "designer"
       },
       {
         name: "Client Approved Name",
-        status: "todo"
+        status: "todo",
+        assignee: "client"
       }
     ]
   },
@@ -140,6 +156,9 @@ const StagesTimeline = () => {
                   name={task.name}
                   status={task.status}
                   date={task.date}
+                  startDate={task.startDate}
+                  endDate={task.endDate}
+                  assignee={task.assignee}
                   onUpdate={(newName) => handleTaskUpdate(stage.name, taskIndex, newName)}
                 />
               ))}
