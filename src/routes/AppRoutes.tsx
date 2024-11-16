@@ -25,7 +25,6 @@ import AdminProjects from "@/pages/admin/AdminProjects";
 import AdminOrders from "@/pages/admin/AdminOrders";
 import AdminCatalog from "@/pages/admin/AdminCatalog";
 import AdminProjectManage from "@/pages/admin/AdminProjectManage";
-import AdminReports from "@/pages/admin/AdminReports";
 
 export const AppRoutes = () => (
   <Routes>
@@ -80,14 +79,6 @@ export const AppRoutes = () => (
       <ProtectedRoute>
         <AdminLayout>
           <AdminProductEdit />
-        </AdminLayout>
-      </ProtectedRoute>
-    } />
-
-    <Route path="/admin/reports" element={
-      <ProtectedRoute>
-        <AdminLayout>
-          <AdminReports />
         </AdminLayout>
       </ProtectedRoute>
     } />
