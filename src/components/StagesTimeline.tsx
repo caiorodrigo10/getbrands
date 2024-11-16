@@ -148,8 +148,17 @@ const StagesTimeline = () => {
           <AccordionTrigger className="px-4 py-2 hover:no-underline">
             <StageHeader name={stage.name} status={stage.status} />
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-3">
+          <AccordionContent className="pb-3">
             <div className="space-y-1">
+              {/* Table Headers */}
+              <div className="grid grid-cols-[2fr,1fr,1.5fr,2fr] gap-4 px-4 py-2 text-sm font-medium text-muted-foreground">
+                <div>Task</div>
+                <div>Status</div>
+                <div>Assignee</div>
+                <div className="text-right">Timeline</div>
+              </div>
+              
+              {/* Tasks */}
               {stage.tasks.map((task, taskIndex) => (
                 <TaskItem
                   key={taskIndex}
