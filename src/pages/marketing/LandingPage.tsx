@@ -8,8 +8,8 @@ const LandingPage = () => {
       {/* Hero Section */}
       <section className="bg-primary min-h-[600px] relative overflow-hidden">
         <div className="container mx-auto px-4 py-16 flex flex-col lg:flex-row items-center gap-12">
-          <div className="flex-1 text-white">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <div className="flex-1">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">
               Your brand. Our expertise.
             </h1>
             <p className="text-lg mb-8 text-white/90">
@@ -34,7 +34,7 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-12 border-b">
+      <section className="py-12 border-b bg-white">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap justify-center gap-8 text-sm text-gray-600">
             <div className="flex items-center gap-2">
@@ -68,34 +68,34 @@ const LandingPage = () => {
       {/* Product Categories */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
             Explore Our Wide Range of Products
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
+            <Card className="p-6 text-center hover:shadow-lg transition-shadow bg-white">
               <Package2 className="w-12 h-12 mx-auto mb-4 text-primary" />
-              <h3 className="font-semibold mb-2">Supplements</h3>
+              <h3 className="font-semibold mb-2 text-gray-900">Supplements</h3>
               <p className="text-sm text-gray-600">
                 Build your health brand with our premium supplements
               </p>
             </Card>
-            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
+            <Card className="p-6 text-center hover:shadow-lg transition-shadow bg-white">
               <Coffee className="w-12 h-12 mx-auto mb-4 text-primary" />
-              <h3 className="font-semibold mb-2">Coffee</h3>
+              <h3 className="font-semibold mb-2 text-gray-900">Coffee</h3>
               <p className="text-sm text-gray-600">
                 Premium coffee solutions for your brand
               </p>
             </Card>
-            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
+            <Card className="p-6 text-center hover:shadow-lg transition-shadow bg-white">
               <ShoppingBag className="w-12 h-12 mx-auto mb-4 text-primary" />
-              <h3 className="font-semibold mb-2">Cosmetics</h3>
+              <h3 className="font-semibold mb-2 text-gray-900">Cosmetics</h3>
               <p className="text-sm text-gray-600">
                 Create your beauty line with our products
               </p>
             </Card>
-            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
+            <Card className="p-6 text-center hover:shadow-lg transition-shadow bg-white">
               <Users className="w-12 h-12 mx-auto mb-4 text-primary" />
-              <h3 className="font-semibold mb-2">Fitness</h3>
+              <h3 className="font-semibold mb-2 text-gray-900">Fitness</h3>
               <p className="text-sm text-gray-600">
                 Launch your fitness brand with our solutions
               </p>
@@ -105,7 +105,7 @@ const LandingPage = () => {
       </section>
 
       {/* Brand Building Section */}
-      <section className="py-16">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1">
@@ -116,7 +116,7 @@ const LandingPage = () => {
               />
             </div>
             <div className="flex-1">
-              <h2 className="text-3xl font-bold mb-6">
+              <h2 className="text-3xl font-bold mb-6 text-gray-900">
                 Brand-building made easy
               </h2>
               <p className="text-lg text-gray-600 mb-8">
