@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Package2, Coffee, ShoppingBag, Users } from "lucide-react";
+import { Package2, Coffee, ShoppingBag, Users, Star } from "lucide-react";
 
 const LandingPage = () => {
   return (
@@ -24,11 +24,7 @@ const LandingPage = () => {
             </Button>
           </div>
           <div className="flex-1">
-            <img 
-              src="https://content.app-sources.com/s/97257455971736356/uploads/Images/Bottle_Hero-7282326.png" 
-              alt="Product Showcase"
-              className="w-full h-auto max-w-[500px] mx-auto"
-            />
+            <div className="bg-gray-300 w-full h-[400px] rounded-lg"></div>
           </div>
         </div>
       </section>
@@ -132,6 +128,119 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Testimonials Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
+            What Our Clients Say
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="p-6 bg-white">
+                <div className="flex items-center text-primary mb-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} className="w-4 h-4 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-600 mb-4">
+                  "The support and guidance we received throughout the process was invaluable. Our brand wouldn't be where it is today without their expertise."
+                </p>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gray-300 rounded-full"></div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Client Name</p>
+                    <p className="text-sm text-gray-600">Company Name</p>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
+            15 Reasons to Start Your Private Label Business
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            {[...Array(15)].map((_, i) => (
+              <Card key={i} className="p-4 bg-white hover:shadow-lg transition-shadow">
+                <div className="w-full h-32 bg-gray-300 rounded-lg mb-4"></div>
+                <h3 className="font-semibold text-gray-900 mb-2">Reason {i + 1}</h3>
+                <p className="text-sm text-gray-600">
+                  Description of why this is a compelling reason to start your private label business.
+                </p>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action Section */}
+      <section className="py-16 bg-primary">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">
+            Ready to Start Your Brand Journey?
+          </h2>
+          <p className="text-lg mb-8 text-white/90">
+            Join thousands of successful entrepreneurs who have built their brands with us.
+          </p>
+          <Button 
+            size="lg" 
+            variant="secondary"
+            className="text-primary font-semibold"
+          >
+            Start Building Your Brand
+          </Button>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="font-bold mb-4">About Us</h3>
+              <div className="w-32 h-8 bg-gray-700 rounded mb-4"></div>
+              <p className="text-gray-400 text-sm">
+                Your trusted partner in private label manufacturing and brand building.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-bold mb-4">Products</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li>Supplements</li>
+                <li>Coffee</li>
+                <li>Cosmetics</li>
+                <li>Fitness</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold mb-4">Resources</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li>Blog</li>
+                <li>Case Studies</li>
+                <li>Documentation</li>
+                <li>Support</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold mb-4">Contact</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li>Contact Us</li>
+                <li>Schedule a Call</li>
+                <li>FAQ</li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; {new Date().getFullYear()} Your Company. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
