@@ -7,22 +7,22 @@ const AdminProjectManage = () => {
   // Demo data - this would be fetched from the API in a real implementation
   const project = {
     id: 1,
-    name: "Eco-Friendly Packaging",
-    description: "Sustainable packaging solutions for beauty products",
+    name: "Eco-Friendly Beauty Brand",
+    description: "Sustainable packaging solutions for beauty products with focus on environmental impact",
     client: {
-      name: "Green Earth Co",
-      email: "contact@greenearth.co",
+      name: "Sarah Johnson",
+      email: "sarah@greenbeauty.co",
       phone: "+1 (555) 123-4567",
-      address: "123 Green Street, Eco City, EC 12345"
+      address: "123 Eco Street, Green City, GC 12345"
     },
     status: "Active",
-    progress: 65,
-    accountManager: "Sarah Johnson",
+    progress: 35,
+    accountManager: "Michael Anderson",
     points: 850,
-    lastUpdate: "Product selection phase completed",
-    updatedAt: "2024-02-15T10:30:00Z",
-    startDate: "2024-01-15",
-    expectedCompletion: "2024-05-15"
+    lastUpdate: "Naming phase in progress",
+    updatedAt: "2024-03-19T10:30:00Z",
+    startDate: "2024-03-10",
+    expectedCompletion: "2024-06-10"
   };
 
   return (
