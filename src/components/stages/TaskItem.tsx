@@ -1,4 +1,4 @@
-import { Check, Clock, AlertCircle, Ban, Calendar, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { TaskStatusSelect } from "./TaskStatusSelect";
 import { TaskAssigneeSelect } from "./TaskAssigneeSelect";
@@ -81,8 +81,8 @@ export const TaskItem = ({
 
       <div>
         <TaskAssigneeSelect 
-          assignee={taskAssignee} 
-          onAssigneeChange={setTaskAssignee} 
+          assignee={taskAssignee as AssigneeType} 
+          onAssigneeChange={(value) => setTaskAssignee(value)} 
         />
       </div>
 
