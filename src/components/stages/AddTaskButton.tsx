@@ -12,22 +12,17 @@ import { useState } from "react";
 import { TaskStatusSelect } from "./TaskStatusSelect";
 import { TaskAssigneeSelect } from "./TaskAssigneeSelect";
 import { TaskDatePicker } from "./TaskDatePicker";
+import type { Task, TaskStatus } from "../StagesTimeline";
 
 interface AddTaskButtonProps {
   stageName: string;
-  onAddTask: (taskData: {
-    name: string;
-    status: string;
-    assignee?: string;
-    startDate?: Date;
-    endDate?: Date;
-  }) => void;
+  onAddTask: (taskData: Task) => void;
 }
 
 export const AddTaskButton = ({ stageName, onAddTask }: AddTaskButtonProps) => {
   const [taskName, setTaskName] = useState("");
-  const [status, setStatus] = useState("todo");
-  const [assignee, setAssignee] = useState<string>();
+  const [status, setStatus] = useState<TaskStatus>("todo");
+  const [assignee, setAssignee] = useState<string>("none");
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
 
@@ -66,14 +61,14 @@ export const AddTaskButton = ({ stageName, onAddTask }: AddTaskButtonProps) => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <TaskStatusSelect
-                status={status as any}
-                onStatusChange={(s) => setStatus(s)}
+                status={status}
+                onStatusChange={setStatus}
               />
             </div>
             <div>
               <TaskAssigneeSelect
-                assignee={assignee as any}
-                onAssigneeChange={setAssignee as any}
+                assignee={assignee}
+                onAssigneeChange={setAssignee}
               />
             </div>
           </div>
