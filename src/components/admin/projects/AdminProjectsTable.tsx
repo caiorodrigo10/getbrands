@@ -51,12 +51,10 @@ const AdminProjectsTable = ({ projects }: AdminProjectsTableProps) => {
         <TableHeader>
           <TableRow>
             <TableHead>Project</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Phone</TableHead>
+            <TableHead>Client</TableHead>
             <TableHead>Progress</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Account Manager</TableHead>
+            <TableHead>Points</TableHead>
             <TableHead className="w-[100px]"></TableHead>
           </TableRow>
         </TableHeader>
@@ -64,16 +62,16 @@ const AdminProjectsTable = ({ projects }: AdminProjectsTableProps) => {
           {projects.map((project) => (
             <TableRow key={project.id}>
               <TableCell>
-                <p className="font-medium">{project.name}</p>
+                <div>
+                  <p className="font-medium">{project.name}</p>
+                  <p className="text-sm text-muted-foreground">{project.accountManager}</p>
+                </div>
               </TableCell>
               <TableCell>
-                <p className="font-medium">{project.client}</p>
-              </TableCell>
-              <TableCell>
-                <p className="text-sm text-muted-foreground">{project.email}</p>
-              </TableCell>
-              <TableCell>
-                <p className="text-sm text-muted-foreground">{project.phone}</p>
+                <div>
+                  <p className="font-medium">{project.client}</p>
+                  <p className="text-sm text-muted-foreground">{project.email}</p>
+                </div>
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2 w-full">
@@ -94,7 +92,7 @@ const AdminProjectsTable = ({ projects }: AdminProjectsTableProps) => {
                 </Badge>
               </TableCell>
               <TableCell>
-                <p className="text-sm text-muted-foreground">{project.accountManager}</p>
+                <span>{project.points}</span>
               </TableCell>
               <TableCell>
                 <Button 
