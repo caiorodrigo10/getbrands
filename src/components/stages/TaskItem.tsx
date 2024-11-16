@@ -3,6 +3,7 @@ import { useState } from "react";
 import { TaskStatusSelect } from "./TaskStatusSelect";
 import { TaskAssigneeSelect } from "./TaskAssigneeSelect";
 import { TaskDatePicker } from "./TaskDatePicker";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 type TaskStatus = "blocked" | "todo" | "in_progress" | "done" | "scheduled" | "not_included";
 type AssigneeType = "client" | "account_manager" | "designer" | "none";
@@ -48,15 +49,24 @@ export const TaskItem = ({
   const [taskEndDate, setTaskEndDate] = useState<Date | undefined>(endDate);
 
   return (
-    <div className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 items-center px-4 py-2 hover:bg-accent/50 rounded-md transition-colors">
+    <div className="grid grid-cols-[2fr,1fr,1.5fr,0.7fr,0.7fr] gap-2 items-center px-4 py-2 hover:bg-accent/50 rounded-md transition-colors">
       {/* Task Name and Status Icon Column */}
       <div className="flex items-center gap-3">
         {getStatusIcon(taskStatus)}
-        <span className="text-sm font-medium truncate max-w-[200px]">{name}</span>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <span className="text-sm font-medium truncate max-w-[200px]">{name}</span>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{name}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
       {/* Status Select Column */}
-      <div className="min-w-[100px]">
+      <div>
         <TaskStatusSelect 
           status={taskStatus} 
           onStatusChange={setTaskStatus} 
