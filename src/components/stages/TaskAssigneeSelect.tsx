@@ -32,15 +32,17 @@ export const TaskAssigneeSelect = ({ assignee, onAssigneeChange }: TaskAssigneeS
   return (
     <Select value={assignee} onValueChange={(value) => onAssigneeChange(value as AssigneeType)}>
       <SelectTrigger className="h-7 w-[100px]">
-        <div className="flex items-center gap-1.5">
-          <Avatar className="h-5 w-5">
-            <AvatarImage src={ASSIGNEE_DATA[assignee].image} />
-            <AvatarFallback>
-              <User2 className="h-3 w-3" />
-            </AvatarFallback>
-          </Avatar>
-          <SelectValue className="truncate" />
-        </div>
+        <SelectValue>
+          <div className="flex items-center gap-1.5">
+            <Avatar className="h-5 w-5">
+              <AvatarImage src={ASSIGNEE_DATA[assignee].image} />
+              <AvatarFallback>
+                <User2 className="h-3 w-3" />
+              </AvatarFallback>
+            </Avatar>
+            <span className="truncate">{ASSIGNEE_DATA[assignee].name}</span>
+          </div>
+        </SelectValue>
       </SelectTrigger>
       <SelectContent align="end">
         {Object.entries(ASSIGNEE_DATA).map(([key, data]) => (
