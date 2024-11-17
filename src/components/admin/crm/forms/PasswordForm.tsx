@@ -31,12 +31,26 @@ export function PasswordForm({ onClose, userId }: PasswordFormProps) {
     }
 
     try {
-      const { error } = await supabase.auth.admin.updateUserById(
-        userId,
-        { password: password }
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const response = await fetch(
+        'https://skrvprmnncxpkojraoem.supabase.co/functions/v1/update-user-password',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({
+            userId,
+            password,
+          }),
+        }
       );
 
-      if (error) throw error;
+      const data = await response.json();
+      
+      if (!response.ok) throw new Error(data.error || 'Failed to update password');
 
       toast({
         title: "Success",
