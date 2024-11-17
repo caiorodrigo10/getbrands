@@ -29,7 +29,7 @@ export function UserProfileEditModal({ isOpen, onClose, user, onUserUpdated }: U
         </DialogHeader>
 
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-2 bg-white">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="password">Password</TabsTrigger>
           </TabsList>
