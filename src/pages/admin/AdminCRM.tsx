@@ -26,7 +26,7 @@ const AdminCRM = () => {
       
       return data.map((user) => ({
         ...user,
-        avatar_url: user.profiles?.avatar_url,
+        avatar_url: user.profiles?.[0]?.avatar_url,
         projects: Array.isArray(user.projects) 
           ? (user.projects as Project[])
           : null

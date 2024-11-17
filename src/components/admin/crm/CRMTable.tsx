@@ -26,6 +26,10 @@ interface Project {
 interface CRMUser extends Omit<CRMViewRow, 'projects'> {
   projects: Project[] | null;
   avatar_url?: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  phone: string | null;
 }
 
 interface CRMTableProps {
