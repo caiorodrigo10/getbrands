@@ -27,7 +27,7 @@ export const HeroSection = () => {
       </div>
 
       <div className="container mx-auto px-4 py-16 relative z-10">
-        <div className="max-w-3xl">
+        <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
             Transform Your Vision Into a 
             <span className="text-white/90"> Powerful Brand</span>
@@ -38,7 +38,7 @@ export const HeroSection = () => {
             distinctive private label brands that stand out in today's competitive market.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg"
               variant="secondary"
