@@ -15,7 +15,12 @@ const AdminCRM = () => {
         .select("*");
 
       if (error) throw error;
-      return data;
+      
+      // Transform the JSON string projects into an array if it exists
+      return data.map((user) => ({
+        ...user,
+        projects: user.projects || null
+      }));
     },
   });
 
