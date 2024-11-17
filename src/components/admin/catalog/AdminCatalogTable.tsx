@@ -49,7 +49,9 @@ const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) 
 
   const handleSelectAllPages = (checked: boolean) => {
     setSelectAllPages(checked);
-    if (!checked) {
+    if (checked) {
+      setSelectedProducts(products.map(product => product.id));
+    } else {
       setSelectedProducts([]);
     }
   };
@@ -92,7 +94,7 @@ const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) 
     <div className="space-y-4">
       {selectedProducts.length > 0 && (
         <SelectionBar
-          selectedCount={selectedProducts.length}
+          selectedCount={selectAllPages ? totalProducts : selectedProducts.length}
           totalCount={totalProducts}
           selectAllPages={selectAllPages}
           onSelectAllPages={handleSelectAllPages}
