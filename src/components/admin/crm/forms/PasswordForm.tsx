@@ -7,9 +7,10 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface PasswordFormProps {
   onClose: () => void;
+  userId: string;
 }
 
-export function PasswordForm({ onClose }: PasswordFormProps) {
+export function PasswordForm({ onClose, userId }: PasswordFormProps) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -30,9 +31,10 @@ export function PasswordForm({ onClose }: PasswordFormProps) {
     }
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: password
-      });
+      const { error } = await supabase.auth.admin.updateUserById(
+        userId,
+        { password: password }
+      );
 
       if (error) throw error;
 

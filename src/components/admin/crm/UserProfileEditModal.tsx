@@ -43,7 +43,10 @@ export function UserProfileEditModal({ isOpen, onClose, user, onUserUpdated }: U
           </TabsContent>
 
           <TabsContent value="password">
-            <PasswordForm onClose={onClose} />
+            <PasswordForm 
+              onClose={onClose} 
+              userId={user.id}
+            />
           </TabsContent>
         </Tabs>
       </DialogContent>
