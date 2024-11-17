@@ -8,10 +8,10 @@ import { supabase } from '@/integrations/supabase/client'
 // Initialize Gleap
 Gleap.initialize("qqAquIhEn19VOadZnGz2Xg48r3NoXdas");
 
-// Function to update user data in Gleap
+// Função para atualizar os dados do usuário no Gleap
 const updateGleapUserData = async (userId: string) => {
   try {
-    // Fetch profile and current project data
+    // Buscar dados do perfil e projeto atual do usuário
     const { data: profile } = await supabase
       .from('profiles')
       .select('*')
@@ -27,18 +27,16 @@ const updateGleapUserData = async (userId: string) => {
 
     const currentProject = projects?.[0];
 
-    // Configure user data in Gleap
+    // Configurar dados do usuário no Gleap
     Gleap.identify(userId, {
       name: profile ? `${profile.first_name} ${profile.last_name}`.trim() : '',
       email: profile?.email || '',
       phone: profile?.phone || '',
       value: 0,
-      plan: currentProject?.pack_type?.toUpperCase() || 'START',
+      plan: '',
+      language: 'pt-br',
       companyId: currentProject?.id || '',
       companyName: currentProject?.name || '',
-      customData: {
-        locale: 'en'
-      }
     });
 
   } catch (error) {
@@ -46,7 +44,7 @@ const updateGleapUserData = async (userId: string) => {
   }
 };
 
-// Watch for authentication changes
+// Observar mudanças na autenticação
 supabase.auth.onAuthStateChange((event, session) => {
   if (event === 'SIGNED_IN' && session?.user) {
     updateGleapUserData(session.user.id);

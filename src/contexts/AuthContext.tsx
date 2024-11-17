@@ -45,12 +45,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         email: profile?.email || '',
         phone: profile?.phone || '',
         value: 0,
-        plan: currentProject?.pack_type?.toUpperCase() || 'START',
+        plan: '',
+        language: 'pt-br',
         companyId: currentProject?.id || '',
         companyName: currentProject?.name || '',
-        customData: {
-          locale: 'en'
-        }
       });
     } catch (error) {
       console.error('Error updating Gleap user data:', error);
@@ -163,14 +161,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          <p className="text-muted-foreground">Loading your account...</p>
-        </div>
-      </div>
-    );
+    return <div>Loading...</div>;
   }
 
   return (
