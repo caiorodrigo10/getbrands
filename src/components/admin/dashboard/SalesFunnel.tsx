@@ -31,6 +31,7 @@ interface CustomLabelProps {
   name?: string;
   payload?: {
     percentage: string;
+    fill: string;
   };
 }
 
@@ -42,7 +43,8 @@ const CustomLabel = ({ x = 0, y = 0, width = 0, height = 0, value = 0, payload }
         y={y + (height || 0) / 2}
         textAnchor="middle"
         dominantBaseline="middle"
-        className="fill-white font-bold text-2xl"
+        fill={payload?.fill}
+        className="font-bold text-2xl"
       >
         {value.toLocaleString()}
       </text>
@@ -52,7 +54,8 @@ const CustomLabel = ({ x = 0, y = 0, width = 0, height = 0, value = 0, payload }
           y={y + (height || 0) / 2 + 25}
           textAnchor="middle"
           dominantBaseline="middle"
-          className="fill-white text-sm opacity-80"
+          fill={payload.fill}
+          className="text-sm opacity-80"
         >
           {payload.percentage}
         </text>
