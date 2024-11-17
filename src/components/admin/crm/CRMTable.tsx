@@ -12,18 +12,18 @@ import { formatDistanceToNow } from "date-fns";
 interface Project {
   id: string;
   name: string;
-  status: string;
+  status: string | null;
   pack_type: string;
 }
 
 interface CRMUser {
-  id: string;
+  id: string | null;
   first_name: string | null;
   last_name: string | null;
   email: string | null;
   phone: string | null;
-  user_type: string;
-  created_at: string;
+  user_type: string | null;
+  created_at: string | null;
   projects: Project[] | null;
 }
 
@@ -31,14 +31,14 @@ interface CRMTableProps {
   users: CRMUser[];
 }
 
-const getUserTypeBadge = (type: string) => {
+const getUserTypeBadge = (type: string | null) => {
   const styles = {
     member: "bg-gray-500",
     sampler: "bg-blue-500",
     customer: "bg-green-500",
-  }[type] || "bg-gray-500";
+  }[type || "member"] || "bg-gray-500";
 
-  return <Badge className={styles}>{type}</Badge>;
+  return <Badge className={styles}>{type || "member"}</Badge>;
 };
 
 export const CRMTable = ({ users }: CRMTableProps) => {
@@ -74,7 +74,7 @@ export const CRMTable = ({ users }: CRMTableProps) => {
                 </div>
               </TableCell>
               <TableCell>
-                {formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}
+                {user.created_at ? formatDistanceToNow(new Date(user.created_at), { addSuffix: true }) : "-"}
               </TableCell>
             </TableRow>
           ))}
