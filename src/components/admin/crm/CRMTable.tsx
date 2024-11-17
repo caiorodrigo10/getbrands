@@ -27,13 +27,16 @@ interface CRMTableProps {
   users: CRMUser[];
 }
 
-const getUserTypeBadge = (type: string | null) => {
+const getUserTypeBadge = (type: string | null, hasProjects: boolean) => {
+  // Se o usuário tem projetos, ele é um customer independente do tipo original
+  const effectiveType = hasProjects ? "customer" : type || "lead";
+
   const styles = {
     lead: "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20",
     member: "bg-blue-500/10 text-blue-500 hover:bg-blue-500/20",
     sampler: "bg-purple-500/10 text-purple-500 hover:bg-purple-500/20",
     customer: "bg-green-500/10 text-green-500 hover:bg-green-500/20",
-  }[type || "lead"] || "bg-gray-500/10 text-gray-500 hover:bg-gray-500/20";
+  }[effectiveType] || "bg-gray-500/10 text-gray-500 hover:bg-gray-500/20";
 
   const labels = {
     lead: "Lead",
@@ -44,7 +47,7 @@ const getUserTypeBadge = (type: string | null) => {
 
   return (
     <Badge className={`${styles} transition-colors`} variant="outline">
-      {labels[type as keyof typeof labels] || "Unknown"}
+      {labels[effectiveType as keyof typeof labels] || "Unknown"}
     </Badge>
   );
 };
@@ -71,7 +74,9 @@ export const CRMTable = ({ users }: CRMTableProps) => {
               </TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.phone || "-"}</TableCell>
-              <TableCell>{getUserTypeBadge(user.user_type)}</TableCell>
+              <TableCell>
+                {getUserTypeBadge(user.user_type, Array.isArray(user.projects) && user.projects.length > 0)}
+              </TableCell>
               <TableCell>
                 <div className="space-y-1">
                   {user.projects?.map((project) => (
