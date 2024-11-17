@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(initialSession.user);
           identifyUserInGleap(initialSession.user);
           if (location.pathname === '/login') {
-            navigate('/');
+            navigate('/dashboard');
           }
         }
       } catch (error) {
@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(currentSession.user);
         identifyUserInGleap(currentSession.user);
         if (location.pathname === '/login') {
-          navigate('/');
+          navigate('/dashboard');
         }
       } else {
         setSession(null);
@@ -110,7 +110,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(data.user);
         setSession(data.session);
         identifyUserInGleap(data.user);
-        navigate('/');
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error('Login error:', error);
