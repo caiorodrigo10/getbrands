@@ -2,21 +2,23 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { MoreVertical, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Product } from "@/types/product";
 import { formatCurrency } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { SelectionBar } from "./SelectionBar";
+import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 
 interface AdminCatalogTableProps {
   products: Product[];
+  totalProducts: number;
 }
 
-const AdminCatalogTable = ({ products }: AdminCatalogTableProps) => {
+const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) => {
   const navigate = useNavigate();
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -68,7 +70,7 @@ const AdminCatalogTable = ({ products }: AdminCatalogTableProps) => {
       
       setSelectedProducts([]);
       setShowDeleteDialog(false);
-      window.location.reload(); // Refresh to show updated list
+      window.location.reload();
     } catch (error) {
       toast({
         variant: "destructive",
@@ -89,31 +91,14 @@ const AdminCatalogTable = ({ products }: AdminCatalogTableProps) => {
   return (
     <div className="space-y-4">
       {selectedProducts.length > 0 && (
-        <div className="flex items-center justify-between p-4 bg-white border rounded-md shadow-sm">
-          <div className="flex items-center gap-4">
-            <p className="text-sm text-muted-foreground">
-              {selectedProducts.length} product(s) selected
-            </p>
-            {selectedProducts.length === products.length && !selectAllPages && (
-              <Button
-                variant="link"
-                size="sm"
-                onClick={() => handleSelectAllPages(true)}
-                className="text-primary hover:text-primary/90"
-              >
-                Select all products across all pages
-              </Button>
-            )}
-          </div>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => setShowDeleteDialog(true)}
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete Selected
-          </Button>
-        </div>
+        <SelectionBar
+          selectedCount={selectedProducts.length}
+          totalCount={totalProducts}
+          selectAllPages={selectAllPages}
+          onSelectAllPages={handleSelectAllPages}
+          onDeleteClick={() => setShowDeleteDialog(true)}
+          productsInPage={products.length}
+        />
       )}
 
       <div className="rounded-md border">
@@ -158,17 +143,11 @@ const AdminCatalogTable = ({ products }: AdminCatalogTableProps) => {
                   </div>
                 </TableCell>
                 <TableCell>{product.category}</TableCell>
-                <TableCell>
-                  {formatCurrency(product.from_price)}
-                </TableCell>
+                <TableCell>{formatCurrency(product.from_price)}</TableCell>
                 <TableCell>
                   <div className="space-x-2">
-                    {product.is_new && (
-                      <Badge>NEW</Badge>
-                    )}
-                    {product.is_tiktok && (
-                      <Badge variant="secondary">TIKTOK</Badge>
-                    )}
+                    {product.is_new && <Badge>NEW</Badge>}
+                    {product.is_tiktok && <Badge variant="secondary">TIKTOK</Badge>}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -192,22 +171,12 @@ const AdminCatalogTable = ({ products }: AdminCatalogTableProps) => {
         </Table>
       </div>
 
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete {selectAllPages ? "all" : "the selected"} products.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteSelected} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteConfirmationDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={handleDeleteSelected}
+        selectAllPages={selectAllPages}
+      />
     </div>
   );
 };

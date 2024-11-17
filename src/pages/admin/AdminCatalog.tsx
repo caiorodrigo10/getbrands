@@ -35,6 +35,7 @@ const AdminCatalog = () => {
 
       return {
         data,
+        totalProducts: count || 0,
         totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE),
         currentPage
       };
@@ -84,7 +85,10 @@ const AdminCatalog = () => {
         </div>
       </div>
 
-      <AdminCatalogTable products={filteredProducts || []} />
+      <AdminCatalogTable 
+        products={filteredProducts || []} 
+        totalProducts={productsData?.totalProducts || 0}
+      />
 
       {productsData?.totalPages && productsData.totalPages > 1 && (
         <div className="flex justify-center mt-6">
