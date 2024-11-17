@@ -19,17 +19,29 @@ const AdminCRM = () => {
     queryKey: ["crm-users"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("crm_view")
-        .select("*, profiles(avatar_url)");
+        .from("profiles")
+        .select(`
+          id,
+          first_name,
+          last_name,
+          email,
+          phone,
+          avatar_url,
+          user_type,
+          created_at,
+          projects:projects(
+            id,
+            name,
+            status,
+            pack_type
+          )
+        `);
 
       if (error) throw error;
       
       return data.map((user) => ({
         ...user,
-        avatar_url: user.profiles?.[0]?.avatar_url,
-        projects: Array.isArray(user.projects) 
-          ? (user.projects as Project[])
-          : null
+        projects: user.projects as Project[] | null
       }));
     },
   });

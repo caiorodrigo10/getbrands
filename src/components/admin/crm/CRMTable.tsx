@@ -14,22 +14,23 @@ import { Database } from "@/integrations/supabase/types";
 import { useState } from "react";
 import { UserProfileEditModal } from "./UserProfileEditModal";
 
-type CRMViewRow = Database["public"]["Views"]["crm_view"]["Row"];
-
-interface Project {
+type Project = {
   id: string;
   name: string;
   status: string | null;
   pack_type: Database["public"]["Enums"]["project_pack_type"];
-}
+};
 
-interface CRMUser extends Omit<CRMViewRow, 'projects'> {
-  projects: Project[] | null;
-  avatar_url?: string | null;
+interface CRMUser {
+  id: string;
   first_name: string | null;
   last_name: string | null;
   email: string | null;
   phone: string | null;
+  avatar_url: string | null;
+  user_type: string | null;
+  created_at: string;
+  projects: Project[] | null;
 }
 
 interface CRMTableProps {
