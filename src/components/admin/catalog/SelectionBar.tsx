@@ -31,7 +31,7 @@ export const SelectionBar = ({
             onClick={() => onSelectAllPages(true)}
             className="text-primary hover:text-primary/90"
           >
-            Select all products across all pages
+            Select all {totalCount} products across all pages
           </Button>
         )}
       </div>
