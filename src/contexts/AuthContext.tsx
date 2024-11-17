@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { User, Session, AuthChangeEvent } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Gleap from "gleap";
 
 interface AuthContextType {
@@ -21,6 +21,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const identifyUserInGleap = (currentUser: User | null) => {
     if (currentUser) {
@@ -49,7 +50,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setSession(initialSession);
           setUser(initialSession.user);
           identifyUserInGleap(initialSession.user);
-          navigate('/');
+          if (location.pathname === '/login') {
+            navigate('/');
+          }
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
@@ -69,7 +72,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(currentSession);
         setUser(currentSession.user);
         identifyUserInGleap(currentSession.user);
-        navigate('/');
+        if (location.pathname === '/login') {
+          navigate('/');
+        }
       } else {
         setSession(null);
         setUser(null);
@@ -83,7 +88,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, location]);
 
   const login = async (email: string, password: string) => {
     try {

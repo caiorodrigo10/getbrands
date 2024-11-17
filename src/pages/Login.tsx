@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
@@ -7,7 +6,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const { login } = useAuth();
   const [email, setEmail] = useState("");
@@ -20,9 +18,9 @@ const Login = () => {
 
     try {
       await login(email, password);
-      // The navigation will be handled by the AuthContext after successful login
     } catch (error) {
       console.error("Login error:", error);
+    } finally {
       setIsLoading(false);
     }
   };
