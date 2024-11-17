@@ -58,12 +58,21 @@ const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) 
 
   const handleDeleteSelected = async () => {
     try {
-      const { error } = await supabase
+      // First, delete related sample request products
+      const { error: sampleRequestProductsError } = await supabase
+        .from('sample_request_products')
+        .delete()
+        .in('product_id', selectedProducts);
+
+      if (sampleRequestProductsError) throw sampleRequestProductsError;
+
+      // Then delete the products
+      const { error: productsError } = await supabase
         .from('products')
         .delete()
         .in('id', selectedProducts);
 
-      if (error) throw error;
+      if (productsError) throw productsError;
 
       toast({
         title: "Success",
@@ -74,6 +83,7 @@ const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) 
       setShowDeleteDialog(false);
       window.location.reload();
     } catch (error) {
+      console.error('Delete error:', error);
       toast({
         variant: "destructive",
         title: "Error",
