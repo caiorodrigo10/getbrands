@@ -24,7 +24,7 @@ export const SelectionBar = ({
         <p className="text-sm text-muted-foreground">
           {selectAllPages ? `All ${totalCount} products selected` : `${selectedCount} product(s) selected`}
         </p>
-        {selectedCount === productsInPage && !selectAllPages && (
+        {selectedCount === productsInPage && !selectAllPages && totalCount > productsInPage && (
           <Button
             variant="link"
             size="sm"
