@@ -84,6 +84,14 @@ export const AppRoutes = () => (
     } />
     
     {/* Client Routes */}
+    <Route path="/dashboard" element={
+      <ProtectedRoute>
+        <AppLayout>
+          <Dashboard />
+        </AppLayout>
+      </ProtectedRoute>
+    } />
+    
     <Route path="/" element={
       <ProtectedRoute>
         <AppLayout>

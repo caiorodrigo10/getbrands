@@ -7,7 +7,7 @@ export const NavigationMenu = () => {
   const location = useLocation();
 
   const menuItems = [
-    { label: "Dashboard", path: "/", icon: LayoutDashboard },
+    { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
     { label: "Projects", path: "/projects", icon: FolderGit2 },
     { label: "Catalog", path: "/catalog", icon: Grid3X3 },
     { label: "My Products", path: "/products", icon: Palette },
