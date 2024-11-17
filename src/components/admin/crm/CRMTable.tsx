@@ -7,8 +7,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { Database } from "@/integrations/supabase/types";
+import { useState } from "react";
+import { UserProfileEditModal } from "./UserProfileEditModal";
 
 type CRMViewRow = Database["public"]["Views"]["crm_view"]["Row"];
 
@@ -21,14 +25,15 @@ interface Project {
 
 interface CRMUser extends Omit<CRMViewRow, 'projects'> {
   projects: Project[] | null;
+  avatar_url?: string | null;
 }
 
 interface CRMTableProps {
   users: CRMUser[];
+  onUserUpdated: () => void;
 }
 
 const getUserTypeBadge = (type: string | null, hasProjects: boolean) => {
-  // Se o usuário tem projetos, ele é um customer independente do tipo original
   const effectiveType = hasProjects ? "customer" : type || "lead";
 
   const styles = {
@@ -52,51 +57,74 @@ const getUserTypeBadge = (type: string | null, hasProjects: boolean) => {
   );
 };
 
-export const CRMTable = ({ users }: CRMTableProps) => {
+export const CRMTable = ({ users, onUserUpdated }: CRMTableProps) => {
+  const [selectedUser, setSelectedUser] = useState<CRMUser | null>(null);
+
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Phone</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Projects</TableHead>
-            <TableHead>Member Since</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>
-                {[user.first_name, user.last_name].filter(Boolean).join(" ")}
-              </TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.phone || "-"}</TableCell>
-              <TableCell>
-                {getUserTypeBadge(user.user_type, Array.isArray(user.projects) && user.projects.length > 0)}
-              </TableCell>
-              <TableCell>
-                <div className="space-y-1">
-                  {user.projects?.map((project) => (
-                    <div key={project.id} className="text-sm">
-                      {project.name}
-                    </div>
-                  )) || "-"}
-                </div>
-              </TableCell>
-              <TableCell>
-                {user.created_at
-                  ? formatDistanceToNow(new Date(user.created_at), {
-                      addSuffix: true,
-                    })
-                  : "-"}
-              </TableCell>
+    <>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Phone</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Projects</TableHead>
+              <TableHead>Member Since</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>
+                  {[user.first_name, user.last_name].filter(Boolean).join(" ")}
+                </TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.phone || "-"}</TableCell>
+                <TableCell>
+                  {getUserTypeBadge(user.user_type, Array.isArray(user.projects) && user.projects.length > 0)}
+                </TableCell>
+                <TableCell>
+                  <div className="space-y-1">
+                    {user.projects?.map((project) => (
+                      <div key={project.id} className="text-sm">
+                        {project.name}
+                      </div>
+                    )) || "-"}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {user.created_at
+                    ? formatDistanceToNow(new Date(user.created_at), {
+                        addSuffix: true,
+                      })
+                    : "-"}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedUser(user)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {selectedUser && (
+        <UserProfileEditModal
+          isOpen={!!selectedUser}
+          onClose={() => setSelectedUser(null)}
+          user={selectedUser}
+          onUserUpdated={onUserUpdated}
+        />
+      )}
+    </>
   );
 };

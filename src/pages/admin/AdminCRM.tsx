@@ -15,17 +15,18 @@ type Project = {
 const AdminCRM = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: users, isLoading } = useQuery({
+  const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["crm-users"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("crm_view")
-        .select("*");
+        .select("*, profiles(avatar_url)");
 
       if (error) throw error;
       
       return data.map((user) => ({
         ...user,
+        avatar_url: user.profiles?.avatar_url,
         projects: Array.isArray(user.projects) 
           ? (user.projects as Project[])
           : null
@@ -71,7 +72,7 @@ const AdminCRM = () => {
         />
       </div>
 
-      <CRMTable users={filteredUsers || []} />
+      <CRMTable users={filteredUsers || []} onUserUpdated={refetch} />
     </div>
   );
 };
