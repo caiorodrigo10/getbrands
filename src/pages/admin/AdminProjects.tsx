@@ -4,12 +4,14 @@ import AdminProjectsTable from "@/components/admin/projects/AdminProjectsTable";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { ProjectPackType } from "@/types/project";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Project = Database['public']['Tables']['projects']['Row'];
 
 interface ProjectWithProfile extends Project {
   profiles: Profile | null;
+  pack_type: ProjectPackType;
 }
 
 interface FormattedProject {
@@ -24,7 +26,7 @@ interface FormattedProject {
   points: number;
   lastUpdate: string;
   updatedAt: string;
-  pack_type: 'start' | 'pro' | 'ultra';
+  pack_type: ProjectPackType;
 }
 
 const AdminProjects = () => {

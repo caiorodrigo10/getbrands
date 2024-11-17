@@ -672,6 +672,7 @@ export type Database = {
           description: string | null
           id: string
           name: string
+          pack_type: Database["public"]["Enums"]["project_pack_type"]
           points: number | null
           points_used: number | null
           status: string | null
@@ -683,6 +684,7 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
+          pack_type?: Database["public"]["Enums"]["project_pack_type"]
           points?: number | null
           points_used?: number | null
           status?: string | null
@@ -694,6 +696,7 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          pack_type?: Database["public"]["Enums"]["project_pack_type"]
           points?: number | null
           points_used?: number | null
           status?: string | null
@@ -853,7 +856,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      project_pack_type: "start" | "pro" | "ultra"
     }
     CompositeTypes: {
       [_ in never]: never
