@@ -3,6 +3,7 @@ import { DragEndEvent } from "@dnd-kit/core";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductImage } from "@/types/product";
+import { arrayMove } from "@dnd-kit/sortable";
 
 export const useImageSorting = (images: ProductImage[], onImagesUpdate: () => void) => {
   const { toast } = useToast();
@@ -14,9 +15,8 @@ export const useImageSorting = (images: ProductImage[], onImagesUpdate: () => vo
     const oldIndex = images.findIndex(img => img.id === active.id);
     const newIndex = images.findIndex(img => img.id === over.id);
 
-    const reorderedImages = [...images];
-    const [movedImage] = reorderedImages.splice(oldIndex, 1);
-    reorderedImages.splice(newIndex, 0, movedImage);
+    // Create new array with updated positions
+    const reorderedImages = arrayMove(images, oldIndex, newIndex);
 
     try {
       // Update positions and set first image as primary
@@ -28,16 +28,20 @@ export const useImageSorting = (images: ProductImage[], onImagesUpdate: () => vo
         is_primary: index === 0 // First image is always primary
       }));
 
-      await supabase
+      const { error } = await supabase
         .from('product_images')
         .upsert(updates);
 
+      if (error) throw error;
+
       // Update the product's main image_url with the first image
       if (reorderedImages.length > 0) {
-        await supabase
+        const { error: productError } = await supabase
           .from('products')
           .update({ image_url: reorderedImages[0].image_url })
           .eq('id', reorderedImages[0].product_id);
+
+        if (productError) throw productError;
       }
 
       onImagesUpdate();

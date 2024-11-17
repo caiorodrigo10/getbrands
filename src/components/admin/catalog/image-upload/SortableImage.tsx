@@ -21,7 +21,7 @@ export const SortableImage = ({ image, onDelete }: SortableImageProps) => {
   } = useSortable({ 
     id: image.id,
     transition: {
-      duration: 150,
+      duration: 250,
       easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
     },
   });
@@ -31,6 +31,7 @@ export const SortableImage = ({ image, onDelete }: SortableImageProps) => {
     transition,
     zIndex: isDragging ? 2 : 1,
     position: "relative" as const,
+    touchAction: 'none',
   };
 
   return (
@@ -45,8 +46,8 @@ export const SortableImage = ({ image, onDelete }: SortableImageProps) => {
       <div 
         className="w-full h-full rounded-lg border border-gray-200 overflow-hidden"
       >
-        <div {...attributes} {...listeners} className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-          <GripVertical className="w-5 h-5 text-white drop-shadow-lg cursor-grab" />
+        <div {...attributes} {...listeners} className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
+          <GripVertical className="w-5 h-5 text-white drop-shadow-lg" />
         </div>
         
         <div className="absolute top-2 right-2 z-10">
@@ -65,6 +66,7 @@ export const SortableImage = ({ image, onDelete }: SortableImageProps) => {
           src={image.image_url}
           alt={`Product image ${image.position + 1}`}
           className="w-full h-full object-cover"
+          draggable={false}
         />
       </div>
     </div>
