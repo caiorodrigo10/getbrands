@@ -20,10 +20,9 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate("/");
+      // The navigation will be handled by the AuthContext after successful login
     } catch (error) {
       console.error("Login error:", error);
-    } finally {
       setIsLoading(false);
     }
   };

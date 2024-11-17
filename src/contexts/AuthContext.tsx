@@ -33,18 +33,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const handleAuthError = () => {
-    setSession(null);
-    setUser(null);
-    identifyUserInGleap(null);
-    navigate('/login');
-    toast({
-      variant: "destructive",
-      title: "Session Expired",
-      description: "Please sign in again to continue.",
-    });
-  };
-
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -52,7 +40,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (sessionError) {
           console.error('Session error:', sessionError);
-          handleAuthError();
+          setSession(null);
+          setUser(null);
           return;
         }
         
@@ -60,10 +49,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setSession(initialSession);
           setUser(initialSession.user);
           identifyUserInGleap(initialSession.user);
+          navigate('/');
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-        handleAuthError();
       } finally {
         setIsLoading(false);
       }
@@ -76,23 +65,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, currentSession) => {
       console.log('Auth event:', event);
       
-      if (['SIGNED_OUT', 'USER_DELETED'].includes(event)) {
-        setSession(null);
-        setUser(null);
-        identifyUserInGleap(null);
-        navigate('/login');
-        return;
-      }
-
-      if (event === 'TOKEN_REFRESHED' && !currentSession) {
-        handleAuthError();
-        return;
-      }
-
       if (currentSession) {
         setSession(currentSession);
         setUser(currentSession.user);
         identifyUserInGleap(currentSession.user);
+        navigate('/');
+      } else {
+        setSession(null);
+        setUser(null);
+        identifyUserInGleap(null);
+        if (event === 'SIGNED_OUT') {
+          navigate('/login');
+        }
       }
     });
 
@@ -121,6 +105,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(data.user);
         setSession(data.session);
         identifyUserInGleap(data.user);
+        navigate('/');
       }
     } catch (error) {
       console.error('Login error:', error);
