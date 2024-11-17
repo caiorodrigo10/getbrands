@@ -29,11 +29,11 @@ interface CRMTableProps {
 
 const getUserTypeBadge = (type: string | null) => {
   const styles = {
-    lead: "bg-yellow-500 hover:bg-yellow-600",
-    member: "bg-blue-500 hover:bg-blue-600",
-    sampler: "bg-purple-500 hover:bg-purple-600",
-    customer: "bg-green-500 hover:bg-green-600",
-  }[type || "lead"] || "bg-gray-500 hover:bg-gray-600";
+    lead: "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20",
+    member: "bg-blue-500/10 text-blue-500 hover:bg-blue-500/20",
+    sampler: "bg-purple-500/10 text-purple-500 hover:bg-purple-500/20",
+    customer: "bg-green-500/10 text-green-500 hover:bg-green-500/20",
+  }[type || "lead"] || "bg-gray-500/10 text-gray-500 hover:bg-gray-500/20";
 
   const labels = {
     lead: "Lead",
@@ -43,7 +43,7 @@ const getUserTypeBadge = (type: string | null) => {
   };
 
   return (
-    <Badge className={`${styles} transition-colors`}>
+    <Badge className={`${styles} transition-colors`} variant="outline">
       {labels[type as keyof typeof labels] || "Unknown"}
     </Badge>
   );
@@ -82,7 +82,11 @@ export const CRMTable = ({ users }: CRMTableProps) => {
                 </div>
               </TableCell>
               <TableCell>
-                {user.created_at ? formatDistanceToNow(new Date(user.created_at), { addSuffix: true }) : "-"}
+                {user.created_at
+                  ? formatDistanceToNow(new Date(user.created_at), {
+                      addSuffix: true,
+                    })
+                  : "-"}
               </TableCell>
             </TableRow>
           ))}
