@@ -22,8 +22,19 @@ const data = [
   },
 ];
 
-const CustomLabel = (props: any) => {
-  const { x, y, width, value, name, payload } = props;
+interface CustomLabelProps {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  value?: number;
+  name?: string;
+  payload?: {
+    percentage: string;
+  };
+}
+
+const CustomLabel = ({ x = 0, y = 0, width = 0, value = 0, name = "", payload }: CustomLabelProps) => {
   return (
     <g>
       <text
@@ -44,15 +55,17 @@ const CustomLabel = (props: any) => {
       >
         {value.toLocaleString()}
       </text>
-      <text
-        x={x + width / 2}
-        y={y + 35}
-        textAnchor="middle"
-        dominantBaseline="middle"
-        className="fill-white text-sm opacity-80"
-      >
-        {payload.percentage}
-      </text>
+      {payload && (
+        <text
+          x={x + width / 2}
+          y={y + 35}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          className="fill-white text-sm opacity-80"
+        >
+          {payload.percentage}
+        </text>
+      )}
     </g>
   );
 };
@@ -83,8 +96,6 @@ const SalesFunnel = () => {
               nameKey="name"
               labelLine={false}
               isAnimationActive={true}
-              neckWidth="20%"
-              neckHeight="20%"
             >
               {data.map((entry, index) => (
                 <Cell 
@@ -95,7 +106,7 @@ const SalesFunnel = () => {
               ))}
               <LabelList
                 position="center"
-                content={CustomLabel}
+                content={<CustomLabel />}
               />
             </Funnel>
           </FunnelChart>
