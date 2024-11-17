@@ -3,6 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { CRMTable } from "@/components/admin/crm/CRMTable";
+import { Database } from "@/integrations/supabase/types";
+
+type Project = {
+  id: string;
+  name: string;
+  status: string | null;
+  pack_type: Database["public"]["Enums"]["project_pack_type"];
+};
 
 const AdminCRM = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,10 +24,11 @@ const AdminCRM = () => {
 
       if (error) throw error;
       
-      // Transform the JSON string projects into an array if it exists
       return data.map((user) => ({
         ...user,
-        projects: Array.isArray(user.projects) ? user.projects : null
+        projects: Array.isArray(user.projects) 
+          ? (user.projects as Project[])
+          : null
       }));
     },
   });

@@ -8,22 +8,18 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
+import { Database } from "@/integrations/supabase/types";
+
+type CRMViewRow = Database["public"]["Views"]["crm_view"]["Row"];
 
 interface Project {
   id: string;
   name: string;
   status: string | null;
-  pack_type: string;
+  pack_type: Database["public"]["Enums"]["project_pack_type"];
 }
 
-interface CRMUser {
-  id: string | null;
-  first_name: string | null;
-  last_name: string | null;
-  email: string | null;
-  phone: string | null;
-  user_type: string | null;
-  created_at: string | null;
+interface CRMUser extends Omit<CRMViewRow, 'projects'> {
   projects: Project[] | null;
 }
 
