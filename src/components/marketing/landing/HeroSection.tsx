@@ -1,21 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const HeroSection = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="relative bg-primary min-h-[600px] flex items-center">
       {/* Login Button */}
       <div className="absolute top-4 right-4 z-20">
-        <Link to="/login">
-          <Button 
-            variant="ghost" 
-            size="sm"
-            className="text-white hover:bg-white/10 text-sm font-medium px-4"
-          >
-            Login
-          </Button>
-        </Link>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="text-white hover:bg-white/10 text-sm font-medium px-4"
+          onClick={() => navigate('/login')}
+        >
+          Login
+        </Button>
       </div>
 
       {/* Background Pattern */}
