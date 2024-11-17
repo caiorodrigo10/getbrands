@@ -24,6 +24,7 @@ interface FormattedProject {
   points: number;
   lastUpdate: string;
   updatedAt: string;
+  pack_type: 'start' | 'pro' | 'ultra';
 }
 
 const AdminProjects = () => {
@@ -59,7 +60,8 @@ const AdminProjects = () => {
         accountManager: "Sarah Johnson",
         points: project.points || 0,
         lastUpdate: "Product selection phase completed",
-        updatedAt: project.updated_at
+        updatedAt: project.updated_at,
+        pack_type: project.pack_type || 'start'
       }));
 
       return formattedProjects;

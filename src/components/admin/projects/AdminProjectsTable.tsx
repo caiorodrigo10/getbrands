@@ -2,6 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { PACK_LABELS } from "@/types/project";
 
 interface FormattedProject {
   id: string;
@@ -15,6 +16,7 @@ interface FormattedProject {
   points: number;
   lastUpdate: string;
   updatedAt: string;
+  pack_type: 'start' | 'pro' | 'ultra';
 }
 
 interface AdminProjectsTableProps {
@@ -37,6 +39,19 @@ const AdminProjectsTable = ({ projects }: AdminProjectsTableProps) => {
     }
   };
 
+  const getPackColor = (pack_type: 'start' | 'pro' | 'ultra') => {
+    switch (pack_type) {
+      case "start":
+        return "bg-blue-500/10 text-blue-500";
+      case "pro":
+        return "bg-purple-500/10 text-purple-500";
+      case "ultra":
+        return "bg-amber-500/10 text-amber-500";
+      default:
+        return "bg-gray-500/10 text-gray-500";
+    }
+  };
+
   if (projects.length === 0) {
     return (
       <div className="text-center py-12 border rounded-md">
@@ -54,6 +69,7 @@ const AdminProjectsTable = ({ projects }: AdminProjectsTableProps) => {
             <TableHead>Client</TableHead>
             <TableHead>Progress</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Pack</TableHead>
             <TableHead>Points</TableHead>
             <TableHead className="w-[100px]"></TableHead>
           </TableRow>
@@ -89,6 +105,11 @@ const AdminProjectsTable = ({ projects }: AdminProjectsTableProps) => {
               <TableCell>
                 <Badge className={getStatusColor(project.status)}>
                   {project.status}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <Badge className={getPackColor(project.pack_type)}>
+                  {PACK_LABELS[project.pack_type]}
                 </Badge>
               </TableCell>
               <TableCell>
