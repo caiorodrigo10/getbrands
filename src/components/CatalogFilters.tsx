@@ -20,9 +20,9 @@ const FilterPopover = ({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-[120px] bg-gray-50 text-gray-800 justify-between whitespace-nowrap">
+        <Button variant="outline" className="w-[90px] px-2 py-1 bg-gray-50 text-gray-800 justify-between whitespace-nowrap text-sm">
           {title}
-          <ChevronDown className="h-4 w-4 text-gray-800" />
+          <ChevronDown className="h-3 w-3 text-gray-800" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-4 bg-white">
@@ -86,7 +86,7 @@ const CatalogFilters = () => {
   ];
 
   return (
-    <div className="flex gap-2 md:gap-4 overflow-x-auto pb-2 md:pb-0">
+    <div className="flex gap-1 md:gap-2 overflow-x-auto pb-2 md:pb-0">
       <FilterPopover title="Category" options={categoryOptions} />
       <FilterPopover title="Type" options={typeOptions} />
       <FilterPopover title="Audience" options={audienceOptions} />
