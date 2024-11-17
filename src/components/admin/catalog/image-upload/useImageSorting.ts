@@ -4,9 +4,11 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductImage } from "@/types/product";
 import { arrayMove } from "@dnd-kit/sortable";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useImageSorting = (images: ProductImage[], onImagesUpdate: () => void) => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const handleDragEnd = useCallback(async (event: DragEndEvent) => {
     const { active, over } = event;
@@ -22,8 +24,6 @@ export const useImageSorting = (images: ProductImage[], onImagesUpdate: () => vo
       // Update positions and set first image as primary
       const updates = reorderedImages.map((img, index) => ({
         id: img.id,
-        product_id: img.product_id,
-        image_url: img.image_url,
         position: index,
         is_primary: index === 0 // First image is always primary
       }));
@@ -44,6 +44,9 @@ export const useImageSorting = (images: ProductImage[], onImagesUpdate: () => vo
         if (productError) throw productError;
       }
 
+      // Invalidate queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['product-images'] });
+      
       onImagesUpdate();
     } catch (error) {
       console.error('Error reordering images:', error);
@@ -53,7 +56,7 @@ export const useImageSorting = (images: ProductImage[], onImagesUpdate: () => vo
         description: "Failed to reorder images",
       });
     }
-  }, [images, onImagesUpdate, toast]);
+  }, [images, onImagesUpdate, toast, queryClient]);
 
   return { handleDragEnd };
 };
