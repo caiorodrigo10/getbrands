@@ -29,12 +29,24 @@ interface CRMTableProps {
 
 const getUserTypeBadge = (type: string | null) => {
   const styles = {
-    member: "bg-gray-500",
-    sampler: "bg-blue-500",
-    customer: "bg-green-500",
-  }[type || "member"] || "bg-gray-500";
+    lead: "bg-yellow-500 hover:bg-yellow-600",
+    member: "bg-blue-500 hover:bg-blue-600",
+    sampler: "bg-purple-500 hover:bg-purple-600",
+    customer: "bg-green-500 hover:bg-green-600",
+  }[type || "lead"] || "bg-gray-500 hover:bg-gray-600";
 
-  return <Badge className={styles}>{type || "member"}</Badge>;
+  const labels = {
+    lead: "Lead",
+    member: "Member",
+    sampler: "Sampler",
+    customer: "Customer",
+  };
+
+  return (
+    <Badge className={`${styles} transition-colors`}>
+      {labels[type as keyof typeof labels] || "Unknown"}
+    </Badge>
+  );
 };
 
 export const CRMTable = ({ users }: CRMTableProps) => {
