@@ -34,12 +34,12 @@ interface CustomLabelProps {
   };
 }
 
-const CustomLabel = ({ x = 0, y = 0, width = 0, value = 0, name = "", payload }: CustomLabelProps) => {
+const CustomLabel = ({ x = 0, y = 0, width = 0, height = 0, value = 0, payload }: CustomLabelProps) => {
   return (
     <g>
       <text
         x={x + width / 2}
-        y={y + 15}
+        y={y + (height || 0) / 2}
         textAnchor="middle"
         dominantBaseline="middle"
         className="fill-white font-bold text-2xl"
@@ -49,7 +49,7 @@ const CustomLabel = ({ x = 0, y = 0, width = 0, value = 0, name = "", payload }:
       {payload && (
         <text
           x={x + width / 2}
-          y={y + 40}
+          y={y + (height || 0) / 2 + 25}
           textAnchor="middle"
           dominantBaseline="middle"
           className="fill-white text-sm opacity-80"
