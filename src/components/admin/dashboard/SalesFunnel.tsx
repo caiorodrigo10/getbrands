@@ -39,26 +39,17 @@ const CustomLabel = ({ x = 0, y = 0, width = 0, value = 0, name = "", payload }:
     <g>
       <text
         x={x + width / 2}
-        y={y - 5}
-        textAnchor="middle"
-        dominantBaseline="middle"
-        className="fill-white font-medium text-base"
-      >
-        {name}
-      </text>
-      <text
-        x={x + width / 2}
         y={y + 15}
         textAnchor="middle"
         dominantBaseline="middle"
-        className="fill-white font-bold text-xl"
+        className="fill-white font-bold text-2xl"
       >
         {value.toLocaleString()}
       </text>
       {payload && (
         <text
           x={x + width / 2}
-          y={y + 35}
+          y={y + 40}
           textAnchor="middle"
           dominantBaseline="middle"
           className="fill-white text-sm opacity-80"
@@ -82,7 +73,9 @@ const SalesFunnel = () => {
                 className="w-3 h-3 rounded-sm" 
                 style={{ backgroundColor: item.fill }}
               />
-              <span className="text-sm text-muted-foreground">{item.name}</span>
+              <span className="text-sm text-muted-foreground">
+                {item.name} ({item.percentage})
+              </span>
             </div>
           ))}
         </div>
