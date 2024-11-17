@@ -1,9 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AppLayout } from "./AppLayout";
-import { AdminLayout } from "@/components/admin/AdminLayout";
 import { MarketingRoutes } from "./MarketingRoutes";
-import AdminProductEdit from "@/pages/admin/AdminProductEdit";
+import { AdminRoutes } from "./AdminRoutes";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import Profile from "@/pages/Profile";
@@ -20,11 +19,6 @@ import Success from "@/pages/checkout/Success";
 import ProfitCalculator from "@/pages/ProfitCalculator";
 import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
-import AdminDashboard from "@/pages/admin/AdminDashboard";
-import AdminProjects from "@/pages/admin/AdminProjects";
-import AdminOrders from "@/pages/admin/AdminOrders";
-import AdminCatalog from "@/pages/admin/AdminCatalog";
-import AdminProjectManage from "@/pages/admin/AdminProjectManage";
 
 export const AppRoutes = () => (
   <Routes>
@@ -35,53 +29,7 @@ export const AppRoutes = () => (
     <Route path="/login" element={<Login />} />
     
     {/* Admin Routes */}
-    <Route path="/admin" element={
-      <ProtectedRoute>
-        <AdminLayout>
-          <AdminDashboard />
-        </AdminLayout>
-      </ProtectedRoute>
-    } />
-    
-    <Route path="/admin/projects" element={
-      <ProtectedRoute>
-        <AdminLayout>
-          <AdminProjects />
-        </AdminLayout>
-      </ProtectedRoute>
-    } />
-
-    <Route path="/admin/projects/:id/manage" element={
-      <ProtectedRoute>
-        <AdminLayout>
-          <AdminProjectManage />
-        </AdminLayout>
-      </ProtectedRoute>
-    } />
-
-    <Route path="/admin/orders" element={
-      <ProtectedRoute>
-        <AdminLayout>
-          <AdminOrders />
-        </AdminLayout>
-      </ProtectedRoute>
-    } />
-
-    <Route path="/admin/catalog" element={
-      <ProtectedRoute>
-        <AdminLayout>
-          <AdminCatalog />
-        </AdminLayout>
-      </ProtectedRoute>
-    } />
-
-    <Route path="/admin/catalog/:id" element={
-      <ProtectedRoute>
-        <AdminLayout>
-          <AdminProductEdit />
-        </AdminLayout>
-      </ProtectedRoute>
-    } />
+    {AdminRoutes}
     
     {/* Client Routes */}
     <Route path="/dashboard" element={
