@@ -1,9 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const HeroSection = () => {
   return (
     <section className="relative bg-primary min-h-[600px] flex items-center">
+      {/* Login Button */}
+      <div className="absolute top-4 right-4 z-20">
+        <Link to="/login">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            className="text-white hover:bg-white/10 text-sm font-medium px-4"
+          >
+            Login
+          </Button>
+        </Link>
+      </div>
+
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
@@ -35,8 +49,8 @@ export const HeroSection = () => {
             </Button>
             <Button 
               size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white/10"
+              variant="ghost"
+              className="text-white border border-white/20 hover:bg-white/10"
             >
               View Our Catalog
             </Button>
