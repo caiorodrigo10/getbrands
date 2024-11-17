@@ -45,10 +45,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         email: profile?.email || '',
         phone: profile?.phone || '',
         value: 0,
-        plan: '',
-        language: 'pt-br',
+        plan: currentProject?.pack_type?.toUpperCase() || 'START',
         companyId: currentProject?.id || '',
         companyName: currentProject?.name || '',
+        customData: {
+          locale: 'en'
+        }
       });
     } catch (error) {
       console.error('Error updating Gleap user data:', error);
