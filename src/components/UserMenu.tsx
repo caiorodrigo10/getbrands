@@ -54,7 +54,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
 
   const handleAdminNavigation = () => {
     if (isInAdminPanel) {
-      navigate('/');
+      navigate('/dashboard');
     } else {
       navigate('/admin');
     }
