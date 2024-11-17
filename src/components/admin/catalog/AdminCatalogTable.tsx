@@ -20,6 +20,7 @@ const AdminCatalogTable = ({ products }: AdminCatalogTableProps) => {
   const navigate = useNavigate();
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectAllPages, setSelectAllPages] = useState(false);
   const { toast } = useToast();
 
   const handleEditProduct = (productId: string) => {
@@ -31,6 +32,7 @@ const AdminCatalogTable = ({ products }: AdminCatalogTableProps) => {
       setSelectedProducts([...selectedProducts, productId]);
     } else {
       setSelectedProducts(selectedProducts.filter(id => id !== productId));
+      setSelectAllPages(false);
     }
   };
 
@@ -38,6 +40,14 @@ const AdminCatalogTable = ({ products }: AdminCatalogTableProps) => {
     if (checked) {
       setSelectedProducts(products.map(product => product.id));
     } else {
+      setSelectedProducts([]);
+      setSelectAllPages(false);
+    }
+  };
+
+  const handleSelectAllPages = (checked: boolean) => {
+    setSelectAllPages(checked);
+    if (!checked) {
       setSelectedProducts([]);
     }
   };
@@ -79,10 +89,22 @@ const AdminCatalogTable = ({ products }: AdminCatalogTableProps) => {
   return (
     <div className="space-y-4">
       {selectedProducts.length > 0 && (
-        <div className="flex items-center justify-between p-4 bg-muted rounded-md">
-          <p className="text-sm text-muted-foreground">
-            {selectedProducts.length} product(s) selected
-          </p>
+        <div className="flex items-center justify-between p-4 bg-white border rounded-md shadow-sm">
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-muted-foreground">
+              {selectedProducts.length} product(s) selected
+            </p>
+            {selectedProducts.length === products.length && !selectAllPages && (
+              <Button
+                variant="link"
+                size="sm"
+                onClick={() => handleSelectAllPages(true)}
+                className="text-primary hover:text-primary/90"
+              >
+                Select all products across all pages
+              </Button>
+            )}
+          </div>
           <Button
             variant="destructive"
             size="sm"
@@ -100,7 +122,7 @@ const AdminCatalogTable = ({ products }: AdminCatalogTableProps) => {
             <TableRow>
               <TableHead className="w-[50px]">
                 <Checkbox
-                  checked={selectedProducts.length === products.length}
+                  checked={selectedProducts.length === products.length || selectAllPages}
                   onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
                 />
               </TableHead>
@@ -116,7 +138,7 @@ const AdminCatalogTable = ({ products }: AdminCatalogTableProps) => {
               <TableRow key={product.id}>
                 <TableCell>
                   <Checkbox
-                    checked={selectedProducts.includes(product.id)}
+                    checked={selectedProducts.includes(product.id) || selectAllPages}
                     onCheckedChange={(checked) => handleSelectProduct(product.id, checked as boolean)}
                   />
                 </TableCell>
@@ -175,7 +197,7 @@ const AdminCatalogTable = ({ products }: AdminCatalogTableProps) => {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the selected products.
+              This action cannot be undone. This will permanently delete {selectAllPages ? "all" : "the selected"} products.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
