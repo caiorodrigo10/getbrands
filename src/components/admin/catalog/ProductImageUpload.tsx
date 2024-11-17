@@ -64,31 +64,17 @@ export function ProductImageUpload({ productId, images, mainImageUrl, onImagesUp
         return;
       }
 
-      const imageToDelete = images.find(img => img.id === imageId);
-      const { error } = await supabase
+      const { error: deleteError } = await supabase
         .from('product_images')
         .delete()
         .eq('id', imageId);
 
-      if (error) throw error;
+      if (deleteError) throw deleteError;
 
-      // If we're deleting the first image and there are other images,
-      // update the product's main image_url with the next available image
-      if (imageToDelete?.position === 0 && images.length > 1) {
-        const nextImage = images.find(img => img.id !== imageId);
-        if (nextImage) {
-          await supabase
-            .from('products')
-            .update({ image_url: nextImage.image_url })
-            .eq('id', productId);
-        }
-      }
-
-      // Invalidate queries to refresh the data
-      queryClient.invalidateQueries({ queryKey: ['product-images'] });
-      queryClient.invalidateQueries({ queryKey: ['product', productId] });
-      
+      // If we successfully deleted the image, update the UI
+      queryClient.invalidateQueries({ queryKey: ['product-images', productId] });
       onImagesUpdate();
+
       toast({
         title: "Success",
         description: "Image deleted successfully",
