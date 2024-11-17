@@ -24,13 +24,15 @@ export const useImageSorting = (images: ProductImage[], onImagesUpdate: () => vo
       // Update positions and set first image as primary
       const updates = reorderedImages.map((img, index) => ({
         id: img.id,
+        product_id: img.product_id,
+        image_url: img.image_url,
         position: index,
         is_primary: index === 0 // First image is always primary
       }));
 
       const { error } = await supabase
         .from('product_images')
-        .upsert(updates);
+        .upsert(updates, { onConflict: 'id' });
 
       if (error) throw error;
 
