@@ -10,6 +10,7 @@ interface PasswordFormProps {
 }
 
 export function PasswordForm({ onClose }: PasswordFormProps) {
+  const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +30,16 @@ export function PasswordForm({ onClose }: PasswordFormProps) {
       return;
     }
 
+    if (currentPassword === password) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "New password must be different from current password",
+      });
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const { error } = await supabase.auth.updateUser({
         password: password
@@ -40,14 +51,15 @@ export function PasswordForm({ onClose }: PasswordFormProps) {
         title: "Success",
         description: "Password updated successfully",
       });
+      setCurrentPassword("");
       setPassword("");
       setConfirmPassword("");
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update password",
+        description: error.message || "Failed to update password",
       });
     } finally {
       setIsLoading(false);
@@ -56,6 +68,17 @@ export function PasswordForm({ onClose }: PasswordFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="currentPassword">Current Password</Label>
+        <Input
+          id="currentPassword"
+          type="password"
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+          placeholder="Enter current password"
+        />
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="password">New Password</Label>
         <Input
