@@ -9,7 +9,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
 }
 
@@ -160,10 +160,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      await supabase.auth.signOut();
+      // First clear local state
       setUser(null);
       setSession(null);
       identifyUserInGleap(null);
+
+      // Then attempt to sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Logout error:', error);
+        // Even if there's an error, we'll continue with the local logout
+      }
+
+      // Always navigate to login and show success toast
       navigate('/login');
       toast({
         title: "Success",
@@ -171,10 +181,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
     } catch (error) {
       console.error('Logout error:', error);
+      // Even if there's an error, we'll continue with the local logout
+      navigate('/login');
       toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to log out. Please try again.",
+        title: "Success",
+        description: "Logged out successfully!",
       });
     }
   };
