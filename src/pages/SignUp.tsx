@@ -3,17 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const SignUp = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
     firstName: "",
     lastName: "",
+    email: "",
+    password: "",
   });
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -21,7 +21,7 @@ const SignUp = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -34,18 +34,18 @@ const SignUp = () => {
 
       if (error) throw error;
 
-      if (data) {
-        toast({
-          title: "Success",
-          description: "Account created successfully! Please check your email to verify your account.",
-        });
-        navigate("/login");
-      }
-    } catch (error: any) {
+      toast({
+        title: "Account created successfully!",
+        description: "Please check your email to verify your account.",
+      });
+      
+      navigate("/login");
+    } catch (error) {
+      console.error("Error signing up:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Failed to create account. Please try again.",
+        description: "Failed to create account. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -62,10 +62,10 @@ const SignUp = () => {
             className="w-[180px] h-auto"
           />
           <h2 className="mt-6 text-2xl font-semibold text-gray-900">
-            Create your Mainer Account
+            Create your account
           </h2>
           <p className="text-gray-600">
-            Join us and start creating amazing products
+            Join us and start building your brand
           </p>
         </div>
 
@@ -80,7 +80,7 @@ const SignUp = () => {
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                   required
                   className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
-                  placeholder="First Name"
+                  placeholder="First name"
                 />
               </div>
               <div>
@@ -91,7 +91,7 @@ const SignUp = () => {
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                   required
                   className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
-                  placeholder="Last Name"
+                  placeholder="Last name"
                 />
               </div>
             </div>
@@ -124,21 +124,16 @@ const SignUp = () => {
             className="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
             disabled={isLoading}
           >
-            {isLoading ? "Creating account..." : "Create Account"}
+            {isLoading ? "Creating account..." : "Create account"}
           </Button>
-        </form>
 
-        <div className="mt-4 text-center text-sm">
-          <span className="text-gray-600">Already have an account?</span>
-          {" "}
-          <Button
-            variant="link"
-            className="text-primary hover:text-primary-dark p-0"
-            onClick={() => navigate("/login")}
-          >
-            Sign in
-          </Button>
-        </div>
+          <div className="text-center text-sm">
+            <span className="text-gray-600">Already have an account?</span>{" "}
+            <Link to="/login" className="text-primary hover:text-primary-dark font-medium">
+              Sign in
+            </Link>
+          </div>
+        </form>
       </div>
     </div>
   );
