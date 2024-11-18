@@ -79,7 +79,7 @@ export const ProjectProgressCard = ({ project }: ProjectProgressCardProps) => {
       <Button 
         variant="outline" 
         className="w-full"
-        onClick={() => navigate(`/projects/${project.id}`)}
+        onClick={() => navigate(`/projects/v2/${project.id}`)}
       >
         View Project Details
         <ArrowRight className="ml-2 h-4 w-4" />
