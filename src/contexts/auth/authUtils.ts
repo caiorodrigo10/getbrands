@@ -8,7 +8,7 @@ export const identifyUserInGleap = async (currentUser: User | null) => {
   if (currentUser) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('first_name, last_name')
+      .select('first_name, last_name, user_type')
       .eq('id', currentUser.id)
       .single();
 
@@ -17,6 +17,7 @@ export const identifyUserInGleap = async (currentUser: User | null) => {
     Gleap.identify(currentUser.id, {
       email: currentUser.email,
       name: fullName,
+      userType: profile?.user_type
     });
   } else {
     Gleap.clearIdentity();
@@ -26,9 +27,29 @@ export const identifyUserInGleap = async (currentUser: User | null) => {
 export const checkOnboardingStatus = async (userId: string) => {
   const { data: profile } = await supabase
     .from('profiles')
-    .select('onboarding_completed')
+    .select('onboarding_completed, user_type')
     .eq('id', userId)
     .single();
     
-  return profile?.onboarding_completed || false;
+  return {
+    onboardingCompleted: profile?.onboarding_completed || false,
+    userType: profile?.user_type
+  };
+};
+
+export const getRedirectPath = (userType: string, onboardingCompleted: boolean) => {
+  if (!onboardingCompleted) {
+    return '/onboarding';
+  }
+
+  switch (userType) {
+    case 'admin':
+      return '/admin';
+    case 'customer':
+      return '/dashboard';
+    case 'member':
+      return '/catalog';
+    default:
+      return '/dashboard';
+  }
 };

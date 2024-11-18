@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { identifyUserInGleap, checkOnboardingStatus } from "./authUtils";
+import { identifyUserInGleap, checkOnboardingStatus, getRedirectPath } from "./authUtils";
 import { AuthState } from "./types";
 
 export const useAuthOperations = (initialState: AuthState) => {
@@ -25,7 +25,7 @@ export const useAuthOperations = (initialState: AuthState) => {
 
       if (data.user) {
         await identifyUserInGleap(data.user);
-        const hasCompletedOnboarding = await checkOnboardingStatus(data.user.id);
+        const { onboardingCompleted, userType } = await checkOnboardingStatus(data.user.id);
         
         updateState({
           user: data.user,
@@ -34,7 +34,8 @@ export const useAuthOperations = (initialState: AuthState) => {
           error: null
         });
 
-        navigate(hasCompletedOnboarding ? '/dashboard' : '/onboarding');
+        const redirectPath = getRedirectPath(userType, onboardingCompleted);
+        navigate(redirectPath);
       }
     } catch (error: any) {
       updateState({ error });
