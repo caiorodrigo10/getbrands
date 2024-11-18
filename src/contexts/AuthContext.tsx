@@ -3,7 +3,7 @@ import { User, Session, AuthChangeEvent } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
-import Gleap from "gleap";
+import { identifyUserInGleap, handleProfileBasedRedirect } from "@/utils/authUtils";
 
 interface AuthContextType {
   user: User | null;
@@ -23,46 +23,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const identifyUserInGleap = async (currentUser: User | null) => {
-    if (currentUser) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('first_name, last_name')
-        .eq('id', currentUser.id)
-        .single();
-
-      const fullName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : currentUser.email?.split('@')[0] || 'User';
-      
-      Gleap.identify(currentUser.id, {
-        email: currentUser.email,
-        name: fullName,
-      });
-    } else {
-      Gleap.clearIdentity();
-    }
-  };
-
-  const handleProfileBasedRedirect = async (currentUser: User) => {
-    try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role, user_type')
-        .eq('id', currentUser.id)
-        .single();
-
-      if (profile) {
-        if (profile.user_type === 'customer') {
-          navigate('/dashboard', { replace: true });
-        } else if (['member', 'sampler'].includes(profile.user_type)) {
-          navigate('/start-here', { replace: true });
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-      navigate('/dashboard', { replace: true }); // Default fallback
-    }
-  };
-
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -78,9 +38,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (initialSession) {
           setSession(initialSession);
           setUser(initialSession.user);
-          identifyUserInGleap(initialSession.user);
+          await identifyUserInGleap(initialSession.user);
           if (location.pathname === '/login') {
-            handleProfileBasedRedirect(initialSession.user);
+            await handleProfileBasedRedirect(initialSession.user, navigate);
           }
         }
       } catch (error) {
@@ -100,14 +60,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (currentSession) {
         setSession(currentSession);
         setUser(currentSession.user);
-        identifyUserInGleap(currentSession.user);
+        await identifyUserInGleap(currentSession.user);
         if (location.pathname === '/login') {
-          handleProfileBasedRedirect(currentSession.user);
+          await handleProfileBasedRedirect(currentSession.user, navigate);
         }
       } else {
         setSession(null);
         setUser(null);
-        identifyUserInGleap(null);
+        await identifyUserInGleap(null);
         if (event === 'SIGNED_OUT') {
           navigate('/login', { replace: true });
         }
@@ -138,8 +98,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
-        identifyUserInGleap(data.user);
-        handleProfileBasedRedirect(data.user);
+        await identifyUserInGleap(data.user);
+        await handleProfileBasedRedirect(data.user, navigate);
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -151,7 +111,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setUser(null);
       setSession(null);
-      identifyUserInGleap(null);
+      await identifyUserInGleap(null);
       
       const { error } = await supabase.auth.signOut();
       
