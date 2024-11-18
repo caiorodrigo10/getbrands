@@ -29,11 +29,13 @@ export const AppRoutes = () => (
     <Route path="/login" element={<Login />} />
     
     {/* Protected Routes */}
-    <Route element={
-      <ProtectedRoute>
-        <AppLayout />
-      </ProtectedRoute>
-    }>
+    <Route
+      element={
+        <ProtectedRoute>
+          <AppLayout />
+        </ProtectedRoute>
+      }
+    >
       {/* Admin Routes */}
       {AdminRoutes}
       
