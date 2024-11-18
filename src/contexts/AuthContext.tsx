@@ -1,15 +1,15 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { User, Session, AuthChangeEvent } from "@supabase/supabase-js";
+import React, { createContext, useContext, useState } from "react";
+import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Gleap from "gleap";
 import { useAuthRedirection } from "@/hooks/useAuthRedirection";
 import { useAuthState } from "@/hooks/useAuthState";
+import { useAuthSession } from "@/hooks/useAuthSession";
 
 interface AuthContextType {
   user: User | null;
-  session: Session | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
@@ -21,69 +21,28 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const location = useLocation();
   const { handleUserRedirection } = useAuthRedirection();
+  const { session, isLoading: isSessionLoading } = useAuthSession();
   const { 
     user, 
-    setUser, 
-    session, 
-    setSession, 
-    isLoading, 
+    setUser,
+    isLoading: isUserLoading, 
     setIsLoading,
     identifyUserInGleap 
   } = useAuthState();
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error('Session error:', sessionError);
-          setSession(null);
-          setUser(null);
-          return;
-        }
-        
-        if (initialSession) {
-          setSession(initialSession);
-          setUser(initialSession.user);
-          await identifyUserInGleap(initialSession.user);
-          await handleUserRedirection(initialSession.user);
-        }
-      } catch (error) {
-        console.error('Error initializing auth:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const isLoading = isSessionLoading || isUserLoading;
 
-    initializeAuth();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, currentSession) => {
-      console.log('Auth event:', event);
-      
-      if (currentSession) {
-        setSession(currentSession);
-        setUser(currentSession.user);
-        await identifyUserInGleap(currentSession.user);
-        await handleUserRedirection(currentSession.user);
-      } else {
-        setSession(null);
-        setUser(null);
-        identifyUserInGleap(null);
-        if (event === 'SIGNED_OUT') {
-          navigate('/login');
-        }
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [navigate, location]);
+  React.useEffect(() => {
+    if (session?.user) {
+      setUser(session.user);
+      identifyUserInGleap(session.user);
+      handleUserRedirection(session.user);
+    } else {
+      setUser(null);
+      identifyUserInGleap(null);
+    }
+  }, [session]);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
@@ -104,7 +63,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (data.user) {
         setUser(data.user);
-        setSession(data.session);
         await identifyUserInGleap(data.user);
         await handleUserRedirection(data.user);
       }
@@ -119,13 +77,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     setIsLoading(true);
     try {
-      setUser(null);
-      setSession(null);
-      identifyUserInGleap(null);
-      
       const { error } = await supabase.auth.signOut();
-      
-      navigate('/login');
       
       if (error) {
         console.error('Logout error:', error);
@@ -137,14 +89,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           });
         }
       } else {
+        setUser(null);
+        identifyUserInGleap(null);
         toast({
           title: "Success",
           description: "Logged out successfully!",
         });
+        navigate('/login');
       }
     } catch (error) {
       console.error('Logout error:', error);
-      navigate('/login');
     } finally {
       setIsLoading(false);
     }
@@ -162,7 +116,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     <AuthContext.Provider
       value={{ 
         user, 
-        session, 
         login, 
         logout, 
         isAuthenticated: !!session,
