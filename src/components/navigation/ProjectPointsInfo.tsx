@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Coins } from "lucide-react";
+import { Coins, Package2 } from "lucide-react";
+import { PACK_LABELS } from "@/types/project";
 
 export const ProjectPointsInfo = () => {
   const { user } = useAuth();
@@ -16,7 +17,7 @@ export const ProjectPointsInfo = () => {
         .select("*")
         .eq("user_id", user.id)
         .eq("status", "active")
-        .maybeSingle(); // Changed from .single() to .maybeSingle()
+        .maybeSingle();
         
       if (error && error.code !== 'PGRST116') {
         throw error;
@@ -30,6 +31,7 @@ export const ProjectPointsInfo = () => {
   if (!activeProject) return null;
 
   const availablePoints = activeProject.points - (activeProject.points_used || 0);
+  const packLabel = PACK_LABELS[activeProject.pack_type];
 
   return (
     <div className="p-4 border-t border-border/40">
@@ -37,6 +39,12 @@ export const ProjectPointsInfo = () => {
         <div className="space-y-1">
           <h4 className="text-sm font-medium text-gray-300">Active Project</h4>
           <p className="text-sm text-white truncate">{activeProject.name}</p>
+        </div>
+        
+        <div className="flex items-center gap-2 text-sm">
+          <Package2 className="h-4 w-4 text-primary" />
+          <span className="text-gray-300">Pack:</span>
+          <span className="font-medium text-white">{packLabel}</span>
         </div>
         
         <div className="flex items-center gap-2 text-sm">
