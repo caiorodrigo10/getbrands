@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ClientProducts } from "@/components/admin/projects/manage/ClientProducts";
 import { ClientSamples } from "@/components/admin/projects/manage/ClientSamples";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const AdminProjectManage = () => {
   const navigate = useNavigate();
@@ -82,88 +83,94 @@ const AdminProjectManage = () => {
         </Badge>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Client Information */}
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Client Information</h2>
-          <div className="space-y-3">
-            <div>
-              <p className="text-sm text-muted-foreground">Client Name</p>
-              <p className="font-medium">
-                {`${project.user?.first_name || ''} ${project.user?.last_name || ''}`.trim() || 'N/A'}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Email</p>
-              <p className="font-medium">{project.user?.email || 'N/A'}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Phone</p>
-              <p className="font-medium">{project.user?.phone || 'N/A'}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Address</p>
-              <p className="font-medium">
-                {[
-                  project.user?.shipping_address_street,
-                  project.user?.shipping_address_city,
-                  project.user?.shipping_address_state,
-                  project.user?.shipping_address_zip
-                ].filter(Boolean).join(', ') || 'N/A'}
-              </p>
-            </div>
-          </div>
-        </Card>
+      <Tabs defaultValue="client-info" className="w-full">
+        <TabsList className="bg-white border-b w-full justify-start rounded-none h-12 p-0">
+          <TabsTrigger 
+            value="client-info"
+            className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-12 px-4"
+          >
+            Client Information
+          </TabsTrigger>
+          <TabsTrigger 
+            value="project-stages"
+            className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-12 px-4"
+          >
+            Project Stages
+          </TabsTrigger>
+          <TabsTrigger 
+            value="selected-products"
+            className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-12 px-4"
+          >
+            Selected Products
+          </TabsTrigger>
+          <TabsTrigger 
+            value="sample-requests"
+            className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-12 px-4"
+          >
+            Sample Requests
+          </TabsTrigger>
+        </TabsList>
 
-        {/* Project Details */}
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Project Details</h2>
-          <div className="space-y-3">
-            <div>
-              <p className="text-sm text-muted-foreground">Start Date</p>
-              <p className="font-medium">
-                {new Date(project.created_at).toLocaleDateString()}
-              </p>
+        <TabsContent value="client-info" className="mt-6">
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold mb-4">Client Information</h2>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-muted-foreground">Client Name</p>
+                <p className="font-medium">
+                  {`${project.user?.first_name || ''} ${project.user?.last_name || ''}`.trim() || 'N/A'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Email</p>
+                <p className="font-medium">{project.user?.email || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Phone</p>
+                <p className="font-medium">{project.user?.phone || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Address</p>
+                <p className="font-medium">
+                  {[
+                    project.user?.shipping_address_street,
+                    project.user?.shipping_address_city,
+                    project.user?.shipping_address_state,
+                    project.user?.shipping_address_zip
+                  ].filter(Boolean).join(', ') || 'N/A'}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Expected Completion</p>
-              <p className="font-medium">
-                {new Date(new Date(project.created_at).setMonth(
-                  new Date(project.created_at).getMonth() + 3
-                )).toLocaleDateString()}
-              </p>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="project-stages" className="mt-6">
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold mb-4">Project Progress</h2>
+            <div className="flex items-center gap-2 mb-6">
+              <div className="h-2 w-full bg-muted/15 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-1000 ease-out rounded-full"
+                  style={{ width: '35%' }}
+                />
+              </div>
+              <span className="text-sm text-muted-foreground whitespace-nowrap min-w-[40px]">
+                35%
+              </span>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Points</p>
-              <p className="font-medium">{project.points} points</p>
-            </div>
-          </div>
-        </Card>
-      </div>
+            <Separator className="my-6" />
+            <StagesTimeline />
+          </Card>
+        </TabsContent>
 
-      {/* Client Products */}
-      <ClientProducts projectId={project.id} />
+        <TabsContent value="selected-products" className="mt-6">
+          <ClientProducts projectId={project.id} />
+        </TabsContent>
 
-      {/* Client Samples */}
-      <ClientSamples userId={project.user?.id} />
-
-      {/* Project Progress */}
-      <Card className="p-6">
-        <h2 className="text-lg font-semibold mb-4">Project Progress</h2>
-        <div className="flex items-center gap-2 mb-6">
-          <div className="h-2 w-full bg-muted/15 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-primary transition-all duration-1000 ease-out rounded-full"
-              style={{ width: '35%' }}
-            />
-          </div>
-          <span className="text-sm text-muted-foreground whitespace-nowrap min-w-[40px]">
-            35%
-          </span>
-        </div>
-        <Separator className="my-6" />
-        <StagesTimeline />
-      </Card>
+        <TabsContent value="sample-requests" className="mt-6">
+          <ClientSamples userId={project.user?.id} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
