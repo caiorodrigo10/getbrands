@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, User, ShoppingBag, LayoutDashboard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface UserMenuProps {
   isMobile: boolean;
@@ -21,6 +22,7 @@ interface UserMenuProps {
 const UserMenu = ({ isMobile }: UserMenuProps) => {
   const { user, logout } = useAuth();
   const [profile, setProfile] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const isInAdminPanel = location.pathname.startsWith('/admin');
@@ -34,6 +36,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   const fetchProfile = async () => {
     if (!user) return;
     
+    setIsLoading(true);
     const { data } = await supabase
       .from("profiles")
       .select()
@@ -43,12 +46,13 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
     if (data) {
       setProfile(data);
     }
+    setIsLoading(false);
   };
 
   if (!user) return null;
 
   const userEmail = user.email || "";
-  const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : userEmail?.split("@")[0] || "User";
+  const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : "";
   const userAvatar = profile?.avatar_url;
   const isAdmin = profile?.role === "admin";
 
@@ -60,20 +64,40 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
     }
   };
 
+  const renderUserInfo = () => {
+    if (isLoading) {
+      return (
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-10 w-10 rounded-full" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-3 w-32" />
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <Avatar className="h-10 w-10 border border-white/20">
+          <AvatarImage src={userAvatar} alt={userName} />
+          <AvatarFallback className="bg-primary text-primary-foreground">
+            {userName ? userName.charAt(0) : "?"}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex flex-col">
+          <span className="text-sm font-medium text-white">{userName}</span>
+          <span className="text-xs text-white/70">{userEmail}</span>
+        </div>
+      </>
+    );
+  };
+
   if (isMobile) {
     return (
       <div className="flex flex-col">
         <div className="flex items-center gap-3 mb-4">
-          <Avatar className="h-10 w-10 border border-white/20">
-            <AvatarImage src={userAvatar} alt={userName} />
-            <AvatarFallback className="bg-primary text-primary-foreground">
-              {userName.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-white">{userName}</span>
-            <span className="text-xs text-white/70">{userEmail}</span>
-          </div>
+          {renderUserInfo()}
         </div>
         <div className="flex flex-col space-y-1">
           <Link 
@@ -119,16 +143,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           className="relative h-auto w-full flex flex-col items-start gap-1 px-3 py-2 hover:bg-white/10"
         >
           <div className="flex items-center gap-3 w-full">
-            <Avatar className="h-8 w-8 border border-white/20">
-              <AvatarImage src={userAvatar} alt={userName} />
-              <AvatarFallback className="bg-primary text-primary-foreground">
-                {userName.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col items-start">
-              <span className="text-sm font-medium text-white">{userName}</span>
-              <span className="text-xs text-white/70">{userEmail}</span>
-            </div>
+            {renderUserInfo()}
           </div>
         </Button>
       </DropdownMenuTrigger>
@@ -141,7 +156,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
             <Avatar className="h-10 w-10 border">
               <AvatarImage src={userAvatar} alt={userName} />
               <AvatarFallback className="bg-primary text-primary-foreground">
-                {userName.charAt(0)}
+                {userName ? userName.charAt(0) : "?"}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
