@@ -10,6 +10,10 @@ import Projects from "@/pages/Projects";
 import ProjectDetails from "@/pages/ProjectDetails";
 import ProjectDetailsV2 from "@/pages/ProjectDetailsV2";
 import Catalog from "@/pages/Catalog";
+import Products from "@/pages/Products";
+import ProductDetails from "@/pages/ProductDetails";
+import PedidoAmostra from "@/pages/PedidoAmostra";
+import ProductSelectedSuccess from "@/pages/products/ProductSelectedSuccess";
 
 export const AppRoutes = () => (
   <Routes>
@@ -63,6 +67,30 @@ export const AppRoutes = () => (
       <Route path="/catalog" element={
         <ProtectedRoute>
           <Catalog />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/catalog/:id" element={
+        <ProtectedRoute>
+          <ProductDetails />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/products" element={
+        <ProtectedRoute>
+          <Products />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/products/success" element={
+        <ProtectedRoute>
+          <ProductSelectedSuccess />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/sample-orders" element={
+        <ProtectedRoute>
+          <PedidoAmostra />
         </ProtectedRoute>
       } />
     </Route>

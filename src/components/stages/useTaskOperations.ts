@@ -26,13 +26,13 @@ export const useTaskOperations = (projectId: string) => {
     }
   };
 
-  const addTaskToDatabase = async (stageName: string, taskData: Task): Promise<void> => {
+  const addTaskToDatabase = async (stageId: string, taskData: Task): Promise<void> => {
     try {
       const { error } = await supabase
         .from('project_tasks')
         .insert({
           project_id: projectId,
-          stage_name: stageName,
+          stage_id: stageId,
           title: taskData.name,
           status: taskData.status,
           assignee_id: taskData.assignee === 'none' ? null : taskData.assignee,
