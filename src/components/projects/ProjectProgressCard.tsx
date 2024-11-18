@@ -4,8 +4,6 @@ import { Package, Calendar, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
 interface ProjectProgressCardProps {
   project: {
@@ -28,29 +26,20 @@ const getStatusColor = (status: string) => {
   }
 };
 
-const calculateProgress = (tasks: any[]) => {
-  if (!tasks?.length) return 0;
-  const completedTasks = tasks.filter(task => task.status === "done").length;
-  return Math.round((completedTasks / tasks.length) * 100);
+const getProgressPercentage = (status: string) => {
+  switch (status) {
+    case "completed":
+      return 100;
+    case "in-progress":
+      return 60;
+    default:
+      return 30;
+  }
 };
 
 export const ProjectProgressCard = ({ project }: ProjectProgressCardProps) => {
   const navigate = useNavigate();
-  
-  const { data: tasks, isLoading } = useQuery({
-    queryKey: ["project-tasks", project.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('project_tasks')
-        .select('*')
-        .eq('project_id', project.id);
-        
-      if (error) throw error;
-      return data || [];
-    }
-  });
-
-  const progressPercentage = isLoading ? 0 : calculateProgress(tasks);
+  const progressPercentage = getProgressPercentage(project.status);
 
   return (
     <Card className="p-6 space-y-6">
@@ -90,7 +79,7 @@ export const ProjectProgressCard = ({ project }: ProjectProgressCardProps) => {
       <Button 
         variant="outline" 
         className="w-full"
-        onClick={() => navigate(`/projects/v2/${project.id}`)}
+        onClick={() => navigate(`/projects/${project.id}`)}
       >
         View Project Details
         <ArrowRight className="ml-2 h-4 w-4" />

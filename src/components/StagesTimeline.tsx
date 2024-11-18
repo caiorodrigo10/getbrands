@@ -4,8 +4,6 @@ import { StagesList } from "./stages/StagesList";
 import { AddStageButton } from "./stages/AddStageButton";
 import { useStagesData } from "./stages/useStagesData";
 import { useParams } from "react-router-dom";
-import { useProfile } from "@/hooks/useProfile";
-import { useAuth } from "@/contexts/AuthContext";
 
 export type TaskStatus = "pending" | "in_progress" | "done" | "blocked" | "scheduled" | "not_included";
 export type AssigneeType = "none" | string;
@@ -40,10 +38,6 @@ const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
 
 const StagesTimeline = () => {
   const { id: projectId } = useParams();
-  const { user } = useAuth();
-  const { data: profile } = useProfile(user?.id);
-  const isAdmin = profile?.role === "admin";
-  
   const {
     stages,
     setStages,
@@ -52,7 +46,6 @@ const StagesTimeline = () => {
     deleteTaskFromDatabase,
     addStageToDatabase,
     deleteStageFromDatabase,
-    updateStageInDatabase,
   } = useStagesData(projectId || '');
   
   const [openStages, setOpenStages] = useState<string[]>([]);
@@ -90,31 +83,29 @@ const StagesTimeline = () => {
 
   const handleAddTask = async (stageName: string, taskData: Task) => {
     if (!projectId) return;
+    
     await addTaskToDatabase(stageName, taskData);
   };
 
   const handleDeleteTask = async (stageName: string, taskIndex: number) => {
     const taskId = stages.find(s => s.name === stageName)?.tasks[taskIndex]?.id;
     if (!taskId) return;
+
     await deleteTaskFromDatabase(taskId);
   };
 
   const handleAddStage = async (stageName: string) => {
     if (!projectId) return;
+    
     await addStageToDatabase(stageName);
     toast.success("Stage added successfully");
   };
 
   const handleDeleteStage = async (stageName: string) => {
     if (!projectId) return;
+    
     await deleteStageFromDatabase(stageName);
     toast.success("Stage deleted successfully");
-  };
-
-  const handleStageUpdate = async (oldStageName: string, newStageName: string, newStatus: Stage["status"]) => {
-    if (!projectId) return;
-    await updateStageInDatabase(oldStageName, newStageName, newStatus);
-    toast.success("Stage updated successfully");
   };
 
   return (
@@ -127,8 +118,6 @@ const StagesTimeline = () => {
         onAddTask={handleAddTask}
         onDeleteTask={handleDeleteTask}
         onDeleteStage={handleDeleteStage}
-        onUpdateStage={handleStageUpdate}
-        isAdmin={isAdmin}
       />
       <AddStageButton onAddStage={handleAddStage} />
     </div>

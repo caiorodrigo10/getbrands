@@ -168,30 +168,6 @@ export const useStagesData = (projectId: string) => {
     }
   };
 
-  const updateStageInDatabase = async (oldStageName: string, newStageName: string, newStatus: Stage["status"]) => {
-    try {
-      const { error } = await supabase
-        .from('project_tasks')
-        .update({ stage_name: newStageName })
-        .eq('project_id', projectId)
-        .eq('stage_name', oldStageName);
-
-      if (error) throw error;
-      
-      setStages(prevStages => 
-        prevStages.map(stage => 
-          stage.name === oldStageName
-            ? { ...stage, name: newStageName, status: newStatus }
-            : stage
-        )
-      );
-    } catch (error) {
-      console.error('Error updating stage:', error);
-      toast.error("Failed to update stage");
-      throw error;
-    }
-  };
-
   return {
     stages,
     setStages,
@@ -200,6 +176,5 @@ export const useStagesData = (projectId: string) => {
     deleteTaskFromDatabase,
     addStageToDatabase,
     deleteStageFromDatabase,
-    updateStageInDatabase,
   };
 };

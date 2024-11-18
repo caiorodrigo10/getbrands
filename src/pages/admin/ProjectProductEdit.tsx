@@ -2,12 +2,17 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { ProductFormSection } from "@/components/admin/catalog/ProductFormSection";
+import { ProductImageUpload } from "@/components/admin/catalog/ProductImageUpload";
+import { ProductImage } from "@/types/product";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { ProjectProductEditForm } from "@/components/admin/projects/product-edit/ProjectProductEditForm";
 
 const productFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -19,19 +24,13 @@ const ProjectProductEdit = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof productFormSchema>>({
-    resolver: zodResolver(productFormSchema),
-  });
-
-  const { data: projectProduct, isLoading: isLoadingProduct } = useQuery({
-    queryKey: ["project-product-details", productId],
+  const { data: projectProduct, isLoading, refetch: refetchProduct } = useQuery({
+    queryKey: ["project-product", productId],
     queryFn: async () => {
-      const { data: projectProductData, error: projectProductError } = await supabase
+      const { data, error } = await supabase
         .from("project_products")
         .select(`
           id,
-          product_id,
-          project_id,
           product:products (
             id,
             name,
@@ -39,42 +38,40 @@ const ProjectProductEdit = () => {
             from_price,
             srp,
             image_url
+          ),
+          specific:project_specific_products (
+            id,
+            name,
+            selling_price,
+            main_image_url,
+            images
           )
         `)
         .eq("id", productId)
         .single();
 
-      if (projectProductError) throw projectProductError;
-
-      const { data: specificData } = await supabase
-        .from("project_specific_products")
-        .select("*")
-        .eq("project_product_id", productId)
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      const specificProduct = specificData && specificData.length > 0 ? specificData[0] : null;
-
-      return {
-        projectProduct: projectProductData,
-        baseProduct: projectProductData.product,
-        specificProduct: specificProduct
-      };
+      if (error) throw error;
+      return data;
     },
   });
 
+  const form = useForm<z.infer<typeof productFormSchema>>({
+    resolver: zodResolver(productFormSchema),
+    defaultValues: {
+      name: "",
+      selling_price: 0,
+    },
+  });
+
+  // Update form values when data is loaded
   useQuery({
     queryKey: ["update-form", projectProduct],
     enabled: !!projectProduct,
     queryFn: () => {
-      if (!projectProduct) return null;
-
-      const name = projectProduct.specificProduct?.name || projectProduct.baseProduct.name;
-      const price = projectProduct.specificProduct?.selling_price || projectProduct.baseProduct.srp;
-
+      const specificProduct = projectProduct?.specific?.[0];
       form.reset({
-        name,
-        selling_price: price,
+        name: specificProduct?.name || projectProduct?.product?.name || "",
+        selling_price: specificProduct?.selling_price || projectProduct?.product?.srp || 0,
       });
       return null;
     },
@@ -82,20 +79,9 @@ const ProjectProductEdit = () => {
 
   const { data: productImages, refetch: refetchImages } = useQuery({
     queryKey: ['project-product-images', productId],
-    enabled: !!projectProduct,
     queryFn: async () => {
-      if (!projectProduct?.specificProduct?.images) {
-        const { data, error } = await supabase
-          .from('product_images')
-          .select('*')
-          .eq('product_id', projectProduct?.baseProduct.id)
-          .order('position');
-
-        if (error) throw error;
-        return data || [];
-      }
-
-      const images = projectProduct.specificProduct.images || [];
+      if (!projectProduct?.specific?.[0]?.images) return [];
+      const images = projectProduct.specific[0].images || [];
       return (images as any[]).map((img, index) => ({
         id: img.id || `temp-${index}`,
         product_id: productId as string,
@@ -104,8 +90,9 @@ const ProjectProductEdit = () => {
         is_primary: index === 0,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
-      }));
+      })) as ProductImage[];
     },
+    enabled: !!projectProduct,
   });
 
   const handleSubmit = async (values: z.infer<typeof productFormSchema>) => {
@@ -119,6 +106,9 @@ const ProjectProductEdit = () => {
         });
 
       if (error) throw error;
+
+      // Refetch the product data to update the UI
+      await refetchProduct();
 
       toast({
         title: "Success",
@@ -136,7 +126,7 @@ const ProjectProductEdit = () => {
     }
   };
 
-  if (isLoadingProduct) {
+  if (isLoading) {
     return (
       <div className="p-6">
         <div className="h-8 w-64 bg-gray-200 animate-pulse rounded" />
@@ -145,9 +135,6 @@ const ProjectProductEdit = () => {
   }
 
   if (!projectProduct) return null;
-
-  const mainImageUrl = projectProduct.specificProduct?.main_image_url || 
-                      projectProduct.baseProduct.image_url;
 
   return (
     <div className="space-y-6 p-6">
@@ -167,15 +154,68 @@ const ProjectProductEdit = () => {
         </div>
       </div>
 
-      <ProjectProductEditForm
-        form={form}
-        productId={productId || ""}
-        projectId={projectId || ""}
-        productImages={productImages || []}
-        mainImageUrl={mainImageUrl}
-        onImagesUpdate={() => refetchImages()}
-        onSubmit={handleSubmit}
-      />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+          <ProductFormSection title="Media">
+            <ProductImageUpload
+              productId={productId || ""}
+              images={productImages || []}
+              mainImageUrl={projectProduct.specific?.[0]?.main_image_url || projectProduct.product?.image_url}
+              onImagesUpdate={() => refetchImages()}
+            />
+          </ProductFormSection>
+
+          <ProductFormSection title="Product Information">
+            <div className="grid gap-6 max-w-xl">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Product Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="selling_price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Selling Price</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        step="0.01"
+                        onChange={e => field.onChange(parseFloat(e.target.value))}
+                        value={field.value}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </ProductFormSection>
+
+          <div className="flex justify-end gap-4 pt-6 border-t">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => navigate(`/admin/projects/${projectId}/manage`)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit">
+              Save Changes
+            </Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 };
