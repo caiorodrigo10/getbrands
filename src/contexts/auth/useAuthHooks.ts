@@ -40,9 +40,7 @@ export const useAuthInitialization = () => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
-      console.log('Auth event:', event);
-      
+    } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
       if (currentSession) {
         setSession(currentSession);
         setUser(currentSession.user);
@@ -54,9 +52,7 @@ export const useAuthInitialization = () => {
         setSession(null);
         setUser(null);
         identifyUserInGleap(null);
-        if (event === 'SIGNED_OUT') {
-          navigate('/login');
-        }
+        navigate('/login');
       }
     });
 
@@ -75,8 +71,8 @@ export const useAuthActions = (setUser: (user: User | null) => void, setSession:
   const login = async (email: string, password: string) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: email.trim(),
+        password: password.trim(),
       });
 
       if (error) {
@@ -93,6 +89,11 @@ export const useAuthActions = (setUser: (user: User | null) => void, setSession:
         setSession(data.session);
         await identifyUserInGleap(data.user);
         navigate('/dashboard');
+        
+        toast({
+          title: "Success",
+          description: "Logged in successfully!",
+        });
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -102,17 +103,23 @@ export const useAuthActions = (setUser: (user: User | null) => void, setSession:
 
   const logout = async () => {
     try {
-      setUser(null);
-      setSession(null);
-      identifyUserInGleap(null);
-
       const { error } = await supabase.auth.signOut();
       
       if (error) {
         console.error('Logout error:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Error logging out. Please try again.",
+        });
+        return;
       }
 
+      setUser(null);
+      setSession(null);
+      identifyUserInGleap(null);
       navigate('/login');
+      
       toast({
         title: "Success",
         description: "Logged out successfully!",
