@@ -1,4 +1,4 @@
-import { RadioGroup } from "@/components/ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { profileTypes } from "../onboardingData";
 
@@ -21,7 +21,7 @@ export function ProfileTypeStep({ value, onChange }: ProfileTypeStepProps) {
             key={type}
             className="flex items-center space-x-3 p-4 border rounded-lg cursor-pointer hover:bg-accent"
           >
-            <RadioGroup.Item value={type} id={type} />
+            <RadioGroupItem value={type} id={type} />
             <span>{type}</span>
           </Label>
         ))}
