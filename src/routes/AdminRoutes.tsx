@@ -6,6 +6,8 @@ import AdminProductEdit from "@/pages/admin/AdminProductEdit";
 import AdminProjects from "@/pages/admin/AdminProjects";
 import AdminProjectManage from "@/pages/admin/AdminProjectManage";
 import ProjectProductEdit from "@/pages/admin/ProjectProductEdit";
+import AdminOrders from "@/pages/admin/AdminOrders";
+import AdminCRM from "@/pages/admin/AdminCRM";
 
 export const AdminRoutes = () => (
   <AdminLayout>
@@ -16,6 +18,8 @@ export const AdminRoutes = () => (
       <Route path="/projects" element={<AdminProjects />} />
       <Route path="/projects/:id/manage" element={<AdminProjectManage />} />
       <Route path="/projects/:projectId/products/:productId" element={<ProjectProductEdit />} />
+      <Route path="/orders" element={<AdminOrders />} />
+      <Route path="/crm" element={<AdminCRM />} />
     </Routes>
   </AdminLayout>
 );
