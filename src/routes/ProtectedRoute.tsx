@@ -1,8 +1,36 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserPermissions, isRestrictedRoute } from "@/lib/permissions";
+import { toast } from "sonner";
 
-export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requiresAuth?: boolean;
+  requiresAdmin?: boolean;
+}
+
+export const ProtectedRoute = ({ 
+  children, 
+  requiresAuth = true,
+  requiresAdmin = false,
+}: ProtectedRouteProps) => {
   const { isAuthenticated } = useAuth();
-  if (!isAuthenticated) return <Navigate to="/login" />;
+  const { hasFullAccess } = useUserPermissions();
+  const location = useLocation();
+
+  if (!isAuthenticated && requiresAuth) {
+    return <Navigate to="/login" />;
+  }
+
+  if (requiresAdmin && !hasFullAccess) {
+    toast.error("You don't have permission to access this area");
+    return <Navigate to="/catalog" />;
+  }
+
+  if (isRestrictedRoute(location.pathname) && !hasFullAccess) {
+    toast.error("You need to upgrade your plan to access this feature");
+    return <Navigate to="/checkout/points" />;
+  }
+
   return <>{children}</>;
 };
