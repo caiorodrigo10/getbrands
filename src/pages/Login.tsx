@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -48,25 +47,24 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password.trim(),
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      navigate('/dashboard');
+      await login(email.trim(), password.trim());
     } catch (error: any) {
       console.error("Login error:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message === "Invalid login credentials" 
-          ? "Invalid email or password. Please try again."
-          : "An error occurred during login. Please try again.",
-      });
+      
+      // Show specific error message for invalid credentials
+      if (error.message?.includes("Invalid login credentials")) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Incorrect email or password. Please try again.",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "An error occurred during login. Please try again.",
+        });
+      }
     } finally {
       setIsLoading(false);
     }

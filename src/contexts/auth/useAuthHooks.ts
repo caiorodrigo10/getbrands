@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
 import { identifyUserInGleap } from "./gleapIdentification";
 
@@ -69,39 +69,23 @@ export const useAuthInitialization = () => {
 };
 
 export const useAuthActions = (setUser: (user: User | null) => void, setSession: (session: Session | null) => void) => {
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   const login = async (email: string, password: string) => {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password.trim(),
-      });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password: password.trim(),
+    });
 
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: error.message || "Invalid email or password. Please try again.",
-        });
-        throw error;
-      }
-
-      if (data.user) {
-        setUser(data.user);
-        setSession(data.session);
-        await identifyUserInGleap(data.user);
-        navigate('/dashboard');
-        
-        toast({
-          title: "Success",
-          description: "Logged in successfully!",
-        });
-      }
-    } catch (error) {
-      console.error('Login error:', error);
+    if (error) {
       throw error;
+    }
+
+    if (data.user) {
+      setUser(data.user);
+      setSession(data.session);
+      await identifyUserInGleap(data.user);
+      navigate('/dashboard');
     }
   };
 
@@ -111,22 +95,12 @@ export const useAuthActions = (setUser: (user: User | null) => void, setSession:
       
       if (error) {
         console.error('Logout error:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Error logging out. Please try again.",
-        });
-        return;
+        throw error;
       }
 
       setUser(null);
       setSession(null);
       await identifyUserInGleap(null);
-      
-      toast({
-        title: "Success",
-        description: "Logged out successfully!",
-      });
       
       navigate('/login', { replace: true });
     } catch (error) {
