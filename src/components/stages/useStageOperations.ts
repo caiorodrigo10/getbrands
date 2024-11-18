@@ -1,3 +1,4 @@
+import { supabase } from "@/integrations/supabase/client";
 import { Stage } from "../StagesTimeline";
 import { toast } from "sonner";
 
@@ -16,7 +17,6 @@ export const useStageOperations = (projectId: string) => {
 
   const deleteStageFromDatabase = async (stageName: string) => {
     try {
-      // Delete all tasks in this stage
       const { error } = await supabase
         .from('project_tasks')
         .delete()

@@ -1,4 +1,3 @@
-// Split into multiple files for better organization
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Stage, Task } from "../StagesTimeline";
@@ -71,12 +70,14 @@ export const useStagesData = (projectId: string) => {
           id: task.id,
           stage_name: stage.name,
           stage_position: stageIndex,
+          title: task.name, // Add the required title field
+          project_id: projectId // Add the project_id field
         }))
       );
 
       const { error } = await supabase
         .from('project_tasks')
-        .upsert(updates, { onConflict: 'id' });
+        .upsert(updates);
 
       if (error) throw error;
       await fetchStages();
