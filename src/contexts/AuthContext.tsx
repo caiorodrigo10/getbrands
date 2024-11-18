@@ -25,7 +25,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const identifyUserInGleap = async (currentUser: User | null) => {
     if (currentUser) {
-      // Fetch the profile to get the full name
       const { data: profile } = await supabase
         .from('profiles')
         .select('first_name, last_name')
@@ -36,7 +35,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       Gleap.identify(currentUser.id, {
         email: currentUser.email,
-        name: fullName, // Now using the full name instead of just email prefix
+        name: fullName,
       });
     } else {
       Gleap.clearIdentity();
@@ -129,22 +128,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      await supabase.auth.signOut();
+      // First clear local state
       setUser(null);
       setSession(null);
       identifyUserInGleap(null);
+      
+      // Then attempt to sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      // Even if there's an error, we want to ensure the user is redirected and local state is cleared
       navigate('/login');
-      toast({
-        title: "Success",
-        description: "Logged out successfully!",
-      });
+      
+      if (error) {
+        console.error('Logout error:', error);
+        // Only show error toast if it's not a session_not_found error
+        if (error.message !== 'session_not_found') {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "An error occurred during logout. Please try again.",
+          });
+        }
+      } else {
+        toast({
+          title: "Success",
+          description: "Logged out successfully!",
+        });
+      }
     } catch (error) {
       console.error('Logout error:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to log out. Please try again.",
-      });
+      // Ensure user is still redirected even if there's an error
+      navigate('/login');
     }
   };
 

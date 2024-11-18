@@ -255,34 +255,41 @@ export type Database = {
       }
       onboarding_responses: {
         Row: {
-          id: string
-          user_id: string | null
           answers: Json
           created_at: string
+          id: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
-          id?: string
-          user_id?: string | null
           answers: Json
           created_at?: string
+          id?: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
-          id?: string
-          user_id?: string | null
           answers?: Json
           created_at?: string
+          id?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "onboarding_responses_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "crm_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_responses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       package_quizzes: {
@@ -453,9 +460,13 @@ export type Database = {
           email: string | null
           first_name: string | null
           id: string
+          instagram_handle: string | null
           last_name: string | null
           name: string | null
+          onboarding_completed: boolean | null
           phone: string | null
+          product_interest: string | null
+          profile_type: string | null
           role: string
           shipping_address_city: string | null
           shipping_address_state: string | null
@@ -476,9 +487,13 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id: string
+          instagram_handle?: string | null
           last_name?: string | null
           name?: string | null
+          onboarding_completed?: boolean | null
           phone?: string | null
+          product_interest?: string | null
+          profile_type?: string | null
           role?: string
           shipping_address_city?: string | null
           shipping_address_state?: string | null
@@ -499,9 +514,13 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id?: string
+          instagram_handle?: string | null
           last_name?: string | null
           name?: string | null
+          onboarding_completed?: boolean | null
           phone?: string | null
+          product_interest?: string | null
+          profile_type?: string | null
           role?: string
           shipping_address_city?: string | null
           shipping_address_state?: string | null
@@ -716,7 +735,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           due_date?: string | null
-          id: string
+          id?: string
           position?: number | null
           project_id?: string | null
           stage_id?: string | null
@@ -1077,7 +1096,7 @@ export type Tables<
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never,
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -1164,4 +1183,3 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
-
