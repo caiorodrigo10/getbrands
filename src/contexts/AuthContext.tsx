@@ -9,7 +9,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
 }
 
@@ -128,7 +128,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      // First clear local state
+      // First clear local state and identity
       setUser(null);
       setSession(null);
       identifyUserInGleap(null);
@@ -136,13 +136,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Then attempt to sign out from Supabase
       const { error } = await supabase.auth.signOut();
       
-      // Even if there's an error, we want to ensure the user is redirected and local state is cleared
+      // Always navigate to login page regardless of error
       navigate('/login');
       
       if (error) {
-        console.error('Logout error:', error);
         // Only show error toast if it's not a session_not_found error
         if (error.message !== 'session_not_found') {
+          console.error('Logout error:', error);
           toast({
             variant: "destructive",
             title: "Error",
