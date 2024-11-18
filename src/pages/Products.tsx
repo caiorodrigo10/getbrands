@@ -38,7 +38,8 @@ const Products = () => {
             id,
             name,
             description,
-            image_url,
+            main_image_url,
+            images,
             selling_price
           )
         `)
@@ -112,7 +113,8 @@ const Products = () => {
         {products?.map((item, index) => {
           const specificProduct = item.specific?.[0];
           const displayName = specificProduct?.name || item.product?.name || 'Unnamed Product';
-          const displayImage = specificProduct?.image_url || item.product?.image_url;
+          // Use the specific product's main image if available, otherwise fallback to original product image
+          const displayImage = specificProduct?.main_image_url || item.product?.image_url;
           
           return (
             <Card 
