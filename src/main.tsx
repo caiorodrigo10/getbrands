@@ -4,6 +4,7 @@ import App from './App.tsx'
 import './index.css'
 import Gleap from 'gleap'
 import { AuthProvider } from "./contexts/AuthContext"
+import { BrowserRouter } from "react-router-dom"
 
 // Initialize Gleap
 Gleap.initialize("qqAquIhEn19VOadZnGz2Xg48r3NoXdas");
@@ -15,8 +16,10 @@ const root = createRoot(rootElement)
 
 root.render(
   <React.StrictMode>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </BrowserRouter>
   </React.StrictMode>
 )
