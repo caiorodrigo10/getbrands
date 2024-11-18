@@ -3,6 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Stage } from "../StagesTimeline";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export interface StageHeaderProps {
   name: string;
@@ -26,6 +32,17 @@ const getStatusIcon = (status: Stage["status"]) => {
   }
 };
 
+const getStatusColor = (status: Stage["status"]) => {
+  switch (status) {
+    case "completed":
+      return "text-green-500";
+    case "in-progress":
+      return "text-blue-500";
+    default:
+      return "text-gray-500";
+  }
+};
+
 export const StageHeader = ({
   name,
   status,
@@ -46,6 +63,10 @@ export const StageHeader = ({
     }
   };
 
+  const handleStatusChange = (newStatus: Stage["status"]) => {
+    onUpdate(name, name, newStatus);
+  };
+
   return (
     <div 
       className="flex items-center justify-between p-4 cursor-pointer group hover:bg-muted/5 transition-colors"
@@ -57,8 +78,33 @@ export const StageHeader = ({
             <GripVertical className="w-4 h-4 text-muted-foreground" />
           </div>
         )}
-        <div className="flex items-center gap-2">
-          {getStatusIcon(status)}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                  {getStatusIcon(status)}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => handleStatusChange("pending")}>
+                  <Square className="w-4 h-4 mr-2 text-gray-500" />
+                  <span>Pending</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleStatusChange("in-progress")}>
+                  <Clock className="w-4 h-4 mr-2 text-blue-500" />
+                  <span>In Progress</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleStatusChange("completed")}>
+                  <Check className="w-4 h-4 mr-2 text-green-500" />
+                  <span>Completed</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <span className={`text-sm ${getStatusColor(status)}`}>
+              {status.replace("-", " ")}
+            </span>
+          </div>
           {isEditing ? (
             <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
               <Input
@@ -109,18 +155,7 @@ export const StageHeader = ({
           )}
         </div>
       </div>
-      <div className="flex items-center gap-4">
-        <span
-          className={`text-sm ${
-            status === "completed"
-              ? "text-green-500"
-              : status === "in-progress"
-              ? "text-blue-500"
-              : "text-gray-500"
-          }`}
-        >
-          {status.replace("-", " ")}
-        </span>
+      <div>
         {isOpen ? (
           <ChevronUp className="h-5 w-5" />
         ) : (
