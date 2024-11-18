@@ -2,17 +2,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { ProductFormSection } from "@/components/admin/catalog/ProductFormSection";
-import { ProductImageUpload } from "@/components/admin/catalog/ProductImageUpload";
-import { ProductImage } from "@/types/product";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { ProjectProductEditForm } from "@/components/admin/projects/product-edit/ProjectProductEditForm";
 
 const productFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -23,6 +18,10 @@ const ProjectProductEdit = () => {
   const { projectId, productId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const form = useForm<z.infer<typeof productFormSchema>>({
+    resolver: zodResolver(productFormSchema),
+  });
 
   const { data: projectProduct, isLoading, refetch: refetchProduct } = useQuery({
     queryKey: ["project-product", productId],
@@ -55,23 +54,18 @@ const ProjectProductEdit = () => {
     },
   });
 
-  const form = useForm<z.infer<typeof productFormSchema>>({
-    resolver: zodResolver(productFormSchema),
-    defaultValues: {
-      name: "",
-      selling_price: 0,
-    },
-  });
-
   // Update form values when data is loaded
   useQuery({
     queryKey: ["update-form", projectProduct],
     enabled: !!projectProduct,
     queryFn: () => {
       const specificProduct = projectProduct?.specific?.[0];
+      const defaultName = specificProduct?.name || projectProduct?.product?.name || "";
+      const defaultPrice = specificProduct?.selling_price || projectProduct?.product?.srp || 0;
+      
       form.reset({
-        name: specificProduct?.name || projectProduct?.product?.name || "",
-        selling_price: specificProduct?.selling_price || projectProduct?.product?.srp || 0,
+        name: defaultName,
+        selling_price: defaultPrice,
       });
       return null;
     },
@@ -90,7 +84,7 @@ const ProjectProductEdit = () => {
         is_primary: index === 0,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
-      })) as ProductImage[];
+      }));
     },
     enabled: !!projectProduct,
   });
@@ -107,7 +101,6 @@ const ProjectProductEdit = () => {
 
       if (error) throw error;
 
-      // Refetch the product data to update the UI
       await refetchProduct();
 
       toast({
@@ -154,68 +147,15 @@ const ProjectProductEdit = () => {
         </div>
       </div>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-          <ProductFormSection title="Media">
-            <ProductImageUpload
-              productId={productId || ""}
-              images={productImages || []}
-              mainImageUrl={projectProduct.specific?.[0]?.main_image_url || projectProduct.product?.image_url}
-              onImagesUpdate={() => refetchImages()}
-            />
-          </ProductFormSection>
-
-          <ProductFormSection title="Product Information">
-            <div className="grid gap-6 max-w-xl">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Product Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="selling_price"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Selling Price</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.01"
-                        onChange={e => field.onChange(parseFloat(e.target.value))}
-                        value={field.value}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </ProductFormSection>
-
-          <div className="flex justify-end gap-4 pt-6 border-t">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => navigate(`/admin/projects/${projectId}/manage`)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit">
-              Save Changes
-            </Button>
-          </div>
-        </form>
-      </Form>
+      <ProjectProductEditForm
+        form={form}
+        productId={productId || ""}
+        projectId={projectId || ""}
+        productImages={productImages || []}
+        mainImageUrl={projectProduct.specific?.[0]?.main_image_url || projectProduct.product?.image_url}
+        onImagesUpdate={() => refetchImages()}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 };
