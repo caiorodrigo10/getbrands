@@ -42,20 +42,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const handleUserRedirection = async (currentUser: User | null) => {
-    if (currentUser) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('user_type')
-        .eq('id', currentUser.id)
-        .single();
-
-      if (profile?.user_type === 'customer') {
-        navigate('/dashboard', { replace: true });
-      }
-    }
-  };
-
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -71,8 +57,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (initialSession) {
           setSession(initialSession);
           setUser(initialSession.user);
-          await identifyUserInGleap(initialSession.user);
-          await handleUserRedirection(initialSession.user);
+          identifyUserInGleap(initialSession.user);
+          if (location.pathname === '/login') {
+            navigate('/dashboard');
+          }
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
@@ -91,8 +79,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (currentSession) {
         setSession(currentSession);
         setUser(currentSession.user);
-        await identifyUserInGleap(currentSession.user);
-        await handleUserRedirection(currentSession.user);
+        identifyUserInGleap(currentSession.user);
+        if (location.pathname === '/login') {
+          navigate('/dashboard');
+        }
       } else {
         setSession(null);
         setUser(null);
@@ -127,8 +117,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
-        await identifyUserInGleap(data.user);
-        await handleUserRedirection(data.user);
+        identifyUserInGleap(data.user);
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -138,16 +128,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
+      // First clear local state
       setUser(null);
       setSession(null);
       identifyUserInGleap(null);
       
+      // Then attempt to sign out from Supabase
       const { error } = await supabase.auth.signOut();
       
+      // Even if there's an error, we want to ensure the user is redirected and local state is cleared
       navigate('/login');
       
       if (error) {
         console.error('Logout error:', error);
+        // Only show error toast if it's not a session_not_found error
         if (error.message !== 'session_not_found') {
           toast({
             variant: "destructive",
@@ -163,6 +157,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch (error) {
       console.error('Logout error:', error);
+      // Ensure user is still redirected even if there's an error
       navigate('/login');
     }
   };
