@@ -1,16 +1,14 @@
-import { ChevronDown, ChevronUp, Trash2, Pencil, Check, GripVertical } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, Pencil, Check, Clock, Square, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { Stage } from "@/components/StagesTimeline";
+import { Stage } from "../StagesTimeline";
 import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 export interface StageHeaderProps {
   name: string;
@@ -21,19 +19,27 @@ export interface StageHeaderProps {
   onUpdate: (oldName: string, newName: string, newStatus: Stage["status"]) => void;
   isAdmin?: boolean;
   isDraggable?: boolean;
-  projectId?: string;
 }
+
+const getStatusIcon = (status: Stage["status"]) => {
+  switch (status) {
+    case "completed":
+      return <Check className="w-4 h-4 text-green-500" />;
+    case "in-progress":
+      return <Clock className="w-4 h-4 text-blue-500" />;
+    default:
+      return <Square className="w-4 h-4 text-gray-500" />;
+  }
+};
 
 const getStatusColor = (status: Stage["status"]) => {
   switch (status) {
     case "completed":
-      return "bg-emerald-100 text-emerald-700";
+      return "text-green-500";
     case "in-progress":
-      return "bg-blue-100 text-blue-700";
-    case "pending":
-      return "bg-purple-100 text-purple-700";
+      return "text-blue-500";
     default:
-      return "bg-gray-100 text-gray-700";
+      return "text-gray-500";
   }
 };
 
@@ -46,7 +52,6 @@ export const StageHeader = ({
   onUpdate,
   isAdmin = false,
   isDraggable = false,
-  projectId,
 }: StageHeaderProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(name);
@@ -58,36 +63,8 @@ export const StageHeader = ({
     }
   };
 
-  const handleStatusChange = async (newStatus: Stage["status"]) => {
-    try {
-      if (projectId) {
-        // Update all tasks in this stage to reflect the new status
-        const taskStatus = newStatus === "completed" ? "done" : 
-                         newStatus === "in-progress" ? "in_progress" : 
-                         "pending";
-
-        const { error } = await supabase
-          .from('project_tasks')
-          .update({ status: taskStatus })
-          .eq('project_id', projectId)
-          .eq('stage_name', name);
-
-        if (error) throw error;
-        
-        onUpdate(name, name, newStatus);
-        toast.success("Stage status updated successfully");
-      }
-    } catch (error) {
-      console.error('Error updating stage status:', error);
-      toast.error("Failed to update stage status");
-    }
-  };
-
-  const handleStatusClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!isOpen) {
-      onToggle();
-    }
+  const handleStatusChange = (newStatus: Stage["status"]) => {
+    onUpdate(name, name, newStatus);
   };
 
   return (
@@ -102,28 +79,32 @@ export const StageHeader = ({
           </div>
         )}
         <div className="flex items-center gap-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild onClick={handleStatusClick}>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}
-              >
-                {status.replace("-", " ")}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
-              <DropdownMenuItem onClick={() => handleStatusChange("pending")}>
-                <span className="text-purple-700">Pending</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleStatusChange("in-progress")}>
-                <span className="text-blue-700">In Progress</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleStatusChange("completed")}>
-                <span className="text-emerald-700">Completed</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                  {getStatusIcon(status)}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => handleStatusChange("pending")}>
+                  <Square className="w-4 h-4 mr-2 text-gray-500" />
+                  <span>Pending</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleStatusChange("in-progress")}>
+                  <Clock className="w-4 h-4 mr-2 text-blue-500" />
+                  <span>In Progress</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleStatusChange("completed")}>
+                  <Check className="w-4 h-4 mr-2 text-green-500" />
+                  <span>Completed</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <span className={`text-sm ${getStatusColor(status)}`}>
+              {status.replace("-", " ")}
+            </span>
+          </div>
           {isEditing ? (
             <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
               <Input

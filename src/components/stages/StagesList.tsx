@@ -3,6 +3,8 @@ import { DraggableStage } from "./DraggableStage";
 import {
   DndContext,
   DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
   MouseSensor,
   TouchSensor,
   useSensor,
@@ -25,7 +27,6 @@ interface StagesListProps {
   onUpdateStage: (oldStageName: string, newStageName: string, newStatus: Stage["status"]) => void;
   onReorderStages: (stages: Stage[]) => void;
   isAdmin?: boolean;
-  projectId?: string;
 }
 
 export const StagesList = ({
@@ -39,7 +40,6 @@ export const StagesList = ({
   onUpdateStage,
   onReorderStages,
   isAdmin = false,
-  projectId,
 }: StagesListProps) => {
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -93,7 +93,6 @@ export const StagesList = ({
               onDeleteStage={() => onDeleteStage(stage.name)}
               onUpdateStage={onUpdateStage}
               isAdmin={isAdmin}
-              projectId={projectId}
             />
           ))}
         </div>
