@@ -4,6 +4,8 @@ import { StagesList } from "./stages/StagesList";
 import { AddStageButton } from "./stages/AddStageButton";
 import { useStagesData } from "./stages/useStagesData";
 import { useParams } from "react-router-dom";
+import { useProfile } from "@/hooks/useProfile";
+import { useAuth } from "@/contexts/AuthContext";
 
 export type TaskStatus = "pending" | "in_progress" | "done" | "blocked" | "scheduled" | "not_included";
 export type AssigneeType = "none" | string;
@@ -38,6 +40,10 @@ const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
 
 const StagesTimeline = () => {
   const { id: projectId } = useParams();
+  const { user } = useAuth();
+  const { data: profile } = useProfile(user?.id);
+  const isAdmin = profile?.role === "admin";
+  
   const {
     stages,
     setStages,
@@ -122,6 +128,7 @@ const StagesTimeline = () => {
         onDeleteTask={handleDeleteTask}
         onDeleteStage={handleDeleteStage}
         onUpdateStage={handleStageUpdate}
+        isAdmin={isAdmin}
       />
       <AddStageButton onAddStage={handleAddStage} />
     </div>

@@ -1,92 +1,112 @@
-import { Check, Clock, Pencil } from "lucide-react";
 import { useState } from "react";
-import { Input } from "../ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { Button } from "../ui/button";
+import { ChevronDown, ChevronRight, Pencil, X, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface StageHeaderProps {
   name: string;
   status: "completed" | "in-progress" | "pending";
-  onUpdateStage?: (newName: string, newStatus: "completed" | "in-progress" | "pending") => void;
+  isOpen: boolean;
+  onToggle: () => void;
+  onDelete: () => void;
+  onUpdate: (oldName: string, newName: string, newStatus: "completed" | "in-progress" | "pending") => void;
+  isAdmin?: boolean;
 }
 
-export const StageHeader = ({ name, status, onUpdateStage }: StageHeaderProps) => {
+export const StageHeader = ({
+  name,
+  status,
+  isOpen,
+  onToggle,
+  onDelete,
+  onUpdate,
+  isAdmin = false,
+}: StageHeaderProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(name);
   const [editedStatus, setEditedStatus] = useState(status);
 
   const handleSave = () => {
-    if (editedName.trim() && onUpdateStage) {
-      onUpdateStage(editedName, editedStatus);
-      setIsEditing(false);
-    }
+    onUpdate(name, editedName, editedStatus);
+    setIsEditing(false);
   };
 
-  if (isEditing) {
-    return (
-      <div className="flex items-center gap-3">
-        <Input
-          value={editedName}
-          onChange={(e) => setEditedName(e.target.value)}
-          className="h-7 w-[200px]"
-          autoFocus
-        />
-        <Select value={editedStatus} onValueChange={(value: "completed" | "in-progress" | "pending") => setEditedStatus(value)}>
-          <SelectTrigger className="h-7 w-[130px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="in-progress">In Progress</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
-          </SelectContent>
-        </Select>
+  const handleCancel = () => {
+    setEditedName(name);
+    setEditedStatus(status);
+    setIsEditing(false);
+  };
+
+  return (
+    <div className="flex items-center justify-between p-4 bg-muted/5">
+      <div className="flex items-center gap-2">
         <Button
           variant="ghost"
           size="sm"
-          onClick={handleSave}
-          className="h-7 w-7 p-0"
+          className="p-0 h-8 w-8"
+          onClick={onToggle}
         >
-          <Check className="h-4 w-4" />
+          {isOpen ? (
+            <ChevronDown className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
         </Button>
-      </div>
-    );
-  }
 
-  return (
-    <div className="flex items-center gap-3 group">
-      <div className={`relative flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center border ${
-        status === "completed" 
-          ? "border-primary bg-primary text-white" 
-          : status === "in-progress"
-          ? "border-primary-light bg-primary-light/10"
-          : "border-muted bg-muted/10"
-      }`}>
-        {status === "completed" ? (
-          <Check className="w-3 h-3" />
-        ) : status === "in-progress" ? (
-          <Clock className="w-3 h-3 text-primary-light" />
+        {isEditing && isAdmin ? (
+          <div className="flex items-center gap-2">
+            <Input
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              className="h-8 w-48"
+            />
+            <Select
+              value={editedStatus}
+              onValueChange={(value: "completed" | "in-progress" | "pending") => 
+                setEditedStatus(value)
+              }
+            >
+              <SelectTrigger className="h-8 w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="in-progress">In Progress</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSave}
+              className="h-8 w-8 p-0"
+            >
+              <Check className="h-4 w-4 text-green-500" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCancel}
+              className="h-8 w-8 p-0"
+            >
+              <X className="h-4 w-4 text-red-500" />
+            </Button>
+          </div>
         ) : (
-          <div className="w-1.5 h-1.5 bg-muted rounded-full" />
-        )}
-      </div>
-      
-      <div className="flex-grow min-w-0 flex items-center gap-2">
-        <span className={`text-sm font-medium ${
-          status === "completed" ? "text-foreground" :
-          status === "in-progress" ? "text-foreground" : "text-muted-foreground"
-        }`}>
-          {name}
-        </span>
-        {onUpdateStage && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsEditing(true)}
-            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <span className="font-medium">{name}</span>
+            {isAdmin && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+                className="h-8 w-8 p-0"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         )}
       </div>
     </div>
