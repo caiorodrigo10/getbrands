@@ -18,17 +18,59 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const identifyUserInGleap = (currentUser: User | null) => {
+  const identifyUserInGleap = async (currentUser: User | null) => {
     if (currentUser) {
-      Gleap.identify(currentUser.id, {
-        email: currentUser.email,
-        name: currentUser.email?.split('@')[0] || 'User',
-      });
+      try {
+        // Fetch user profile data
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", currentUser.id)
+          .single();
+
+        // Fetch user's projects
+        const { data: projects } = await supabase
+          .from("projects")
+          .select("*")
+          .eq("user_id", currentUser.id);
+
+        // Get the most recent project if any exists
+        const mainProject = projects && projects.length > 0 ? projects[0] : null;
+
+        // Prepare user data for Gleap
+        const userData = {
+          userId: currentUser.id,
+          email: currentUser.email,
+          name: profile ? `${profile.first_name} ${profile.last_name}`.trim() : currentUser.email?.split('@')[0],
+          phone: profile?.phone || '',
+          value: 0,
+          companyId: mainProject?.id || '',
+          companyName: mainProject?.name || '',
+          plan: mainProject?.pack_type || 'none',
+          customData: {
+            role: profile?.role || 'member',
+            user_type: profile?.user_type || 'member',
+            projects_count: projects?.length || 0,
+            created_at: profile?.created_at,
+            shipping_address: profile?.shipping_address_street 
+              ? `${profile.shipping_address_street}, ${profile.shipping_address_city}, ${profile.shipping_address_state} ${profile.shipping_address_zip}`
+              : '',
+          }
+        };
+
+        Gleap.identify(userData.userId, userData);
+      } catch (error) {
+        console.error('Error identifying user in Gleap:', error);
+        // Fallback to basic identification if there's an error
+        Gleap.identify(currentUser.id, {
+          email: currentUser.email,
+          name: currentUser.email?.split('@')[0] || 'User',
+        });
+      }
     } else {
       Gleap.clearIdentity();
     }
@@ -49,15 +91,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (initialSession) {
           setSession(initialSession);
           setUser(initialSession.user);
-          identifyUserInGleap(initialSession.user);
+          await identifyUserInGleap(initialSession.user);
           if (location.pathname === '/login') {
             navigate('/dashboard');
           }
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -71,7 +111,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (currentSession) {
         setSession(currentSession);
         setUser(currentSession.user);
-        identifyUserInGleap(currentSession.user);
+        await identifyUserInGleap(currentSession.user);
         if (location.pathname === '/login') {
           navigate('/dashboard');
         }
@@ -109,7 +149,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
-        identifyUserInGleap(data.user);
+        await identifyUserInGleap(data.user);
         navigate('/dashboard');
       }
     } catch (error) {
@@ -138,10 +178,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
     }
   };
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <AuthContext.Provider
