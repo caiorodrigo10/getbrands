@@ -9,7 +9,7 @@ interface StagesListProps {
   openStages: string[];
   onToggleStage: (stageName: string) => void;
   onTaskUpdate: (stageName: string, taskIndex: number, updates: Partial<Task>) => void;
-  onAddTask: (stageName: string, task: Task) => void;
+  onAddTask: (stageName: string, task: Task) => Promise<void>;
   onDeleteTask: (stageName: string, taskIndex: number) => void;
   onDeleteStage: (stageName: string) => void;
   onUpdateStage: (oldStageName: string, newStageName: string, newStatus: Stage["status"]) => void;
@@ -58,7 +58,7 @@ export const StagesList = ({
               ))}
               <AddTaskButton
                 stageName={stage.name}
-                onAddTask={(task) => onAddTask(stage.name, task)}
+                onAddTask={async (task) => await onAddTask(stage.name, task)}
               />
             </div>
           )}
