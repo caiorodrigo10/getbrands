@@ -46,15 +46,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (currentUser) {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('user_type, onboarding_completed')
+        .select('user_type')
         .eq('id', currentUser.id)
         .single();
 
       if (profile?.user_type === 'customer') {
-        navigate('/dashboard', { replace: true });
-      } else if (profile?.user_type === 'member' && !profile?.onboarding_completed) {
-        navigate('/onboarding', { replace: true });
-      } else if (profile?.user_type === 'member' && profile?.onboarding_completed) {
         navigate('/dashboard', { replace: true });
       }
     }
