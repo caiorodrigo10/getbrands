@@ -52,12 +52,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(initialSession.user);
           identifyUserInGleap(initialSession.user);
           
-          // Only redirect to dashboard if on login page
           if (location.pathname === '/login') {
             navigate('/dashboard');
           }
         } else if (location.pathname !== '/login') {
-          // If no session and not on login page, redirect to login
           navigate('/login');
         }
       } catch (error) {
@@ -88,7 +86,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(null);
         identifyUserInGleap(null);
         
-        // Only redirect to login if not already there
         if (location.pathname !== '/login') {
           navigate('/login');
         }
@@ -135,14 +132,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession(null);
       identifyUserInGleap(null);
 
-      // Tenta fazer logout no Supabase
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-
-      // Força a limpeza da sessão no localStorage
+      // Força a limpeza do localStorage
       window.localStorage.removeItem('supabase.auth.token');
-      
-      // Navega para a página de login e previne redirecionamentos indesejados
+      window.localStorage.removeItem('sb-skrvprmnncxpkojraoem-auth-token');
+
+      try {
+        // Tenta fazer logout no Supabase
+        await supabase.auth.signOut();
+      } catch (error: any) {
+        // Ignora erros de session_not_found pois já limpamos o estado local
+        if (!error.message?.includes('session_not_found')) {
+          console.error('Erro no signOut:', error);
+        }
+      }
+
+      // Sempre navega para login após limpar o estado
       navigate('/login', { replace: true });
 
       toast({
@@ -152,7 +156,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error: any) {
       console.error('Erro no logout:', error);
       
-      // Sempre navega para login mesmo se houver erro
+      // Garante que o usuário seja redirecionado mesmo em caso de erro
       navigate('/login', { replace: true });
       
       if (!error.message?.includes('session_not_found')) {
