@@ -474,7 +474,6 @@ export type Database = {
           shipping_address_street2: string | null
           shipping_address_zip: string | null
           updated_at: string
-          user_type: string
         }
         Insert: {
           avatar_url?: string | null
@@ -501,7 +500,6 @@ export type Database = {
           shipping_address_street2?: string | null
           shipping_address_zip?: string | null
           updated_at?: string
-          user_type?: string
         }
         Update: {
           avatar_url?: string | null
@@ -528,7 +526,6 @@ export type Database = {
           shipping_address_street2?: string | null
           shipping_address_zip?: string | null
           updated_at?: string
-          user_type?: string
         }
         Relationships: []
       }
@@ -1050,27 +1047,7 @@ export type Database = {
           last_name: string | null
           phone: string | null
           projects: Json | null
-          user_type: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          email?: string | null
-          first_name?: string | null
-          id?: string | null
-          last_name?: string | null
-          phone?: string | null
-          projects?: never
-          user_type?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          email?: string | null
-          first_name?: string | null
-          id?: string | null
-          last_name?: string | null
-          phone?: string | null
-          projects?: never
-          user_type?: string | null
+          role: string | null
         }
         Relationships: []
       }
