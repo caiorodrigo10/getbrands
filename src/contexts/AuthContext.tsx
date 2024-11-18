@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .single();
 
       if (profile?.user_type === 'customer') {
-        navigate('/dashboard');
+        navigate('/dashboard', { replace: true });
       }
     }
   };
@@ -71,8 +71,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (initialSession) {
           setSession(initialSession);
           setUser(initialSession.user);
-          identifyUserInGleap(initialSession.user);
-          handleUserRedirection(initialSession.user);
+          await identifyUserInGleap(initialSession.user);
+          await handleUserRedirection(initialSession.user);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
@@ -91,8 +91,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (currentSession) {
         setSession(currentSession);
         setUser(currentSession.user);
-        identifyUserInGleap(currentSession.user);
-        handleUserRedirection(currentSession.user);
+        await identifyUserInGleap(currentSession.user);
+        await handleUserRedirection(currentSession.user);
       } else {
         setSession(null);
         setUser(null);
@@ -127,8 +127,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
-        identifyUserInGleap(data.user);
-        handleUserRedirection(data.user);
+        await identifyUserInGleap(data.user);
+        await handleUserRedirection(data.user);
       }
     } catch (error) {
       console.error('Login error:', error);
