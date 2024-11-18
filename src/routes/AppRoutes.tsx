@@ -19,6 +19,7 @@ import Success from "@/pages/checkout/Success";
 import ProfitCalculator from "@/pages/ProfitCalculator";
 import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 
 export const AppRoutes = () => (
   <Routes>
@@ -28,122 +29,99 @@ export const AppRoutes = () => (
     {/* Public Routes */}
     <Route path="/login" element={<Login />} />
     
-    {/* Admin Routes */}
-    {AdminRoutes}
+    {/* Admin Routes - Wrapped in AdminLayout */}
+    <Route element={<AdminLayout />}>
+      {AdminRoutes}
+    </Route>
     
-    {/* Client Routes */}
-    <Route path="/dashboard" element={
-      <ProtectedRoute>
-        <AppLayout>
+    {/* Client Routes - Wrapped in AppLayout */}
+    <Route element={<AppLayout />}>
+      <Route path="/" element={
+        <ProtectedRoute>
           <Dashboard />
-        </AppLayout>
-      </ProtectedRoute>
-    } />
-    
-    <Route path="/" element={
-      <ProtectedRoute>
-        <AppLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/dashboard" element={
+        <ProtectedRoute>
           <Dashboard />
-        </AppLayout>
-      </ProtectedRoute>
-    } />
-    
-    <Route path="/profile" element={
-      <ProtectedRoute>
-        <AppLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/profile" element={
+        <ProtectedRoute>
           <Profile />
-        </AppLayout>
-      </ProtectedRoute>
-    } />
-    
-    <Route path="/projects" element={
-      <ProtectedRoute>
-        <AppLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/projects" element={
+        <ProtectedRoute>
           <Projects />
-        </AppLayout>
-      </ProtectedRoute>
-    } />
-    
-    <Route path="/projects/:id" element={
-      <ProtectedRoute>
-        <AppLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/projects/:id" element={
+        <ProtectedRoute>
           <ProjectDetails />
-        </AppLayout>
-      </ProtectedRoute>
-    } />
+        </ProtectedRoute>
+      } />
 
-    <Route path="/package-quiz/:projectId" element={
-      <ProtectedRoute>
-        <AppLayout>
+      <Route path="/package-quiz/:projectId" element={
+        <ProtectedRoute>
           <PackageQuizPage />
-        </AppLayout>
-      </ProtectedRoute>
-    } />
-    
-    <Route path="/catalog" element={
-      <ProtectedRoute>
-        <AppLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/catalog" element={
+        <ProtectedRoute>
           <Catalog />
-        </AppLayout>
-      </ProtectedRoute>
-    } />
+        </ProtectedRoute>
+      } />
 
-    <Route path="/catalog/:id" element={
-      <ProtectedRoute>
-        <AppLayout>
+      <Route path="/catalog/:id" element={
+        <ProtectedRoute>
           <ProductDetails />
-        </AppLayout>
-      </ProtectedRoute>
-    } />
-    
-    <Route path="/products" element={
-      <ProtectedRoute>
-        <AppLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/products" element={
+        <ProtectedRoute>
           <Products />
-        </AppLayout>
-      </ProtectedRoute>
-    } />
-    
-    <Route path="/products/:id" element={
-      <ProtectedRoute>
-        <AppLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/products/:id" element={
+        <ProtectedRoute>
           <ProductDetails />
-        </AppLayout>
-      </ProtectedRoute>
-    } />
-    
-    <Route path="/products/success" element={
-      <ProtectedRoute>
-        <AppLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/products/success" element={
+        <ProtectedRoute>
           <ProductSelectedSuccess />
-        </AppLayout>
-      </ProtectedRoute>
-    } />
-    
-    <Route path="/documents" element={
-      <ProtectedRoute>
-        <AppLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/documents" element={
+        <ProtectedRoute>
           <Documents />
-        </AppLayout>
-      </ProtectedRoute>
-    } />
-    
-    <Route path="/sample-orders" element={
-      <ProtectedRoute>
-        <AppLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/sample-orders" element={
+        <ProtectedRoute>
           <SampleOrders />
-        </AppLayout>
-      </ProtectedRoute>
-    } />
-    
-    <Route path="/profit-calculator" element={
-      <ProtectedRoute>
-        <AppLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/profit-calculator" element={
+        <ProtectedRoute>
           <ProfitCalculator />
-        </AppLayout>
-      </ProtectedRoute>
-    } />
-    
+        </ProtectedRoute>
+      } />
+    </Route>
+
+    {/* Standalone Routes */}
     <Route path="/checkout/*" element={
       <ProtectedRoute>
         <Checkout />
