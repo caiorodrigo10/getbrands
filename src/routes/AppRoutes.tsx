@@ -3,7 +3,6 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import { AppLayout } from "./AppLayout";
 import { MarketingRoutes } from "./MarketingRoutes";
 import { AdminRoutes } from "./AdminRoutes";
-import { OnboardingQuiz } from "@/components/onboarding/OnboardingQuiz";
 import Login from "@/pages/Login";
 import SignUp from "@/pages/SignUp";
 import Dashboard from "@/pages/Dashboard";
@@ -22,7 +21,6 @@ import Success from "@/pages/checkout/Success";
 import ProfitCalculator from "@/pages/ProfitCalculator";
 import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
-import StartHere from "@/pages/StartHere";
 
 export const AppRoutes = () => (
   <Routes>
@@ -32,11 +30,6 @@ export const AppRoutes = () => (
     {/* Public Routes */}
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<SignUp />} />
-    <Route path="/onboarding" element={
-      <ProtectedRoute>
-        <OnboardingQuiz />
-      </ProtectedRoute>
-    } />
     
     {/* Admin Routes */}
     <Route path="/admin/*" element={
@@ -53,12 +46,6 @@ export const AppRoutes = () => (
         </ProtectedRoute>
       } />
       
-      <Route path="/start-here" element={
-        <ProtectedRoute>
-          <StartHere />
-        </ProtectedRoute>
-      } />
-
       <Route path="/get-started" element={
         <ProtectedRoute>
           <GetStarted />

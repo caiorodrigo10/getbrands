@@ -1,7 +1,7 @@
 const Index = () => {
   return (
     <div className="space-y-6">
-      <h1>Landing Page</h1>
+      <h1>Welcome to Mainer Portal</h1>
       <div className="grid gap-6">
         <div className="card p-6">
           <h2 className="text-xl font-semibold mb-4">Overview</h2>
