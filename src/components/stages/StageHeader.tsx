@@ -58,6 +58,13 @@ export const StageHeader = ({
     onUpdate(name, name, newStatus);
   };
 
+  const handleStatusClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isOpen) {
+      onToggle();
+    }
+  };
+
   return (
     <div 
       className="flex items-center justify-between p-4 cursor-pointer group hover:bg-muted/5 transition-colors"
@@ -71,7 +78,7 @@ export const StageHeader = ({
         )}
         <div className="flex items-center gap-4">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+            <DropdownMenuTrigger asChild onClick={handleStatusClick}>
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -80,7 +87,7 @@ export const StageHeader = ({
                 {status.replace("-", " ")}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
               <DropdownMenuItem onClick={() => handleStatusChange("pending")}>
                 <span className="text-purple-700">Pending</span>
               </DropdownMenuItem>
