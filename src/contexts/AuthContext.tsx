@@ -23,11 +23,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const identifyUserInGleap = (currentUser: User | null) => {
+  const identifyUserInGleap = async (currentUser: User | null) => {
     if (currentUser) {
+      // Fetch the profile to get the full name
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('id', currentUser.id)
+        .single();
+
+      const fullName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : currentUser.email?.split('@')[0] || 'User';
+      
       Gleap.identify(currentUser.id, {
         email: currentUser.email,
-        name: currentUser.email?.split('@')[0] || 'User',
+        name: fullName, // Now using the full name instead of just email prefix
       });
     } else {
       Gleap.clearIdentity();
