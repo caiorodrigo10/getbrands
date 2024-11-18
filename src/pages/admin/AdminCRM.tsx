@@ -12,14 +12,14 @@ type Project = {
   pack_type: Database["public"]["Enums"]["project_pack_type"];
 };
 
-interface ProfileWithProjects {
+interface CRMUser {
   id: string;
   first_name: string | null;
   last_name: string | null;
   email: string | null;
   phone: string | null;
   avatar_url: string | null;
-  role: string | null;
+  user_type: string | null;
   created_at: string;
   projects: Project[] | null;
 }
@@ -35,7 +35,13 @@ const AdminCRM = () => {
         .select("*");
 
       if (error) throw error;
-      return data as ProfileWithProjects[];
+      
+      // Transform the data to match CRMUser interface
+      return (data as any[]).map(user => ({
+        ...user,
+        user_type: user.role, // Map role to user_type for backward compatibility
+        projects: user.projects as Project[] | null
+      })) as CRMUser[];
     },
   });
 
