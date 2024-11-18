@@ -26,9 +26,13 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate('/dashboard');
     } catch (error) {
       console.error("Login error:", error);
+      toast({
+        variant: "destructive",
+        title: "Erro no login",
+        description: "Email ou senha inválidos. Por favor, verifique suas credenciais.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -48,8 +52,8 @@ const Login = () => {
       console.error('Error logging in with Google:', error);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to login with Google. Please try again.",
+        title: "Erro",
+        description: "Falha ao fazer login com Google. Por favor, tente novamente.",
       });
     }
   };

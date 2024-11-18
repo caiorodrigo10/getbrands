@@ -15,8 +15,6 @@ export const useAuthOperations = (initialState: AuthState) => {
   };
 
   const login = async (email: string, password: string) => {
-    updateState({ error: null });
-
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
@@ -32,25 +30,19 @@ export const useAuthOperations = (initialState: AuthState) => {
         updateState({
           user: data.user,
           session: data.session,
-          isAuthenticated: true
+          isAuthenticated: true,
+          error: null
         });
 
         navigate(hasCompletedOnboarding ? '/dashboard' : '/onboarding');
       }
     } catch (error: any) {
       updateState({ error });
-      toast({
-        variant: "destructive",
-        title: "Login Error",
-        description: "Invalid email or password. Please check your credentials.",
-      });
       throw error;
     }
   };
 
   const logout = async () => {
-    updateState({ error: null });
-
     try {
       await identifyUserInGleap(null);
       await supabase.auth.signOut();
@@ -61,7 +53,8 @@ export const useAuthOperations = (initialState: AuthState) => {
       updateState({
         user: null,
         session: null,
-        isAuthenticated: false
+        isAuthenticated: false,
+        error: null
       });
 
       navigate('/login', { replace: true });
