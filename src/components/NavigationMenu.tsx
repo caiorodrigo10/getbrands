@@ -17,7 +17,7 @@ export const NavigationMenu = () => {
       label: "Dashboard", 
       path: "/dashboard", 
       icon: LayoutDashboard,
-      restricted: true
+      restricted: false
     },
     { 
       label: "Projects", 
@@ -54,7 +54,7 @@ export const NavigationMenu = () => {
   const handleRestrictedNavigation = (path: string) => {
     if (!hasFullAccess) {
       toast.error("You need to upgrade your plan to access this feature");
-      navigate("/checkout/points");
+      navigate("/dashboard");
       return;
     }
     navigate(path);
