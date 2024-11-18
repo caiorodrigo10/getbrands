@@ -584,6 +584,8 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
+          images: Json | null
+          main_image_url: string | null
           name: string | null
           project_product_id: string | null
           selling_price: number | null
@@ -594,6 +596,8 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          images?: Json | null
+          main_image_url?: string | null
           name?: string | null
           project_product_id?: string | null
           selling_price?: number | null
@@ -604,6 +608,8 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          images?: Json | null
+          main_image_url?: string | null
           name?: string | null
           project_product_id?: string | null
           selling_price?: number | null
