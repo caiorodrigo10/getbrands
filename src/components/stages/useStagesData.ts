@@ -18,15 +18,7 @@ export const useStagesData = (projectId: string) => {
 
   const fetchStages = async () => {
     try {
-      const { data: stagesData, error: stagesError } = await supabase
-        .from('project_stages')
-        .select('*')
-        .eq('project_id', projectId)
-        .order('position', { ascending: true });
-
-      if (stagesError) throw stagesError;
-
-      const { data: tasks, error: tasksError } = await supabase
+      const { data: tasks, error } = await supabase
         .from('project_tasks')
         .select(`
           *,
@@ -37,45 +29,55 @@ export const useStagesData = (projectId: string) => {
           )
         `)
         .eq('project_id', projectId)
+        .order('stage_position', { ascending: true })
         .order('position', { ascending: true });
 
-      if (tasksError) throw tasksError;
+      if (error) throw error;
 
-      const formattedStages: Stage[] = stagesData.map(stage => ({
-        id: stage.id,
-        name: stage.name,
-        status: stage.status as Stage["status"],
-        position: stage.position,
-        tasks: tasks
-          .filter(task => task.stage_id === stage.id)
-          .map(task => ({
-            id: task.id,
-            name: task.title,
-            status: task.status as Task["status"],
-            startDate: task.start_date ? new Date(task.start_date) : undefined,
-            endDate: task.due_date ? new Date(task.due_date) : undefined,
-            assignee: task.assignee_id || 'none',
-            position: task.position,
-            stage_position: task.stage_position,
-          })),
+      // Group tasks by stage
+      const stagesMap = new Map<string, Task[]>();
+      tasks?.forEach(task => {
+        const stageTasks = stagesMap.get(task.stage_name) || [];
+        stagesMap.set(task.stage_name, [...stageTasks, {
+          id: task.id,
+          name: task.title,
+          status: task.status as Task['status'],
+          assignee: task.assignee_id || 'none',
+          startDate: task.start_date ? new Date(task.start_date) : undefined,
+          endDate: task.due_date ? new Date(task.due_date) : undefined,
+          position: task.position || 0,
+          stage_position: task.stage_position || 0,
+        }]);
+      });
+
+      const stagesArray: Stage[] = Array.from(stagesMap.entries()).map(([name, tasks]) => ({
+        name,
+        status: calculateStageStatus(tasks),
+        tasks,
+        position: tasks[0]?.stage_position || 0,
       }));
 
-      setStages(formattedStages);
+      setStages(stagesArray);
     } catch (error) {
-      console.error('Error fetching stages:', error);
-      toast.error("Failed to load project stages");
+      console.error('Error fetching tasks:', error);
+      toast.error("Failed to load project tasks");
     }
   };
 
   const reorderStagesInDatabase = async (newStages: Stage[]) => {
     try {
-      const updates = newStages.map((stage, index) => ({
-        id: stage.id,
-        position: index,
-      }));
+      const updates = newStages.flatMap((stage, stageIndex) =>
+        stage.tasks.map(task => ({
+          id: task.id,
+          stage_name: stage.name,
+          stage_position: stageIndex,
+          title: task.name,
+          project_id: projectId
+        }))
+      );
 
       const { error } = await supabase
-        .from('project_stages')
+        .from('project_tasks')
         .upsert(updates);
 
       if (error) throw error;
@@ -98,4 +100,16 @@ export const useStagesData = (projectId: string) => {
     updateStageInDatabase,
     reorderStagesInDatabase,
   };
+};
+
+const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
+  if (tasks.length === 0) return "pending";
+  
+  const allCompleted = tasks.every(task => task.status === "done");
+  if (allCompleted) return "completed";
+  
+  const hasInProgress = tasks.some(task => task.status === "in_progress");
+  if (hasInProgress) return "in-progress";
+  
+  return "pending";
 };

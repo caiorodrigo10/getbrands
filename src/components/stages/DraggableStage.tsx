@@ -4,7 +4,7 @@ import { Stage } from "../StagesTimeline";
 import { StageHeader } from "./StageHeader";
 import { TaskItem } from "./TaskItem";
 import { AddTaskButton } from "./AddTaskButton";
-import { Card } from "../ui/card";
+import { Card } from "@/components/ui/card";
 import { Task } from "../StagesTimeline";
 
 interface DraggableStageProps {
@@ -17,6 +17,7 @@ interface DraggableStageProps {
   onDeleteStage: () => void;
   onUpdateStage: (oldName: string, newName: string, newStatus: Stage["status"]) => void;
   isAdmin?: boolean;
+  projectId?: string;
 }
 
 export const DraggableStage = ({
@@ -29,6 +30,7 @@ export const DraggableStage = ({
   onDeleteStage,
   onUpdateStage,
   isAdmin,
+  projectId,
 }: DraggableStageProps) => {
   const {
     attributes,
@@ -58,6 +60,7 @@ export const DraggableStage = ({
             onUpdate={onUpdateStage}
             isAdmin={isAdmin}
             isDraggable
+            projectId={projectId}
           />
         </div>
         

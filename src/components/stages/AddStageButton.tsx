@@ -1,20 +1,22 @@
 import { Plus } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
-import { Input } from "../ui/input";
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface AddStageButtonProps {
   onAddStage: (stageName: string) => Promise<void>;
+  projectId: string;
 }
 
-export const AddStageButton = ({ onAddStage }: AddStageButtonProps) => {
+export const AddStageButton = ({ onAddStage, projectId }: AddStageButtonProps) => {
   const [stageName, setStageName] = useState("");
   const [open, setOpen] = useState(false);
 
@@ -28,8 +30,10 @@ export const AddStageButton = ({ onAddStage }: AddStageButtonProps) => {
       await onAddStage(stageName);
       setStageName("");
       setOpen(false);
+      toast.success("Stage added successfully");
     } catch (error) {
       console.error('Failed to add stage:', error);
+      toast.error("Failed to add stage");
     }
   };
 

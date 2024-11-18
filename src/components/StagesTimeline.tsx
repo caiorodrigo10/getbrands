@@ -23,7 +23,6 @@ export interface Task {
 }
 
 export interface Stage {
-  id: string;
   name: string;
   status: "completed" | "in-progress" | "pending";
   tasks: Task[];
@@ -141,8 +140,9 @@ const StagesTimeline = () => {
         onUpdateStage={handleStageUpdate}
         onReorderStages={handleReorderStages}
         isAdmin={isAdmin}
+        projectId={projectId}
       />
-      <AddStageButton onAddStage={handleAddStage} />
+      <AddStageButton onAddStage={handleAddStage} projectId={projectId || ''} />
     </div>
   );
 };
