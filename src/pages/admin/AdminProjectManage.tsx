@@ -7,33 +7,8 @@ import { ArrowLeft } from "lucide-react";
 import StagesTimeline from "@/components/StagesTimeline";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
-
-type Profile = Database['public']['Tables']['profiles']['Row'];
-type Project = Database['public']['Tables']['projects']['Row'];
-
-interface ProjectWithProfile extends Project {
-  profiles: Profile | null;
-}
-
-interface FormattedProject {
-  id: string;
-  name: string;
-  description: string | null;
-  client: {
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-  };
-  status: string;
-  progress: number;
-  accountManager: string;
-  points: number | null;
-  lastUpdate: string;
-  startDate: string;
-  expectedCompletion: string;
-}
+import { ClientProducts } from "@/components/admin/projects/manage/ClientProducts";
+import { ClientSamples } from "@/components/admin/projects/manage/ClientSamples";
 
 const AdminProjectManage = () => {
   const navigate = useNavigate();
@@ -62,34 +37,7 @@ const AdminProjectManage = () => {
         .single();
 
       if (error) throw error;
-      
-      const projectData = data as unknown as ProjectWithProfile;
-      
-      const formattedProject: FormattedProject = {
-        id: projectData.id,
-        name: projectData.name,
-        description: projectData.description,
-        client: {
-          name: `${projectData.profiles?.first_name || ''} ${projectData.profiles?.last_name || ''}`.trim(),
-          email: projectData.profiles?.email || '',
-          phone: projectData.profiles?.phone || '',
-          address: [
-            projectData.profiles?.shipping_address_street,
-            projectData.profiles?.shipping_address_city,
-            projectData.profiles?.shipping_address_state,
-            projectData.profiles?.shipping_address_zip
-          ].filter(Boolean).join(', ')
-        },
-        status: projectData.status === 'em_andamento' ? 'Active' : 'Completed',
-        progress: 35,
-        accountManager: "Michael Anderson",
-        points: projectData.points,
-        lastUpdate: "Naming phase in progress",
-        startDate: new Date(projectData.created_at).toLocaleDateString('en-US'),
-        expectedCompletion: new Date(new Date(projectData.created_at).setMonth(new Date(projectData.created_at).getMonth() + 3)).toLocaleDateString('en-US')
-      };
-
-      return formattedProject;
+      return data;
     },
     enabled: !!id
   });
@@ -129,7 +77,7 @@ const AdminProjectManage = () => {
           <p className="text-muted-foreground mt-1">{project.description}</p>
         </div>
         <Badge className="bg-emerald-500/10 text-emerald-500">
-          {project.status}
+          {project.status === 'em_andamento' ? 'Active' : 'Completed'}
         </Badge>
       </div>
 
@@ -140,19 +88,28 @@ const AdminProjectManage = () => {
           <div className="space-y-3">
             <div>
               <p className="text-sm text-muted-foreground">Client Name</p>
-              <p className="font-medium">{project.client.name}</p>
+              <p className="font-medium">
+                {`${project.profiles?.first_name || ''} ${project.profiles?.last_name || ''}`.trim()}
+              </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Email</p>
-              <p className="font-medium">{project.client.email}</p>
+              <p className="font-medium">{project.profiles?.email}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Phone</p>
-              <p className="font-medium">{project.client.phone}</p>
+              <p className="font-medium">{project.profiles?.phone}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Address</p>
-              <p className="font-medium">{project.client.address}</p>
+              <p className="font-medium">
+                {[
+                  project.profiles?.shipping_address_street,
+                  project.profiles?.shipping_address_city,
+                  project.profiles?.shipping_address_state,
+                  project.profiles?.shipping_address_zip
+                ].filter(Boolean).join(', ')}
+              </p>
             </div>
           </div>
         </Card>
@@ -162,16 +119,18 @@ const AdminProjectManage = () => {
           <h2 className="text-lg font-semibold mb-4">Project Details</h2>
           <div className="space-y-3">
             <div>
-              <p className="text-sm text-muted-foreground">Account Manager</p>
-              <p className="font-medium">{project.accountManager}</p>
-            </div>
-            <div>
               <p className="text-sm text-muted-foreground">Start Date</p>
-              <p className="font-medium">{project.startDate}</p>
+              <p className="font-medium">
+                {new Date(project.created_at).toLocaleDateString()}
+              </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Expected Completion</p>
-              <p className="font-medium">{project.expectedCompletion}</p>
+              <p className="font-medium">
+                {new Date(new Date(project.created_at).setMonth(
+                  new Date(project.created_at).getMonth() + 3
+                )).toLocaleDateString()}
+              </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Points</p>
@@ -181,6 +140,12 @@ const AdminProjectManage = () => {
         </Card>
       </div>
 
+      {/* Client Products */}
+      <ClientProducts projectId={project.id} />
+
+      {/* Client Samples */}
+      <ClientSamples userId={project.profiles?.id} />
+
       {/* Project Progress */}
       <Card className="p-6">
         <h2 className="text-lg font-semibold mb-4">Project Progress</h2>
@@ -188,11 +153,11 @@ const AdminProjectManage = () => {
           <div className="h-2 w-full bg-muted/15 rounded-full overflow-hidden">
             <div
               className="h-full bg-primary transition-all duration-1000 ease-out rounded-full"
-              style={{ width: `${project.progress}%` }}
+              style={{ width: '35%' }}
             />
           </div>
           <span className="text-sm text-muted-foreground whitespace-nowrap min-w-[40px]">
-            {project.progress}%
+            35%
           </span>
         </div>
         <Separator className="my-6" />
