@@ -41,6 +41,19 @@ const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
   return "pending";
 };
 
+const mapStageStatusToTaskStatus = (stageStatus: Stage["status"]): TaskStatus => {
+  switch (stageStatus) {
+    case "completed":
+      return "done";
+    case "in-progress":
+      return "in_progress";
+    case "pending":
+      return "pending";
+    default:
+      return "pending";
+  }
+};
+
 const StagesTimeline = () => {
   const { id: projectId } = useParams();
   const { user } = useAuth();
@@ -117,7 +130,8 @@ const StagesTimeline = () => {
 
   const handleStageUpdate = async (oldStageName: string, newStageName: string, newStatus: Stage["status"]) => {
     if (!projectId) return;
-    await updateStageInDatabase(oldStageName, newStageName, newStatus);
+    const taskStatus = mapStageStatusToTaskStatus(newStatus);
+    await updateStageInDatabase(oldStageName, newStageName, taskStatus);
     toast.success("Stage updated successfully");
   };
 

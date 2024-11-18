@@ -1,11 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Stage } from "../StagesTimeline";
+import { Stage, TaskStatus } from "../StagesTimeline";
 import { toast } from "sonner";
 
 export const useStageOperations = (projectId: string) => {
   const addStageToDatabase = async (stageName: string) => {
     try {
-      // Create an initial task for the new stage
       const { error } = await supabase
         .from('project_tasks')
         .insert({
@@ -43,11 +42,14 @@ export const useStageOperations = (projectId: string) => {
     }
   };
 
-  const updateStageInDatabase = async (oldStageName: string, newStageName: string, newStatus: Stage["status"]) => {
+  const updateStageInDatabase = async (oldStageName: string, newStageName: string, newStatus: TaskStatus) => {
     try {
       const { error } = await supabase
         .from('project_tasks')
-        .update({ stage_name: newStageName })
+        .update({ 
+          stage_name: newStageName,
+          status: newStatus
+        })
         .eq('project_id', projectId)
         .eq('stage_name', oldStageName);
 
