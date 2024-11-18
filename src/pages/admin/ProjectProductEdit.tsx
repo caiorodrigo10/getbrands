@@ -23,11 +23,9 @@ const ProjectProductEdit = () => {
     resolver: zodResolver(productFormSchema),
   });
 
-  // First, fetch the project product with its related data
   const { data: projectProduct, isLoading: isLoadingProduct } = useQuery({
     queryKey: ["project-product-details", productId],
     queryFn: async () => {
-      // Get the project product details
       const { data: projectProductData, error: projectProductError } = await supabase
         .from("project_products")
         .select(`
@@ -48,7 +46,6 @@ const ProjectProductEdit = () => {
 
       if (projectProductError) throw projectProductError;
 
-      // Get any specific product data
       const { data: specificData } = await supabase
         .from("project_specific_products")
         .select("*")
@@ -56,7 +53,6 @@ const ProjectProductEdit = () => {
         .order('created_at', { ascending: false })
         .limit(1);
 
-      // Get the most recent specific product data if it exists
       const specificProduct = specificData && specificData.length > 0 ? specificData[0] : null;
 
       return {
@@ -67,7 +63,6 @@ const ProjectProductEdit = () => {
     },
   });
 
-  // Update form when data is loaded
   useQuery({
     queryKey: ["update-form", projectProduct],
     enabled: !!projectProduct,
@@ -90,7 +85,6 @@ const ProjectProductEdit = () => {
     enabled: !!projectProduct,
     queryFn: async () => {
       if (!projectProduct?.specificProduct?.images) {
-        // If no specific images, fetch the base product images
         const { data, error } = await supabase
           .from('product_images')
           .select('*')
@@ -101,7 +95,6 @@ const ProjectProductEdit = () => {
         return data || [];
       }
 
-      // Use specific product images if available
       const images = projectProduct.specificProduct.images || [];
       return (images as any[]).map((img, index) => ({
         id: img.id || `temp-${index}`,
