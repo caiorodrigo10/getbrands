@@ -3,6 +3,7 @@ import { User, Session, AuthChangeEvent } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
+import { getRoleBasedRedirectPath } from "@/lib/roleRedirection";
 import Gleap from "gleap";
 
 interface AuthContextType {
@@ -25,7 +26,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const identifyUserInGleap = async (currentUser: User | null) => {
     if (currentUser) {
-      // Fetch the profile to get the full name
       const { data: profile } = await supabase
         .from('profiles')
         .select('first_name, last_name')
@@ -36,10 +36,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       Gleap.identify(currentUser.id, {
         email: currentUser.email,
-        name: fullName, // Now using the full name instead of just email prefix
+        name: fullName,
       });
     } else {
       Gleap.clearIdentity();
+    }
+  };
+
+  const handleRedirection = async (currentUser: User | null) => {
+    if (!currentUser) {
+      if (location.pathname !== '/login') {
+        navigate('/login');
+      }
+      return;
+    }
+
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role, projects:projects(id)')
+        .eq('id', currentUser.id)
+        .single();
+
+      if (error) throw error;
+
+      const hasProjects = Array.isArray(profile?.projects) && profile.projects.length > 0;
+      const redirectPath = getRoleBasedRedirectPath(profile?.role, hasProjects);
+      
+      // Only redirect if we're on the login page or at the root
+      if (location.pathname === '/login' || location.pathname === '/') {
+        navigate(redirectPath);
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      navigate('/login');
     }
   };
 
@@ -59,9 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setSession(initialSession);
           setUser(initialSession.user);
           identifyUserInGleap(initialSession.user);
-          if (location.pathname === '/login') {
-            navigate('/dashboard');
-          }
+          handleRedirection(initialSession.user);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
@@ -81,9 +109,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(currentSession);
         setUser(currentSession.user);
         identifyUserInGleap(currentSession.user);
-        if (location.pathname === '/login') {
-          navigate('/dashboard');
-        }
+        handleRedirection(currentSession.user);
       } else {
         setSession(null);
         setUser(null);
@@ -97,7 +123,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, location]);
+  }, [navigate, location.pathname]);
 
   const login = async (email: string, password: string) => {
     try {
@@ -119,7 +145,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(data.user);
         setSession(data.session);
         identifyUserInGleap(data.user);
-        navigate('/dashboard');
+        handleRedirection(data.user);
       }
     } catch (error) {
       console.error('Login error:', error);

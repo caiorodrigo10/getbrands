@@ -6,6 +6,7 @@ import { AdminRoutes } from "./AdminRoutes";
 import Login from "@/pages/Login";
 import SignUp from "@/pages/SignUp";
 import Dashboard from "@/pages/Dashboard";
+import StartHere from "@/pages/StartHere";
 import Profile from "@/pages/Profile";
 import Projects from "@/pages/Projects";
 import ProjectDetails from "@/pages/ProjectDetails";
@@ -39,9 +40,9 @@ export const AppRoutes = () => (
     
     {/* Client Routes - Wrapped in AppLayout */}
     <Route element={<AppLayout />}>
-      <Route path="/" element={
+      <Route path="/start-here" element={
         <ProtectedRoute>
-          <Dashboard />
+          <StartHere />
         </ProtectedRoute>
       } />
       
