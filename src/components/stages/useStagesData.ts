@@ -165,7 +165,10 @@ export const useStagesData = (projectId: string) => {
         .upsert(
           updatedStages.map((stage, index) => ({
             id: stage.id,
+            name: stage.name,
             position: index,
+            project_id: projectId,
+            status: stage.status
           }))
         );
 
@@ -184,8 +187,14 @@ export const useStagesData = (projectId: string) => {
         .upsert(
           updatedTasks.map((task, index) => ({
             id: task.id,
+            title: task.name,
             position: index,
             stage_id: stageId,
+            project_id: projectId,
+            status: task.status,
+            assignee_id: task.assignee === 'none' ? null : task.assignee,
+            start_date: task.startDate?.toISOString(),
+            due_date: task.endDate?.toISOString()
           }))
         );
 

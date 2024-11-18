@@ -19,6 +19,7 @@ export interface Task {
   assignee?: AssigneeType;
   position: number;
   stageId: string;
+  title?: string; // Added for database compatibility
 }
 
 export interface Stage {

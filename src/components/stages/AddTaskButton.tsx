@@ -38,10 +38,13 @@ export const AddTaskButton = ({ stageName, onAddTask }: AddTaskButtonProps) => {
     const newTask: Task = {
       id: crypto.randomUUID(),
       name: taskName,
+      title: taskName, // Add title for database compatibility
       status,
       assignee,
       startDate,
-      endDate
+      endDate,
+      position: 0, // Default position
+      stageId: '', // This will be set by the parent component
     };
     
     try {
