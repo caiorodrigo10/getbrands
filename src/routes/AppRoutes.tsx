@@ -22,6 +22,7 @@ import Success from "@/pages/checkout/Success";
 import ProfitCalculator from "@/pages/ProfitCalculator";
 import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
+import StartHere from "@/pages/StartHere";
 
 export const AppRoutes = () => (
   <Routes>
@@ -52,6 +53,12 @@ export const AppRoutes = () => (
         </ProtectedRoute>
       } />
       
+      <Route path="/start-here" element={
+        <ProtectedRoute>
+          <StartHere />
+        </ProtectedRoute>
+      } />
+
       <Route path="/get-started" element={
         <ProtectedRoute>
           <GetStarted />

@@ -42,6 +42,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const handleProfileBasedRedirect = async (currentUser: User) => {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role, user_type')
+        .eq('id', currentUser.id)
+        .single();
+
+      if (profile) {
+        if (profile.user_type === 'customer') {
+          navigate('/dashboard', { replace: true });
+        } else if (['member', 'sampler'].includes(profile.user_type)) {
+          navigate('/start-here', { replace: true });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      navigate('/dashboard', { replace: true }); // Default fallback
+    }
+  };
+
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -59,7 +80,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(initialSession.user);
           identifyUserInGleap(initialSession.user);
           if (location.pathname === '/login') {
-            navigate('/dashboard', { replace: true });
+            handleProfileBasedRedirect(initialSession.user);
           }
         }
       } catch (error) {
@@ -81,7 +102,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(currentSession.user);
         identifyUserInGleap(currentSession.user);
         if (location.pathname === '/login') {
-          navigate('/dashboard', { replace: true });
+          handleProfileBasedRedirect(currentSession.user);
         }
       } else {
         setSession(null);
@@ -118,7 +139,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(data.user);
         setSession(data.session);
         identifyUserInGleap(data.user);
-        navigate('/dashboard', { replace: true });
+        handleProfileBasedRedirect(data.user);
       }
     } catch (error) {
       console.error('Login error:', error);
