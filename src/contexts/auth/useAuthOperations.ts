@@ -15,7 +15,7 @@ export const useAuthOperations = (initialState: AuthState) => {
   };
 
   const login = async (email: string, password: string) => {
-    updateState({ isLoading: true, error: null });
+    updateState({ error: null });
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -45,13 +45,11 @@ export const useAuthOperations = (initialState: AuthState) => {
         description: "Invalid email or password. Please check your credentials.",
       });
       throw error;
-    } finally {
-      updateState({ isLoading: false });
     }
   };
 
   const logout = async () => {
-    updateState({ isLoading: true, error: null });
+    updateState({ error: null });
 
     try {
       await identifyUserInGleap(null);
@@ -81,8 +79,6 @@ export const useAuthOperations = (initialState: AuthState) => {
           description: "An error occurred during logout.",
         });
       }
-    } finally {
-      updateState({ isLoading: false });
     }
   };
 
