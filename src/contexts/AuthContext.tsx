@@ -24,11 +24,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   const handleAuthRedirect = async (userId: string) => {
-    const hasCompletedOnboarding = await checkOnboardingStatus(userId);
-    if (!hasCompletedOnboarding) {
-      navigate('/onboarding');
-    } else {
-      navigate('/dashboard');
+    try {
+      const hasCompletedOnboarding = await checkOnboardingStatus(userId);
+      if (!hasCompletedOnboarding) {
+        navigate('/onboarding');
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.error('Error in handleAuthRedirect:', error);
+      setIsLoading(false);
     }
   };
 
@@ -54,6 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           navigate('/login');
         }
       } finally {
+        // Ensure loading state is always set to false after initialization
         setIsLoading(false);
       }
     };
@@ -65,22 +71,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       console.log('Auth event:', event);
       
-      if (currentSession) {
-        setSession(currentSession);
-        setUser(currentSession.user);
-        await identifyUserInGleap(currentSession.user);
-        
-        if (location.pathname === '/login') {
-          await handleAuthRedirect(currentSession.user.id);
+      try {
+        if (currentSession) {
+          setSession(currentSession);
+          setUser(currentSession.user);
+          await identifyUserInGleap(currentSession.user);
+          
+          if (location.pathname === '/login') {
+            await handleAuthRedirect(currentSession.user.id);
+          }
+        } else {
+          setSession(null);
+          setUser(null);
+          await identifyUserInGleap(null);
+          
+          if (!PUBLIC_ROUTES.includes(location.pathname)) {
+            navigate('/login');
+          }
         }
-      } else {
-        setSession(null);
-        setUser(null);
-        await identifyUserInGleap(null);
-        
-        if (!PUBLIC_ROUTES.includes(location.pathname)) {
-          navigate('/login');
-        }
+      } catch (error) {
+        console.error('Error in auth state change:', error);
+      } finally {
+        // Ensure loading state is updated even if there's an error
+        setIsLoading(false);
       }
     });
 
@@ -156,9 +169,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-    </div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
   }
 
   return (
