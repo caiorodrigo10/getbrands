@@ -55,6 +55,28 @@ const ProjectProductEdit = () => {
     },
   });
 
+  const form = useForm<z.infer<typeof productFormSchema>>({
+    resolver: zodResolver(productFormSchema),
+    defaultValues: {
+      name: "",
+      selling_price: 0,
+    },
+  });
+
+  // Update form values when data is loaded
+  useQuery({
+    queryKey: ["update-form", projectProduct],
+    enabled: !!projectProduct,
+    queryFn: () => {
+      const specificProduct = projectProduct?.specific?.[0];
+      form.reset({
+        name: specificProduct?.name || projectProduct?.product?.name || "",
+        selling_price: specificProduct?.selling_price || projectProduct?.product?.srp || 0,
+      });
+      return null;
+    },
+  });
+
   const { data: productImages, refetch: refetchImages } = useQuery({
     queryKey: ['project-product-images', productId],
     queryFn: async () => {
@@ -71,14 +93,6 @@ const ProjectProductEdit = () => {
       })) as ProductImage[];
     },
     enabled: !!projectProduct,
-  });
-
-  const form = useForm<z.infer<typeof productFormSchema>>({
-    resolver: zodResolver(productFormSchema),
-    defaultValues: {
-      name: projectProduct?.specific?.[0]?.name || projectProduct?.product?.name || "",
-      selling_price: projectProduct?.specific?.[0]?.selling_price || projectProduct?.product?.srp || 0,
-    },
   });
 
   const handleSubmit = async (values: z.infer<typeof productFormSchema>) => {
