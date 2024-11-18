@@ -11,13 +11,17 @@ export const ProjectPointsInfo = () => {
     queryFn: async () => {
       if (!user) return null;
       
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("projects")
         .select("*")
         .eq("user_id", user.id)
         .eq("status", "active")
-        .single();
+        .maybeSingle(); // Changed from .single() to .maybeSingle()
         
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+      
       return data;
     },
     enabled: !!user,
