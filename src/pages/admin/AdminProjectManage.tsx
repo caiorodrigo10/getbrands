@@ -11,9 +11,13 @@ import { ProjectHeader } from "@/components/admin/projects/manage/ProjectHeader"
 import { ProjectCoverUpload } from "@/components/admin/projects/manage/ProjectCoverUpload";
 import { ProjectInfo } from "@/components/admin/projects/manage/ProjectInfo";
 import StagesTimeline from "@/components/StagesTimeline";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
 
 const AdminProjectManage = () => {
   const { id } = useParams();
+  const [isOpen, setIsOpen] = useState(false);
   
   const { data: project, isLoading, refetch } = useQuery({
     queryKey: ["admin-project", id],
@@ -65,26 +69,46 @@ const AdminProjectManage = () => {
     <div className="space-y-6">
       <ProjectHeader />
 
-      <Card className="p-6">
-        <div className="flex justify-between items-start mb-6">
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold">{project.name}</h1>
-            <p className="text-muted-foreground mt-1">{project.description}</p>
-            <Badge className="mt-2 bg-emerald-500/10 text-emerald-500">
-              {project.status === 'em_andamento' ? 'Active' : 'Completed'}
-            </Badge>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <Card className="p-6">
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold">{project.name}</h1>
+              <p className="text-muted-foreground mt-1">{project.description}</p>
+              <Badge className="mt-2 bg-emerald-500/10 text-emerald-500">
+                {project.status === 'em_andamento' ? 'Active' : 'Completed'}
+              </Badge>
+            </div>
+            <div className="w-64 ml-6">
+              <ProjectCoverUpload 
+                projectId={project.id}
+                coverUrl={project.cover_image_url}
+                onUploadSuccess={refetch}
+              />
+            </div>
           </div>
-          <div className="w-64 ml-6">
-            <ProjectCoverUpload 
-              projectId={project.id}
-              coverUrl={project.cover_image_url}
-              onUploadSuccess={refetch}
-            />
-          </div>
-        </div>
 
-        <ProjectInfo project={project} />
-      </Card>
+          <CollapsibleContent className="space-y-4">
+            <ProjectInfo project={project} />
+          </CollapsibleContent>
+
+          <CollapsibleTrigger className="w-full pt-4">
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+              {isOpen ? (
+                <>
+                  <ChevronUp className="h-4 w-4" />
+                  <span>Show Less</span>
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="h-4 w-4" />
+                  <span>Show More</span>
+                </>
+              )}
+            </div>
+          </CollapsibleTrigger>
+        </Card>
+      </Collapsible>
 
       <Tabs defaultValue="project-stages" className="w-full">
         <TabsList className="bg-white border-b w-full justify-start rounded-none h-12 p-0">
