@@ -18,12 +18,14 @@ export interface Task {
   startDate?: Date;
   endDate?: Date;
   assignee?: AssigneeType;
+  position?: number;
 }
 
 export interface Stage {
   name: string;
   status: "completed" | "in-progress" | "pending";
   tasks: Task[];
+  position?: number;
 }
 
 const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
@@ -53,6 +55,7 @@ const StagesTimeline = () => {
     addStageToDatabase,
     deleteStageFromDatabase,
     updateStageInDatabase,
+    reorderStagesInDatabase,
   } = useStagesData(projectId || '');
   
   const [openStages, setOpenStages] = useState<string[]>([]);
@@ -117,6 +120,12 @@ const StagesTimeline = () => {
     toast.success("Stage updated successfully");
   };
 
+  const handleReorderStages = async (newStages: Stage[]) => {
+    if (!projectId) return;
+    await reorderStagesInDatabase(newStages);
+    setStages(newStages);
+  };
+
   return (
     <div className="space-y-4">
       <StagesList
@@ -128,6 +137,7 @@ const StagesTimeline = () => {
         onDeleteTask={handleDeleteTask}
         onDeleteStage={handleDeleteStage}
         onUpdateStage={handleStageUpdate}
+        onReorderStages={handleReorderStages}
         isAdmin={isAdmin}
       />
       <AddStageButton onAddStage={handleAddStage} />
