@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import Gleap from 'gleap'
+import { AuthProvider } from "./contexts/AuthContext"
 
 // Initialize Gleap
 Gleap.initialize("qqAquIhEn19VOadZnGz2Xg48r3NoXdas");
@@ -14,6 +15,8 @@ const root = createRoot(rootElement)
 
 root.render(
   <React.StrictMode>
-    <App />
+    <AuthProvider>
+      <App />
+    </AuthProvider>
   </React.StrictMode>
 )
