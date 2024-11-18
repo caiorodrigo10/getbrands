@@ -19,7 +19,7 @@ export interface Task {
   endDate?: Date;
   assignee?: AssigneeType;
   position?: number;
-  stage_position?: number;  // Added this property
+  stage_position?: number;
 }
 
 export interface Stage {
@@ -140,8 +140,9 @@ const StagesTimeline = () => {
         onUpdateStage={handleStageUpdate}
         onReorderStages={handleReorderStages}
         isAdmin={isAdmin}
+        projectId={projectId}
       />
-      <AddStageButton onAddStage={handleAddStage} />
+      <AddStageButton onAddStage={handleAddStage} projectId={projectId || ''} />
     </div>
   );
 };

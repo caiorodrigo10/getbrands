@@ -5,8 +5,19 @@ import { toast } from "sonner";
 export const useStageOperations = (projectId: string) => {
   const addStageToDatabase = async (stageName: string) => {
     try {
-      // For now, we only update the local state since stages are implicit
-      // based on task stage_name values
+      // Create an initial task for the new stage
+      const { error } = await supabase
+        .from('project_tasks')
+        .insert({
+          project_id: projectId,
+          stage_name: stageName,
+          title: 'Initial task',
+          status: 'pending',
+          position: 0,
+          stage_position: 0
+        });
+
+      if (error) throw error;
       toast.success("Stage added successfully");
     } catch (error) {
       console.error('Error adding stage:', error);
