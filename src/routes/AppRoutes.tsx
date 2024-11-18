@@ -46,13 +46,7 @@ export const AppRoutes = () => (
     
     {/* Client Routes - Wrapped in AppLayout */}
     <Route element={<AppLayout />}>
-      {/* Dashboard acessível tanto em / quanto em /dashboard */}
       <Route path="/" element={
-        <ProtectedRoute>
-          <Dashboard />
-        </ProtectedRoute>
-      } />
-      <Route path="/dashboard" element={
         <ProtectedRoute>
           <Dashboard />
         </ProtectedRoute>
@@ -136,7 +130,6 @@ export const AppRoutes = () => (
         </ProtectedRoute>
       } />
 
-      {/* Catch all route for 404 */}
       <Route path="*" element={<Error404 />} />
     </Route>
 
