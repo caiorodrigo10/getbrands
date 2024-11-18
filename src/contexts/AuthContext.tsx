@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
 import Gleap from "gleap";
+import { useAuthRedirection } from "@/hooks/useAuthRedirection";
+import { useAuthState } from "@/hooks/useAuthState";
 
 interface AuthContextType {
   user: User | null;
@@ -11,64 +13,25 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const getRedirectPath = (role?: string) => {
-  switch (role?.toLowerCase()) {
-    case 'customer':
-      return '/dashboard';
-    case 'admin':
-      return '/admin/dashboard';
-    case 'member':
-    case 'sampler':
-      return '/start-here';
-    default:
-      return '/dashboard';
-  }
-};
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
-
-  const identifyUserInGleap = async (currentUser: User | null) => {
-    if (currentUser) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('first_name, last_name')
-        .eq('id', currentUser.id)
-        .single();
-
-      const fullName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : currentUser.email?.split('@')[0] || 'User';
-      
-      Gleap.identify(currentUser.id, {
-        email: currentUser.email,
-        name: fullName,
-      });
-    } else {
-      Gleap.clearIdentity();
-    }
-  };
-
-  const handleUserRedirection = async (currentUser: User | null) => {
-    if (currentUser) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', currentUser.id)
-        .single();
-
-      if (profile?.role) {
-        navigate(getRedirectPath(profile.role), { replace: true });
-      }
-    }
-  };
+  const { handleUserRedirection } = useAuthRedirection();
+  const { 
+    user, 
+    setUser, 
+    session, 
+    setSession, 
+    isLoading, 
+    setIsLoading,
+    identifyUserInGleap 
+  } = useAuthState();
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -123,6 +86,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [navigate, location]);
 
   const login = async (email: string, password: string) => {
+    setIsLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
@@ -147,10 +111,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error('Login error:', error);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const logout = async () => {
+    setIsLoading(true);
     try {
       setUser(null);
       setSession(null);
@@ -178,6 +145,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error('Logout error:', error);
       navigate('/login');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -191,7 +160,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, session, login, logout, isAuthenticated: !!session }}
+      value={{ 
+        user, 
+        session, 
+        login, 
+        logout, 
+        isAuthenticated: !!session,
+        isLoading 
+      }}
     >
       {children}
     </AuthContext.Provider>
