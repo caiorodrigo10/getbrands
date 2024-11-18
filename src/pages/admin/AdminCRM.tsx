@@ -12,18 +12,6 @@ type Project = {
   pack_type: Database["public"]["Enums"]["project_pack_type"];
 };
 
-interface CRMUser {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  email: string | null;
-  phone: string | null;
-  avatar_url: string | null;
-  user_type: string | null;
-  created_at: string;
-  projects: Project[] | null;
-}
-
 const AdminCRM = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -31,17 +19,30 @@ const AdminCRM = () => {
     queryKey: ["crm-users"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("crm_view")
-        .select("*");
+        .from("profiles")
+        .select(`
+          id,
+          first_name,
+          last_name,
+          email,
+          phone,
+          avatar_url,
+          user_type,
+          created_at,
+          projects:projects(
+            id,
+            name,
+            status,
+            pack_type
+          )
+        `);
 
       if (error) throw error;
       
-      // Transform the data to match CRMUser interface
-      return (data as any[]).map(user => ({
+      return data.map((user) => ({
         ...user,
-        user_type: user.role, // Map role to user_type for backward compatibility
         projects: user.projects as Project[] | null
-      })) as CRMUser[];
+      }));
     },
   });
 

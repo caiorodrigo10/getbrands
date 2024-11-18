@@ -6,7 +6,6 @@ import { AdminRoutes } from "./AdminRoutes";
 import Login from "@/pages/Login";
 import SignUp from "@/pages/SignUp";
 import Dashboard from "@/pages/Dashboard";
-import GetStarted from "@/pages/GetStarted";
 import Profile from "@/pages/Profile";
 import Projects from "@/pages/Projects";
 import ProjectDetails from "@/pages/ProjectDetails";
@@ -24,13 +23,12 @@ import PackageQuizPage from "@/pages/PackageQuizPage";
 
 export const AppRoutes = () => (
   <Routes>
-    {/* Marketing Routes - Public Landing Page */}
+    {/* Marketing Routes */}
     {MarketingRoutes}
     
     {/* Public Routes */}
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<SignUp />} />
-    <Route path="/get-started" element={<GetStarted />} />
     
     {/* Admin Routes */}
     <Route path="/admin/*" element={
@@ -41,6 +39,12 @@ export const AppRoutes = () => (
     
     {/* Client Routes - Wrapped in AppLayout */}
     <Route element={<AppLayout />}>
+      <Route path="/" element={
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
+      } />
+      
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <Dashboard />

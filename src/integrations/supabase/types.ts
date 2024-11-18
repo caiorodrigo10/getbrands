@@ -253,45 +253,6 @@ export type Database = {
           },
         ]
       }
-      onboarding_responses: {
-        Row: {
-          answers: Json
-          created_at: string
-          id: string
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          answers: Json
-          created_at?: string
-          id?: string
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          answers?: Json
-          created_at?: string
-          id?: string
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "onboarding_responses_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "crm_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "onboarding_responses_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       package_quizzes: {
         Row: {
           additional_notes: string | null
@@ -460,13 +421,9 @@ export type Database = {
           email: string | null
           first_name: string | null
           id: string
-          instagram_handle: string | null
           last_name: string | null
           name: string | null
-          onboarding_completed: boolean | null
           phone: string | null
-          product_interest: string | null
-          profile_type: string | null
           role: string
           shipping_address_city: string | null
           shipping_address_state: string | null
@@ -474,6 +431,7 @@ export type Database = {
           shipping_address_street2: string | null
           shipping_address_zip: string | null
           updated_at: string
+          user_type: string
         }
         Insert: {
           avatar_url?: string | null
@@ -486,13 +444,9 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id: string
-          instagram_handle?: string | null
           last_name?: string | null
           name?: string | null
-          onboarding_completed?: boolean | null
           phone?: string | null
-          product_interest?: string | null
-          profile_type?: string | null
           role?: string
           shipping_address_city?: string | null
           shipping_address_state?: string | null
@@ -500,6 +454,7 @@ export type Database = {
           shipping_address_street2?: string | null
           shipping_address_zip?: string | null
           updated_at?: string
+          user_type?: string
         }
         Update: {
           avatar_url?: string | null
@@ -512,13 +467,9 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id?: string
-          instagram_handle?: string | null
           last_name?: string | null
           name?: string | null
-          onboarding_completed?: boolean | null
           phone?: string | null
-          product_interest?: string | null
-          profile_type?: string | null
           role?: string
           shipping_address_city?: string | null
           shipping_address_state?: string | null
@@ -526,6 +477,7 @@ export type Database = {
           shipping_address_street2?: string | null
           shipping_address_zip?: string | null
           updated_at?: string
+          user_type?: string
         }
         Relationships: []
       }
@@ -1047,7 +999,27 @@ export type Database = {
           last_name: string | null
           phone: string | null
           projects: Json | null
-          role: string | null
+          user_type: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string | null
+          last_name?: string | null
+          phone?: string | null
+          projects?: never
+          user_type?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string | null
+          last_name?: string | null
+          phone?: string | null
+          projects?: never
+          user_type?: string | null
         }
         Relationships: []
       }
