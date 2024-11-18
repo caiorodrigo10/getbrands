@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -15,71 +15,21 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // If user is already authenticated, redirect to dashboard
     if (isAuthenticated) {
       navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
 
-  const validateForm = () => {
-    if (!email || !password) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please fill in all fields",
-      });
-      return false;
-    }
-    if (!email.includes('@')) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter a valid email address",
-      });
-      return false;
-    }
-    return true;
-  };
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) return;
-    
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password.trim(),
-      });
-
-      if (error) {
-        if (error.message === "Invalid login credentials") {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Incorrect email or password. Please try again.",
-          });
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "An error occurred during login. Please try again.",
-          });
-        }
-        return;
-      }
-
-      if (data.user) {
-        await login(email.trim(), password.trim());
-      }
-    } catch (error: any) {
+      await login(email, password);
+      navigate('/dashboard');
+    } catch (error) {
       console.error("Login error:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An error occurred during login. Please try again.",
-      });
     } finally {
       setIsLoading(false);
     }
@@ -95,7 +45,7 @@ const Login = () => {
       });
       
       if (error) throw error;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error logging in with Google:', error);
       toast({
         variant: "destructive",
@@ -151,7 +101,7 @@ const Login = () => {
           <div className="space-y-4">
             <Button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
+              className="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign in"}
@@ -183,11 +133,11 @@ const Login = () => {
         </form>
 
         <div className="mt-4 text-center text-sm">
-          <a href="#" className="text-primary hover:text-primary/90">
+          <a href="#" className="text-primary hover:text-primary-dark">
             Forgot password?
           </a>
           <span className="mx-2 text-gray-400">•</span>
-          <a href="#" className="text-primary hover:text-primary/90">
+          <a href="#" className="text-primary hover:text-primary-dark">
             Create an account
           </a>
         </div>
