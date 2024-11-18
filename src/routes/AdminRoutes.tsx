@@ -1,90 +1,22 @@
-import { Route } from "react-router-dom";
-import { ProtectedRoute } from "./ProtectedRoute";
-import { AdminLayout } from "@/components/admin/AdminLayout";
+import { Routes, Route } from "react-router-dom";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
-import AdminProjects from "@/pages/admin/AdminProjects";
-import AdminProjectManage from "@/pages/admin/AdminProjectManage";
-import AdminOrders from "@/pages/admin/AdminOrders";
 import AdminCatalog from "@/pages/admin/AdminCatalog";
 import AdminProductEdit from "@/pages/admin/AdminProductEdit";
-import AdminCRM from "@/pages/admin/AdminCRM";
+import AdminProjects from "@/pages/admin/AdminProjects";
+import AdminProjectManage from "@/pages/admin/AdminProjectManage";
+import ProjectProductEdit from "@/pages/admin/ProjectProductEdit";
 
-export const AdminRoutes = [
-  <Route
-    key="admin-dashboard"
-    path="/admin"
-    element={
-      <ProtectedRoute>
-        <AdminLayout>
-          <AdminDashboard />
-        </AdminLayout>
-      </ProtectedRoute>
-    }
-  />,
-  <Route
-    key="admin-projects"
-    path="/admin/projects"
-    element={
-      <ProtectedRoute>
-        <AdminLayout>
-          <AdminProjects />
-        </AdminLayout>
-      </ProtectedRoute>
-    }
-  />,
-  <Route
-    key="admin-project-manage"
-    path="/admin/projects/:id/manage"
-    element={
-      <ProtectedRoute>
-        <AdminLayout>
-          <AdminProjectManage />
-        </AdminLayout>
-      </ProtectedRoute>
-    }
-  />,
-  <Route
-    key="admin-orders"
-    path="/admin/orders"
-    element={
-      <ProtectedRoute>
-        <AdminLayout>
-          <AdminOrders />
-        </AdminLayout>
-      </ProtectedRoute>
-    }
-  />,
-  <Route
-    key="admin-catalog"
-    path="/admin/catalog"
-    element={
-      <ProtectedRoute>
-        <AdminLayout>
-          <AdminCatalog />
-        </AdminLayout>
-      </ProtectedRoute>
-    }
-  />,
-  <Route
-    key="admin-catalog-edit"
-    path="/admin/catalog/:id"
-    element={
-      <ProtectedRoute>
-        <AdminLayout>
-          <AdminProductEdit />
-        </AdminLayout>
-      </ProtectedRoute>
-    }
-  />,
-  <Route
-    key="admin-crm"
-    path="/admin/crm"
-    element={
-      <ProtectedRoute>
-        <AdminLayout>
-          <AdminCRM />
-        </AdminLayout>
-      </ProtectedRoute>
-    }
-  />,
-];
+const AdminRoutes = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<AdminDashboard />} />
+      <Route path="/catalog" element={<AdminCatalog />} />
+      <Route path="/catalog/:id" element={<AdminProductEdit />} />
+      <Route path="/projects" element={<AdminProjects />} />
+      <Route path="/projects/:id/manage" element={<AdminProjectManage />} />
+      <Route path="/projects/:projectId/products/:productId" element={<ProjectProductEdit />} />
+    </Routes>
+  );
+};
+
+export default AdminRoutes;
