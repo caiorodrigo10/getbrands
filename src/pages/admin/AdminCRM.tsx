@@ -12,6 +12,18 @@ type Project = {
   pack_type: Database["public"]["Enums"]["project_pack_type"];
 };
 
+interface ProfileWithProjects {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  phone: string | null;
+  avatar_url: string | null;
+  role: string | null;
+  created_at: string;
+  projects: Project[] | null;
+}
+
 const AdminCRM = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -19,30 +31,11 @@ const AdminCRM = () => {
     queryKey: ["crm-users"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("profiles")
-        .select(`
-          id,
-          first_name,
-          last_name,
-          email,
-          phone,
-          avatar_url,
-          user_type,
-          created_at,
-          projects:projects(
-            id,
-            name,
-            status,
-            pack_type
-          )
-        `);
+        .from("crm_view")
+        .select("*");
 
       if (error) throw error;
-      
-      return data.map((user) => ({
-        ...user,
-        projects: user.projects as Project[] | null
-      }));
+      return data as ProfileWithProjects[];
     },
   });
 
