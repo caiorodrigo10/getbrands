@@ -134,31 +134,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       identifyUserInGleap(null);
       
       // Then attempt to sign out from Supabase
-      const { error } = await supabase.auth.signOut();
+      await supabase.auth.signOut();
       
-      // Always navigate to login page regardless of error
+      // Always navigate to login page
       navigate('/login');
       
-      if (error) {
-        // Only show error toast if it's not a session_not_found error
-        if (error.message !== 'session_not_found') {
-          console.error('Logout error:', error);
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "An error occurred during logout. Please try again.",
-          });
-        }
-      } else {
+      toast({
+        title: "Success",
+        description: "Logged out successfully!",
+      });
+    } catch (error: any) {
+      console.error('Logout error:', error);
+      // Still navigate to login page even if there's an error
+      navigate('/login');
+      
+      // Only show error toast for unexpected errors
+      if (error?.message !== 'session_not_found') {
         toast({
-          title: "Success",
-          description: "Logged out successfully!",
+          variant: "destructive",
+          title: "Error",
+          description: "An error occurred during logout.",
         });
       }
-    } catch (error) {
-      console.error('Logout error:', error);
-      // Ensure user is still redirected even if there's an error
-      navigate('/login');
     }
   };
 
