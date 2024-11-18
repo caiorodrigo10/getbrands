@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Check, Clock, Square } from "lucide-react";
+import StagesTimeline from "@/components/StagesTimeline";
 import { 
   Accordion, 
   AccordionContent, 

@@ -19,10 +19,11 @@ export interface Task {
   endDate?: Date;
   assignee?: AssigneeType;
   position?: number;
-  stage_position?: number;  // Added this property
+  stage_position?: number;
 }
 
 export interface Stage {
+  id: string;
   name: string;
   status: "completed" | "in-progress" | "pending";
   tasks: Task[];
