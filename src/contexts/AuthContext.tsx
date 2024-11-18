@@ -23,35 +23,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const updateGleapUserData = async (currentUser: User) => {
-    try {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", currentUser.id)
-        .single();
-
-      const { data: projects } = await supabase
-        .from("projects")
-        .select("*")
-        .eq("user_id", currentUser.id)
-        .order("created_at", { ascending: false })
-        .limit(1);
-
-      const currentProject = projects?.[0];
-
+  const identifyUserInGleap = (currentUser: User | null) => {
+    if (currentUser) {
       Gleap.identify(currentUser.id, {
-        name: profile ? `${profile.first_name} ${profile.last_name}`.trim() : '',
-        email: profile?.email || '',
-        phone: profile?.phone || '',
-        value: 0,
-        plan: '',
-        language: 'pt-br',
-        companyId: currentProject?.id || '',
-        companyName: currentProject?.name || '',
+        email: currentUser.email,
+        name: currentUser.email?.split('@')[0] || 'User',
       });
-    } catch (error) {
-      console.error('Error updating Gleap user data:', error);
+    } else {
+      Gleap.clearIdentity();
     }
   };
 
@@ -70,7 +49,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (initialSession) {
           setSession(initialSession);
           setUser(initialSession.user);
-          await updateGleapUserData(initialSession.user);
+          identifyUserInGleap(initialSession.user);
           if (location.pathname === '/login') {
             navigate('/dashboard');
           }
@@ -92,14 +71,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (currentSession) {
         setSession(currentSession);
         setUser(currentSession.user);
-        await updateGleapUserData(currentSession.user);
+        identifyUserInGleap(currentSession.user);
         if (location.pathname === '/login') {
           navigate('/dashboard');
         }
       } else {
         setSession(null);
         setUser(null);
-        Gleap.clearIdentity();
+        identifyUserInGleap(null);
         if (event === 'SIGNED_OUT') {
           navigate('/login');
         }
@@ -130,7 +109,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
-        await updateGleapUserData(data.user);
+        identifyUserInGleap(data.user);
         navigate('/dashboard');
       }
     } catch (error) {
@@ -144,7 +123,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await supabase.auth.signOut();
       setUser(null);
       setSession(null);
-      Gleap.clearIdentity();
+      identifyUserInGleap(null);
       navigate('/login');
       toast({
         title: "Success",
