@@ -46,13 +46,19 @@ export const StagesList = ({
               {stage.tasks.map((task, index) => (
                 <TaskItem
                   key={task.id}
-                  task={task}
+                  id={task.id}
+                  name={task.name}
+                  status={task.status}
+                  startDate={task.startDate}
+                  endDate={task.endDate}
+                  assignee={task.assignee}
                   onUpdate={(updates) => onTaskUpdate(stage.name, index, updates)}
                   onDelete={() => onDeleteTask(stage.name, index)}
                 />
               ))}
               <AddTaskButton
-                onAdd={(task) => onAddTask(stage.name, task)}
+                stageName={stage.name}
+                onAddTask={(task) => onAddTask(stage.name, task)}
               />
             </div>
           )}
