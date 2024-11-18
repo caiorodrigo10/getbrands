@@ -632,8 +632,10 @@ export type Database = {
           description: string | null
           due_date: string | null
           id: string
+          position: number | null
           project_id: string | null
           stage_name: string
+          stage_position: number | null
           start_date: string | null
           status: string | null
           title: string
@@ -645,8 +647,10 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
+          position?: number | null
           project_id?: string | null
           stage_name: string
+          stage_position?: number | null
           start_date?: string | null
           status?: string | null
           title: string
@@ -658,8 +662,10 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
+          position?: number | null
           project_id?: string | null
           stage_name?: string
+          stage_position?: number | null
           start_date?: string | null
           status?: string | null
           title?: string

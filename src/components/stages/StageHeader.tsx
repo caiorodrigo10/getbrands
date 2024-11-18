@@ -1,17 +1,18 @@
+import { ChevronDown, ChevronUp, Trash2, Pencil, Check } from "lucide-react";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import { useState } from "react";
-import { ChevronDown, ChevronRight, Pencil, X, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Stage } from "../StagesTimeline";
 
-interface StageHeaderProps {
+export interface StageHeaderProps {
   name: string;
-  status: "completed" | "in-progress" | "pending";
+  status: Stage["status"];
   isOpen: boolean;
   onToggle: () => void;
   onDelete: () => void;
-  onUpdate: (oldName: string, newName: string, newStatus: "completed" | "in-progress" | "pending") => void;
+  onUpdate: (oldName: string, newName: string, newStatus: Stage["status"]) => void;
   isAdmin?: boolean;
+  isDraggable?: boolean;
 }
 
 export const StageHeader = ({
@@ -22,92 +23,99 @@ export const StageHeader = ({
   onDelete,
   onUpdate,
   isAdmin = false,
+  isDraggable = false,
 }: StageHeaderProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(name);
-  const [editedStatus, setEditedStatus] = useState(status);
 
   const handleSave = () => {
-    onUpdate(name, editedName, editedStatus);
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setEditedName(name);
-    setEditedStatus(status);
-    setIsEditing(false);
+    if (editedName.trim() !== "") {
+      onUpdate(name, editedName, status);
+      setIsEditing(false);
+    }
   };
 
   return (
-    <div className="flex items-center justify-between p-4 bg-muted/5">
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="p-0 h-8 w-8"
-          onClick={onToggle}
-        >
-          {isOpen ? (
-            <ChevronDown className="h-4 w-4" />
-          ) : (
-            <ChevronRight className="h-4 w-4" />
-          )}
-        </Button>
-
-        {isEditing && isAdmin ? (
+    <div className="flex items-center justify-between p-4 cursor-pointer group">
+      <div className="flex items-center gap-3 flex-1">
+        {isDraggable && (
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity cursor-grab">
+            ⋮⋮
+          </div>
+        )}
+        {isEditing ? (
           <div className="flex items-center gap-2">
             <Input
               value={editedName}
               onChange={(e) => setEditedName(e.target.value)}
-              className="h-8 w-48"
+              className="h-7 w-[200px]"
+              autoFocus
             />
-            <Select
-              value={editedStatus}
-              onValueChange={(value: "completed" | "in-progress" | "pending") => 
-                setEditedStatus(value)
-              }
-            >
-              <SelectTrigger className="h-8 w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="in-progress">In Progress</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-              </SelectContent>
-            </Select>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleSave}
-              className="h-8 w-8 p-0"
+              className="h-7 w-7 p-0"
             >
-              <Check className="h-4 w-4 text-green-500" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleCancel}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4 text-red-500" />
+              <Check className="h-4 w-4" />
             </Button>
           </div>
         ) : (
-          <div className="flex items-center gap-2">
-            <span className="font-medium">{name}</span>
-            {isAdmin && (
+          <h3 className="text-lg font-medium">{name}</h3>
+        )}
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+          {isAdmin && !isEditing && (
+            <>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsEditing(true)}
-                className="h-8 w-8 p-0"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsEditing(true);
+                }}
+                className="h-6 w-6 p-0"
               >
                 <Pencil className="h-4 w-4" />
               </Button>
-            )}
-          </div>
-        )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
+                className="h-6 w-6 p-0"
+              >
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+      <div className="flex items-center gap-4">
+        <span
+          className={`text-sm ${
+            status === "completed"
+              ? "text-green-500"
+              : status === "in-progress"
+              ? "text-blue-500"
+              : "text-gray-500"
+          }`}
+        >
+          {status.replace("-", " ")}
+        </span>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onToggle}
+          className="p-0 hover:bg-transparent"
+        >
+          {isOpen ? (
+            <ChevronUp className="h-5 w-5" />
+          ) : (
+            <ChevronDown className="h-5 w-5" />
+          )}
+        </Button>
       </div>
     </div>
   );
