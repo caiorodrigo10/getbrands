@@ -19,7 +19,7 @@ export interface Task {
   assignee?: AssigneeType;
   position: number;
   stageId: string;
-  title?: string; // Added for database compatibility
+  title?: string;
 }
 
 export interface Stage {
@@ -70,7 +70,6 @@ const StagesTimeline = () => {
           const movedStage = newStages.splice(evt.oldIndex!, 1)[0];
           newStages.splice(evt.newIndex!, 0, movedStage);
           
-          // Update positions
           const updatedStages = newStages.map((stage, index) => ({
             ...stage,
             position: index,
@@ -120,24 +119,41 @@ const StagesTimeline = () => {
   const handleAddTask = async (stageId: string, taskData: Task) => {
     if (!projectId) return;
     await addTaskToDatabase(stageId, taskData);
+    
+    // Refresh stages after adding task
+    const stageIndex = stages.findIndex(s => s.id === stageId);
+    if (stageIndex !== -1) {
+      const newStages = [...stages];
+      newStages[stageIndex].tasks.push(taskData);
+      setStages(newStages);
+    }
   };
 
   const handleDeleteTask = async (stageId: string, taskId: string) => {
     await deleteTaskFromDatabase(taskId);
+    
+    setStages(prevStages => 
+      prevStages.map(stage => {
+        if (stage.id === stageId) {
+          return {
+            ...stage,
+            tasks: stage.tasks.filter(task => task.id !== taskId)
+          };
+        }
+        return stage;
+      })
+    );
   };
 
   const handleAddStage = async (stageName: string) => {
     if (!projectId) return;
-    
     await addStageToDatabase(stageName);
-    toast.success("Stage added successfully");
   };
 
   const handleDeleteStage = async (stageId: string) => {
     if (!projectId) return;
-    
     await deleteStageFromDatabase(stageId);
-    toast.success("Stage deleted successfully");
+    setStages(prevStages => prevStages.filter(stage => stage.id !== stageId));
   };
 
   return (
