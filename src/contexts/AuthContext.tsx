@@ -23,81 +23,84 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleAuthRedirect = async (userId: string) => {
-    try {
-      const hasCompletedOnboarding = await checkOnboardingStatus(userId);
-      if (!hasCompletedOnboarding) {
-        navigate('/onboarding');
-      } else {
-        navigate('/dashboard');
-      }
-    } catch (error) {
-      console.error('Error in handleAuthRedirect:', error);
-      setIsLoading(false);
-    }
-  };
-
+  // Initialize auth state
   useEffect(() => {
+    let mounted = true;
+
     const initializeAuth = async () => {
       try {
         const { data: { session: initialSession } } = await supabase.auth.getSession();
         
-        if (initialSession) {
-          setSession(initialSession);
-          setUser(initialSession.user);
-          await identifyUserInGleap(initialSession.user);
-          
-          if (location.pathname === '/login') {
-            await handleAuthRedirect(initialSession.user.id);
+        if (mounted) {
+          if (initialSession) {
+            setSession(initialSession);
+            setUser(initialSession.user);
+            await identifyUserInGleap(initialSession.user);
+            
+            if (location.pathname === '/login') {
+              const hasCompletedOnboarding = await checkOnboardingStatus(initialSession.user.id);
+              if (!hasCompletedOnboarding) {
+                navigate('/onboarding');
+              } else {
+                navigate('/dashboard');
+              }
+            }
+          } else if (!PUBLIC_ROUTES.includes(location.pathname)) {
+            navigate('/login');
           }
-        } else if (!PUBLIC_ROUTES.includes(location.pathname)) {
-          navigate('/login');
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-        if (!PUBLIC_ROUTES.includes(location.pathname)) {
+        if (mounted && !PUBLIC_ROUTES.includes(location.pathname)) {
           navigate('/login');
         }
       } finally {
-        // Ensure loading state is always set to false after initialization
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     initializeAuth();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       console.log('Auth event:', event);
       
-      try {
-        if (currentSession) {
-          setSession(currentSession);
-          setUser(currentSession.user);
-          await identifyUserInGleap(currentSession.user);
-          
-          if (location.pathname === '/login') {
-            await handleAuthRedirect(currentSession.user.id);
+      if (mounted) {
+        try {
+          if (currentSession) {
+            setSession(currentSession);
+            setUser(currentSession.user);
+            await identifyUserInGleap(currentSession.user);
+            
+            if (location.pathname === '/login') {
+              const hasCompletedOnboarding = await checkOnboardingStatus(currentSession.user.id);
+              if (!hasCompletedOnboarding) {
+                navigate('/onboarding');
+              } else {
+                navigate('/dashboard');
+              }
+            }
+          } else {
+            setSession(null);
+            setUser(null);
+            await identifyUserInGleap(null);
+            
+            if (!PUBLIC_ROUTES.includes(location.pathname)) {
+              navigate('/login');
+            }
           }
-        } else {
-          setSession(null);
-          setUser(null);
-          await identifyUserInGleap(null);
-          
+        } catch (error) {
+          console.error('Error in auth state change:', error);
           if (!PUBLIC_ROUTES.includes(location.pathname)) {
             navigate('/login');
           }
         }
-      } catch (error) {
-        console.error('Error in auth state change:', error);
-      } finally {
-        // Ensure loading state is updated even if there's an error
-        setIsLoading(false);
       }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [navigate, location.pathname]);
@@ -122,7 +125,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(data.user);
         setSession(data.session);
         await identifyUserInGleap(data.user);
-        await handleAuthRedirect(data.user.id);
+        
+        const hasCompletedOnboarding = await checkOnboardingStatus(data.user.id);
+        if (!hasCompletedOnboarding) {
+          navigate('/onboarding');
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -134,7 +143,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setUser(null);
       setSession(null);
-      identifyUserInGleap(null);
+      await identifyUserInGleap(null);
 
       window.localStorage.removeItem('supabase.auth.token');
       window.localStorage.removeItem('sb-skrvprmnncxpkojraoem-auth-token');
@@ -170,7 +179,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="fixed inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     );
