@@ -10,7 +10,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { ClientProducts } from "@/components/admin/projects/manage/ClientProducts";
 import { ClientSamples } from "@/components/admin/projects/manage/ClientSamples";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ProjectHeader } from "@/components/admin/projects/manage/ProjectHeader";
 
 const AdminProjectManage = () => {
   const navigate = useNavigate();
@@ -29,7 +28,6 @@ const AdminProjectManage = () => {
             last_name,
             email,
             phone,
-            created_at,
             shipping_address_street,
             shipping_address_street2,
             shipping_address_city,
@@ -64,27 +62,35 @@ const AdminProjectManage = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <div className="flex items-center gap-4 mb-4">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate('/admin/projects')}
-            className="gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Projects
-          </Button>
-          <Badge className="bg-emerald-500/10 text-emerald-500">
-            {project.status === 'em_andamento' ? 'Active' : 'Completed'}
-          </Badge>
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-4 mb-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/admin/projects')}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Projects
+            </Button>
+          </div>
+          <h1 className="text-2xl font-bold">{project.name}</h1>
+          <p className="text-muted-foreground mt-1">{project.description}</p>
         </div>
-
-        <ProjectHeader project={project} />
+        <Badge className="bg-emerald-500/10 text-emerald-500">
+          {project.status === 'em_andamento' ? 'Active' : 'Completed'}
+        </Badge>
       </div>
 
-      <Tabs defaultValue="project-stages" className="w-full">
+      <Tabs defaultValue="client-info" className="w-full">
         <TabsList className="bg-white border-b w-full justify-start rounded-none h-12 p-0">
+          <TabsTrigger 
+            value="client-info"
+            className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-12 px-4"
+          >
+            Client Information
+          </TabsTrigger>
           <TabsTrigger 
             value="project-stages"
             className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-12 px-4"
@@ -104,6 +110,39 @@ const AdminProjectManage = () => {
             Sample Requests
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="client-info" className="mt-6">
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold mb-4">Client Information</h2>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-muted-foreground">Client Name</p>
+                <p className="font-medium">
+                  {`${project.user?.first_name || ''} ${project.user?.last_name || ''}`.trim() || 'N/A'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Email</p>
+                <p className="font-medium">{project.user?.email || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Phone</p>
+                <p className="font-medium">{project.user?.phone || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Address</p>
+                <p className="font-medium">
+                  {[
+                    project.user?.shipping_address_street,
+                    project.user?.shipping_address_city,
+                    project.user?.shipping_address_state,
+                    project.user?.shipping_address_zip
+                  ].filter(Boolean).join(', ') || 'N/A'}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="project-stages" className="mt-6">
           <Card className="p-6">

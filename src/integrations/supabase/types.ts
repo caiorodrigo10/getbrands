@@ -740,7 +740,6 @@ export type Database = {
       }
       projects: {
         Row: {
-          cover_image_url: string | null
           created_at: string
           description: string | null
           id: string
@@ -753,7 +752,6 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
-          cover_image_url?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -766,7 +764,6 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
-          cover_image_url?: string | null
           created_at?: string
           description?: string | null
           id?: string
