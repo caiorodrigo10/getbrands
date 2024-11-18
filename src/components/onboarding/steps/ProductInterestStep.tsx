@@ -1,4 +1,4 @@
-import { RadioGroup } from "@/components/ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { productCategories } from "../onboardingData";
 
@@ -21,7 +21,7 @@ export function ProductInterestStep({ value, onChange }: ProductInterestStepProp
             key={category}
             className="flex items-center space-x-3 p-4 border rounded-lg cursor-pointer hover:bg-accent"
           >
-            <RadioGroup.Item value={category} id={category} />
+            <RadioGroupItem value={category} />
             <span>{category}</span>
           </Label>
         ))}
