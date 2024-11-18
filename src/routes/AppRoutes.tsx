@@ -25,30 +25,33 @@ import PackageQuizPage from "@/pages/PackageQuizPage";
 
 export const AppRoutes = () => (
   <Routes>
-    {/* Marketing Routes - Public */}
+    {/* Marketing Routes */}
     {MarketingRoutes}
     
-    {/* Auth Routes - Public */}
+    {/* Public Routes */}
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<SignUp />} />
-    
-    {/* Onboarding - Protected */}
     <Route path="/onboarding" element={
       <ProtectedRoute>
         <OnboardingQuiz />
       </ProtectedRoute>
     } />
     
-    {/* Admin Routes - Protected + Admin Only */}
+    {/* Admin Routes */}
     <Route path="/admin/*" element={
       <ProtectedRoute requiresAdmin>
         <AdminRoutes />
       </ProtectedRoute>
     } />
     
-    {/* Client Routes - Protected + AppLayout */}
+    {/* Client Routes - Wrapped in AppLayout */}
     <Route element={<AppLayout />}>
-      {/* Dashboard route - Protected */}
+      {/* Dashboard acessível tanto em / quanto em /dashboard */}
+      <Route path="/" element={
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
+      } />
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <Dashboard />
@@ -137,7 +140,7 @@ export const AppRoutes = () => (
       <Route path="*" element={<Error404 />} />
     </Route>
 
-    {/* Standalone Routes - Protected */}
+    {/* Standalone Routes */}
     <Route path="/checkout/*" element={
       <ProtectedRoute>
         <Checkout />
