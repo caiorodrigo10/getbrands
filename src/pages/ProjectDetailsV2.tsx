@@ -101,7 +101,7 @@ const ProjectDetailsV2 = () => {
           <h1 className="text-2xl font-bold">{project?.name}</h1>
           <p className="text-muted-foreground mt-1">{project?.description}</p>
         </div>
-        <Badge className="bg-emerald-500/10 text-emerald-500">
+        <Badge variant="outline" className="bg-emerald-500/10 text-emerald-500">
           {project?.status === 'em_andamento' ? 'Active' : 'Completed'}
         </Badge>
       </div>
@@ -212,10 +212,10 @@ const calculateProgress = (stages: { status: string }[]) => {
   return Math.round((completed / stages.length) * 100);
 };
 
-const getStatusVariant = (status: string) => {
+const getStatusVariant = (status: string): "default" | "destructive" | "secondary" | "outline" => {
   switch (status) {
     case "done":
-      return "success";
+      return "outline";
     case "in_progress":
       return "default";
     case "blocked":

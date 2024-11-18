@@ -65,21 +65,6 @@ export const AppRoutes = () => (
           <Catalog />
         </ProtectedRoute>
       } />
-
-      <Route path="*" element={<Error404 />} />
     </Route>
-
-    {/* Standalone Routes */}
-    <Route path="/checkout/*" element={
-      <ProtectedRoute>
-        <Checkout />
-      </ProtectedRoute>
-    } />
-    
-    <Route path="/checkout/success" element={
-      <ProtectedRoute>
-        <Success />
-      </ProtectedRoute>
-    } />
   </Routes>
 );
