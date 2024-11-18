@@ -46,6 +46,7 @@ export const useStagesData = (projectId: string) => {
           startDate: task.start_date ? new Date(task.start_date) : undefined,
           endDate: task.due_date ? new Date(task.due_date) : undefined,
           position: task.position || 0,
+          stage_position: task.stage_position || 0,
         }]);
       });
 
@@ -70,8 +71,8 @@ export const useStagesData = (projectId: string) => {
           id: task.id,
           stage_name: stage.name,
           stage_position: stageIndex,
-          title: task.name, // Add the required title field
-          project_id: projectId // Add the project_id field
+          title: task.name,
+          project_id: projectId
         }))
       );
 

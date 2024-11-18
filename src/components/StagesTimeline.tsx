@@ -19,6 +19,7 @@ export interface Task {
   endDate?: Date;
   assignee?: AssigneeType;
   position?: number;
+  stage_position?: number;  // Added this property
 }
 
 export interface Stage {
