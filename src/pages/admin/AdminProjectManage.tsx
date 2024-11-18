@@ -21,13 +21,14 @@ const AdminProjectManage = () => {
         .from("projects")
         .select(`
           *,
-          profiles:user_id (
+          user:profiles (
             id,
             first_name,
             last_name,
             email,
             phone,
             shipping_address_street,
+            shipping_address_street2,
             shipping_address_city,
             shipping_address_state,
             shipping_address_zip
@@ -89,26 +90,26 @@ const AdminProjectManage = () => {
             <div>
               <p className="text-sm text-muted-foreground">Client Name</p>
               <p className="font-medium">
-                {`${project.profiles?.first_name || ''} ${project.profiles?.last_name || ''}`.trim()}
+                {`${project.user?.first_name || ''} ${project.user?.last_name || ''}`.trim() || 'N/A'}
               </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Email</p>
-              <p className="font-medium">{project.profiles?.email}</p>
+              <p className="font-medium">{project.user?.email || 'N/A'}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Phone</p>
-              <p className="font-medium">{project.profiles?.phone}</p>
+              <p className="font-medium">{project.user?.phone || 'N/A'}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Address</p>
               <p className="font-medium">
                 {[
-                  project.profiles?.shipping_address_street,
-                  project.profiles?.shipping_address_city,
-                  project.profiles?.shipping_address_state,
-                  project.profiles?.shipping_address_zip
-                ].filter(Boolean).join(', ')}
+                  project.user?.shipping_address_street,
+                  project.user?.shipping_address_city,
+                  project.user?.shipping_address_state,
+                  project.user?.shipping_address_zip
+                ].filter(Boolean).join(', ') || 'N/A'}
               </p>
             </div>
           </div>
@@ -144,7 +145,7 @@ const AdminProjectManage = () => {
       <ClientProducts projectId={project.id} />
 
       {/* Client Samples */}
-      <ClientSamples userId={project.profiles?.id} />
+      <ClientSamples userId={project.user?.id} />
 
       {/* Project Progress */}
       <Card className="p-6">

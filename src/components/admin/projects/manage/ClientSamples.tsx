@@ -4,13 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 
 interface ClientSamplesProps {
-  userId: string;
+  userId: string | undefined;
 }
 
 export const ClientSamples = ({ userId }: ClientSamplesProps) => {
   const { data: sampleRequests } = useQuery({
     queryKey: ["client-samples", userId],
     queryFn: async () => {
+      if (!userId) return [];
+      
       const { data, error } = await supabase
         .from("sample_requests")
         .select(`
@@ -26,9 +28,10 @@ export const ClientSamples = ({ userId }: ClientSamplesProps) => {
       if (error) throw error;
       return data;
     },
+    enabled: !!userId,
   });
 
-  if (!sampleRequests?.length) {
+  if (!userId || !sampleRequests?.length) {
     return (
       <Card className="p-6">
         <h2 className="text-lg font-semibold mb-4">Sample Requests</h2>
