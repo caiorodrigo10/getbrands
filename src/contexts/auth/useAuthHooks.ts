@@ -20,6 +20,7 @@ export const useAuthInitialization = () => {
           console.error('Session error:', sessionError);
           setSession(null);
           setUser(null);
+          navigate('/login');
           return;
         }
         
@@ -30,9 +31,12 @@ export const useAuthInitialization = () => {
           if (location.pathname === '/login') {
             navigate('/dashboard');
           }
+        } else {
+          navigate('/login');
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
+        navigate('/login');
       }
     };
 
@@ -117,16 +121,17 @@ export const useAuthActions = (setUser: (user: User | null) => void, setSession:
 
       setUser(null);
       setSession(null);
-      identifyUserInGleap(null);
-      navigate('/login');
+      await identifyUserInGleap(null);
       
       toast({
         title: "Success",
         description: "Logged out successfully!",
       });
+      
+      navigate('/login', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
-      navigate('/login');
+      navigate('/login', { replace: true });
     }
   };
 

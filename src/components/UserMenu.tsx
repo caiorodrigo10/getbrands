@@ -45,6 +45,11 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
     }
   };
 
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    await logout();
+  };
+
   if (!user) return null;
 
   const userEmail = user.email || "";
@@ -100,7 +105,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
             </button>
           )}
           <button
-            onClick={logout}
+            onClick={handleLogout}
             className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-gray-800 rounded-md w-full text-left"
           >
             <LogOut className="h-4 w-4" />
@@ -174,7 +179,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
             </DropdownMenuItem>
           )}
           <DropdownMenuItem 
-            onClick={logout}
+            onClick={handleLogout}
             className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 text-red-600 rounded-md"
           >
             <LogOut className="h-4 w-4" />
