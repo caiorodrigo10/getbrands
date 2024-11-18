@@ -46,6 +46,11 @@ export const AppRoutes = () => (
     
     {/* Client Routes - Wrapped in AppLayout */}
     <Route element={<AppLayout />}>
+      <Route path="/dashboard" element={
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
+      } />
       <Route path="/" element={
         <ProtectedRoute>
           <Dashboard />
