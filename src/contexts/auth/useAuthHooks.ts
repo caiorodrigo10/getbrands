@@ -94,7 +94,6 @@ export const useAuthActions = (setUser: (user: User | null) => void, setSession:
       const { error } = await supabase.auth.signOut();
       
       if (error) {
-        console.error('Logout error:', error);
         throw error;
       }
 
