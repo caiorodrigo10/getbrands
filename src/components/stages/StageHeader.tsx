@@ -9,8 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 export interface StageHeaderProps {
   name: string;
@@ -21,7 +19,6 @@ export interface StageHeaderProps {
   onUpdate: (oldName: string, newName: string, newStatus: Stage["status"]) => void;
   isAdmin?: boolean;
   isDraggable?: boolean;
-  projectId?: string;
 }
 
 const getStatusColor = (status: Stage["status"]) => {
@@ -46,7 +43,6 @@ export const StageHeader = ({
   onUpdate,
   isAdmin = false,
   isDraggable = false,
-  projectId,
 }: StageHeaderProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(name);
@@ -58,36 +54,8 @@ export const StageHeader = ({
     }
   };
 
-  const handleStatusChange = async (newStatus: Stage["status"]) => {
-    try {
-      if (projectId) {
-        // Update all tasks in this stage to reflect the new status
-        const taskStatus = newStatus === "completed" ? "done" : 
-                         newStatus === "in-progress" ? "in_progress" : 
-                         "pending";
-
-        const { error } = await supabase
-          .from('project_tasks')
-          .update({ status: taskStatus })
-          .eq('project_id', projectId)
-          .eq('stage_name', name);
-
-        if (error) throw error;
-        
-        onUpdate(name, name, newStatus);
-        toast.success("Stage status updated successfully");
-      }
-    } catch (error) {
-      console.error('Error updating stage status:', error);
-      toast.error("Failed to update stage status");
-    }
-  };
-
-  const handleStatusClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!isOpen) {
-      onToggle();
-    }
+  const handleStatusChange = (newStatus: Stage["status"]) => {
+    onUpdate(name, name, newStatus);
   };
 
   return (
@@ -103,7 +71,7 @@ export const StageHeader = ({
         )}
         <div className="flex items-center gap-4">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild onClick={handleStatusClick}>
+            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -112,7 +80,7 @@ export const StageHeader = ({
                 {status.replace("-", " ")}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
+            <DropdownMenuContent>
               <DropdownMenuItem onClick={() => handleStatusChange("pending")}>
                 <span className="text-purple-700">Pending</span>
               </DropdownMenuItem>

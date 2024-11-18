@@ -19,7 +19,7 @@ export interface Task {
   endDate?: Date;
   assignee?: AssigneeType;
   position?: number;
-  stage_position?: number;
+  stage_position?: number;  // Added this property
 }
 
 export interface Stage {
@@ -39,19 +39,6 @@ const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
   if (hasInProgress) return "in-progress";
   
   return "pending";
-};
-
-const mapStageStatusToTaskStatus = (stageStatus: Stage["status"]): TaskStatus => {
-  switch (stageStatus) {
-    case "completed":
-      return "done";
-    case "in-progress":
-      return "in_progress";
-    case "pending":
-      return "pending";
-    default:
-      return "pending";
-  }
 };
 
 const StagesTimeline = () => {
@@ -130,8 +117,7 @@ const StagesTimeline = () => {
 
   const handleStageUpdate = async (oldStageName: string, newStageName: string, newStatus: Stage["status"]) => {
     if (!projectId) return;
-    const taskStatus = mapStageStatusToTaskStatus(newStatus);
-    await updateStageInDatabase(oldStageName, newStageName, taskStatus);
+    await updateStageInDatabase(oldStageName, newStageName, newStatus);
     toast.success("Stage updated successfully");
   };
 
@@ -154,9 +140,8 @@ const StagesTimeline = () => {
         onUpdateStage={handleStageUpdate}
         onReorderStages={handleReorderStages}
         isAdmin={isAdmin}
-        projectId={projectId}
       />
-      <AddStageButton onAddStage={handleAddStage} projectId={projectId || ''} />
+      <AddStageButton onAddStage={handleAddStage} />
     </div>
   );
 };

@@ -1,22 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Stage, TaskStatus } from "../StagesTimeline";
+import { Stage } from "../StagesTimeline";
 import { toast } from "sonner";
 
 export const useStageOperations = (projectId: string) => {
   const addStageToDatabase = async (stageName: string) => {
     try {
-      const { error } = await supabase
-        .from('project_tasks')
-        .insert({
-          project_id: projectId,
-          stage_name: stageName,
-          title: 'Initial task',
-          status: 'pending',
-          position: 0,
-          stage_position: 0
-        });
-
-      if (error) throw error;
+      // For now, we only update the local state since stages are implicit
+      // based on task stage_name values
       toast.success("Stage added successfully");
     } catch (error) {
       console.error('Error adding stage:', error);
@@ -42,14 +32,11 @@ export const useStageOperations = (projectId: string) => {
     }
   };
 
-  const updateStageInDatabase = async (oldStageName: string, newStageName: string, newStatus: TaskStatus) => {
+  const updateStageInDatabase = async (oldStageName: string, newStageName: string, newStatus: Stage["status"]) => {
     try {
       const { error } = await supabase
         .from('project_tasks')
-        .update({ 
-          stage_name: newStageName,
-          status: newStatus
-        })
+        .update({ stage_name: newStageName })
         .eq('project_id', projectId)
         .eq('stage_name', oldStageName);
 
