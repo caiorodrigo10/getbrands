@@ -56,11 +56,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (location.pathname === '/login') {
             navigate('/dashboard');
           }
-        } else {
+        } else if (location.pathname !== '/login') {
           // If no session and not on login page, redirect to login
-          if (location.pathname !== '/login') {
-            navigate('/login');
-          }
+          navigate('/login');
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
@@ -89,7 +87,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(null);
         setUser(null);
         identifyUserInGleap(null);
-        navigate('/login');
+        
+        // Only redirect to login if not already there
+        if (location.pathname !== '/login') {
+          navigate('/login');
+        }
       }
     });
 
@@ -137,8 +139,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
-      // Navega para a página de login
-      navigate('/login');
+      // Força a limpeza da sessão no localStorage
+      window.localStorage.removeItem('supabase.auth.token');
+      
+      // Navega para a página de login e previne redirecionamentos indesejados
+      navigate('/login', { replace: true });
 
       toast({
         title: "Sucesso",
@@ -148,9 +153,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Erro no logout:', error);
       
       // Sempre navega para login mesmo se houver erro
-      navigate('/login');
+      navigate('/login', { replace: true });
       
-      // Não mostra toast de erro para session_not_found pois é esperado em alguns casos
       if (!error.message?.includes('session_not_found')) {
         toast({
           variant: "destructive",
