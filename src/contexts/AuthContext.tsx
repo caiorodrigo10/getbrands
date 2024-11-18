@@ -49,19 +49,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (sessionError) {
           console.error('Session error:', sessionError);
-          await handleLogout();
+          setSession(null);
+          setUser(null);
           return;
         }
         
         if (initialSession) {
           setSession(initialSession);
           setUser(initialSession.user);
-          await identifyUserInGleap(initialSession.user);
-          navigate('/dashboard', { replace: true });
+          identifyUserInGleap(initialSession.user);
+          if (location.pathname === '/login') {
+            navigate('/dashboard', { replace: true });
+          }
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-        await handleLogout();
       } finally {
         setIsLoading(false);
       }
@@ -77,10 +79,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (currentSession) {
         setSession(currentSession);
         setUser(currentSession.user);
-        await identifyUserInGleap(currentSession.user);
-        navigate('/dashboard', { replace: true });
+        identifyUserInGleap(currentSession.user);
+        if (location.pathname === '/login') {
+          navigate('/dashboard', { replace: true });
+        }
       } else {
-        await handleLogout();
+        setSession(null);
+        setUser(null);
+        identifyUserInGleap(null);
         if (event === 'SIGNED_OUT') {
           navigate('/login', { replace: true });
         }
@@ -90,15 +96,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
-
-  const handleLogout = async () => {
-    setUser(null);
-    setSession(null);
-    await Gleap.clearIdentity();
-    localStorage.removeItem('supabase.auth.token');
-    await supabase.auth.signOut();
-  };
+  }, [navigate, location]);
 
   const login = async (email: string, password: string) => {
     try {
@@ -119,7 +117,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
-        await identifyUserInGleap(data.user);
+        identifyUserInGleap(data.user);
         navigate('/dashboard', { replace: true });
       }
     } catch (error) {
@@ -130,20 +128,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      await handleLogout();
+      setUser(null);
+      setSession(null);
+      identifyUserInGleap(null);
+      
+      const { error } = await supabase.auth.signOut();
+      
       navigate('/login', { replace: true });
       
-      toast({
-        title: "Success",
-        description: "Logged out successfully!",
-      });
+      if (error) {
+        console.error('Logout error:', error);
+        if (error.message !== 'session_not_found') {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "An error occurred during logout. Please try again.",
+          });
+        }
+      } else {
+        toast({
+          title: "Success",
+          description: "Logged out successfully!",
+        });
+      }
     } catch (error) {
       console.error('Logout error:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An error occurred during logout. Please try again.",
-      });
       navigate('/login', { replace: true });
     }
   };
