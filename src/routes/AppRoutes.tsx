@@ -4,6 +4,7 @@ import { AppLayout } from "./AppLayout";
 import { MarketingRoutes } from "./MarketingRoutes";
 import { AdminRoutes } from "./AdminRoutes";
 import Login from "@/pages/Login";
+import SignUp from "@/pages/SignUp";
 import Dashboard from "@/pages/Dashboard";
 import Profile from "@/pages/Profile";
 import Projects from "@/pages/Projects";
@@ -27,6 +28,7 @@ export const AppRoutes = () => (
     
     {/* Public Routes */}
     <Route path="/login" element={<Login />} />
+    <Route path="/signup" element={<SignUp />} />
     
     {/* Admin Routes */}
     <Route path="/admin/*" element={
