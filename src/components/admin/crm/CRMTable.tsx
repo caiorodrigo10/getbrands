@@ -28,7 +28,7 @@ interface CRMUser {
   email: string | null;
   phone: string | null;
   avatar_url: string | null;
-  user_type: string | null;
+  role: string | null;
   created_at: string;
   projects: Project[] | null;
 }
@@ -38,14 +38,15 @@ interface CRMTableProps {
   onUserUpdated: () => void;
 }
 
-const getUserTypeBadge = (type: string | null, hasProjects: boolean) => {
-  const effectiveType = hasProjects ? "customer" : type || "lead";
+const getUserTypeBadge = (role: string | null, hasProjects: boolean) => {
+  const effectiveType = hasProjects ? "customer" : role || "lead";
 
   const styles = {
     lead: "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20",
     member: "bg-blue-500/10 text-blue-500 hover:bg-blue-500/20",
     sampler: "bg-purple-500/10 text-purple-500 hover:bg-purple-500/20",
     customer: "bg-green-500/10 text-green-500 hover:bg-green-500/20",
+    admin: "bg-red-500/10 text-red-500 hover:bg-red-500/20"
   }[effectiveType] || "bg-gray-500/10 text-gray-500 hover:bg-gray-500/20";
 
   const labels = {
@@ -53,6 +54,7 @@ const getUserTypeBadge = (type: string | null, hasProjects: boolean) => {
     member: "Member",
     sampler: "Sampler",
     customer: "Customer",
+    admin: "Admin"
   };
 
   return (
@@ -89,7 +91,7 @@ export const CRMTable = ({ users, onUserUpdated }: CRMTableProps) => {
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.phone || "-"}</TableCell>
                 <TableCell>
-                  {getUserTypeBadge(user.user_type, Array.isArray(user.projects) && user.projects.length > 0)}
+                  {getUserTypeBadge(user.role, Array.isArray(user.projects) && user.projects.length > 0)}
                 </TableCell>
                 <TableCell>
                   <div className="space-y-1">

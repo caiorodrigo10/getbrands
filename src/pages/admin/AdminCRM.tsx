@@ -27,7 +27,7 @@ const AdminCRM = () => {
           email,
           phone,
           avatar_url,
-          user_type,
+          role,
           created_at,
           projects:projects(
             id,
@@ -38,11 +38,7 @@ const AdminCRM = () => {
         `);
 
       if (error) throw error;
-      
-      return data.map((user) => ({
-        ...user,
-        projects: user.projects as Project[] | null
-      }));
+      return data;
     },
   });
 
