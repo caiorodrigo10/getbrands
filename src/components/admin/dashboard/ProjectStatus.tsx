@@ -8,26 +8,6 @@ const data = [
   { name: "Completed", value: 20, color: "#3b82f6" },
 ];
 
-const RADIAN = Math.PI / 180;
-const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, value, name }: any) => {
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-  return (
-    <text
-      x={x}
-      y={y}
-      fill="white"
-      textAnchor={x > cx ? 'start' : 'end'}
-      dominantBaseline="central"
-      className="text-xs font-medium"
-    >
-      {`${name} ${value}%`}
-    </text>
-  );
-};
-
 const ProjectStatus = () => {
   return (
     <Card className="p-6">
@@ -43,8 +23,6 @@ const ProjectStatus = () => {
               outerRadius={80}
               paddingAngle={5}
               dataKey="value"
-              label={CustomLabel}
-              labelLine={false}
             >
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
