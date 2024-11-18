@@ -30,10 +30,12 @@ export const ProjectCoverUpload = ({ projectId }: ProjectCoverUploadProps) => {
         .from('project-covers')
         .getPublicUrl(filePath);
 
-      await supabase
+      const { error: updateError } = await supabase
         .from('projects')
         .update({ cover_image_url: publicUrl })
         .eq('id', projectId);
+
+      if (updateError) throw updateError;
 
       toast({
         title: "Success",

@@ -1,14 +1,13 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+import { type Project } from "./project";
 
-export type Database = {
+export interface Database {
   public: {
     Tables: {
+      projects: {
+        Row: Project;
+        Insert: Partial<Project>;
+        Update: Partial<Project>;
+      };
       addresses: {
         Row: {
           city: string
@@ -72,7 +71,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       audit_logs: {
@@ -117,7 +116,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       cart_items: {
@@ -163,7 +162,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       documents: {
@@ -208,7 +207,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       marketing_quiz_responses: {
@@ -250,7 +249,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       package_quizzes: {
@@ -326,7 +325,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       product_images: {
@@ -364,7 +363,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       products: {
@@ -536,7 +535,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       project_products: {
@@ -575,7 +574,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       project_specific_products: {
@@ -622,7 +621,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "project_products"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       project_tasks: {
@@ -686,7 +685,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       project_team_members: {
@@ -735,64 +734,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-        ]
-      }
-      projects: {
-        Row: {
-          cover_image_url: string | null
-          created_at: string
-          description: string | null
-          id: string
-          name: string
-          pack_type: Database["public"]["Enums"]["project_pack_type"]
-          points: number | null
-          points_used: number | null
-          status: string | null
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          cover_image_url?: string | null
-          created_at?: string
-          description?: string | null
-          id?: string
-          name: string
-          pack_type?: Database["public"]["Enums"]["project_pack_type"]
-          points?: number | null
-          points_used?: number | null
-          status?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          cover_image_url?: string | null
-          created_at?: string
-          description?: string | null
-          id?: string
-          name?: string
-          pack_type?: Database["public"]["Enums"]["project_pack_type"]
-          points?: number | null
-          points_used?: number | null
-          status?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "projects_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "crm_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "projects_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
+          }
         ]
       }
       sample_request_products: {
@@ -831,7 +773,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "sample_requests"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       sample_requests: {
@@ -901,7 +843,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       shipping_rates: {
@@ -984,6 +926,14 @@ export type Database = {
     }
   }
 }
+
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 type PublicSchema = Database[Extract<keyof Database, "public">]
 
