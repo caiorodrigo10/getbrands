@@ -128,28 +128,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      // First clear local state and identity
+      // First clear local state
       setUser(null);
       setSession(null);
       identifyUserInGleap(null);
-      
-      // Then attempt to sign out from Supabase
+
+      // Attempt to sign out from Supabase
       await supabase.auth.signOut();
       
-      // Always navigate to login page
+      // Navigate to login page
       navigate('/login');
-      
+
+      // Show success message
       toast({
         title: "Success",
         description: "Logged out successfully!",
       });
     } catch (error: any) {
       console.error('Logout error:', error);
-      // Still navigate to login page even if there's an error
+      
+      // Always navigate to login page even if there's an error
       navigate('/login');
       
-      // Only show error toast for unexpected errors
-      if (error?.message !== 'session_not_found') {
+      // Don't show error toast for session_not_found as it's expected in some cases
+      if (!error.message?.includes('session_not_found')) {
         toast({
           variant: "destructive",
           title: "Error",
