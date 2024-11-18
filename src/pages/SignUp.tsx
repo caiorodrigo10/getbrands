@@ -28,6 +28,7 @@ const SignUp = () => {
           data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
+            role: "member", // Explicitly set the role
           },
         },
       });
