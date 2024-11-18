@@ -23,49 +23,61 @@ const ProjectProductEdit = () => {
     resolver: zodResolver(productFormSchema),
   });
 
-  const { data: projectProduct, isLoading, refetch: refetchProduct } = useQuery({
-    queryKey: ["project-product", productId],
+  // First, fetch the project product with its related data
+  const { data: projectProduct, isLoading: isLoadingProduct } = useQuery({
+    queryKey: ["project-product-details", productId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: projectProductData, error: projectProductError } = await supabase
         .from("project_products")
         .select(`
           id,
-          product:products (
-            id,
-            name,
-            category,
-            from_price,
-            srp,
-            image_url
-          ),
-          specific:project_specific_products (
-            id,
-            name,
-            selling_price,
-            main_image_url,
-            images
-          )
+          product_id,
+          project_id
         `)
         .eq("id", productId)
         .single();
 
-      if (error) throw error;
-      return data;
+      if (projectProductError) throw projectProductError;
+
+      // Now fetch the base product data
+      const { data: productData, error: productError } = await supabase
+        .from("products")
+        .select("*")
+        .eq("id", projectProductData.product_id)
+        .single();
+
+      if (productError) throw productError;
+
+      // Finally, fetch any specific product data
+      const { data: specificData, error: specificError } = await supabase
+        .from("project_specific_products")
+        .select("*")
+        .eq("project_product_id", productId)
+        .single();
+
+      if (specificError && specificError.code !== 'PGRST116') throw specificError;
+
+      return {
+        projectProduct: projectProductData,
+        baseProduct: productData,
+        specificProduct: specificData
+      };
     },
   });
 
-  // Update form values when data is loaded
+  // Update form when data is loaded
   useQuery({
     queryKey: ["update-form", projectProduct],
     enabled: !!projectProduct,
     queryFn: () => {
-      const specificProduct = projectProduct?.specific?.[0];
-      const defaultName = specificProduct?.name || projectProduct?.product?.name || "";
-      const defaultPrice = specificProduct?.selling_price || projectProduct?.product?.srp || 0;
-      
+      if (!projectProduct) return null;
+
+      const name = projectProduct.specificProduct?.name || projectProduct.baseProduct.name;
+      const price = projectProduct.specificProduct?.selling_price || projectProduct.baseProduct.srp;
+
       form.reset({
-        name: defaultName,
-        selling_price: defaultPrice,
+        name,
+        selling_price: price,
       });
       return null;
     },
@@ -73,9 +85,22 @@ const ProjectProductEdit = () => {
 
   const { data: productImages, refetch: refetchImages } = useQuery({
     queryKey: ['project-product-images', productId],
+    enabled: !!projectProduct,
     queryFn: async () => {
-      if (!projectProduct?.specific?.[0]?.images) return [];
-      const images = projectProduct.specific[0].images || [];
+      if (!projectProduct?.specificProduct?.images) {
+        // If no specific images, fetch the base product images
+        const { data, error } = await supabase
+          .from('product_images')
+          .select('*')
+          .eq('product_id', projectProduct?.baseProduct.id)
+          .order('position');
+
+        if (error) throw error;
+        return data || [];
+      }
+
+      // Use specific product images if available
+      const images = projectProduct.specificProduct.images || [];
       return (images as any[]).map((img, index) => ({
         id: img.id || `temp-${index}`,
         product_id: productId as string,
@@ -86,7 +111,6 @@ const ProjectProductEdit = () => {
         updated_at: new Date().toISOString()
       }));
     },
-    enabled: !!projectProduct,
   });
 
   const handleSubmit = async (values: z.infer<typeof productFormSchema>) => {
@@ -100,8 +124,6 @@ const ProjectProductEdit = () => {
         });
 
       if (error) throw error;
-
-      await refetchProduct();
 
       toast({
         title: "Success",
@@ -119,7 +141,7 @@ const ProjectProductEdit = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoadingProduct) {
     return (
       <div className="p-6">
         <div className="h-8 w-64 bg-gray-200 animate-pulse rounded" />
@@ -128,6 +150,9 @@ const ProjectProductEdit = () => {
   }
 
   if (!projectProduct) return null;
+
+  const mainImageUrl = projectProduct.specificProduct?.main_image_url || 
+                      projectProduct.baseProduct.image_url;
 
   return (
     <div className="space-y-6 p-6">
@@ -152,7 +177,7 @@ const ProjectProductEdit = () => {
         productId={productId || ""}
         projectId={projectId || ""}
         productImages={productImages || []}
-        mainImageUrl={projectProduct.specific?.[0]?.main_image_url || projectProduct.product?.image_url}
+        mainImageUrl={mainImageUrl}
         onImagesUpdate={() => refetchImages()}
         onSubmit={handleSubmit}
       />
