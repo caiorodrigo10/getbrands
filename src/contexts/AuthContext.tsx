@@ -45,25 +45,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error('Session error:', sessionError);
-          setSession(null);
-          setUser(null);
-          return;
-        }
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
         
         if (initialSession) {
           setSession(initialSession);
           setUser(initialSession.user);
           identifyUserInGleap(initialSession.user);
+          
+          // Only redirect to dashboard if on login page
           if (location.pathname === '/login') {
             navigate('/dashboard');
+          }
+        } else {
+          // If no session and not on login page, redirect to login
+          if (location.pathname !== '/login') {
+            navigate('/login');
           }
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
+        navigate('/login');
       } finally {
         setIsLoading(false);
       }
@@ -80,6 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(currentSession);
         setUser(currentSession.user);
         identifyUserInGleap(currentSession.user);
+        
         if (location.pathname === '/login') {
           navigate('/dashboard');
         }
@@ -87,16 +89,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(null);
         setUser(null);
         identifyUserInGleap(null);
-        if (event === 'SIGNED_OUT') {
-          navigate('/login');
-        }
+        navigate('/login');
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, location]);
+  }, [navigate, location.pathname]);
 
   const login = async (email: string, password: string) => {
     try {
@@ -108,8 +108,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (error) {
         toast({
           variant: "destructive",
-          title: "Login Error",
-          description: "Invalid email or password. Please check your credentials and try again.",
+          title: "Erro no Login",
+          description: "Email ou senha inválidos. Por favor, verifique suas credenciais.",
         });
         throw error;
       }
@@ -128,46 +128,54 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      // First clear local state
+      // Primeiro limpa o estado local
       setUser(null);
       setSession(null);
       identifyUserInGleap(null);
 
-      // Attempt to sign out from Supabase
-      await supabase.auth.signOut();
-      
-      // Navigate to login page
+      // Tenta fazer logout no Supabase
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+
+      // Navega para a página de login
       navigate('/login');
 
-      // Show success message
       toast({
-        title: "Success",
-        description: "Logged out successfully!",
+        title: "Sucesso",
+        description: "Logout realizado com sucesso!",
       });
     } catch (error: any) {
-      console.error('Logout error:', error);
+      console.error('Erro no logout:', error);
       
-      // Always navigate to login page even if there's an error
+      // Sempre navega para login mesmo se houver erro
       navigate('/login');
       
-      // Don't show error toast for session_not_found as it's expected in some cases
+      // Não mostra toast de erro para session_not_found pois é esperado em alguns casos
       if (!error.message?.includes('session_not_found')) {
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "An error occurred during logout.",
+          title: "Erro",
+          description: "Ocorreu um erro durante o logout.",
         });
       }
     }
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>;
   }
 
   return (
     <AuthContext.Provider
-      value={{ user, session, login, logout, isAuthenticated: !!session }}
+      value={{
+        user,
+        session,
+        login,
+        logout,
+        isAuthenticated: !!session
+      }}
     >
       {children}
     </AuthContext.Provider>
