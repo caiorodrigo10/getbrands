@@ -6,7 +6,6 @@ import { useUserPermissions } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
-import { ProjectPointsInfo } from "./navigation/ProjectPointsInfo";
 
 export const NavigationMenu = () => {
   const location = useLocation();
@@ -114,8 +113,6 @@ export const NavigationMenu = () => {
             {menuItems.map(item => renderMenuItem(item))}
           </nav>
 
-          <ProjectPointsInfo />
-
           <div className="p-4 border-t border-border/40">
             <UserMenu isMobile={false} />
           </div>
@@ -139,14 +136,13 @@ export const NavigationMenu = () => {
                 <Menu className="h-6 w-6 text-gray-300" />
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] bg-[#131313] p-0">
-                <div className="flex flex-col h-full">
+                <div className="flex flex-col">
                   <div className="p-4 border-b border-gray-800">
                     <UserMenu isMobile={true} />
                   </div>
-                  <nav className="flex-1 p-4">
+                  <nav className="flex flex-col p-4">
                     {menuItems.map(item => renderMenuItem(item, true))}
                   </nav>
-                  <ProjectPointsInfo />
                 </div>
               </SheetContent>
             </Sheet>
