@@ -3,9 +3,11 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import { AppLayout } from "./AppLayout";
 import { MarketingRoutes } from "./MarketingRoutes";
 import { AdminRoutes } from "./AdminRoutes";
+import { OnboardingQuiz } from "@/components/onboarding/OnboardingQuiz";
 import Login from "@/pages/Login";
 import SignUp from "@/pages/SignUp";
 import Dashboard from "@/pages/Dashboard";
+import GetStarted from "@/pages/GetStarted";
 import Profile from "@/pages/Profile";
 import Projects from "@/pages/Projects";
 import ProjectDetails from "@/pages/ProjectDetails";
@@ -29,6 +31,11 @@ export const AppRoutes = () => (
     {/* Public Routes */}
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<SignUp />} />
+    <Route path="/onboarding" element={
+      <ProtectedRoute>
+        <OnboardingQuiz />
+      </ProtectedRoute>
+    } />
     
     {/* Admin Routes */}
     <Route path="/admin/*" element={
@@ -45,12 +52,12 @@ export const AppRoutes = () => (
         </ProtectedRoute>
       } />
       
-      <Route path="/dashboard" element={
+      <Route path="/get-started" element={
         <ProtectedRoute>
-          <Dashboard />
+          <GetStarted />
         </ProtectedRoute>
       } />
-      
+
       <Route path="/profile" element={
         <ProtectedRoute>
           <Profile />
