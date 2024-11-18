@@ -1,21 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 export const HeroSection = () => {
-  const { user, isAuthenticated } = useAuth();
-
-  const renderAuthButton = () => {
-    if (!isAuthenticated) {
-      return (
+  return (
+    <section className="relative bg-primary min-h-[600px] flex items-center">
+      {/* Login Button */}
+      <div className="absolute top-4 right-4 z-20">
         <Link to="/login">
           <Button 
             variant="ghost" 
@@ -25,44 +16,6 @@ export const HeroSection = () => {
             Login
           </Button>
         </Link>
-      );
-    }
-
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            className="text-white hover:bg-white/10 flex items-center gap-2"
-          >
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={user?.user_metadata?.avatar_url} />
-              <AvatarFallback className="bg-primary-foreground text-primary">
-                {user?.email?.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-sm font-medium">
-              {user?.email?.split('@')[0]}
-            </span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
-          <Link to="/dashboard">
-            <DropdownMenuItem className="cursor-pointer">
-              Access Platform
-            </DropdownMenuItem>
-          </Link>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  };
-
-  return (
-    <section className="relative bg-primary min-h-[600px] flex items-center">
-      {/* Auth Button */}
-      <div className="absolute top-4 right-4 z-20">
-        {renderAuthButton()}
       </div>
 
       {/* Background Pattern */}
