@@ -15,6 +15,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Array de rotas públicas que não requerem autenticação
+const PUBLIC_ROUTES = ['/login', '/signup', '/forgot-password'];
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -55,12 +58,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (location.pathname === '/login') {
             navigate('/dashboard');
           }
-        } else if (location.pathname !== '/login') {
+        } else if (!PUBLIC_ROUTES.includes(location.pathname)) {
+          // Só redireciona para login se não estiver em uma rota pública
           navigate('/login');
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-        navigate('/login');
+        if (!PUBLIC_ROUTES.includes(location.pathname)) {
+          navigate('/login');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -86,7 +92,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(null);
         identifyUserInGleap(null);
         
-        if (location.pathname !== '/login') {
+        if (!PUBLIC_ROUTES.includes(location.pathname)) {
           navigate('/login');
         }
       }
@@ -127,7 +133,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      // Primeiro limpa o estado local
       setUser(null);
       setSession(null);
       identifyUserInGleap(null);
