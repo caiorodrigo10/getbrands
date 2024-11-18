@@ -625,6 +625,44 @@ export type Database = {
           },
         ]
       }
+      project_stages: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          position: number | null
+          project_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          position?: number | null
+          project_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          position?: number | null
+          project_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_stages_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_tasks: {
         Row: {
           assignee_id: string | null
@@ -632,8 +670,10 @@ export type Database = {
           description: string | null
           due_date: string | null
           id: string
+          position: number | null
           project_id: string | null
-          stage_name: string
+          stage_id: string | null
+          stage_position: number | null
           start_date: string | null
           status: string | null
           title: string
@@ -645,8 +685,10 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
+          position?: number | null
           project_id?: string | null
-          stage_name: string
+          stage_id?: string | null
+          stage_position?: number | null
           start_date?: string | null
           status?: string | null
           title: string
@@ -658,8 +700,10 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
+          position?: number | null
           project_id?: string | null
-          stage_name?: string
+          stage_id?: string | null
+          stage_position?: number | null
           start_date?: string | null
           status?: string | null
           title?: string
@@ -685,6 +729,13 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_tasks_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "project_stages"
             referencedColumns: ["id"]
           },
         ]
@@ -740,6 +791,7 @@ export type Database = {
       }
       projects: {
         Row: {
+          cover_image_url: string | null
           created_at: string
           description: string | null
           id: string
@@ -752,6 +804,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          cover_image_url?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -764,6 +817,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          cover_image_url?: string | null
           created_at?: string
           description?: string | null
           id?: string

@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { StagesList } from "./stages/StagesList";
 import { AddStageButton } from "./stages/AddStageButton";
 import { useStagesData } from "./stages/useStagesData";
 import { useParams } from "react-router-dom";
+import Sortable from "sortablejs";
 
 export type TaskStatus = "pending" | "in_progress" | "done" | "blocked" | "scheduled" | "not_included";
 export type AssigneeType = "none" | string;
@@ -16,12 +17,16 @@ export interface Task {
   startDate?: Date;
   endDate?: Date;
   assignee?: AssigneeType;
+  position: number;
+  stageId: string;
 }
 
 export interface Stage {
+  id: string;
   name: string;
   status: "completed" | "in-progress" | "pending";
   tasks: Task[];
+  position: number;
 }
 
 const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
@@ -38,6 +43,8 @@ const calculateStageStatus = (tasks: Task[]): Stage["status"] => {
 
 const StagesTimeline = () => {
   const { id: projectId } = useParams();
+  const stagesListRef = useRef<HTMLDivElement>(null);
+  
   const {
     stages,
     setStages,
@@ -46,30 +53,58 @@ const StagesTimeline = () => {
     deleteTaskFromDatabase,
     addStageToDatabase,
     deleteStageFromDatabase,
+    updateStagePositions,
+    updateTaskPositions,
   } = useStagesData(projectId || '');
   
   const [openStages, setOpenStages] = useState<string[]>([]);
 
-  const toggleStage = (stageName: string) => {
+  useEffect(() => {
+    if (stagesListRef.current) {
+      const sortable = new Sortable(stagesListRef.current, {
+        animation: 150,
+        handle: ".stage-handle",
+        onEnd: async (evt) => {
+          const newStages = [...stages];
+          const movedStage = newStages.splice(evt.oldIndex!, 1)[0];
+          newStages.splice(evt.newIndex!, 0, movedStage);
+          
+          // Update positions
+          const updatedStages = newStages.map((stage, index) => ({
+            ...stage,
+            position: index,
+          }));
+          
+          setStages(updatedStages);
+          await updateStagePositions(updatedStages);
+          toast.success("Stage order updated");
+        },
+      });
+
+      return () => {
+        sortable.destroy();
+      };
+    }
+  }, [stages, updateStagePositions]);
+
+  const toggleStage = (stageId: string) => {
     setOpenStages(prev => {
-      if (prev.includes(stageName)) {
-        return prev.filter(name => name !== stageName);
+      if (prev.includes(stageId)) {
+        return prev.filter(id => id !== stageId);
       }
-      return [...prev, stageName];
+      return [...prev, stageId];
     });
   };
 
-  const handleTaskUpdate = async (stageName: string, taskIndex: number, updates: Partial<Task>) => {
-    const taskId = stages.find(s => s.name === stageName)?.tasks[taskIndex]?.id;
-    if (!taskId) return;
-
+  const handleTaskUpdate = async (stageId: string, taskId: string, updates: Partial<Task>) => {
     await updateTaskInDatabase(taskId, updates);
     
     setStages(prevStages => 
       prevStages.map(stage => {
-        if (stage.name === stageName) {
-          const updatedTasks = [...stage.tasks];
-          updatedTasks[taskIndex] = { ...updatedTasks[taskIndex], ...updates };
+        if (stage.id === stageId) {
+          const updatedTasks = stage.tasks.map(task => 
+            task.id === taskId ? { ...task, ...updates } : task
+          );
           return {
             ...stage,
             tasks: updatedTasks,
@@ -81,16 +116,12 @@ const StagesTimeline = () => {
     );
   };
 
-  const handleAddTask = async (stageName: string, taskData: Task) => {
+  const handleAddTask = async (stageId: string, taskData: Task) => {
     if (!projectId) return;
-    
-    await addTaskToDatabase(stageName, taskData);
+    await addTaskToDatabase(stageId, taskData);
   };
 
-  const handleDeleteTask = async (stageName: string, taskIndex: number) => {
-    const taskId = stages.find(s => s.name === stageName)?.tasks[taskIndex]?.id;
-    if (!taskId) return;
-
+  const handleDeleteTask = async (stageId: string, taskId: string) => {
     await deleteTaskFromDatabase(taskId);
   };
 
@@ -101,24 +132,27 @@ const StagesTimeline = () => {
     toast.success("Stage added successfully");
   };
 
-  const handleDeleteStage = async (stageName: string) => {
+  const handleDeleteStage = async (stageId: string) => {
     if (!projectId) return;
     
-    await deleteStageFromDatabase(stageName);
+    await deleteStageFromDatabase(stageId);
     toast.success("Stage deleted successfully");
   };
 
   return (
     <div className="space-y-4">
-      <StagesList
-        stages={stages}
-        openStages={openStages}
-        onToggleStage={toggleStage}
-        onTaskUpdate={handleTaskUpdate}
-        onAddTask={handleAddTask}
-        onDeleteTask={handleDeleteTask}
-        onDeleteStage={handleDeleteStage}
-      />
+      <div ref={stagesListRef}>
+        <StagesList
+          stages={stages}
+          openStages={openStages}
+          onToggleStage={toggleStage}
+          onTaskUpdate={handleTaskUpdate}
+          onAddTask={handleAddTask}
+          onDeleteTask={handleDeleteTask}
+          onDeleteStage={handleDeleteStage}
+          onUpdateTaskPositions={updateTaskPositions}
+        />
+      </div>
       <AddStageButton onAddStage={handleAddStage} />
     </div>
   );

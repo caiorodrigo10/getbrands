@@ -1,4 +1,4 @@
-import { Trash2, Pencil, Check } from "lucide-react";
+import { Trash2, Pencil, Check, GripVertical } from "lucide-react";
 import { useState } from "react";
 import { TaskStatusSelect } from "./TaskStatusSelect";
 import { TaskAssigneeSelect } from "./TaskAssigneeSelect";
@@ -12,7 +12,6 @@ interface TaskItemProps {
   id: string;
   name: string;
   status: TaskStatus;
-  date?: string;
   startDate?: Date;
   endDate?: Date;
   assignee?: AssigneeType;
@@ -99,8 +98,14 @@ export const TaskItem = ({
   };
 
   return (
-    <div className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 items-center px-4 py-2 rounded-md transition-colors group">
+    <div 
+      className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 items-center px-4 py-2 rounded-md transition-colors group hover:bg-accent/50"
+      data-task-id={id}
+    >
       <div className="flex items-center gap-3">
+        <div className="task-handle cursor-move">
+          <GripVertical className="h-4 w-4 text-muted-foreground" />
+        </div>
         <TaskName />
         <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
           {!isEditing && (
