@@ -23,6 +23,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const handleAuthRedirect = async (userId: string) => {
+    const hasCompletedOnboarding = await checkOnboardingStatus(userId);
+    if (!hasCompletedOnboarding) {
+      navigate('/onboarding');
+    } else {
+      navigate('/dashboard');
+    }
+  };
+
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -33,13 +42,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(initialSession.user);
           await identifyUserInGleap(initialSession.user);
           
-          // Check onboarding status and redirect if necessary
-          const hasCompletedOnboarding = await checkOnboardingStatus(initialSession.user.id);
-          
-          if (!hasCompletedOnboarding && !location.pathname.includes('/onboarding')) {
-            navigate('/onboarding');
-          } else if (location.pathname === '/login') {
-            navigate('/dashboard');
+          if (location.pathname === '/login') {
+            await handleAuthRedirect(initialSession.user.id);
           }
         } else if (!PUBLIC_ROUTES.includes(location.pathname)) {
           navigate('/login');
@@ -66,13 +70,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(currentSession.user);
         await identifyUserInGleap(currentSession.user);
         
-        // Check onboarding status on auth state change
-        const hasCompletedOnboarding = await checkOnboardingStatus(currentSession.user.id);
-        
-        if (!hasCompletedOnboarding && !location.pathname.includes('/onboarding')) {
-          navigate('/onboarding');
-        } else if (location.pathname === '/login') {
-          navigate('/dashboard');
+        if (location.pathname === '/login') {
+          await handleAuthRedirect(currentSession.user.id);
         }
       } else {
         setSession(null);
@@ -110,14 +109,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(data.user);
         setSession(data.session);
         await identifyUserInGleap(data.user);
-        
-        // Check onboarding status after login
-        const hasCompletedOnboarding = await checkOnboardingStatus(data.user.id);
-        if (!hasCompletedOnboarding) {
-          navigate('/onboarding');
-        } else {
-          navigate('/dashboard');
-        }
+        await handleAuthRedirect(data.user.id);
       }
     } catch (error) {
       console.error('Login error:', error);
