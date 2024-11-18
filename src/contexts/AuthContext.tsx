@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(initialSession.user);
           identifyUserInGleap(initialSession.user);
           if (location.pathname === '/login') {
-            navigate('/dashboard');
+            navigate('/dashboard', { replace: true });
           }
         }
       } catch (error) {
@@ -81,14 +81,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(currentSession.user);
         identifyUserInGleap(currentSession.user);
         if (location.pathname === '/login') {
-          navigate('/dashboard');
+          navigate('/dashboard', { replace: true });
         }
       } else {
         setSession(null);
         setUser(null);
         identifyUserInGleap(null);
         if (event === 'SIGNED_OUT') {
-          navigate('/login');
+          navigate('/login', { replace: true });
         }
       }
     });
@@ -118,7 +118,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(data.user);
         setSession(data.session);
         identifyUserInGleap(data.user);
-        navigate('/dashboard');
+        navigate('/dashboard', { replace: true });
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -128,20 +128,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      // First clear local state
       setUser(null);
       setSession(null);
       identifyUserInGleap(null);
       
-      // Then attempt to sign out from Supabase
       const { error } = await supabase.auth.signOut();
       
-      // Even if there's an error, we want to ensure the user is redirected and local state is cleared
-      navigate('/login');
+      navigate('/login', { replace: true });
       
       if (error) {
         console.error('Logout error:', error);
-        // Only show error toast if it's not a session_not_found error
         if (error.message !== 'session_not_found') {
           toast({
             variant: "destructive",
@@ -157,8 +153,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch (error) {
       console.error('Logout error:', error);
-      // Ensure user is still redirected even if there's an error
-      navigate('/login');
+      navigate('/login', { replace: true });
     }
   };
 
