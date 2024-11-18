@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Stage, Task } from "../StagesTimeline";
+import { Stage, Task } from "@/components/StagesTimeline";
 import { toast } from "sonner";
 
 export const useFetchStages = (projectId: string) => {

@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Stage } from "../StagesTimeline";
+import { Stage } from "@/components/StagesTimeline";
 import { toast } from "sonner";
 
 export const useStageOperations = () => {
@@ -45,10 +45,10 @@ export const useStageOperations = () => {
       const { error } = await supabase
         .from('project_stages')
         .upsert(
-          stages.map((stage, index) => ({
+          stages.map(stage => ({
             id: stage.id,
             name: stage.name,
-            position: index,
+            position: stage.position,
             status: stage.status,
           }))
         );

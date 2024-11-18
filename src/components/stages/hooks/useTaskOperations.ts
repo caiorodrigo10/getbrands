@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Task } from "../StagesTimeline";
+import { Task } from "@/components/StagesTimeline";
 import { toast } from "sonner";
 
 export const useTaskOperations = (projectId: string) => {
@@ -14,6 +14,7 @@ export const useTaskOperations = (projectId: string) => {
           start_date: updates.startDate?.toISOString(),
           due_date: updates.endDate?.toISOString(),
           position: updates.position,
+          stage_id: updates.stageId,
         })
         .eq('id', taskId);
 
@@ -68,10 +69,10 @@ export const useTaskOperations = (projectId: string) => {
       const { error } = await supabase
         .from('project_tasks')
         .upsert(
-          tasks.map((task, index) => ({
+          tasks.map(task => ({
             id: task.id,
             title: task.name,
-            position: index,
+            position: task.position,
             stage_id: stageId,
             status: task.status,
           }))
