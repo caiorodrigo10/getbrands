@@ -17,7 +17,9 @@ export const identifyUserInGleap = async (currentUser: User | null) => {
     Gleap.identify(currentUser.id, {
       email: currentUser.email,
       name: fullName,
-      userType: profile?.user_type
+      customData: {
+        userType: profile?.user_type
+      }
     });
   } else {
     Gleap.clearIdentity();
