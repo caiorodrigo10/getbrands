@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { identifyUserInGleap, checkOnboardingStatus } from "../auth/authUtils";
+import { identifyUserInGleap, checkOnboardingStatus } from "./authUtils";
 import { AuthState } from "./types";
 
 export const useAuthOperations = (initialState: AuthState) => {
