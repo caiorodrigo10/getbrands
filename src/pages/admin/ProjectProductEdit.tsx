@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { ProductImageUpload } from "@/components/admin/catalog/ProductImageUpload";
 
 const productFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -40,7 +41,9 @@ const ProjectProductEdit = () => {
           specific:project_specific_products (
             id,
             name,
-            selling_price
+            selling_price,
+            main_image_url,
+            images
           )
         `)
         .eq("id", productId)
@@ -49,6 +52,15 @@ const ProjectProductEdit = () => {
       if (error) throw error;
       return data;
     },
+  });
+
+  const { data: productImages, refetch: refetchImages } = useQuery({
+    queryKey: ['project-product-images', productId],
+    queryFn: async () => {
+      if (!projectProduct?.specific?.[0]?.images) return [];
+      return projectProduct.specific[0].images || [];
+    },
+    enabled: !!projectProduct,
   });
 
   const form = useForm<z.infer<typeof productFormSchema>>({
@@ -117,6 +129,15 @@ const ProjectProductEdit = () => {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+          <ProductFormSection title="Media">
+            <ProductImageUpload
+              productId={productId}
+              images={productImages || []}
+              mainImageUrl={projectProduct.specific?.[0]?.main_image_url || projectProduct.product?.image_url}
+              onImagesUpdate={() => refetchImages()}
+            />
+          </ProductFormSection>
+
           <ProductFormSection title="Product Information">
             <div className="grid gap-6 max-w-xl">
               <FormField
