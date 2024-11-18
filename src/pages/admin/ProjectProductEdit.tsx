@@ -27,40 +27,42 @@ const ProjectProductEdit = () => {
   const { data: projectProduct, isLoading: isLoadingProduct } = useQuery({
     queryKey: ["project-product-details", productId],
     queryFn: async () => {
+      // Get the project product details
       const { data: projectProductData, error: projectProductError } = await supabase
         .from("project_products")
         .select(`
           id,
           product_id,
-          project_id
+          project_id,
+          product:products (
+            id,
+            name,
+            category,
+            from_price,
+            srp,
+            image_url
+          )
         `)
         .eq("id", productId)
         .single();
 
       if (projectProductError) throw projectProductError;
 
-      // Now fetch the base product data
-      const { data: productData, error: productError } = await supabase
-        .from("products")
-        .select("*")
-        .eq("id", projectProductData.product_id)
-        .single();
-
-      if (productError) throw productError;
-
-      // Finally, fetch any specific product data
-      const { data: specificData, error: specificError } = await supabase
+      // Get any specific product data
+      const { data: specificData } = await supabase
         .from("project_specific_products")
         .select("*")
         .eq("project_product_id", productId)
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1);
 
-      if (specificError && specificError.code !== 'PGRST116') throw specificError;
+      // Get the most recent specific product data if it exists
+      const specificProduct = specificData && specificData.length > 0 ? specificData[0] : null;
 
       return {
         projectProduct: projectProductData,
-        baseProduct: productData,
-        specificProduct: specificData
+        baseProduct: projectProductData.product,
+        specificProduct: specificProduct
       };
     },
   });
