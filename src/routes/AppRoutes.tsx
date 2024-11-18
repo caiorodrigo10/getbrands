@@ -30,6 +30,7 @@ export const AppRoutes = () => (
     {/* Public Routes */}
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<SignUp />} />
+    <Route path="/get-started" element={<GetStarted />} />
     
     {/* Admin Routes */}
     <Route path="/admin/*" element={
@@ -46,12 +47,6 @@ export const AppRoutes = () => (
         </ProtectedRoute>
       } />
       
-      <Route path="/get-started" element={
-        <ProtectedRoute>
-          <GetStarted />
-        </ProtectedRoute>
-      } />
-
       <Route path="/profile" element={
         <ProtectedRoute>
           <Profile />
