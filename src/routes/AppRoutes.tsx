@@ -25,7 +25,7 @@ import PackageQuizPage from "@/pages/PackageQuizPage";
 
 export const AppRoutes = () => (
   <Routes>
-    {/* Marketing Routes */}
+    {/* Marketing Routes - Public Landing Page */}
     {MarketingRoutes}
     
     {/* Public Routes */}
@@ -47,11 +47,6 @@ export const AppRoutes = () => (
     {/* Client Routes - Wrapped in AppLayout */}
     <Route element={<AppLayout />}>
       <Route path="/dashboard" element={
-        <ProtectedRoute>
-          <Dashboard />
-        </ProtectedRoute>
-      } />
-      <Route path="/" element={
         <ProtectedRoute>
           <Dashboard />
         </ProtectedRoute>
