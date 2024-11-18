@@ -24,7 +24,7 @@ export const ProtectedRoute = ({
 
   if (requiresAdmin && !hasFullAccess) {
     toast.error("You don't have permission to access this area");
-    return <Navigate to="/catalog" />;
+    return <Navigate to="/dashboard" />;
   }
 
   if (isRestrictedRoute(location.pathname) && !hasFullAccess) {

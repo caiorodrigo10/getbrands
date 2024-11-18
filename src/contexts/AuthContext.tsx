@@ -15,6 +15,20 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const getRedirectPath = (role?: string) => {
+  switch (role?.toLowerCase()) {
+    case 'customer':
+      return '/dashboard';
+    case 'admin':
+      return '/admin/dashboard';
+    case 'member':
+    case 'sampler':
+      return '/start-here';
+    default:
+      return '/dashboard';
+  }
+};
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -46,12 +60,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (currentUser) {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('user_type')
+        .select('role')
         .eq('id', currentUser.id)
         .single();
 
-      if (profile?.user_type === 'customer') {
-        navigate('/dashboard', { replace: true });
+      if (profile?.role) {
+        navigate(getRedirectPath(profile.role), { replace: true });
       }
     }
   };
@@ -168,7 +182,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   return (

@@ -2,7 +2,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export type UserRole = 'admin' | 'member' | 'sampler';
+export type UserRole = 'admin' | 'customer' | 'member' | 'sampler';
 
 export const useUserPermissions = () => {
   const { user } = useAuth();
@@ -13,7 +13,7 @@ export const useUserPermissions = () => {
       if (!user?.id) return null;
       const { data } = await supabase
         .from("profiles")
-        .select("role, user_type")
+        .select("role")
         .eq("id", user.id)
         .single();
       return data;
@@ -22,14 +22,16 @@ export const useUserPermissions = () => {
   });
 
   const isAdmin = profile?.role === 'admin';
-  const isMember = profile?.user_type === 'member';
-  const isSampler = profile?.user_type === 'sampler';
+  const isCustomer = profile?.role === 'customer';
+  const isMember = profile?.role === 'member';
+  const isSampler = profile?.role === 'sampler';
 
   const hasFullAccess = isAdmin;
-  const hasLimitedAccess = isMember || isSampler;
+  const hasLimitedAccess = isMember || isSampler || isCustomer;
 
   return {
     isAdmin,
+    isCustomer,
     isMember,
     isSampler,
     hasFullAccess,
