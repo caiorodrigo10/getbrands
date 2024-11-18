@@ -2,7 +2,7 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import Gleap from "gleap";
 
-export const PUBLIC_ROUTES = ['/login', '/signup', '/forgot-password'];
+export const PUBLIC_ROUTES = ['/', '/login', '/signup', '/forgot-password'];
 
 export const identifyUserInGleap = async (currentUser: User | null) => {
   if (currentUser) {
