@@ -1,4 +1,4 @@
-import { Trash2, Pencil, Check, GripVertical } from "lucide-react";
+import { Trash2, Pencil, Check } from "lucide-react";
 import { useState } from "react";
 import { TaskStatusSelect } from "./TaskStatusSelect";
 import { TaskAssigneeSelect } from "./TaskAssigneeSelect";
@@ -7,8 +7,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { type TaskStatus, type AssigneeType, type Task } from "../StagesTimeline";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 
 interface TaskItemProps {
   id: string;
@@ -38,21 +36,6 @@ export const TaskItem = ({
   const [taskEndDate, setTaskEndDate] = useState<Date | undefined>(endDate);
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(name);
-
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
 
   const handleStatusChange = (newStatus: TaskStatus) => {
     setTaskStatus(newStatus);
@@ -116,15 +99,8 @@ export const TaskItem = ({
   };
 
   return (
-    <div 
-      ref={setNodeRef}
-      style={style}
-      className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 items-center px-4 py-2 rounded-md transition-colors group hover:bg-muted/5"
-    >
+    <div className="grid grid-cols-[2fr,1fr,1.5fr,1fr,1fr] gap-4 items-center px-4 py-2 rounded-md transition-colors group">
       <div className="flex items-center gap-3">
-        <div {...attributes} {...listeners} className="cursor-grab opacity-0 group-hover:opacity-100 transition-opacity">
-          <GripVertical className="w-4 h-4 text-muted-foreground" />
-        </div>
         <TaskName />
         <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
           {!isEditing && (
