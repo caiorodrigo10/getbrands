@@ -18,8 +18,10 @@ export const ProtectedRoute = ({
   const { hasFullAccess } = useUserPermissions();
   const location = useLocation();
 
+  // If authentication is required and user is not authenticated
   if (!isAuthenticated && requiresAuth) {
-    return <Navigate to="/login" />;
+    // Store the attempted URL to redirect back after login
+    return <Navigate to="/login" state={{ from: location }} />;
   }
 
   if (requiresAdmin && !hasFullAccess) {

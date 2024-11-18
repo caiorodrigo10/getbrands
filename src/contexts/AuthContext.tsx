@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { User, Session, AuthChangeEvent } from "@supabase/supabase-js";
+import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
-import Gleap from "gleap";
+import { PUBLIC_ROUTES, identifyUserInGleap, checkOnboardingStatus } from "./auth/authUtils";
 
 interface AuthContextType {
   user: User | null;
@@ -23,76 +23,84 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const identifyUserInGleap = async (currentUser: User | null) => {
-    if (currentUser) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('first_name, last_name')
-        .eq('id', currentUser.id)
-        .single();
-
-      const fullName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : currentUser.email?.split('@')[0] || 'User';
-      
-      Gleap.identify(currentUser.id, {
-        email: currentUser.email,
-        name: fullName,
-      });
-    } else {
-      Gleap.clearIdentity();
-    }
-  };
-
+  // Initialize auth state
   useEffect(() => {
+    let mounted = true;
+
     const initializeAuth = async () => {
       try {
         const { data: { session: initialSession } } = await supabase.auth.getSession();
         
-        if (initialSession) {
-          setSession(initialSession);
-          setUser(initialSession.user);
-          identifyUserInGleap(initialSession.user);
-          
-          if (location.pathname === '/login') {
-            navigate('/dashboard');
+        if (mounted) {
+          if (initialSession) {
+            setSession(initialSession);
+            setUser(initialSession.user);
+            await identifyUserInGleap(initialSession.user);
+            
+            if (location.pathname === '/login') {
+              const hasCompletedOnboarding = await checkOnboardingStatus(initialSession.user.id);
+              if (!hasCompletedOnboarding) {
+                navigate('/onboarding');
+              } else {
+                navigate('/dashboard');
+              }
+            }
+          } else if (!PUBLIC_ROUTES.includes(location.pathname)) {
+            navigate('/login');
           }
-        } else if (location.pathname !== '/login') {
-          navigate('/login');
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-        navigate('/login');
+        if (mounted && !PUBLIC_ROUTES.includes(location.pathname)) {
+          navigate('/login');
+        }
       } finally {
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     initializeAuth();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, currentSession) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       console.log('Auth event:', event);
       
-      if (currentSession) {
-        setSession(currentSession);
-        setUser(currentSession.user);
-        identifyUserInGleap(currentSession.user);
-        
-        if (location.pathname === '/login') {
-          navigate('/dashboard');
-        }
-      } else {
-        setSession(null);
-        setUser(null);
-        identifyUserInGleap(null);
-        
-        if (location.pathname !== '/login') {
-          navigate('/login');
+      if (mounted) {
+        try {
+          if (currentSession) {
+            setSession(currentSession);
+            setUser(currentSession.user);
+            await identifyUserInGleap(currentSession.user);
+            
+            if (location.pathname === '/login') {
+              const hasCompletedOnboarding = await checkOnboardingStatus(currentSession.user.id);
+              if (!hasCompletedOnboarding) {
+                navigate('/onboarding');
+              } else {
+                navigate('/dashboard');
+              }
+            }
+          } else {
+            setSession(null);
+            setUser(null);
+            await identifyUserInGleap(null);
+            
+            if (!PUBLIC_ROUTES.includes(location.pathname)) {
+              navigate('/login');
+            }
+          }
+        } catch (error) {
+          console.error('Error in auth state change:', error);
+          if (!PUBLIC_ROUTES.includes(location.pathname)) {
+            navigate('/login');
+          }
         }
       }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [navigate, location.pathname]);
@@ -107,8 +115,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (error) {
         toast({
           variant: "destructive",
-          title: "Erro no Login",
-          description: "Email ou senha inválidos. Por favor, verifique suas credenciais.",
+          title: "Login Error",
+          description: "Invalid email or password. Please check your credentials.",
         });
         throw error;
       }
@@ -116,8 +124,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
-        identifyUserInGleap(data.user);
-        navigate('/dashboard');
+        await identifyUserInGleap(data.user);
+        
+        const hasCompletedOnboarding = await checkOnboardingStatus(data.user.id);
+        if (!hasCompletedOnboarding) {
+          navigate('/onboarding');
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -127,52 +141,48 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      // Primeiro limpa o estado local
       setUser(null);
       setSession(null);
-      identifyUserInGleap(null);
+      await identifyUserInGleap(null);
 
-      // Força a limpeza do localStorage
       window.localStorage.removeItem('supabase.auth.token');
       window.localStorage.removeItem('sb-skrvprmnncxpkojraoem-auth-token');
 
       try {
-        // Tenta fazer logout no Supabase
         await supabase.auth.signOut();
       } catch (error: any) {
-        // Ignora erros de session_not_found pois já limpamos o estado local
         if (!error.message?.includes('session_not_found')) {
-          console.error('Erro no signOut:', error);
+          console.error('SignOut error:', error);
         }
       }
 
-      // Sempre navega para login após limpar o estado
       navigate('/login', { replace: true });
 
       toast({
-        title: "Sucesso",
-        description: "Logout realizado com sucesso!",
+        title: "Success",
+        description: "Logged out successfully!",
       });
     } catch (error: any) {
-      console.error('Erro no logout:', error);
+      console.error('Logout error:', error);
       
-      // Garante que o usuário seja redirecionado mesmo em caso de erro
       navigate('/login', { replace: true });
       
       if (!error.message?.includes('session_not_found')) {
         toast({
           variant: "destructive",
-          title: "Erro",
-          description: "Ocorreu um erro durante o logout.",
+          title: "Error",
+          description: "An error occurred during logout.",
         });
       }
     }
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-    </div>;
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
   }
 
   return (
