@@ -93,15 +93,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (email: string, password: string) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: email.trim(),
+        password: password.trim(),
       });
 
       if (error) {
         toast({
           variant: "destructive",
-          title: "Error",
-          description: error.message || "Invalid email or password. Please try again.",
+          title: "Login Error",
+          description: "Invalid email or password. Please check your credentials and try again.",
         });
         throw error;
       }

@@ -15,7 +15,6 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // If user is already authenticated, redirect to dashboard
     if (isAuthenticated) {
       navigate('/dashboard');
     }
@@ -27,7 +26,6 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate('/dashboard');
     } catch (error) {
       console.error("Login error:", error);
     } finally {
