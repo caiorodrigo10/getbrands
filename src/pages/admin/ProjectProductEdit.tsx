@@ -2,17 +2,17 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
-import { ProductFormSection } from "@/components/admin/catalog/ProductFormSection";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { ProductFormSection } from "@/components/admin/catalog/ProductFormSection";
 import { ProductImageUpload } from "@/components/admin/catalog/ProductImageUpload";
 import { ProductImage } from "@/types/product";
+import { ArrowLeft } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const productFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -24,7 +24,7 @@ const ProjectProductEdit = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const { data: projectProduct, isLoading } = useQuery({
+  const { data: projectProduct, isLoading, refetch: refetchProduct } = useQuery({
     queryKey: ["project-product", productId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -106,6 +106,9 @@ const ProjectProductEdit = () => {
         });
 
       if (error) throw error;
+
+      // Refetch the product data to update the UI
+      await refetchProduct();
 
       toast({
         title: "Success",
