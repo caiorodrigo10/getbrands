@@ -24,6 +24,7 @@ interface StagesListProps {
   onAddTask: (stageName: string, taskData: Task) => Promise<void>;
   onDeleteTask: (stageName: string, taskIndex: number) => void;
   onDeleteStage: (stageName: string) => void;
+  onUpdateStage: (oldStageName: string, newStageName: string, newStatus: Stage["status"]) => void;
 }
 
 export const StagesList = ({
@@ -34,6 +35,7 @@ export const StagesList = ({
   onAddTask,
   onDeleteTask,
   onDeleteStage,
+  onUpdateStage,
 }: StagesListProps) => {
   return (
     <Accordion type="multiple" value={openStages}>
@@ -48,7 +50,11 @@ export const StagesList = ({
               className="flex-1 py-4 hover:no-underline"
               onClick={() => onToggleStage(stage.name)}
             >
-              <StageHeader name={stage.name} status={stage.status} />
+              <StageHeader 
+                name={stage.name} 
+                status={stage.status}
+                onUpdateStage={(newName, newStatus) => onUpdateStage(stage.name, newName, newStatus)}
+              />
             </AccordionTrigger>
             <StageActions onDeleteStage={() => onDeleteStage(stage.name)} />
           </div>
