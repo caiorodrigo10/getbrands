@@ -5,19 +5,19 @@ const data = [
   { 
     name: "Members", 
     value: 1200, 
-    fill: "#6A1B9A",
+    fill: "#f0562e",
     percentage: "100%"
   },
   { 
     name: "Samplers", 
     value: 800, 
-    fill: "#8E24AA",
+    fill: "#f56d49",
     percentage: "67%"
   },
   { 
     name: "Customers", 
     value: 400, 
-    fill: "#AB47BC",
+    fill: "#f79274",
     percentage: "33%"
   },
 ];

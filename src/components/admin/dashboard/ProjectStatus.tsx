@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 
 const data = [
-  { name: "In Progress", value: 45, color: "#4c1e6c" },
+  { name: "In Progress", value: 45, color: "#f0562e" },
   { name: "Delayed", value: 15, color: "#ef4444" },
   { name: "Ahead", value: 20, color: "#22c55e" },
   { name: "Completed", value: 20, color: "#3b82f6" },
