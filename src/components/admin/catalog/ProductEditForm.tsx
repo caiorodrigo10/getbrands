@@ -41,9 +41,12 @@ export function ProductEditForm({ product, onSubmit, onCancel }: ProductEditForm
     },
   });
 
+  // Only fetch images if we have a valid product ID (not empty string)
   const { data: productImages, refetch: refetchImages } = useQuery({
     queryKey: ['product-images', product.id],
     queryFn: async () => {
+      if (!product.id) return [];
+      
       const { data, error } = await supabase
         .from('product_images')
         .select('*')
@@ -53,6 +56,7 @@ export function ProductEditForm({ product, onSubmit, onCancel }: ProductEditForm
       if (error) throw error;
       return data;
     },
+    enabled: !!product.id, // Only run query if product.id exists and is not empty
   });
 
   const handleSubmit = (values: z.infer<typeof productFormSchema>) => {
