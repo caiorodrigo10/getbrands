@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import {
   Table,
   TableBody,
@@ -12,6 +12,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { BulkAction } from "@/types/bulk-actions";
 
+interface Profile {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+}
+
 const AdminBulkActions = () => {
   const { data: actions, isLoading } = useQuery({
     queryKey: ["bulk-actions"],
@@ -20,7 +27,8 @@ const AdminBulkActions = () => {
         .from("bulk_actions")
         .select(`
           *,
-          created_by:profiles(
+          created_by_profile:profiles!bulk_actions_created_by_fkey (
+            id,
             first_name,
             last_name,
             email
@@ -29,19 +37,19 @@ const AdminBulkActions = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as BulkAction[];
+      return data as (BulkAction & { created_by_profile: Profile })[];
     },
   });
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, string> = {
-      pending: "bg-yellow-500/10 text-yellow-500",
-      processing: "bg-blue-500/10 text-blue-500",
-      completed: "bg-green-500/10 text-green-500",
-      failed: "bg-red-500/10 text-red-500",
-    };
+    const styles = {
+      pending: "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20",
+      processing: "bg-blue-500/10 text-blue-500 hover:bg-blue-500/20",
+      completed: "bg-green-500/10 text-green-500 hover:bg-green-500/20",
+      failed: "bg-red-500/10 text-red-500 hover:bg-red-500/20",
+    }[status] || "bg-gray-500/10 text-gray-500 hover:bg-gray-500/20";
 
-    return variants[status] || "bg-gray-500/10 text-gray-500";
+    return <Badge className={styles}>{status}</Badge>;
   };
 
   if (isLoading) {
@@ -57,7 +65,7 @@ const AdminBulkActions = () => {
       <div>
         <h1 className="text-2xl font-semibold">Bulk Actions</h1>
         <p className="text-muted-foreground mt-2">
-          View the history of all bulk operations performed on the platform
+          View and manage all bulk operations
         </p>
       </div>
 
@@ -68,29 +76,43 @@ const AdminBulkActions = () => {
               <TableHead>Action Type</TableHead>
               <TableHead>Entity Type</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Created By</TableHead>
               <TableHead>Affected Records</TableHead>
-              <TableHead>Performed By</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead>Created At</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {actions?.map((action) => (
               <TableRow key={action.id}>
-                <TableCell className="capitalize">{action.action_type}</TableCell>
-                <TableCell className="capitalize">{action.entity_type}</TableCell>
-                <TableCell>
-                  <Badge className={getStatusBadge(action.status)}>
-                    {action.status}
-                  </Badge>
+                <TableCell className="font-medium">
+                  {action.action_type}
                 </TableCell>
-                <TableCell>{action.affected_records || "-"}</TableCell>
+                <TableCell>{action.entity_type}</TableCell>
+                <TableCell>{getStatusBadge(action.status)}</TableCell>
                 <TableCell>
-                  {action.created_by?.first_name
-                    ? `${action.created_by.first_name} ${action.created_by.last_name}`
-                    : action.created_by?.email}
+                  {action.created_by_profile ? (
+                    <div>
+                      <p className="font-medium">
+                        {[
+                          action.created_by_profile.first_name,
+                          action.created_by_profile.last_name,
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {action.created_by_profile.email}
+                      </p>
+                    </div>
+                  ) : (
+                    "System"
+                  )}
                 </TableCell>
+                <TableCell>{action.affected_records || 0}</TableCell>
                 <TableCell>
-                  {format(new Date(action.created_at), "MMM d, yyyy HH:mm")}
+                  {formatDistanceToNow(new Date(action.created_at), {
+                    addSuffix: true,
+                  })}
                 </TableCell>
               </TableRow>
             ))}
