@@ -1,43 +1,39 @@
-import { Card } from "@/components/ui/card";
-import { Coffee, Package2, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 export const ServicesSection = () => {
-  const services = [
-    {
-      icon: <Package2 className="w-12 h-12 text-primary" />,
-      title: "Supplements",
-      description: "Premium quality supplements for your brand",
-    },
-    {
-      icon: <Sparkles className="w-12 h-12 text-primary" />,
-      title: "Cosmetics",
-      description: "Professional beauty and skincare products",
-    },
-    {
-      icon: <Coffee className="w-12 h-12 text-primary" />,
-      title: "Coffee",
-      description: "Artisanal coffee solutions for your brand",
-    },
-  ];
-
   return (
-    <section className="py-20 bg-white">
+    <section className="py-32 bg-white">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-          On-Demand Services
-        </h2>
-        <p className="text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
-          Choose from our wide range of high-quality products to build your brand
-        </p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {services.map((service, index) => (
-            <Card key={index} className="p-6 text-center hover:shadow-lg transition-all duration-300">
-              <div className="mb-6">{service.icon}</div>
-              <h3 className="text-xl font-semibold mb-3">{service.title}</h3>
-              <p className="text-gray-600">{service.description}</p>
-            </Card>
-          ))}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="space-y-8">
+            <h2 className="text-5xl font-bold tracking-tight text-gray-900">
+              250+ private label products
+            </h2>
+            
+            <p className="text-xl text-gray-600 leading-relaxed">
+              Choose from over 250 private label or pre-buy products for your brand. 
+              From supplements to skincare, find everything your customers need for their wellness.
+            </p>
+
+            <Button 
+              asChild
+              className="bg-[#0bcf88] hover:bg-[#0bcf88]/90 text-white rounded-full px-8 py-6 text-lg h-auto"
+            >
+              <Link to="/catalog">
+                Explore products
+              </Link>
+            </Button>
+          </div>
+
+          <div className="relative">
+            <img
+              src="/lovable-uploads/53f55bfd-bb48-4745-83ff-61b351124a58.png"
+              alt="Private label products showcase"
+              className="w-full rounded-2xl shadow-xl"
+            />
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent rounded-2xl" />
+          </div>
         </div>
       </div>
     </section>
