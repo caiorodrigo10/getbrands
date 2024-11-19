@@ -4,10 +4,33 @@ import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { ProductEditForm } from "@/components/admin/catalog/ProductEditForm";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 const AdminProductCreate = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Query temporary images
+  const { data: tempImages = [] } = useQuery({
+    queryKey: ['temp-product-images'],
+    queryFn: async () => {
+      const { data } = await supabase.storage
+        .from('product-images')
+        .list('temp');
+      
+      if (!data) return [];
+
+      return data.map((file, index) => ({
+        id: `temp-${file.id}`,
+        product_id: 'temp',
+        image_url: supabase.storage.from('product-images').getPublicUrl(`temp/${file.name}`).data.publicUrl,
+        position: index,
+        is_primary: index === 0,
+        created_at: file.created_at,
+        updated_at: file.created_at
+      }));
+    }
+  });
 
   const handleCreateProduct = async (productData: any) => {
     try {
@@ -61,8 +84,8 @@ const AdminProductCreate = () => {
           .insert({
             product_id: newProduct.id,
             image_url: publicUrl,
-            position: 0, // You might want to handle position differently
-            is_primary: true // First image will be primary
+            position: 0,
+            is_primary: true
           });
 
         if (imageError) {
@@ -70,7 +93,7 @@ const AdminProductCreate = () => {
           continue;
         }
 
-        // Update the product with the main image URL
+        // Update the product with the main image URL if this is the first image
         const { error: updateError } = await supabase
           .from('products')
           .update({ image_url: publicUrl })

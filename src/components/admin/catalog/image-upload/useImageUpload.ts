@@ -21,22 +21,8 @@ export const useImageUpload = (productId: string, onImagesUpdate: () => void) =>
 
     setIsUploading(true);
     try {
-      let hasPrimaryImage = false;
+      const uploadedImages = [];
       
-      // Only check for existing primary image if we have a product ID
-      if (productId) {
-        const { data: existingImages, error: fetchError } = await supabase
-          .from('product_images')
-          .select('is_primary')
-          .eq('product_id', productId);
-
-        if (fetchError) {
-          throw fetchError;
-        }
-
-        hasPrimaryImage = existingImages?.some(img => img.is_primary) || false;
-      }
-
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const fileExt = file.name.split('.').pop();
@@ -68,7 +54,7 @@ export const useImageUpload = (productId: string, onImagesUpdate: () => void) =>
               product_id: productId,
               image_url: publicUrl,
               position: i,
-              is_primary: !hasPrimaryImage && i === 0
+              is_primary: !uploadedImages.length
             });
 
           if (dbError) {
@@ -76,6 +62,16 @@ export const useImageUpload = (productId: string, onImagesUpdate: () => void) =>
             continue;
           }
         }
+
+        uploadedImages.push({
+          id: `temp-${Date.now()}-${i}`,
+          product_id: productId || 'temp',
+          image_url: publicUrl,
+          position: i,
+          is_primary: !uploadedImages.length,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
       }
 
       onImagesUpdate();

@@ -107,26 +107,35 @@ export function ProductImageUpload({ productId, images, mainImageUrl, onImagesUp
 
   const handleMediaLibrarySelect = async (selectedUrls: string[]) => {
     try {
-      for (const url of selectedUrls) {
-        // Create product image entries
-        if (productId) {
+      const newImages = selectedUrls.map((url, index) => ({
+        id: `temp-${Date.now()}-${index}`,
+        product_id: productId || 'temp',
+        image_url: url,
+        position: images.length + index,
+        is_primary: images.length === 0 && index === 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }));
+
+      // If we have a product ID, create the entries in the database
+      if (productId) {
+        for (const image of newImages) {
           const { error } = await supabase
             .from('product_images')
             .insert({
               product_id: productId,
-              image_url: url,
-              position: images.length,
-              is_primary: images.length === 0
+              image_url: image.image_url,
+              position: image.position,
+              is_primary: image.is_primary
             });
 
-          if (error) {
-            console.error('Error creating image entry:', error);
-            throw error;
-          }
+          if (error) throw error;
         }
       }
       
+      // Update the local state with the new images
       onImagesUpdate();
+      
       toast({
         title: "Success",
         description: "Images added successfully",
