@@ -16,6 +16,18 @@ interface MediaLibraryProps {
   multiple?: boolean;
 }
 
+interface MediaLibraryItem {
+  id: string;
+  file_name: string;
+  file_url: string;
+  file_size: number;
+  mime_type: string;
+  category?: string;
+  created_at: string;
+  updated_at: string;
+  created_by?: string;
+}
+
 export function MediaLibrary({ open, onOpenChange, onSelect, multiple = true }: MediaLibraryProps) {
   const { toast } = useToast();
   const [search, setSearch] = useState("");
@@ -23,7 +35,7 @@ export function MediaLibrary({ open, onOpenChange, onSelect, multiple = true }: 
   const [isUploading, setIsUploading] = useState(false);
 
   const { data: images = [], refetch } = useQuery({
-    queryKey: ['media-library'],
+    queryKey: ['media-library', search],
     queryFn: async () => {
       const query = supabase
         .from('media_library')
@@ -36,7 +48,7 @@ export function MediaLibrary({ open, onOpenChange, onSelect, multiple = true }: 
 
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return data as MediaLibraryItem[];
     },
   });
 

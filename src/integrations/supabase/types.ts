@@ -253,6 +253,42 @@ export type Database = {
           },
         ]
       }
+      media_library: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string | null
+          file_name: string
+          file_size: number
+          file_url: string
+          id: string
+          mime_type: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          file_name: string
+          file_size: number
+          file_url: string
+          id?: string
+          mime_type: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          file_name?: string
+          file_size?: number
+          file_url?: string
+          id?: string
+          mime_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       onboarding_responses: {
         Row: {
           answers: Json
