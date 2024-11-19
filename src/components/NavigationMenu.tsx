@@ -55,7 +55,7 @@ export const NavigationMenu = () => {
   const handleRestrictedNavigation = (path: string) => {
     if (!hasFullAccess) {
       toast.error("You need to upgrade your plan to access this feature");
-      navigate("/checkout/points");
+      navigate("/start-here");
       return;
     }
     navigate(path);

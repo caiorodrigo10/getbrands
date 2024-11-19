@@ -29,7 +29,7 @@ export const ProtectedRoute = ({
 
   if (isRestrictedRoute(location.pathname) && !hasFullAccess) {
     toast.error("You need to upgrade your plan to access this feature");
-    return <Navigate to="/checkout/points" />;
+    return <Navigate to="/start-here" />;
   }
 
   return <>{children}</>;
