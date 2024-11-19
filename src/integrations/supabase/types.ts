@@ -120,6 +120,63 @@ export type Database = {
           },
         ]
       }
+      bulk_actions: {
+        Row: {
+          action_type: Database["public"]["Enums"]["bulk_action_type"]
+          affected_records: number | null
+          created_at: string | null
+          created_by: string | null
+          details: Json | null
+          entity_type: string
+          error_message: string | null
+          file_url: string | null
+          id: string
+          status: Database["public"]["Enums"]["bulk_action_status"]
+          updated_at: string | null
+        }
+        Insert: {
+          action_type: Database["public"]["Enums"]["bulk_action_type"]
+          affected_records?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          details?: Json | null
+          entity_type: string
+          error_message?: string | null
+          file_url?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["bulk_action_status"]
+          updated_at?: string | null
+        }
+        Update: {
+          action_type?: Database["public"]["Enums"]["bulk_action_type"]
+          affected_records?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          details?: Json | null
+          entity_type?: string
+          error_message?: string | null
+          file_url?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["bulk_action_status"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bulk_actions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "crm_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bulk_actions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cart_items: {
         Row: {
           created_at: string
@@ -1104,6 +1161,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      bulk_action_status: "pending" | "processing" | "completed" | "failed"
+      bulk_action_type: "import" | "delete"
       project_pack_type: "start" | "pro" | "ultra"
     }
     CompositeTypes: {

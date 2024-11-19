@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { BulkAction } from "@/types/bulk-actions";
 
 const AdminBulkActions = () => {
   const { data: actions, isLoading } = useQuery({
@@ -28,7 +29,7 @@ const AdminBulkActions = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as BulkAction[];
     },
   });
 
