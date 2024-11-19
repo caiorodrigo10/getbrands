@@ -80,10 +80,11 @@ const Checkout = () => {
 
           <div className="bg-card rounded-lg border border-border/50 shadow-sm p-4 md:p-6 lg:p-8">
             <Routes>
-              <Route index element={<Navigate to="/checkout/confirmation" replace />} />
               <Route path="confirmation" element={<PedidoAmostra />} />
               <Route path="shipping" element={<Shipping />} />
               <Route path="payment" element={<Payment />} />
+              <Route path="points" element={<PedidoAmostra />} />
+              <Route index element={<Navigate to="/checkout/confirmation" replace />} />
             </Routes>
           </div>
         </div>

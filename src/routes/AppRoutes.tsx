@@ -134,17 +134,17 @@ export const AppRoutes = () => (
       <Route path="*" element={<Error404 />} />
     </Route>
 
-    {/* Standalone Routes */}
-    <Route path="/checkout/*" element={
+    {/* Standalone Checkout Routes */}
+    <Route path="/checkout" element={
       <ProtectedRoute>
         <Checkout />
       </ProtectedRoute>
-    } />
-    
-    <Route path="/checkout/success" element={
-      <ProtectedRoute>
-        <Success />
-      </ProtectedRoute>
-    } />
+    }>
+      <Route path="shipping" element={<Checkout />} />
+      <Route path="payment" element={<Checkout />} />
+      <Route path="confirmation" element={<Checkout />} />
+      <Route path="success" element={<Success />} />
+      <Route path="points" element={<Checkout />} />
+    </Route>
   </Routes>
 );
