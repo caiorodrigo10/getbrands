@@ -21,7 +21,7 @@ export function CartButton() {
             variant="outline"
             size="icon"
             className="relative"
-            onClick={() => navigate("/checkout/confirmation")}
+            onClick={() => navigate("/cart")}
           >
             <ShoppingCart className="h-5 w-5" />
             {items.length > 0 && (
@@ -32,7 +32,7 @@ export function CartButton() {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>View sample cart</p>
+          <p>View cart</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
