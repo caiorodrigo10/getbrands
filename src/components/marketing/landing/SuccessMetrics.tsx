@@ -32,7 +32,7 @@ export const SuccessMetrics = () => {
     <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="bg-white rounded-2xl shadow-lg p-12">
-          <h2 className="text-4xl font-bold text-center mb-16">
+          <h2 className="text-3xl font-bold text-center mb-16">
             The results speak<br />for themselves
           </h2>
           

@@ -96,7 +96,7 @@ export const CreativeSection = () => {
             </div>
 
             <div className="space-y-8">
-              <h2 className="text-4xl md:text-5xl font-bold leading-tight">
+              <h2 className="text-3xl md:text-4xl font-bold leading-tight">
                 Focus on growth, let us take care of the logistics
               </h2>
               
