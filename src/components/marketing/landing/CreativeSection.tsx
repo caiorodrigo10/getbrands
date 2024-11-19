@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Instagram, ShoppingBag } from "lucide-react";
 
 export const CreativeSection = () => {
   return (
@@ -58,6 +59,71 @@ export const CreativeSection = () => {
               <p className="text-gray-600">
                 Launch your products and start selling with our complete support and guidance.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-24 bg-[#F2FCE2]">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="w-full aspect-square relative">
+              <div style={{
+                width: "100%",
+                height: "0px",
+                position: "relative",
+                paddingBottom: "100%"
+              }}>
+                <iframe 
+                  src="https://streamable.com/e/p4l1fu?quality=highest" 
+                  frameBorder="0" 
+                  width="100%" 
+                  height="100%" 
+                  allowFullScreen 
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    position: "absolute"
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-8">
+              <h2 className="text-4xl md:text-5xl font-bold leading-tight">
+                Focus on growth, let us take care of the logistics
+              </h2>
+              
+              <div className="flex items-center gap-4">
+                <span className="text-xl font-semibold">Sell on</span>
+                <div className="flex items-center gap-4">
+                  <ShoppingBag className="w-8 h-8 text-[#96BF48]" />
+                  <Instagram className="w-8 h-8 text-[#E4405F]" />
+                </div>
+              </div>
+
+              <p className="text-xl text-gray-600">
+                GetBrands silently takes care of the product, packaging, and shipping for you. No upfront fees.
+              </p>
+
+              <div>
+                <h3 className="text-xl font-semibold mb-2 inline-block border-b-2 border-gray-900">
+                  How it works
+                </h3>
+              </div>
+
+              <div className="bg-white rounded-xl p-6 shadow-lg">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-[#4ADE80] bg-opacity-20 rounded-full flex items-center justify-center">
+                    <div className="w-6 h-6 text-[#4ADE80]">
+                      🔔
+                    </div>
+                  </div>
+                  <p className="text-lg font-medium">
+                    WE RECEIVE YOUR STORE ORDERS
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
