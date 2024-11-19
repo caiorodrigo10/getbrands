@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { PACK_LABELS } from "@/types/project";
 import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
 
 interface ProjectPointsCardProps {
   project: {
@@ -62,10 +61,10 @@ export const ProjectPointsCard = ({ project }: ProjectPointsCardProps) => {
   const progressPercentage = ((project.points_used || 0) / project.points) * 100;
 
   return (
-    <Card className="p-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <Card className="p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
         {/* Client Information Section */}
-        <div>
+        <div className="md:border-r border-border/30 pr-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium">Client Information</h3>
             <Button
@@ -109,17 +108,12 @@ export const ProjectPointsCard = ({ project }: ProjectPointsCardProps) => {
           )}
         </div>
 
-        {/* Vertical Separator for Desktop */}
-        <div className="hidden md:block absolute left-1/2 top-4 bottom-4">
-          <Separator orientation="vertical" />
-        </div>
-
         {/* Project Points Section */}
-        <div>
+        <div className="pl-0 md:pl-6">
           <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-lg font-medium">Project Points</h3>
-              <div className="mt-4 space-y-2">
+            <div className="w-full">
+              <h3 className="text-lg font-medium mb-4">Project Points</h3>
+              <div className="space-y-2">
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Total Points:</span>
                   <span className="font-medium text-foreground">{project.points}</span>
@@ -140,7 +134,7 @@ export const ProjectPointsCard = ({ project }: ProjectPointsCardProps) => {
                 </Badge>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ml-4">
               <Button
                 variant="outline"
                 size="sm"
