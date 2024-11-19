@@ -51,6 +51,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
+    // Skip redirection if user is on the root path
+    if (location.pathname === '/') {
+      return;
+    }
+
     try {
       const { data: profile, error } = await supabase
         .from('profiles')
@@ -63,8 +68,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const hasProjects = Array.isArray(profile?.projects) && profile.projects.length > 0;
       const redirectPath = getRoleBasedRedirectPath(profile?.role, hasProjects);
       
-      // Only redirect if we're on the login page or at the root
-      if (location.pathname === '/login' || location.pathname === '/') {
+      // Only redirect if we're on the login page
+      if (location.pathname === '/login') {
         navigate(redirectPath);
       }
     } catch (error) {
