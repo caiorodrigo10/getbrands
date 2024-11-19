@@ -37,13 +37,15 @@ export const HeroSection = () => {
               we build your brand from the ground up.
             </p>
 
-            <Button 
-              size="lg"
-              className="bg-[#f0562e] hover:bg-[#f0562e]/90 text-white font-semibold px-8"
-            >
-              Start Now
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+            <Link to="/login">
+              <Button 
+                size="lg"
+                className="bg-[#f0562e] hover:bg-[#f0562e]/90 text-white font-semibold px-8"
+              >
+                Start Now
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
