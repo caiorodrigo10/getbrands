@@ -42,7 +42,7 @@ export function ProductEditForm({ product, onSubmit, onCancel }: ProductEditForm
   });
 
   // Only fetch images if we have a valid product ID (not empty string)
-  const { data: productImages, refetch: refetchImages } = useQuery({
+  const { data: productImages = [], refetch: refetchImages } = useQuery({
     queryKey: ['product-images', product.id],
     queryFn: async () => {
       if (!product.id) return [];
@@ -54,9 +54,9 @@ export function ProductEditForm({ product, onSubmit, onCancel }: ProductEditForm
         .order('position');
 
       if (error) throw error;
-      return data;
+      return data || [];
     },
-    enabled: !!product.id, // Only run query if product.id exists and is not empty
+    enabled: Boolean(product.id), // Only run query if product.id exists
   });
 
   const handleSubmit = (values: z.infer<typeof productFormSchema>) => {
@@ -72,7 +72,7 @@ export function ProductEditForm({ product, onSubmit, onCancel }: ProductEditForm
         <BasicInformationSection form={form} />
         <MediaSection 
           productId={product.id}
-          images={productImages || []}
+          images={productImages}
           mainImageUrl={product.image_url}
           onImagesUpdate={() => refetchImages()}
         />
