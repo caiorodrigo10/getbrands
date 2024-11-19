@@ -65,11 +65,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) throw error;
 
-      const hasProjects = Array.isArray(profile?.projects) && profile.projects.length > 0;
-      const redirectPath = getRoleBasedRedirectPath(profile?.role, hasProjects);
-      
-      // Only redirect if we're on the login page
+      // For members and samplers, redirect directly to start-here if they're on the login page
+      if ((profile?.role === 'member' || profile?.role === 'sampler') && location.pathname === '/login') {
+        navigate('/start-here');
+        return;
+      }
+
+      // For other roles, use the standard redirection logic
       if (location.pathname === '/login') {
+        const hasProjects = Array.isArray(profile?.projects) && profile.projects.length > 0;
+        const redirectPath = getRoleBasedRedirectPath(profile?.role, hasProjects);
         navigate(redirectPath);
       }
     } catch (error) {
