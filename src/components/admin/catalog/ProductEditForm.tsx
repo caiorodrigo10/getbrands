@@ -4,7 +4,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Product } from "@/types/product";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { BasicInformationSection } from "./product-form/BasicInformationSection";
 import { MediaSection } from "./product-form/MediaSection";
@@ -28,6 +28,8 @@ interface ProductEditFormProps {
 }
 
 export function ProductEditForm({ product, onSubmit, onCancel }: ProductEditFormProps) {
+  const queryClient = useQueryClient();
+  
   const form = useForm<z.infer<typeof productFormSchema>>({
     resolver: zodResolver(productFormSchema),
     defaultValues: {
@@ -60,11 +62,15 @@ export function ProductEditForm({ product, onSubmit, onCancel }: ProductEditForm
     enabled: Boolean(product.id), // Only run query if product.id exists
   });
 
-  const handleSubmit = (values: z.infer<typeof productFormSchema>) => {
-    onSubmit({
+  const handleSubmit = async (values: z.infer<typeof productFormSchema>) => {
+    await onSubmit({
       ...product,
       ...values,
     });
+    
+    // Invalidate both queries to force a refresh
+    queryClient.invalidateQueries({ queryKey: ['admin-catalog'] });
+    queryClient.invalidateQueries({ queryKey: ['product-images-catalog'] });
   };
 
   return (
