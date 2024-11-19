@@ -140,7 +140,7 @@ export const ClientSamples = ({ userId }: ClientSamplesProps) => {
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <div className="p-4 border-t bg-accent/50">
+                  <div className="p-4 border-t bg-gray-50">
                     <div className="space-y-4">
                       {request.products?.map((item: any) => (
                         <div key={item.product.id} className="flex items-start gap-3">
