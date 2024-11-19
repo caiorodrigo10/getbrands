@@ -1,10 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Product } from "@/types/product";
-import { ProductActions } from "./ProductActions";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { ProductActions } from "./ProductActions";
+import { ProductBenefits } from "./ProductBenefits";
+import { ProductCalculator } from "./ProductCalculator";
 
 interface ProductHeaderProps {
   product: Product;
@@ -24,7 +26,17 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
         .order('position');
 
       if (error) throw error;
-      return data;
+      
+      // Filter out any images that don't exist in our media library
+      const validImages = data?.filter(img => img.image_url?.startsWith('https://'));
+      
+      // If we have a primary image, set it as selected
+      const primaryImage = validImages?.find(img => img.is_primary)?.image_url;
+      if (primaryImage) {
+        setSelectedImage(primaryImage);
+      }
+      
+      return validImages || [];
     },
   });
 
@@ -35,7 +47,7 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
   // Create an array of unique images, including the main product image if it exists
   const uniqueImages = [
     ...(product.image_url ? [{ image_url: product.image_url, position: -1 }] : []),
-    ...(productImages || []).map(img => ({ image_url: img.image_url, position: img.position }))
+    ...(productImages || [])
   ].filter((img, index, self) => 
     index === self.findIndex((t) => t.image_url === img.image_url)
   );
@@ -54,6 +66,10 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
             src={selectedImage}
             alt={product.name}
             className="w-full aspect-square object-contain p-4"
+            onError={(e) => {
+              const img = e.target as HTMLImageElement;
+              img.src = '/placeholder.svg';
+            }}
           />
         </div>
         {uniqueImages.length > 1 && (
@@ -72,6 +88,10 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
                   src={image.image_url}
                   alt={`${product.name} - View ${index + 1}`}
                   className="w-full h-full object-contain p-2 bg-white"
+                  onError={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    img.src = '/placeholder.svg';
+                  }}
                 />
               </button>
             ))}
