@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { Instagram, ShoppingBag } from "lucide-react";
 
 export const CreativeSection = () => {
@@ -66,8 +67,8 @@ export const CreativeSection = () => {
 
       <section className="py-24 bg-[#F2FCE2]">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="w-full aspect-square relative">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+            <div className="w-full aspect-square relative order-last md:order-first">
               <div className="w-full aspect-square relative">
                 <div className="absolute inset-0" style={{
                   clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
