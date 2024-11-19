@@ -1,11 +1,11 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { AdminNavigationMenu } from "./AdminNavigationMenu";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
+export const AdminLayout = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -48,7 +48,7 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       <AdminNavigationMenu />
       <main className="md:pl-64 w-full">
         <div className="max-w-[1200px] mx-auto px-4 py-6 mt-16 md:mt-0">
-          {children}
+          <Outlet />
         </div>
       </main>
     </div>

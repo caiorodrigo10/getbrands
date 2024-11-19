@@ -14,7 +14,7 @@ export const AdminRoutes = () => {
   return (
     <Routes>
       <Route element={<AdminLayout />}>
-        <Route index element={<AdminDashboard />} />
+        <Route path="/" element={<AdminDashboard />} />
         <Route path="catalog" element={<AdminCatalog />} />
         <Route path="catalog/new" element={<AdminProductCreate />} />
         <Route path="catalog/:id" element={<AdminProductEdit />} />
