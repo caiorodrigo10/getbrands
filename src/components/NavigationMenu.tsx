@@ -104,7 +104,7 @@ export const NavigationMenu = () => {
         <div className="flex flex-col h-full">
           <div className="p-6">
             <img 
-              src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png"
+              src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
               alt="Logo"
               className="h-12 w-auto"
             />
@@ -128,7 +128,7 @@ export const NavigationMenu = () => {
           <div className="flex h-16 items-center justify-between gap-4">
             <div className="flex items-center gap-6">
               <img 
-                src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png"
+                src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
                 alt="Logo"
                 className="h-12 w-auto"
               />
