@@ -7,6 +7,20 @@ import { Coins } from "lucide-react";
 export const ProjectPointsInfo = () => {
   const { user } = useAuth();
 
+  const { data: profile } = useQuery({
+    queryKey: ["user-profile", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data } = await supabase
+        .from("profiles")
+        .select("role, profile_type")
+        .eq("id", user.id)
+        .single();
+      return data;
+    },
+    enabled: !!user,
+  });
+
   const { data: activeProject } = useQuery({
     queryKey: ["active-project"],
     queryFn: async () => {
@@ -28,7 +42,8 @@ export const ProjectPointsInfo = () => {
     enabled: !!user,
   });
 
-  if (!activeProject) {
+  // Show call to action for members and samplers
+  if (profile?.role === 'member' || profile?.profile_type === 'sampler') {
     return (
       <div className="p-4 bg-[#fff1ed] border-t border-[#f0562e]/20">
         <div className="space-y-3">
@@ -46,20 +61,29 @@ export const ProjectPointsInfo = () => {
     );
   }
 
-  const availablePoints = activeProject.points - (activeProject.points_used || 0);
-
-  return (
-    <div className="p-4 bg-[#fff1ed] border-t border-[#f0562e]/20">
-      <div className="space-y-2">
-        <div className="flex items-center gap-2 text-[#f0562e]">
-          <Coins className="h-4 w-4" />
-          <span className="text-sm font-medium">Available Points</span>
+  // For customers, only show points if they have an active project with points
+  if (profile?.profile_type === 'customer' && activeProject) {
+    const availablePoints = activeProject.points - (activeProject.points_used || 0);
+    
+    // Only show if there are points available
+    if (availablePoints > 0) {
+      return (
+        <div className="p-4 bg-[#fff1ed] border-t border-[#f0562e]/20">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-[#f0562e]">
+              <Coins className="h-4 w-4" />
+              <span className="text-sm font-medium">Available Points</span>
+            </div>
+            <p className="text-2xl font-bold text-gray-900">{availablePoints}</p>
+            <p className="text-sm text-gray-600">
+              Total: {activeProject.points} points
+            </p>
+          </div>
         </div>
-        <p className="text-2xl font-bold text-gray-900">{availablePoints}</p>
-        <p className="text-sm text-gray-600">
-          Total: {activeProject.points} points
-        </p>
-      </div>
-    </div>
-  );
+      );
+    }
+  }
+
+  // Return null if none of the conditions are met
+  return null;
 };
