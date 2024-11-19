@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Coins, Package2 } from "lucide-react";
-import { PACK_LABELS } from "@/types/project";
+import { Button } from "@/components/ui/button";
+import { Coins } from "lucide-react";
 
 export const ProjectPointsInfo = () => {
   const { user } = useAuth();
@@ -28,30 +28,37 @@ export const ProjectPointsInfo = () => {
     enabled: !!user,
   });
 
-  if (!activeProject) return null;
+  if (!activeProject) {
+    return (
+      <div className="p-4 bg-[#fff1ed] border-t border-[#f0562e]/20">
+        <div className="space-y-3">
+          <p className="text-sm text-gray-800">
+            You don't have any points available. Schedule a call with our team to learn about our Packs!
+          </p>
+          <Button 
+            className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white"
+            onClick={() => window.location.href = "https://calendly.com/your-team"}
+          >
+            Schedule a Call
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const availablePoints = activeProject.points - (activeProject.points_used || 0);
-  const packLabel = PACK_LABELS[activeProject.pack_type];
 
   return (
-    <div className="p-4 border-t border-border/40">
-      <div className="space-y-3">
-        <div className="space-y-1">
-          <h4 className="text-sm font-medium text-gray-300">Active Project</h4>
-          <p className="text-sm text-white truncate">{activeProject.name}</p>
+    <div className="p-4 bg-[#fff1ed] border-t border-[#f0562e]/20">
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 text-[#f0562e]">
+          <Coins className="h-4 w-4" />
+          <span className="text-sm font-medium">Available Points</span>
         </div>
-        
-        <div className="flex items-center gap-2 text-sm">
-          <Package2 className="h-4 w-4 text-primary" />
-          <span className="text-gray-300">Pack:</span>
-          <span className="font-medium text-white">{packLabel}</span>
-        </div>
-        
-        <div className="flex items-center gap-2 text-sm">
-          <Coins className="h-4 w-4 text-primary" />
-          <span className="text-gray-300">Available Points:</span>
-          <span className="font-medium text-white">{availablePoints}</span>
-        </div>
+        <p className="text-2xl font-bold text-gray-900">{availablePoints}</p>
+        <p className="text-sm text-gray-600">
+          Total: {activeProject.points} points
+        </p>
       </div>
     </div>
   );
