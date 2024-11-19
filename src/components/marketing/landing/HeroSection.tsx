@@ -46,11 +46,6 @@ export const HeroSection = () => {
 
         <div className="mt-16 grid grid-cols-2 md:grid-cols-3 gap-8">
           <img 
-            src="/lovable-uploads/3a1fb15c-3252-4eb7-b150-e8f75f4b48fd.png" 
-            alt="Product Showcase"
-            className="w-full rounded-lg shadow-lg"
-          />
-          <img 
             src="https://images.unsplash.com/photo-1556229162-5c63ed9c4efb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80" 
             alt="Product Showcase"
             className="w-full rounded-lg shadow-lg"
