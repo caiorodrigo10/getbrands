@@ -106,26 +106,39 @@ export function ProductImageUpload({ productId, images, mainImageUrl, onImagesUp
   };
 
   const handleMediaLibrarySelect = async (selectedUrls: string[]) => {
-    for (const url of selectedUrls) {
-      // Create product image entries
-      if (productId) {
-        const { error } = await supabase
-          .from('product_images')
-          .insert({
-            product_id: productId,
-            image_url: url,
-            position: images.length,
-            is_primary: images.length === 0
-          });
+    try {
+      for (const url of selectedUrls) {
+        // Create product image entries
+        if (productId) {
+          const { error } = await supabase
+            .from('product_images')
+            .insert({
+              product_id: productId,
+              image_url: url,
+              position: images.length,
+              is_primary: images.length === 0
+            });
 
-        if (error) {
-          console.error('Error creating image entry:', error);
-          continue;
+          if (error) {
+            console.error('Error creating image entry:', error);
+            throw error;
+          }
         }
       }
+      
+      onImagesUpdate();
+      toast({
+        title: "Success",
+        description: "Images added successfully",
+      });
+    } catch (error) {
+      console.error('Error adding images:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to add images. Please try again.",
+      });
     }
-    
-    onImagesUpdate();
   };
 
   return (
