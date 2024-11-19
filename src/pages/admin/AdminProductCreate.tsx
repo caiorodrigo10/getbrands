@@ -11,7 +11,8 @@ const AdminProductCreate = () => {
 
   const handleCreateProduct = async (productData: any) => {
     try {
-      const { data, error } = await supabase
+      // First, create the product
+      const { data: newProduct, error: productError } = await supabase
         .from('products')
         .insert({
           name: productData.name,
@@ -25,7 +26,60 @@ const AdminProductCreate = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (productError) throw productError;
+
+      // Get all files from storage with temp prefix
+      const { data: storageFiles, error: storageError } = await supabase
+        .storage
+        .from('product-images')
+        .list('temp');
+
+      if (storageError) throw storageError;
+
+      // Move files to the new product folder and create database entries
+      for (const file of (storageFiles || [])) {
+        // Move the file
+        const { error: moveError } = await supabase
+          .storage
+          .from('product-images')
+          .move(`temp/${file.name}`, `${newProduct.id}/${file.name}`);
+
+        if (moveError) {
+          console.error('Error moving file:', moveError);
+          continue;
+        }
+
+        // Get the public URL
+        const { data: { publicUrl } } = supabase
+          .storage
+          .from('product-images')
+          .getPublicUrl(`${newProduct.id}/${file.name}`);
+
+        // Create database entry
+        const { error: imageError } = await supabase
+          .from('product_images')
+          .insert({
+            product_id: newProduct.id,
+            image_url: publicUrl,
+            position: 0, // You might want to handle position differently
+            is_primary: true // First image will be primary
+          });
+
+        if (imageError) {
+          console.error('Error creating image entry:', imageError);
+          continue;
+        }
+
+        // Update the product with the main image URL
+        const { error: updateError } = await supabase
+          .from('products')
+          .update({ image_url: publicUrl })
+          .eq('id', newProduct.id);
+
+        if (updateError) {
+          console.error('Error updating product image:', updateError);
+        }
+      }
 
       toast({
         title: "Success",
@@ -33,7 +87,7 @@ const AdminProductCreate = () => {
       });
       
       // Redirect to edit page after creation
-      navigate(`/admin/catalog/${data.id}`);
+      navigate(`/admin/catalog/${newProduct.id}`);
     } catch (error) {
       console.error('Error creating product:', error);
       toast({
