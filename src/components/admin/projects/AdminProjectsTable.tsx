@@ -70,7 +70,6 @@ const AdminProjectsTable = ({ projects }: AdminProjectsTableProps) => {
             <TableHead>Progress</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Pack</TableHead>
-            <TableHead>Points</TableHead>
             <TableHead className="w-[100px]"></TableHead>
           </TableRow>
         </TableHeader>
@@ -111,9 +110,6 @@ const AdminProjectsTable = ({ projects }: AdminProjectsTableProps) => {
                 <Badge className={getPackColor(project.pack_type)}>
                   {PACK_LABELS[project.pack_type]}
                 </Badge>
-              </TableCell>
-              <TableCell>
-                <span>{project.points}</span>
               </TableCell>
               <TableCell>
                 <Button 
