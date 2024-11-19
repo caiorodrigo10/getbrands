@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { X, GripVertical } from "lucide-react";
 import { ProductImage } from "@/types/product";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 interface SortableImageProps {
   image: ProductImage;
@@ -11,6 +12,9 @@ interface SortableImageProps {
 }
 
 export const SortableImage = ({ image, onDelete }: SortableImageProps) => {
+  const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   const {
     attributes,
     listeners,
@@ -34,38 +38,48 @@ export const SortableImage = ({ image, onDelete }: SortableImageProps) => {
     touchAction: 'none',
   };
 
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoaded(true);
+  };
+
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={cn(
-        "relative group aspect-square",
-        isDragging && "opacity-80"
+        "relative group aspect-square bg-white rounded-lg border border-gray-200",
+        isDragging && "opacity-80 shadow-lg"
       )}
     >
-      <div 
-        className="w-full h-full rounded-lg border border-gray-200 overflow-hidden"
-      >
+      <div className="w-full h-full overflow-hidden">
         <div {...attributes} {...listeners} className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
-          <GripVertical className="w-5 h-5 text-white drop-shadow-lg" />
+          <GripVertical className="w-5 h-5 text-gray-600 drop-shadow-lg" />
         </div>
         
-        <div className="absolute top-2 right-2 z-10">
-          <Button
-            type="button"
-            variant="destructive"
-            size="icon"
-            className="opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={(e) => onDelete(image.id, e)}
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
+        <Button
+          type="button"
+          variant="destructive"
+          size="icon"
+          className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+          onClick={(e) => onDelete(image.id, e)}
+        >
+          <X className="w-4 h-4" />
+        </Button>
+
+        {!imageLoaded && (
+          <div className="absolute inset-0 bg-gray-100 animate-pulse" />
+        )}
 
         <img
-          src={image.image_url}
-          alt={`Product image ${image.position + 1}`}
-          className="w-full h-full object-cover"
+          src={imageError ? '/placeholder.svg' : image.image_url}
+          alt={`Product image ${image.position}`}
+          className={cn(
+            "w-full h-full object-contain p-2 transition-opacity duration-200",
+            imageLoaded ? "opacity-100" : "opacity-0"
+          )}
+          onLoad={() => setImageLoaded(true)}
+          onError={handleImageError}
           draggable={false}
         />
       </div>
