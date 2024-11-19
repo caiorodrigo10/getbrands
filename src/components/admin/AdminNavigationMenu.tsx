@@ -26,7 +26,7 @@ export const AdminNavigationMenu = () => {
               alt="Mainer Logo"
               className="h-12 w-auto"
             />
-            <div className="mt-2 text-sm text-gray-600">
+            <div className="mt-2 text-sm text-gray-600 border-2 border-yellow-400 rounded-md px-2 py-1 inline-block">
               Admin Panel
             </div>
           </div>
@@ -67,7 +67,7 @@ export const AdminNavigationMenu = () => {
                 alt="Mainer Logo"
                 className="h-12 w-auto"
               />
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 border-2 border-yellow-400 rounded-md px-2 py-1">
                 Admin Panel
               </div>
             </div>
