@@ -40,8 +40,8 @@ export const AdminNavigationMenu = () => {
                   to={item.path}
                   className={`flex items-center gap-3 px-4 py-2.5 my-1 text-sm rounded-md transition-all duration-200 ${
                     location.pathname === item.path
-                      ? "bg-[#f8dafc] text-gray-900 font-medium"
-                      : "text-gray-600 hover:bg-[#f8dafc] hover:text-gray-900"
+                      ? "bg-[#fff1ed] text-gray-900 font-medium"
+                      : "text-gray-600 hover:bg-[#fff1ed] hover:text-gray-900"
                   }`}
                 >
                   <Icon className="h-4 w-4" />

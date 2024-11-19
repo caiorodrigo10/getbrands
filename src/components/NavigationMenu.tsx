@@ -67,8 +67,8 @@ export const NavigationMenu = () => {
     const baseStyles = cn(
       "flex items-center gap-3 px-4 py-2.5 my-1 text-sm rounded-md transition-all duration-200",
       isActive
-        ? "bg-[#f8dafc] text-black font-medium"
-        : "text-black hover:bg-[#f8dafc] hover:text-black",
+        ? "bg-[#fff1ed] text-black font-medium"
+        : "text-black hover:bg-[#fff1ed] hover:text-black",
       item.restricted && !hasFullAccess && "opacity-50 cursor-not-allowed"
     );
 

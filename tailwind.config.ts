@@ -33,9 +33,9 @@ export default {
         background: "#FFFFFF",
         foreground: "#333333",
         primary: {
-          DEFAULT: "#6A1B9A",
-          light: "#8E24AA",
-          dark: "#4A148C",
+          DEFAULT: "#f0562e",
+          light: "#f56d49",
+          dark: "#d64a26",
           foreground: "#FFFFFF",
         },
         secondary: {
@@ -47,7 +47,7 @@ export default {
           foreground: "#333333",
         },
         accent: {
-          DEFAULT: "#6A1B9A",
+          DEFAULT: "#f0562e",
           foreground: "#FFFFFF",
         },
         card: {
