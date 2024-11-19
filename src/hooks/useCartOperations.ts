@@ -66,6 +66,7 @@ export const useCartOperations = (user: User | null) => {
     try {
       setIsLoading(true);
       
+      // Check if item already exists in cart
       const { data: existingItems, error: queryError } = await supabase
         .from('cart_items')
         .select('id')
@@ -74,10 +75,16 @@ export const useCartOperations = (user: User | null) => {
 
       if (queryError) throw queryError;
 
+      // If item exists, don't add it again
       if (existingItems && existingItems.length > 0) {
+        toast({
+          title: "Info",
+          description: "This item is already in your cart.",
+        });
         return;
       }
 
+      // If item doesn't exist, add it
       const { error } = await supabase
         .from('cart_items')
         .insert({
@@ -88,6 +95,11 @@ export const useCartOperations = (user: User | null) => {
       if (error) throw error;
 
       setItems((currentItems) => [...currentItems, { ...product, quantity: 1 }]);
+      
+      toast({
+        title: "Success",
+        description: "Item added to cart successfully.",
+      });
     } catch (error) {
       console.error('Error adding item to cart:', error);
       throw error;
