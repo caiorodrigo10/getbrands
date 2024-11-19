@@ -78,7 +78,7 @@ export const ProjectProgressCard = ({ project }: ProjectProgressCardProps) => {
 
       <Button 
         variant="outline" 
-        className="w-full"
+        className="w-full hover:bg-[#fff4fc]"
         onClick={() => navigate(`/projects/${project.id}`)}
       >
         View Project Details

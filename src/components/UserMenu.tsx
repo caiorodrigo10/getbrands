@@ -102,14 +102,14 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
         <div className="flex flex-col space-y-1">
           <Link 
             to="/profile" 
-            className="flex items-center gap-2 px-3 py-2 text-sm text-black hover:bg-[#fff1ed] rounded-md"
+            className="flex items-center gap-2 px-3 py-2 text-sm text-black hover:bg-[#fff4fc] rounded-md"
           >
             <User className="h-4 w-4" />
             <span>My Profile</span>
           </Link>
           <Link 
             to="/sample-orders" 
-            className="flex items-center gap-2 px-3 py-2 text-sm text-black hover:bg-[#fff1ed] rounded-md"
+            className="flex items-center gap-2 px-3 py-2 text-sm text-black hover:bg-[#fff4fc] rounded-md"
           >
             <ShoppingBag className="h-4 w-4" />
             <span>Orders</span>
@@ -117,7 +117,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           {isAdmin && (
             <button
               onClick={handleAdminNavigation}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-black hover:bg-[#fff1ed] rounded-md w-full text-left"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-black hover:bg-[#fff4fc] rounded-md w-full text-left"
             >
               <LayoutDashboard className="h-4 w-4" />
               <span>{isInAdminPanel ? 'User View' : 'Admin Panel'}</span>
@@ -125,7 +125,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           )}
           <button
             onClick={logout}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-[#fff1ed] rounded-md w-full text-left"
+            className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-[#fff4fc] rounded-md w-full text-left"
           >
             <LogOut className="h-4 w-4" />
             <span>Sign Out</span>
@@ -140,7 +140,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
-          className="relative h-auto w-full flex flex-col items-start gap-1 px-3 py-2 hover:bg-[#fff1ed]"
+          className="relative h-auto w-full flex flex-col items-start gap-1 px-3 py-2 hover:bg-[#fff4fc]"
         >
           <div className="flex items-center gap-3 w-full">
             {renderUserInfo()}
@@ -168,13 +168,13 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
         <DropdownMenuSeparator className="bg-gray-100" />
         <div className="p-1">
           <Link to="/profile">
-            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#fff1ed] rounded-md">
+            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#fff4fc] rounded-md">
               <User className="h-4 w-4 text-black" />
               <span className="text-black">My Profile</span>
             </DropdownMenuItem>
           </Link>
           <Link to="/sample-orders">
-            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#fff1ed] rounded-md">
+            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#fff4fc] rounded-md">
               <ShoppingBag className="h-4 w-4 text-black" />
               <span className="text-black">Orders</span>
             </DropdownMenuItem>
@@ -182,7 +182,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           {isAdmin && (
             <DropdownMenuItem 
               onClick={handleAdminNavigation}
-              className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#fff1ed] rounded-md"
+              className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#fff4fc] rounded-md"
             >
               <LayoutDashboard className="h-4 w-4 text-black" />
               <span className="text-black">{isInAdminPanel ? 'User View' : 'Admin Panel'}</span>
@@ -190,7 +190,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           )}
           <DropdownMenuItem 
             onClick={logout}
-            className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#fff1ed] text-red-600 rounded-md"
+            className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#fff4fc] text-red-600 rounded-md"
           >
             <LogOut className="h-4 w-4" />
             <span>Sign Out</span>
