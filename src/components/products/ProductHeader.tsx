@@ -43,7 +43,7 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
       <div className="space-y-6">
-        <div className="relative">
+        <div className="relative bg-white rounded-lg overflow-hidden">
           {product.is_new && (
             <Badge className="absolute top-4 left-4 bg-primary">NEW</Badge>
           )}
@@ -53,21 +53,27 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
           <img
             src={selectedImage}
             alt={product.name}
-            className="w-full aspect-square object-cover rounded-lg"
+            className="w-full aspect-square object-contain p-4"
           />
         </div>
         {uniqueImages.length > 1 && (
           <div className="grid grid-cols-4 gap-4">
             {uniqueImages.map((image, index) => (
-              <img
+              <button
                 key={`${image.image_url}-${index}`}
-                src={image.image_url}
-                alt={`${product.name} - View ${index + 1}`}
-                className={`w-full aspect-square object-cover rounded-lg cursor-pointer hover:ring-2 transition-all duration-200 ${
-                  selectedImage === image.image_url ? 'ring-2 ring-primary' : 'hover:ring-primary/50'
-                }`}
                 onClick={() => handleThumbnailClick(image.image_url)}
-              />
+                className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                  selectedImage === image.image_url 
+                    ? 'border-primary' 
+                    : 'border-transparent hover:border-primary/50'
+                }`}
+              >
+                <img
+                  src={image.image_url}
+                  alt={`${product.name} - View ${index + 1}`}
+                  className="w-full h-full object-contain p-2 bg-white"
+                />
+              </button>
             ))}
           </div>
         )}
