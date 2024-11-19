@@ -11,6 +11,8 @@ import { useState } from "react";
 import { SelectionBar } from "./SelectionBar";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 import { useDeleteProducts } from "./hooks/useDeleteProducts";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AdminCatalogTableProps {
   products: Product[];
@@ -61,6 +63,29 @@ const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) 
       setSelectedProducts([]);
       setShowDeleteDialog(false);
     }
+  };
+
+  // Fetch primary images for products
+  const { data: productImages } = useQuery({
+    queryKey: ['product-images-catalog'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('product_images')
+        .select('*')
+        .in('product_id', products.map(p => p.id))
+        .eq('is_primary', true);
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: products.length > 0,
+  });
+
+  const getProductImage = (product: Product) => {
+    // First try to get the primary image from product_images
+    const primaryImage = productImages?.find(img => img.product_id === product.id)?.image_url;
+    // If no primary image found, fall back to the product's main image_url
+    return primaryImage || product.image_url || "/placeholder.svg";
   };
 
   if (products.length === 0) {
@@ -115,11 +140,17 @@ const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) 
                     className="flex items-center gap-3 cursor-pointer hover:opacity-80"
                     onClick={() => handleEditProduct(product.id)}
                   >
-                    <img
-                      src={product.image_url || "/placeholder.svg"}
-                      alt={product.name}
-                      className="h-12 w-12 rounded-md object-cover"
-                    />
+                    <div className="relative h-12 w-12 rounded-md overflow-hidden bg-gray-100">
+                      <img
+                        src={getProductImage(product)}
+                        alt={product.name}
+                        className="h-full w-full object-contain"
+                        onError={(e) => {
+                          const img = e.target as HTMLImageElement;
+                          img.src = "/placeholder.svg";
+                        }}
+                      />
+                    </div>
                     <div>
                       <p className="font-medium hover:underline">{product.name}</p>
                     </div>
