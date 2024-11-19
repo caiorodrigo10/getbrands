@@ -21,7 +21,7 @@ export const ProductLightbox = ({
 }: ProductLightboxProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl p-0 bg-transparent border-none shadow-none">
+      <DialogContent className="max-w-4xl p-0 bg-transparent border-none shadow-none" onPointerDownOutside={() => onOpenChange(false)}>
         <div className="relative flex items-center justify-center min-h-[70vh]">
           <Button
             variant="ghost"
