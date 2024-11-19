@@ -32,10 +32,10 @@ export const ProjectPointsInfo = () => {
   if (!totalPoints) return null;
 
   return (
-    <div className="p-4 bg-[#fff4fc] border-t border-gray-200">
-      <div className="space-y-3">
+    <div className="p-4 bg-[#fff1ed] border-t border-[#f0562e]/20">
+      <div className="space-y-4">
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-gray-900">
+          <div className="flex items-center gap-2 text-[#f0562e]">
             <Coins className="h-4 w-4" />
             <span className="text-sm font-medium">Available Points</span>
           </div>
@@ -43,7 +43,7 @@ export const ProjectPointsInfo = () => {
         </div>
         
         <Button 
-          className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white h-8 px-3"
+          className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white"
           onClick={() => navigate("/catalog")}
         >
           <ShoppingBag className="h-4 w-4 mr-2" />
