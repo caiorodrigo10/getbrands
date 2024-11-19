@@ -42,10 +42,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
     setImageLoaded(true);
   };
 
-  // Get the primary image or fall back to the product's main image
-  const displayImage = productImages?.find(img => img.is_primary)?.image_url || 
-                      product.image_url || 
-                      '/placeholder.svg';
+  // Get the primary image or fall back to the first image in the gallery, then product's main image
+  const displayImage = productImages?.length 
+    ? (productImages.find(img => img.is_primary)?.image_url || productImages[0]?.image_url)
+    : (product.image_url || '/placeholder.svg');
 
   // Ensure we have valid numbers for calculations
   const fromPrice = typeof product.from_price === 'number' ? product.from_price : 0;
