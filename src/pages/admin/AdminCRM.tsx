@@ -2,7 +2,10 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Upload } from "lucide-react";
 import { CRMTable } from "@/components/admin/crm/CRMTable";
+import { ImportContactsDialog } from "@/components/admin/crm/ImportContactsDialog";
 import { Database } from "@/integrations/supabase/types";
 
 type Project = {
@@ -14,6 +17,7 @@ type Project = {
 
 const AdminCRM = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [showImportDialog, setShowImportDialog] = useState(false);
 
   const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["crm-users"],
@@ -78,9 +82,21 @@ const AdminCRM = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+        <Button 
+          variant="outline"
+          onClick={() => setShowImportDialog(true)}
+        >
+          <Upload className="h-4 w-4 mr-2" />
+          Import Contacts
+        </Button>
       </div>
 
       <CRMTable users={filteredUsers || []} onUserUpdated={refetch} />
+
+      <ImportContactsDialog 
+        open={showImportDialog} 
+        onOpenChange={setShowImportDialog}
+      />
     </div>
   );
 };
