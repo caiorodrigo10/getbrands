@@ -22,7 +22,7 @@ export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue, onSave }
       toast({
         description: "Order cancelled and cart cleared.",
       });
-      navigate("/catalogo");
+      navigate("/checkout/confirmation");
     } catch (error) {
       toast({
         variant: "destructive",

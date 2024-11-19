@@ -21,7 +21,6 @@ import Success from "@/pages/checkout/Success";
 import ProfitCalculator from "@/pages/ProfitCalculator";
 import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
-import CartReview from "@/pages/checkout/CartReview";
 
 export const AppRoutes = () => (
   <Routes>
@@ -122,12 +121,6 @@ export const AppRoutes = () => (
       <Route path="/profit-calculator" element={
         <ProtectedRoute>
           <ProfitCalculator />
-        </ProtectedRoute>
-      } />
-
-      <Route path="/cart" element={
-        <ProtectedRoute>
-          <CartReview />
         </ProtectedRoute>
       } />
 

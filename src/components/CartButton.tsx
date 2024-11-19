@@ -21,7 +21,7 @@ export function CartButton() {
             variant="outline"
             size="icon"
             className="relative"
-            onClick={() => navigate("/cart")}
+            onClick={() => navigate("/checkout/confirmation")}
           >
             <ShoppingCart className="h-5 w-5" />
             {items.length > 0 && (
