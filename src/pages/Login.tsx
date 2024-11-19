@@ -58,7 +58,7 @@ const Login = () => {
       <div className="w-full max-w-md space-y-8 p-8 bg-white rounded-2xl shadow-lg">
         <div className="flex flex-col items-center space-y-2">
           <img
-            src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png"
+            src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
             alt="Logo"
             className="w-[180px] h-auto"
           />

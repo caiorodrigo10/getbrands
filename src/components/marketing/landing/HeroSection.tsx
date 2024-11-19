@@ -23,7 +23,7 @@ export const HeroSection = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <img
-              src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png"
+              src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
               alt="GetBrands Logo"
               className="h-12 mx-auto mb-8"
             />
@@ -39,7 +39,7 @@ export const HeroSection = () => {
 
             <Button 
               size="lg"
-              className="bg-[#F16529] hover:bg-[#F16529]/90 text-white font-semibold px-8"
+              className="bg-[#f0562e] hover:bg-[#f0562e]/90 text-white font-semibold px-8"
             >
               Start Now
               <ArrowRight className="ml-2 h-5 w-5" />

@@ -22,7 +22,7 @@ export const AdminNavigationMenu = () => {
         <div className="flex flex-col h-full">
           <div className="p-6">
             <img 
-              src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png"
+              src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
               alt="Mainer Logo"
               className="h-12 w-auto"
             />
@@ -63,7 +63,7 @@ export const AdminNavigationMenu = () => {
           <div className="flex h-16 items-center justify-between gap-4">
             <div className="flex items-center gap-6">
               <img 
-                src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png"
+                src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
                 alt="Mainer Logo"
                 className="h-12 w-auto"
               />
@@ -90,8 +90,8 @@ export const AdminNavigationMenu = () => {
                           to={item.path}
                           className={`flex items-center gap-3 px-4 py-3 text-sm rounded-md transition-all duration-200 ${
                             location.pathname === item.path
-                              ? "bg-[#f8dafc] text-gray-900 font-medium"
-                              : "text-gray-600 hover:bg-[#f8dafc] hover:text-gray-900"
+                              ? "bg-[#fff1ed] text-gray-900 font-medium"
+                              : "text-gray-600 hover:bg-[#fff1ed] hover:text-gray-900"
                           }`}
                         >
                           <Icon className="h-4 w-4" />
