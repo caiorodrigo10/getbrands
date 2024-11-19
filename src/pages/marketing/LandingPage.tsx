@@ -12,12 +12,12 @@ const LandingPage = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <HeroSection />
+      <CreativeSection />
       <SuccessMetrics />
       <ServicesSection />
       <BrandBuildingSection />
       <ProductCategoriesSection />
       <WhyChooseSection />
-      <CreativeSection />
       <TestimonialsSection />
       <Footer />
     </div>
