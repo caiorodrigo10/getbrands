@@ -4,72 +4,53 @@ import { Link } from "react-router-dom";
 
 export const HeroSection = () => {
   return (
-    <section className="relative bg-primary min-h-[600px] flex items-center">
+    <section className="relative bg-white pt-20 pb-16 lg:pt-32">
       {/* Login Button */}
       <div className="absolute top-4 right-4 z-20">
         <Link to="/login">
           <Button 
             variant="ghost" 
             size="sm"
-            className="text-white hover:bg-white/10 text-sm font-medium px-4"
+            className="text-gray-700 hover:bg-gray-100 text-sm font-medium px-4"
           >
             Login
           </Button>
         </Link>
       </div>
 
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0" style={{
-          backgroundImage: "radial-gradient(circle at 25px 25px, white 2%, transparent 0%)",
-          backgroundSize: "50px 50px"
-        }} />
-      </div>
-
-      <div className="container mx-auto px-4 py-16 relative z-10">
+      <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-            Transform Your Vision Into a 
-            <span className="text-white/90"> Powerful Brand</span>
+          <img
+            src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png"
+            alt="GetBrands Logo"
+            className="h-12 mx-auto mb-8"
+          />
+          
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Create your own private label on demand
           </h1>
           
-          <p className="text-xl text-white/80 mb-8 leading-relaxed">
-            From concept to shelf-ready products, we guide entrepreneurs in creating 
-            distinctive private label brands that stand out in today's competitive market.
+          <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+            We specialize in cosmetics, supplements, and coffee. From idea to launch, 
+            we build your brand from the ground up.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg"
-              variant="secondary"
-              className="bg-white text-primary hover:bg-white/90 font-semibold"
-            >
-              Start Your Journey
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button 
-              size="lg"
-              variant="ghost"
-              className="text-white border border-white/20 hover:bg-white/10"
-            >
-              View Our Catalog
-            </Button>
-          </div>
+          <Button 
+            size="lg"
+            className="bg-[#F16529] hover:bg-[#F16529]/90 text-white font-semibold px-8"
+          >
+            Start Now
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
         </div>
 
-        {/* Stats Section */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 text-white/90">
-          {[
-            { number: "500+", label: "Brands Launched" },
-            { number: "98%", label: "Success Rate" },
-            { number: "24/7", label: "Expert Support" },
-            { number: "50+", label: "Product Categories" },
-          ].map((stat, index) => (
-            <div key={index} className="text-center">
-              <div className="text-3xl font-bold text-white mb-2">{stat.number}</div>
-              <div className="text-sm">{stat.label}</div>
-            </div>
-          ))}
+        <div className="mt-16 grid grid-cols-2 md:grid-cols-3 gap-8">
+          <img 
+            src="/lovable-uploads/943cac07-9354-4831-82fc-be2471d67daa.png" 
+            alt="Product Showcase"
+            className="w-full rounded-lg shadow-lg"
+          />
+          {/* Add more product showcase images here */}
         </div>
       </div>
     </section>
