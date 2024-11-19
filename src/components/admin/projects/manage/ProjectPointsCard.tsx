@@ -30,8 +30,8 @@ interface ProjectPointsCardProps {
 }
 
 export const ProjectPointsCard = ({ project }: ProjectPointsCardProps) => {
-  const [showClientInfo, setShowClientInfo] = useState(true);
-  const [showProjectPoints, setShowProjectPoints] = useState(true);
+  const [showClientInfo, setShowClientInfo] = useState(false);
+  const [showProjectPoints, setShowProjectPoints] = useState(false);
   const queryClient = useQueryClient();
 
   const handlePointsChange = async (amount: number) => {
