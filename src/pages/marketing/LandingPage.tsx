@@ -6,6 +6,7 @@ import { BrandBuildingSection } from "@/components/marketing/landing/BrandBuildi
 import { TestimonialsSection } from "@/components/marketing/landing/TestimonialsSection";
 import { ProductCategoriesSection } from "@/components/marketing/landing/ProductCategoriesSection";
 import { CreativeSection } from "@/components/marketing/landing/CreativeSection";
+import { BrandExpandableSection } from "@/components/marketing/landing/BrandExpandableSection";
 import { Footer } from "@/components/marketing/landing/Footer";
 
 const LandingPage = () => {
@@ -13,6 +14,7 @@ const LandingPage = () => {
     <div className="flex flex-col min-h-screen">
       <HeroSection />
       <CreativeSection />
+      <BrandExpandableSection />
       <SuccessMetrics />
       <ServicesSection />
       <BrandBuildingSection />
