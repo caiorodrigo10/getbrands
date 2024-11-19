@@ -50,11 +50,6 @@ export const HeroSection = () => {
             alt="Product Showcase"
             className="w-full rounded-lg shadow-lg"
           />
-          <img 
-            src="https://images.unsplash.com/photo-1556229010-6c3f2c9ca5f8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80" 
-            alt="Product Showcase"
-            className="w-full rounded-lg shadow-lg"
-          />
         </div>
       </div>
     </section>
