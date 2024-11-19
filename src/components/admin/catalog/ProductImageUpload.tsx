@@ -54,16 +54,26 @@ export function ProductImageUpload({ productId, images, mainImageUrl, onImagesUp
     e.stopPropagation();
     
     try {
-      // Don't allow deletion of the main image through this interface
-      if (imageId === 'main-image') {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Cannot delete the main product image here",
-        });
-        return;
+      // Get the image details before deletion
+      const imageToDelete = images.find(img => img.id === imageId);
+      if (!imageToDelete) {
+        throw new Error('Image not found');
       }
 
+      // Extract the file path from the URL
+      const fileUrl = new URL(imageToDelete.image_url);
+      const filePath = fileUrl.pathname.split('/').pop();
+
+      // Delete from storage first
+      const { error: storageError } = await supabase.storage
+        .from('product-images')
+        .remove([`${filePath}`]);
+
+      if (storageError) {
+        console.error('Storage deletion error:', storageError);
+      }
+
+      // Then delete from the database
       const { error: deleteError } = await supabase
         .from('product_images')
         .delete()
@@ -84,7 +94,7 @@ export function ProductImageUpload({ productId, images, mainImageUrl, onImagesUp
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to delete image",
+        description: "Failed to delete image. Please try again.",
       });
     }
   };

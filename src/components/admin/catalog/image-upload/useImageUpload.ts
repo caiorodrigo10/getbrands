@@ -24,26 +24,40 @@ export const useImageUpload = (productId: string, onImagesUpdate: () => void) =>
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const fileExt = file.name.split('.').pop();
-        const filePath = `${productId}/${crypto.randomUUID()}.${fileExt}`;
+        const fileName = `${productId}/${crypto.randomUUID()}.${fileExt}`;
 
-        const { error: uploadError } = await supabase.storage
+        // Upload to storage
+        const { error: uploadError, data: uploadData } = await supabase.storage
           .from('product-images')
-          .upload(filePath, file);
+          .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          continue;
+        }
 
+        // Get the public URL
         const { data: { publicUrl } } = supabase.storage
           .from('product-images')
-          .getPublicUrl(filePath);
+          .getPublicUrl(fileName);
 
-        await supabase
+        // Insert into database
+        const { error: dbError } = await supabase
           .from('product_images')
           .insert({
             product_id: productId,
             image_url: publicUrl,
             position: i,
-            is_primary: !hasPrimaryImage && i === 0 // Only set as primary if there's no primary image and it's the first upload
+            is_primary: !hasPrimaryImage && i === 0
           });
+
+        if (dbError) {
+          console.error('Database error:', dbError);
+          continue;
+        }
       }
 
       onImagesUpdate();
