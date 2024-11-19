@@ -9,6 +9,8 @@ import { useImageUpload } from "./image-upload/useImageUpload";
 import { useImageSorting } from "./image-upload/useImageSorting";
 import { useToast } from "@/components/ui/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { MediaLibrary } from "./media-library/MediaLibrary";
 
 interface ProductImageUploadProps {
   productId: string;
@@ -20,6 +22,7 @@ interface ProductImageUploadProps {
 export function ProductImageUpload({ productId, images, mainImageUrl, onImagesUpdate }: ProductImageUploadProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [showMediaLibrary, setShowMediaLibrary] = useState(false);
   const { isUploading, handleFileUpload } = useImageUpload(productId, onImagesUpdate);
   const { handleDragEnd } = useImageSorting(images, onImagesUpdate);
   
@@ -102,9 +105,27 @@ export function ProductImageUpload({ productId, images, mainImageUrl, onImagesUp
     }
   };
 
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    handleFileUpload(e);
+  const handleMediaLibrarySelect = async (selectedUrls: string[]) => {
+    for (const url of selectedUrls) {
+      // Create product image entries
+      if (productId) {
+        const { error } = await supabase
+          .from('product_images')
+          .insert({
+            product_id: productId,
+            image_url: url,
+            position: images.length,
+            is_primary: images.length === 0
+          });
+
+        if (error) {
+          console.error('Error creating image entry:', error);
+          continue;
+        }
+      }
+    }
+    
+    onImagesUpdate();
   };
 
   return (
@@ -113,24 +134,12 @@ export function ProductImageUpload({ productId, images, mainImageUrl, onImagesUp
         <Button
           type="button"
           variant="outline"
-          onClick={(e) => {
-            e.preventDefault();
-            document.getElementById('image-upload')?.click();
-          }}
+          onClick={() => setShowMediaLibrary(true)}
           disabled={isUploading}
         >
           <ImagePlus className="w-4 h-4 mr-2" />
           {isUploading ? 'Uploading...' : 'Add Images'}
         </Button>
-        <input
-          id="image-upload"
-          type="file"
-          multiple
-          accept="image/*"
-          className="hidden"
-          onChange={handleFileInputChange}
-          disabled={isUploading}
-        />
       </div>
 
       <DndContext
@@ -153,6 +162,12 @@ export function ProductImageUpload({ productId, images, mainImageUrl, onImagesUp
           </div>
         </SortableContext>
       </DndContext>
+
+      <MediaLibrary
+        open={showMediaLibrary}
+        onOpenChange={setShowMediaLibrary}
+        onSelect={handleMediaLibrarySelect}
+      />
     </div>
   );
 }
