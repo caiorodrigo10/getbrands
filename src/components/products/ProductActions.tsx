@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import NoPointsDialog from "@/components/dialogs/NoPointsDialog";
 import ProjectSelectionDialog from "@/components/dialogs/ProjectSelectionDialog";
 
 interface ProductActionsProps {
@@ -17,7 +16,6 @@ interface ProductActionsProps {
 
 export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [showNoPointsDialog, setShowNoPointsDialog] = useState(false);
   const [showProjectDialog, setShowProjectDialog] = useState(false);
   const [projects, setProjects] = useState<any[]>([]);
   const { addItem } = useCart();
@@ -71,17 +69,11 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
       return;
     }
 
-    // Filter projects that have enough available points (1000 or more)
-    const availableProjects = userProjects?.filter(project => {
-      const remainingPoints = project.points - (project.points_used || 0);
-      return remainingPoints >= 1000;
-    }) || [];
-
-    if (availableProjects.length === 0) {
-      setShowNoPointsDialog(true);
-    } else {
-      setProjects(availableProjects);
+    if (userProjects?.length) {
+      setProjects(userProjects);
       setShowProjectDialog(true);
+    } else {
+      navigate("/checkout/points");
     }
   };
 
@@ -169,11 +161,6 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
       >
         Select Product
       </Button>
-
-      <NoPointsDialog 
-        open={showNoPointsDialog} 
-        onOpenChange={setShowNoPointsDialog} 
-      />
 
       {product && (
         <ProjectSelectionDialog 
