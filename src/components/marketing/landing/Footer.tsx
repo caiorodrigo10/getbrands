@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   return (
@@ -23,11 +24,18 @@ export const Footer = () => {
           </div>
           
           <div>
-            <h3 className="font-bold text-lg mb-4">Resources</h3>
+            <h3 className="font-bold text-lg mb-4">Legal</h3>
             <ul className="space-y-2 text-gray-400">
-              <li>Documentation</li>
-              <li>Pricing</li>
-              <li>Blog</li>
+              <li>
+                <Link to="/terms" className="hover:text-white transition-colors">
+                  Termos e Condições
+                </Link>
+              </li>
+              <li>
+                <Link to="/policies" className="hover:text-white transition-colors">
+                  Política de Privacidade
+                </Link>
+              </li>
             </ul>
           </div>
           
