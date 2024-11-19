@@ -21,8 +21,8 @@ export const ProductLightbox = ({
 }: ProductLightboxProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] p-0">
-        <div className="relative flex items-center justify-center min-h-[60vh]">
+      <DialogContent className="max-w-4xl p-0 bg-transparent border-none shadow-none">
+        <div className="relative flex items-center justify-center min-h-[70vh]">
           <Button
             variant="ghost"
             size="icon"
@@ -41,11 +41,13 @@ export const ProductLightbox = ({
             <ChevronLeft className="h-8 w-8" />
           </Button>
 
-          <img
-            src={selectedImage}
-            alt={productName}
-            className="max-h-[70vh] w-auto object-contain p-4"
-          />
+          <div className="bg-white rounded-lg p-8 max-h-[70vh] w-auto">
+            <img
+              src={selectedImage}
+              alt={productName}
+              className="max-h-[60vh] w-auto object-contain"
+            />
+          </div>
 
           <Button
             variant="ghost"
