@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { PACK_LABELS } from "@/types/project";
+import { Progress } from "@/components/ui/progress";
 
 interface ProjectPointsCardProps {
   project: {
@@ -56,16 +57,30 @@ export const ProjectPointsCard = ({ project }: ProjectPointsCardProps) => {
     }
   };
 
+  const availablePoints = project.points - (project.points_used || 0);
+  const progressPercentage = ((project.points_used || 0) / project.points) * 100;
+
   return (
     <Card className="p-4">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-lg font-medium">Project Points</h3>
-          <p className="text-3xl font-bold mt-1">{project.points}</p>
-          <p className="text-sm text-muted-foreground">
-            {project.points_used || 0} points used
-          </p>
-          <div className="mt-2">
+          <div className="mt-4 space-y-2">
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>Total Points:</span>
+              <span className="font-medium text-foreground">{project.points}</span>
+            </div>
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>Points Used:</span>
+              <span className="font-medium text-foreground">{project.points_used || 0}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Available Points:</span>
+              <span className="font-medium text-primary">{availablePoints}</span>
+            </div>
+            <Progress value={progressPercentage} className="h-2 mt-2" />
+          </div>
+          <div className="mt-4">
             <Badge className="bg-purple-500/10 text-purple-500">
               {PACK_LABELS[project.pack_type]}
             </Badge>
