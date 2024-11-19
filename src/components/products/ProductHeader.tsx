@@ -1,14 +1,14 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Product } from "@/types/product";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductActions } from "./ProductActions";
 import { ProductBenefits } from "./ProductBenefits";
 import { ProductCalculator } from "./ProductCalculator";
+import { ProductImages } from "./ProductImages";
+import { ProductLightbox } from "./ProductLightbox";
 
 interface ProductHeaderProps {
   product: Product;
@@ -31,10 +31,8 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
 
       if (error) throw error;
       
-      // Filter out any images that don't exist in our media library
       const validImages = data?.filter(img => img.image_url?.startsWith('https://'));
       
-      // If we have a primary image, set it as selected
       const primaryImage = validImages?.find(img => img.is_primary)?.image_url;
       if (primaryImage) {
         setSelectedImage(primaryImage);
@@ -49,7 +47,6 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
     setCurrentImageIndex(index);
   };
 
-  // Create an array of unique images, including the main product image if it exists
   const uniqueImages = [
     ...(product.image_url ? [{ image_url: product.image_url, position: -1 }] : []),
     ...(productImages || [])
@@ -76,88 +73,22 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
       <div className="space-y-6">
-        <div className="relative bg-white rounded-lg overflow-hidden">
-          {product.is_new && (
-            <Badge className="absolute top-4 left-4 bg-primary">NEW</Badge>
-          )}
-          {product.is_tiktok && (
-            <Badge className="absolute top-4 right-4 bg-pink-600">SELL ON TIKTOK</Badge>
-          )}
-          <img
-            src={selectedImage}
-            alt={product.name}
-            className="w-full aspect-square object-contain p-4 cursor-zoom-in"
-            onClick={() => setLightboxOpen(true)}
-            onError={(e) => {
-              const img = e.target as HTMLImageElement;
-              img.src = '/placeholder.svg';
-            }}
-          />
-        </div>
-        {uniqueImages.length > 1 && (
-          <div className="grid grid-cols-4 gap-4">
-            {uniqueImages.map((image, index) => (
-              <button
-                key={`${image.image_url}-${index}`}
-                onClick={() => handleThumbnailClick(image.image_url, index)}
-                className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 ${
-                  selectedImage === image.image_url 
-                    ? 'border-primary' 
-                    : 'border-transparent hover:border-primary/50'
-                }`}
-              >
-                <img
-                  src={image.image_url}
-                  alt={`${product.name} - View ${index + 1}`}
-                  className="w-full h-full object-contain p-2 bg-white"
-                  onError={(e) => {
-                    const img = e.target as HTMLImageElement;
-                    img.src = '/placeholder.svg';
-                  }}
-                />
-              </button>
-            ))}
-          </div>
-        )}
+        <ProductImages
+          images={uniqueImages}
+          selectedImage={selectedImage}
+          onImageSelect={handleThumbnailClick}
+          productName={product.name}
+          onZoomClick={() => setLightboxOpen(true)}
+        />
 
-        <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-          <DialogContent className="max-w-[90vw] h-[90vh] p-0">
-            <div className="relative w-full h-full flex items-center justify-center bg-black/95">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute top-4 right-4 text-white hover:bg-white/20"
-                onClick={() => setLightboxOpen(false)}
-              >
-                <X className="h-6 w-6" />
-              </Button>
-              
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20"
-                onClick={handlePreviousImage}
-              >
-                <ChevronLeft className="h-8 w-8" />
-              </Button>
-
-              <img
-                src={selectedImage}
-                alt={product.name}
-                className="max-h-full max-w-full object-contain p-4"
-              />
-
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20"
-                onClick={handleNextImage}
-              >
-                <ChevronRight className="h-8 w-8" />
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <ProductLightbox
+          open={lightboxOpen}
+          onOpenChange={setLightboxOpen}
+          selectedImage={selectedImage}
+          productName={product.name}
+          onPrevious={handlePreviousImage}
+          onNext={handleNextImage}
+        />
       </div>
 
       <div className="space-y-8">
