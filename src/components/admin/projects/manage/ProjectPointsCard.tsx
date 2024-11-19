@@ -75,15 +75,15 @@ export const ProjectPointsCard = ({ project }: ProjectPointsCardProps) => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handlePointsChange(-100)}
-            disabled={!project.points || project.points < 100}
+            onClick={() => handlePointsChange(-1000)}
+            disabled={!project.points || project.points < 1000}
           >
             <Minus className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handlePointsChange(100)}
+            onClick={() => handlePointsChange(1000)}
           >
             <Plus className="h-4 w-4" />
           </Button>
