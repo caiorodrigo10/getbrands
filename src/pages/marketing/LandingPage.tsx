@@ -5,6 +5,7 @@ import { SuccessMetrics } from "@/components/marketing/landing/SuccessMetrics";
 import { BrandBuildingSection } from "@/components/marketing/landing/BrandBuildingSection";
 import { TestimonialsSection } from "@/components/marketing/landing/TestimonialsSection";
 import { ProductCategoriesSection } from "@/components/marketing/landing/ProductCategoriesSection";
+import { CreativeSection } from "@/components/marketing/landing/CreativeSection";
 import { Footer } from "@/components/marketing/landing/Footer";
 
 const LandingPage = () => {
@@ -14,6 +15,7 @@ const LandingPage = () => {
       <SuccessMetrics />
       <ServicesSection />
       <BrandBuildingSection />
+      <CreativeSection />
       <ProductCategoriesSection />
       <WhyChooseSection />
       <TestimonialsSection />
