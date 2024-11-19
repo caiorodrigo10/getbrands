@@ -18,7 +18,7 @@ export const ServicesSection = () => {
 
             <Button 
               asChild
-              className="bg-[#0bcf88] hover:bg-[#0bcf88]/90 text-white rounded-full px-8 py-6 text-lg h-auto"
+              className="bg-[#F97316] hover:bg-[#F97316]/90 text-white rounded-full px-8 py-6 text-lg h-auto"
             >
               <Link to="/catalog">
                 Explore products
@@ -26,12 +26,7 @@ export const ServicesSection = () => {
             </Button>
           </div>
 
-          <div className="relative">
-            <img
-              src="/lovable-uploads/53f55bfd-bb48-4745-83ff-61b351124a58.png"
-              alt="Private label products showcase"
-              className="w-full rounded-2xl shadow-xl"
-            />
+          <div className="relative aspect-square bg-gray-200 rounded-2xl">
             <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent rounded-2xl" />
           </div>
         </div>
