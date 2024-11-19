@@ -15,7 +15,7 @@ interface ProductActionsProps {
   onSelectProduct?: () => void;
 }
 
-export const ProductActions = ({ product }: ProductActionsProps) => {
+export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showNoPointsDialog, setShowNoPointsDialog] = useState(false);
   const [showProjectDialog, setShowProjectDialog] = useState(false);
@@ -113,7 +113,6 @@ export const ProductActions = ({ product }: ProductActionsProps) => {
           onOpenChange={setShowProjectDialog}
           projects={projects}
           onConfirm={(projectId) => {
-            // This function is already implemented in the parent component
             if (onSelectProduct) {
               onSelectProduct();
             }
