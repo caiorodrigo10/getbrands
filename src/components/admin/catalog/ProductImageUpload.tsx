@@ -35,7 +35,7 @@ export function ProductImageUpload({ productId, images, mainImageUrl, onImagesUp
   const allImages = mainImageUrl && !images.some(img => img.image_url === mainImageUrl)
     ? [{ 
         id: 'main-image', 
-        product_id: productId, 
+        product_id: productId || 'temp', 
         image_url: mainImageUrl, 
         position: -1,
         is_primary: true,
@@ -73,16 +73,19 @@ export function ProductImageUpload({ productId, images, mainImageUrl, onImagesUp
         console.error('Storage deletion error:', storageError);
       }
 
-      // Then delete from the database
-      const { error: deleteError } = await supabase
-        .from('product_images')
-        .delete()
-        .eq('id', imageId);
+      // Only delete from database if we have a valid product ID
+      if (productId) {
+        const { error: deleteError } = await supabase
+          .from('product_images')
+          .delete()
+          .eq('id', imageId);
 
-      if (deleteError) throw deleteError;
+        if (deleteError) throw deleteError;
 
-      // If we successfully deleted the image, update the UI
-      queryClient.invalidateQueries({ queryKey: ['product-images', productId] });
+        // If we successfully deleted the image, update the UI
+        queryClient.invalidateQueries({ queryKey: ['product-images', productId] });
+      }
+      
       onImagesUpdate();
 
       toast({

@@ -10,34 +10,37 @@ export const useImageUpload = (productId: string, onImagesUpdate: () => void) =>
     event.preventDefault();
     const files = event.target.files;
     
-    // Validate product ID and files
-    if (!productId || !files || files.length === 0) {
+    if (!files || files.length === 0) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: !productId ? "Invalid product ID" : "No files selected",
+        description: "No files selected",
       });
       return;
     }
 
     setIsUploading(true);
     try {
-      // Check if there's already a primary image
-      const { data: existingImages, error: fetchError } = await supabase
-        .from('product_images')
-        .select('is_primary')
-        .eq('product_id', productId);
+      let hasPrimaryImage = false;
+      
+      // Only check for existing primary image if we have a product ID
+      if (productId) {
+        const { data: existingImages, error: fetchError } = await supabase
+          .from('product_images')
+          .select('is_primary')
+          .eq('product_id', productId);
 
-      if (fetchError) {
-        throw fetchError;
+        if (fetchError) {
+          throw fetchError;
+        }
+
+        hasPrimaryImage = existingImages?.some(img => img.is_primary) || false;
       }
-
-      const hasPrimaryImage = existingImages?.some(img => img.is_primary);
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const fileExt = file.name.split('.').pop();
-        const fileName = `${productId}/${crypto.randomUUID()}.${fileExt}`;
+        const fileName = `${productId || 'temp'}/${crypto.randomUUID()}.${fileExt}`;
 
         // Upload to storage
         const { error: uploadError, data: uploadData } = await supabase.storage
@@ -57,19 +60,21 @@ export const useImageUpload = (productId: string, onImagesUpdate: () => void) =>
           .from('product-images')
           .getPublicUrl(fileName);
 
-        // Insert into database
-        const { error: dbError } = await supabase
-          .from('product_images')
-          .insert({
-            product_id: productId,
-            image_url: publicUrl,
-            position: i,
-            is_primary: !hasPrimaryImage && i === 0
-          });
+        // Only insert into database if we have a valid product ID
+        if (productId) {
+          const { error: dbError } = await supabase
+            .from('product_images')
+            .insert({
+              product_id: productId,
+              image_url: publicUrl,
+              position: i,
+              is_primary: !hasPrimaryImage && i === 0
+            });
 
-        if (dbError) {
-          console.error('Database error:', dbError);
-          continue;
+          if (dbError) {
+            console.error('Database error:', dbError);
+            continue;
+          }
         }
       }
 
