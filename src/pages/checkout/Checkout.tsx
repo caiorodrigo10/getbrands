@@ -35,10 +35,10 @@ const Checkout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <NavigationMenu />
-      <main className="flex-1">
-        <div className="max-w-3xl mx-auto px-4 py-8">
+      <main className="flex-1 flex items-start justify-center w-full py-8">
+        <div className="w-full max-w-3xl mx-auto px-4">
           <div className="mb-8">
             <Button
               variant="ghost"
