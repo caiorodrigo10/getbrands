@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Upload } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import AdminCatalogTable from "@/components/admin/catalog/AdminCatalogTable";
+import { ImportProductsDialog } from "@/components/admin/bulk-actions/ImportProductsDialog";
 import { 
   Pagination, 
   PaginationContent, 
@@ -15,7 +16,6 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from "@/components/ui/pagination";
-import { useEffect } from "react";
 
 const ITEMS_PER_PAGE = 15;
 
@@ -23,9 +23,8 @@ const AdminCatalog = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const queryClient = useQueryClient();
+  const [showImportDialog, setShowImportDialog] = useState(false);
 
-  // Check if user is authenticated and is admin
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -111,10 +110,19 @@ const AdminCatalog = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <Button onClick={() => navigate("/admin/catalog/new")}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Product
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => setShowImportDialog(true)}
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Import Products
+            </Button>
+            <Button onClick={() => navigate("/admin/catalog/new")}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Product
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -156,6 +164,11 @@ const AdminCatalog = () => {
           </Pagination>
         </div>
       )}
+
+      <ImportProductsDialog 
+        open={showImportDialog} 
+        onOpenChange={setShowImportDialog}
+      />
     </div>
   );
 };

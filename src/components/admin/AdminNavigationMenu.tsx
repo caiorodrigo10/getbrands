@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Menu, LayoutDashboard, Users, FolderGit2, Grid3X3, Package2, FileText } from "lucide-react";
+import { Menu, LayoutDashboard, Users, FolderGit2, Grid3X3, Package2, FileText, Database } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import UserMenu from "@/components/UserMenu";
 
@@ -10,6 +10,7 @@ export const AdminNavigationMenu = () => {
     { label: "Dashboard", path: "/admin", icon: LayoutDashboard },
     { label: "Projects", path: "/admin/projects", icon: FolderGit2 },
     { label: "CRM", path: "/admin/crm", icon: Users },
+    { label: "Bulk Actions", path: "/admin/bulk-actions", icon: Database },
     { label: "Catalog", path: "/admin/catalog", icon: Grid3X3 },
     { label: "Orders", path: "/admin/orders", icon: Package2 },
     { label: "Reports", path: "/admin/reports", icon: FileText },
