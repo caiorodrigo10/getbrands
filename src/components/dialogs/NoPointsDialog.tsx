@@ -15,9 +15,9 @@ const NoPointsDialog = ({ open, onOpenChange }: NoPointsDialogProps) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>No Available Points</DialogTitle>
+          <DialogTitle>Insufficient Points</DialogTitle>
           <DialogDescription className="pt-2">
-            You don't have any points available. Schedule a call with our team to learn about our Packs and start creating amazing products!
+            You don't have enough points available in any active project. Each product selection requires 1000 points. Please schedule a call with our team to learn about our Packs or create a new project!
           </DialogDescription>
         </DialogHeader>
         <div className="mt-6 flex justify-end gap-3">

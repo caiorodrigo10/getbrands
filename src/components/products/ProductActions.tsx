@@ -92,7 +92,7 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
     // For admin users, show all projects with points
     const availableProjects = userProjects?.filter(project => {
       const remainingPoints = project.points - (project.points_used || 0);
-      return isAdmin || remainingPoints >= 1000;
+      return remainingPoints >= 1000; // Remove isAdmin check since we want to verify points for all users
     }) || [];
 
     if (availableProjects.length === 0) {
