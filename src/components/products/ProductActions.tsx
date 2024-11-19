@@ -6,7 +6,6 @@ import { Product } from "@/types/product";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 import NoPointsDialog from "@/components/dialogs/NoPointsDialog";
 import ProjectSelectionDialog from "@/components/dialogs/ProjectSelectionDialog";
 
@@ -89,10 +88,10 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
     // Check if user is admin
     const isAdmin = profile?.role === 'admin';
 
-    // For admin users, show all projects with points
+    // Filter projects that have enough available points (1000 or more)
     const availableProjects = userProjects?.filter(project => {
       const remainingPoints = project.points - (project.points_used || 0);
-      return remainingPoints >= 1000; // Remove isAdmin check since we want to verify points for all users
+      return remainingPoints >= 1000;
     }) || [];
 
     if (availableProjects.length === 0) {
