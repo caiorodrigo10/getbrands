@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Product } from "@/types/product";
+import { Product, ProductImage } from "@/types/product";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,8 +47,16 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
     setCurrentImageIndex(index);
   };
 
-  const uniqueImages = [
-    ...(product.image_url ? [{ image_url: product.image_url, position: -1 }] : []),
+  const uniqueImages: ProductImage[] = [
+    ...(product.image_url ? [{
+      id: 'main',
+      product_id: product.id,
+      image_url: product.image_url,
+      position: -1,
+      is_primary: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }] : []),
     ...(productImages || [])
   ].filter((img, index, self) => 
     index === self.findIndex((t) => t.image_url === img.image_url)

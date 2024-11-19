@@ -22,7 +22,7 @@ export const ProductLightbox = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[80vh] p-0">
-        <div className="relative w-full h-full flex items-center justify-center bg-black/95">
+        <div className="relative flex items-center justify-center min-h-[60vh]">
           <Button
             variant="ghost"
             size="icon"
