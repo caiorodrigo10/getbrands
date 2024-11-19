@@ -1,49 +1,53 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { BrandLogosSection } from "./BrandLogosSection";
 
 export const HeroSection = () => {
   return (
-    <section className="relative bg-white pt-20 pb-16 lg:pt-32">
-      {/* Login Button */}
-      <div className="absolute top-4 right-4 z-20">
-        <Link to="/login">
-          <Button 
-            variant="ghost" 
-            size="sm"
-            className="text-gray-700 hover:bg-gray-100 text-sm font-medium px-4"
-          >
-            Login
-          </Button>
-        </Link>
-      </div>
-
-      <div className="container mx-auto px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <img
-            src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png"
-            alt="GetBrands Logo"
-            className="h-12 mx-auto mb-8"
-          />
-          
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Create your own private label on demand
-          </h1>
-          
-          <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-            We specialize in cosmetics, supplements, and coffee. From idea to launch, 
-            we build your brand from the ground up.
-          </p>
-
-          <Button 
-            size="lg"
-            className="bg-[#F16529] hover:bg-[#F16529]/90 text-white font-semibold px-8"
-          >
-            Start Now
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+    <>
+      <section className="relative bg-white pt-20 pb-16 lg:pt-32">
+        {/* Login Button */}
+        <div className="absolute top-4 right-4 z-20">
+          <Link to="/login">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="text-gray-700 hover:bg-gray-100 text-sm font-medium px-4"
+            >
+              Login
+            </Button>
+          </Link>
         </div>
-      </div>
-    </section>
+
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <img
+              src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png"
+              alt="GetBrands Logo"
+              className="h-12 mx-auto mb-8"
+            />
+            
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              Create your own private label on demand
+            </h1>
+            
+            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+              We specialize in cosmetics, supplements, and coffee. From idea to launch, 
+              we build your brand from the ground up.
+            </p>
+
+            <Button 
+              size="lg"
+              className="bg-[#F16529] hover:bg-[#F16529]/90 text-white font-semibold px-8"
+            >
+              Start Now
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+      </section>
+      <BrandLogosSection />
+    </>
   );
 };
