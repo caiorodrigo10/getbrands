@@ -28,12 +28,12 @@ export const Footer = () => {
             <ul className="space-y-2 text-gray-400">
               <li>
                 <Link to="/terms" className="hover:text-white transition-colors">
-                  Termos e Condições
+                  Terms and Conditions
                 </Link>
               </li>
               <li>
                 <Link to="/policies" className="hover:text-white transition-colors">
-                  Política de Privacidade
+                  Privacy Policy
                 </Link>
               </li>
             </ul>

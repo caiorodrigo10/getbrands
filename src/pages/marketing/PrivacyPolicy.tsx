@@ -4,52 +4,52 @@ const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-white">
       <main className="container mx-auto px-4 py-16">
-        <h1 className="text-4xl font-bold mb-8">Política de Privacidade</h1>
+        <h1 className="text-4xl font-bold mb-8">Privacy Policy</h1>
         
         <div className="prose max-w-none">
           <p className="text-lg mb-6">
-            Última atualização: {new Date().toLocaleDateString('pt-BR')}
+            Last updated: {new Date().toLocaleDateString('en-US')}
           </p>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">1. Introdução</h2>
+            <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
             <p>
-              A GetBrands está comprometida em proteger sua privacidade. Esta Política de Privacidade 
-              explica como coletamos, usamos, divulgamos e protegemos suas informações pessoais.
+              GetBrands is committed to protecting your privacy. This Privacy Policy 
+              explains how we collect, use, disclose, and protect your personal information.
             </p>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">2. Coleta de Informações</h2>
+            <h2 className="text-2xl font-semibold mb-4">2. Information Collection</h2>
             <p>
-              Coletamos informações que você nos fornece diretamente, incluindo:
+              We collect information that you provide directly to us, including:
             </p>
             <ul className="list-disc pl-6 mt-2">
-              <li>Nome e informações de contato</li>
-              <li>Informações de pagamento</li>
-              <li>Endereço de entrega</li>
-              <li>Preferências de produtos</li>
+              <li>Name and contact information</li>
+              <li>Payment information</li>
+              <li>Shipping address</li>
+              <li>Product preferences</li>
             </ul>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">3. Uso das Informações</h2>
+            <h2 className="text-2xl font-semibold mb-4">3. Use of Information</h2>
             <p>
-              Utilizamos suas informações para:
+              We use your information to:
             </p>
             <ul className="list-disc pl-6 mt-2">
-              <li>Processar seus pedidos</li>
-              <li>Melhorar nossos serviços</li>
-              <li>Comunicar-nos com você sobre produtos e serviços</li>
-              <li>Cumprir obrigações legais</li>
+              <li>Process your orders</li>
+              <li>Improve our services</li>
+              <li>Communicate with you about products and services</li>
+              <li>Comply with legal obligations</li>
             </ul>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">4. Proteção de Dados</h2>
+            <h2 className="text-2xl font-semibold mb-4">4. Data Protection</h2>
             <p>
-              Implementamos medidas de segurança apropriadas para proteger suas informações 
-              contra acesso não autorizado, alteração, divulgação ou destruição.
+              We implement appropriate security measures to protect your information 
+              against unauthorized access, alteration, disclosure, or destruction.
             </p>
           </section>
         </div>
