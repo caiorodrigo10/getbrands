@@ -1,82 +1,49 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
-
-interface ExpandableItemProps {
-  title: string;
-  content: string;
-  isExpanded: boolean;
-  onClick: () => void;
-}
-
-const ExpandableItem = ({ title, content, isExpanded, onClick }: ExpandableItemProps) => (
-  <div 
-    className="cursor-pointer border-b border-gray-200 last:border-none"
-    onClick={onClick}
-  >
-    <div className="flex items-center justify-between py-4">
-      <h3 className="text-xl font-semibold">{title}</h3>
-      <ChevronDown 
-        className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} 
-      />
-    </div>
-    <AnimatePresence>
-      {isExpanded && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "auto", opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="pb-4"
-        >
-          <p className="text-gray-600 leading-relaxed">{content}</p>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  </div>
-);
+import { Users, Package, Star, Clock } from "lucide-react";
 
 export const BrandExpandableSection = () => {
-  const [expandedIndex, setExpandedIndex] = useState(0);
-
-  const items = [
+  const metrics = [
     {
-      title: "Create Your Own Brand",
-      content: "Launch your private label brand with our comprehensive support. We guide you through every step, from concept to market, ensuring your brand stands out in the competitive landscape."
+      label: "FAST",
+      value: "5X",
+      description: "Growth for our clients",
+      icon: <Users className="w-8 h-8 text-[#4c1e6c]" />
     },
     {
-      title: "Product Range",
-      content: "Choose from a wide selection of premium products including cosmetics, supplements, and coffee. Our diverse catalog allows you to build a unique product line that resonates with your target market."
+      label: "AFFORDABLE",
+      value: "2/3",
+      description: "Market share achieved",
+      icon: <Package className="w-8 h-8 text-[#4c1e6c]" />
     },
     {
-      title: "Fast-Track Project",
-      content: "Experience rapid brand development with our streamlined process. We've optimized every step to get your products to market quickly without compromising on quality."
+      label: "TRANSPARENT",
+      value: "Unlimited",
+      description: "Product possibilities",
+      icon: <Star className="w-8 h-8 text-[#4c1e6c]" />
     },
     {
-      title: "American Suppliers",
-      content: "Partner with trusted American manufacturers and suppliers. We ensure all products meet the highest quality standards and comply with US regulations."
+      label: "PERFORMANCE",
+      value: "29.5%",
+      description: "Faster launch time",
+      icon: <Clock className="w-8 h-8 text-[#4c1e6c]" />
     }
   ];
 
   return (
-    <section className="py-24 bg-[#fafafa]">
+    <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-6">
-            {items.map((item, index) => (
-              <ExpandableItem
-                key={index}
-                title={item.title}
-                content={item.content}
-                isExpanded={index === expandedIndex}
-                onClick={() => setExpandedIndex(index)}
-              />
-            ))}
-          </div>
-          
-          <div className="bg-gray-100 rounded-lg aspect-square flex items-center justify-center">
-            <p className="text-gray-400">Image placeholder</p>
-          </div>
+        <h2 className="text-4xl md:text-5xl font-bold text-center mb-16">
+          The results speak<br />for themselves
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          {metrics.map((metric, index) => (
+            <div key={index} className="text-center">
+              <p className="text-[#4c1e6c] font-semibold mb-4">{metric.label}</p>
+              <div className="mb-4 flex justify-center">{metric.icon}</div>
+              <div className="text-5xl font-bold mb-3">{metric.value}</div>
+              <div className="text-gray-600 text-lg">{metric.description}</div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
