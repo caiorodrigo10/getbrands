@@ -22,9 +22,9 @@ export const AdminNavigationMenu = () => {
         <div className="flex flex-col h-full">
           <div className="p-6">
             <img 
-              src="https://content.app-sources.com/s/97257455971736356/uploads/Logos/Logotipo_4-7282325.png?format=webp"
+              src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png"
               alt="Mainer Logo"
-              className="h-8 w-auto"
+              className="h-12 w-auto"
             />
             <div className="mt-2 text-sm text-gray-600">
               Admin Panel
@@ -63,9 +63,9 @@ export const AdminNavigationMenu = () => {
           <div className="flex h-16 items-center justify-between gap-4">
             <div className="flex items-center gap-6">
               <img 
-                src="https://content.app-sources.com/s/97257455971736356/uploads/Logos/Logotipo_4-7282325.png?format=webp"
+                src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png"
                 alt="Mainer Logo"
-                className="h-8 w-auto"
+                className="h-12 w-auto"
               />
               <div className="text-sm text-gray-600">
                 Admin Panel

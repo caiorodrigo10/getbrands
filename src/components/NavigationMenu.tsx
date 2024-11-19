@@ -106,7 +106,7 @@ export const NavigationMenu = () => {
             <img 
               src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png"
               alt="Logo"
-              className="h-8 w-auto"
+              className="h-12 w-auto"
             />
           </div>
           
@@ -130,7 +130,7 @@ export const NavigationMenu = () => {
               <img 
                 src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png"
                 alt="Logo"
-                className="h-8 w-auto"
+                className="h-12 w-auto"
               />
             </div>
 
@@ -143,7 +143,7 @@ export const NavigationMenu = () => {
                   <div className="p-4 border-b border-gray-200">
                     <UserMenu isMobile={true} />
                   </div>
-                  <nav className="flex-1 p-4">
+                  <nav className="flex flex-col p-4">
                     {menuItems.map(item => renderMenuItem(item, true))}
                   </nav>
                   <ProjectPointsInfo />
