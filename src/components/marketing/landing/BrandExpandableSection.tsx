@@ -61,7 +61,7 @@ export const BrandExpandableSection = () => {
   return (
     <section className="py-24 bg-[#fafafa]">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <div className="space-y-6">
             {items.map((item, index) => (
               <ExpandableItem
@@ -74,7 +74,7 @@ export const BrandExpandableSection = () => {
             ))}
           </div>
           
-          <div className="bg-gray-100 rounded-lg aspect-square flex items-center justify-center">
+          <div className="bg-gray-100 rounded-lg aspect-square flex items-center justify-center order-first md:order-last">
             <p className="text-gray-400">Image placeholder</p>
           </div>
         </div>

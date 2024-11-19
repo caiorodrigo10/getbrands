@@ -5,7 +5,7 @@ export const ServicesSection = () => {
   return (
     <section className="py-32 bg-white">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <div className="space-y-8">
             <h2 className="text-4xl font-bold tracking-tight text-gray-900">
               250+ private label products
