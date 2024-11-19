@@ -25,6 +25,21 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  // Fetch user profile to check role
+  const { data: profile } = useQuery({
+    queryKey: ["user-profile", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+      return data;
+    },
+    enabled: !!user,
+  });
+
   const handleRequestSample = async () => {
     setIsLoading(true);
     try {
@@ -71,9 +86,14 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
       return;
     }
 
-    const availableProjects = userProjects?.filter(
-      project => (project.points - (project.points_used || 0)) >= 1000
-    ) || [];
+    // Check if user is admin
+    const isAdmin = profile?.role === 'admin';
+
+    // For admin users, show all projects with points
+    const availableProjects = userProjects?.filter(project => {
+      const remainingPoints = project.points - (project.points_used || 0);
+      return isAdmin || remainingPoints >= 1000;
+    }) || [];
 
     if (availableProjects.length === 0) {
       setShowNoPointsDialog(true);
