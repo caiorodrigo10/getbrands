@@ -971,6 +971,10 @@ export type Database = {
       }
       sample_requests: {
         Row: {
+          billing_address: string | null
+          billing_city: string | null
+          billing_state: string | null
+          billing_zip: string | null
           created_at: string
           first_name: string | null
           id: string
@@ -986,6 +990,10 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          billing_address?: string | null
+          billing_city?: string | null
+          billing_state?: string | null
+          billing_zip?: string | null
           created_at?: string
           first_name?: string | null
           id?: string
@@ -1001,6 +1009,10 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          billing_address?: string | null
+          billing_city?: string | null
+          billing_state?: string | null
+          billing_zip?: string | null
           created_at?: string
           first_name?: string | null
           id?: string
