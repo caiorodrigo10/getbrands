@@ -43,14 +43,6 @@ export const HeroSection = () => {
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
-
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-3 gap-8">
-          <img 
-            src="https://images.unsplash.com/photo-1556229162-5c63ed9c4efb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80" 
-            alt="Product Showcase"
-            className="w-full rounded-lg shadow-lg"
-          />
-        </div>
       </div>
     </section>
   );
