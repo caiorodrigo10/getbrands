@@ -68,24 +68,30 @@ export const CreativeSection = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="w-full aspect-square relative">
-              <div style={{
-                width: "100%",
-                height: "0px",
-                position: "relative",
-                paddingBottom: "100%"
-              }}>
-                <iframe 
-                  src="https://streamable.com/e/p4l1fu?quality=highest" 
-                  frameBorder="0" 
-                  width="100%" 
-                  height="100%" 
-                  allowFullScreen 
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    position: "absolute"
-                  }}
-                />
+              <div className="w-full aspect-square relative">
+                <div className="absolute inset-0" style={{
+                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                  overflow: "hidden",
+                  background: "white",
+                  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)"
+                }}>
+                  <iframe 
+                    src="https://streamable.com/e/p4l1fu?quality=highest&autoplay=1&controls=0" 
+                    frameBorder="0" 
+                    width="100%" 
+                    height="100%" 
+                    allowFullScreen 
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%) scale(1.2)",
+                      pointerEvents: "none"
+                    }}
+                  />
+                </div>
               </div>
             </div>
 
