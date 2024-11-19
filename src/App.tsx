@@ -8,6 +8,9 @@ import { CartProvider } from "./contexts/CartContext";
 import { AppRoutes } from "./routes/AppRoutes";
 import { useEffect } from "react";
 import { trackPage } from "@/lib/analytics";
+import { createClient } from '@supabase/supabase-js';
+import { SessionContextProvider } from '@supabase/auth-helpers-react';
+import { supabase } from "@/integrations/supabase/client";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,19 +31,21 @@ const App = () => {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <CartProvider>
-            <TooltipProvider>
-              <AppRoutes />
-              <Toaster />
-              <Sonner />
-            </TooltipProvider>
-          </CartProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <SessionContextProvider supabaseClient={supabase}>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AuthProvider>
+            <CartProvider>
+              <TooltipProvider>
+                <AppRoutes />
+                <Toaster />
+                <Sonner />
+              </TooltipProvider>
+            </CartProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </SessionContextProvider>
   );
 };
 
