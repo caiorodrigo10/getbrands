@@ -31,6 +31,7 @@ interface ProjectPointsCardProps {
 
 export const ProjectPointsCard = ({ project }: ProjectPointsCardProps) => {
   const [showClientInfo, setShowClientInfo] = useState(true);
+  const [showProjectPoints, setShowProjectPoints] = useState(true);
   const queryClient = useQueryClient();
 
   const handlePointsChange = async (amount: number) => {
@@ -111,8 +112,19 @@ export const ProjectPointsCard = ({ project }: ProjectPointsCardProps) => {
         {/* Project Points Section */}
         <div className="pl-0 md:pl-6">
           <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium">Project Points</h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowProjectPoints(!showProjectPoints)}
+              className="flex items-center gap-2"
+            >
+              {showProjectPoints ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          </div>
+
+          {showProjectPoints && (
             <div className="w-full">
-              <h3 className="text-lg font-medium mb-4">Project Points</h3>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Total Points:</span>
@@ -133,25 +145,25 @@ export const ProjectPointsCard = ({ project }: ProjectPointsCardProps) => {
                   {PACK_LABELS[project.pack_type]}
                 </Badge>
               </div>
+              <div className="flex items-center gap-2 mt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePointsChange(-1000)}
+                  disabled={!project.points || project.points < 1000}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePointsChange(1000)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-            <div className="flex items-center gap-2 ml-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePointsChange(-1000)}
-                disabled={!project.points || project.points < 1000}
-              >
-                <Minus className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePointsChange(1000)}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </Card>
