@@ -33,6 +33,11 @@ export const AddressFormSection = ({
     setIsAddressSaved(true);
   };
 
+  React.useEffect(() => {
+    // Pre-fill useSameForBilling as true by default
+    form.setValue("useSameForBilling", true);
+  }, [form]);
+
   return (
     <Form {...form}>
       <form className="space-y-6">
@@ -46,6 +51,15 @@ export const AddressFormSection = ({
             checked={useSameForBilling}
             onCheckedChange={(checked) => {
               form.setValue("useSameForBilling", checked as boolean);
+              if (checked) {
+                // Copy shipping address to billing address
+                const values = form.getValues();
+                form.setValue("billingAddress1", values.address1);
+                form.setValue("billingAddress2", values.address2);
+                form.setValue("billingCity", values.city);
+                form.setValue("billingState", values.state);
+                form.setValue("billingZipCode", values.zipCode);
+              }
               if (!checked) {
                 setIsAddressSaved(false);
               }
@@ -58,6 +72,22 @@ export const AddressFormSection = ({
             Use same address for billing
           </label>
         </div>
+
+        {!useSameForBilling && (
+          <div className="mt-6 border-t pt-6">
+            <h3 className="text-lg font-medium mb-4">Billing Address</h3>
+            <AddressFields
+              form={form}
+              formFields={{
+                address1: "billingAddress1",
+                address2: "billingAddress2",
+                city: "billingCity",
+                state: "billingState",
+                zipCode: "billingZipCode",
+              }}
+            />
+          </div>
+        )}
 
         <ShippingButtons
           isAddressSaved={isAddressSaved}

@@ -58,6 +58,12 @@ export const ShippingFormContainer = ({
         city: localStorage.getItem('shipping_city') || "",
         state: localStorage.getItem('shipping_state') || "",
         zipCode: localStorage.getItem('shipping_zip') || "",
+        useSameForBilling: true,
+        billingAddress1: localStorage.getItem('shipping_address') || "",
+        billingAddress2: localStorage.getItem('shipping_address2') || "",
+        billingCity: localStorage.getItem('shipping_city') || "",
+        billingState: localStorage.getItem('shipping_state') || "",
+        billingZipCode: localStorage.getItem('shipping_zip') || "",
       };
 
       // Only set form values if they're not already set
@@ -85,6 +91,14 @@ export const ShippingFormContainer = ({
       localStorage.setItem('shipping_state', values.state);
       localStorage.setItem('shipping_zip', values.zipCode);
 
+      if (!values.useSameForBilling) {
+        localStorage.setItem('billing_address', values.billingAddress1);
+        localStorage.setItem('billing_address2', values.billingAddress2 || '');
+        localStorage.setItem('billing_city', values.billingCity || '');
+        localStorage.setItem('billing_state', values.billingState || '');
+        localStorage.setItem('billing_zip', values.billingZipCode || '');
+      }
+
       // Save to addresses table without marking as used_in_order
       const { error } = await supabase
         .from('addresses')
@@ -99,7 +113,7 @@ export const ShippingFormContainer = ({
           zip_code: values.zipCode,
           type: 'shipping',
           phone: values.phone,
-          used_in_order: false // This is the key change
+          used_in_order: false
         });
 
       if (error) throw error;
