@@ -37,8 +37,8 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <NavigationMenu />
-      <main className="flex-1 flex items-start justify-center w-full py-8">
-        <div className="w-full max-w-3xl mx-auto px-4">
+      <main className="flex-1 container py-8 px-4 md:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto">
           <div className="mb-8">
             <Button
               variant="ghost"
@@ -50,7 +50,7 @@ const Checkout = () => {
               Back
             </Button>
             
-            <div className="space-y-4 max-w-2xl mx-auto">
+            <div className="space-y-4">
               <Progress value={(currentStep / (steps.length - 1)) * 100} />
               <div className="flex justify-between">
                 {steps.map((step, index) => {
@@ -63,7 +63,7 @@ const Checkout = () => {
                       }`}
                     >
                       <Icon className="h-5 w-5" />
-                      <span className="text-sm font-medium">
+                      <span className="text-sm font-medium hidden sm:inline">
                         {step.name}
                       </span>
                     </div>
@@ -73,12 +73,14 @@ const Checkout = () => {
             </div>
           </div>
 
-          <Routes>
-            <Route index element={<Navigate to="/checkout/confirmation" replace />} />
-            <Route path="confirmation" element={<PedidoAmostra />} />
-            <Route path="shipping" element={<Shipping />} />
-            <Route path="payment" element={<Payment />} />
-          </Routes>
+          <div className="bg-card rounded-lg border border-border/50 shadow-sm p-4 md:p-6 lg:p-8">
+            <Routes>
+              <Route index element={<Navigate to="/checkout/confirmation" replace />} />
+              <Route path="confirmation" element={<PedidoAmostra />} />
+              <Route path="shipping" element={<Shipping />} />
+              <Route path="payment" element={<Payment />} />
+            </Routes>
+          </div>
         </div>
       </main>
     </div>
