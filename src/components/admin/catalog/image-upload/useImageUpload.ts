@@ -9,15 +9,28 @@ export const useImageUpload = (productId: string, onImagesUpdate: () => void) =>
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
     const files = event.target.files;
-    if (!files || files.length === 0) return;
+    
+    // Validate product ID and files
+    if (!productId || !files || files.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: !productId ? "Invalid product ID" : "No files selected",
+      });
+      return;
+    }
 
     setIsUploading(true);
     try {
       // Check if there's already a primary image
-      const { data: existingImages } = await supabase
+      const { data: existingImages, error: fetchError } = await supabase
         .from('product_images')
         .select('is_primary')
         .eq('product_id', productId);
+
+      if (fetchError) {
+        throw fetchError;
+      }
 
       const hasPrimaryImage = existingImages?.some(img => img.is_primary);
 
