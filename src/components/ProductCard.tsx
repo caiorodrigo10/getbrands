@@ -18,6 +18,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const { data: productImages } = useQuery({
     queryKey: ['product-images', product.id],
     queryFn: async () => {
+      // Only fetch if we have a valid product ID
+      if (!product.id) return [];
+      
       const { data, error } = await supabase
         .from('product_images')
         .select('*')
@@ -25,8 +28,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
         .order('position');
 
       if (error) throw error;
-      return data;
+      return data || [];
     },
+    enabled: Boolean(product.id), // Only run query if product.id exists
   });
 
   const handleCardClick = () => {

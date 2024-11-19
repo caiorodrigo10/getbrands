@@ -41,10 +41,11 @@ export function ProductEditForm({ product, onSubmit, onCancel }: ProductEditForm
     },
   });
 
-  // Only fetch images if we have a valid product ID (not empty string)
+  // Only fetch images if we have a valid product ID
   const { data: productImages = [], refetch: refetchImages } = useQuery({
     queryKey: ['product-images', product.id],
     queryFn: async () => {
+      // Return empty array for new products (no ID yet)
       if (!product.id) return [];
       
       const { data, error } = await supabase
