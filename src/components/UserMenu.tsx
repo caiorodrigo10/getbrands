@@ -14,7 +14,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, User, ShoppingBag, LayoutDashboard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TotalProjectPoints } from "./user-menu/TotalProjectPoints";
 
 interface UserMenuProps {
   isMobile: boolean;
@@ -132,7 +131,6 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
             <span>Sign Out</span>
           </button>
         </div>
-        <TotalProjectPoints />
       </div>
     );
   }
@@ -198,8 +196,6 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
             <span>Sign Out</span>
           </DropdownMenuItem>
         </div>
-        <DropdownMenuSeparator className="bg-gray-100" />
-        <TotalProjectPoints />
       </DropdownMenuContent>
     </DropdownMenu>
   );
