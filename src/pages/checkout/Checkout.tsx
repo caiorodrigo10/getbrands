@@ -17,6 +17,11 @@ const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Only render checkout if we're in a checkout route
+  if (!location.pathname.startsWith('/checkout')) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   const getCurrentStepIndex = () => {
     return steps.findIndex(step => location.pathname.includes(step.id));
   };
@@ -25,7 +30,7 @@ const Checkout = () => {
 
   const goBack = () => {
     if (currentStep === 0) {
-      navigate("/catalog");
+      navigate("/cart");
     } else {
       const prevStep = steps[currentStep - 1];
       if (prevStep) {
