@@ -79,15 +79,15 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
 
     return (
       <>
-        <Avatar className="h-10 w-10 border border-white/20">
+        <Avatar className="h-10 w-10 border border-gray-200">
           <AvatarImage src={userAvatar} alt={userName} />
           <AvatarFallback className="bg-primary text-primary-foreground">
             {userName ? userName.charAt(0) : "?"}
           </AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
-          <span className="text-sm font-medium text-white">{userName}</span>
-          <span className="text-xs text-white/70">{userEmail}</span>
+          <span className="text-sm font-medium text-black">{userName}</span>
+          <span className="text-xs text-gray-600">{userEmail}</span>
         </div>
       </>
     );
@@ -102,14 +102,14 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
         <div className="flex flex-col space-y-1">
           <Link 
             to="/profile" 
-            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-md"
+            className="flex items-center gap-2 px-3 py-2 text-sm text-black hover:bg-[#f8dafc] rounded-md"
           >
             <User className="h-4 w-4" />
             <span>My Profile</span>
           </Link>
           <Link 
             to="/sample-orders" 
-            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-md"
+            className="flex items-center gap-2 px-3 py-2 text-sm text-black hover:bg-[#f8dafc] rounded-md"
           >
             <ShoppingBag className="h-4 w-4" />
             <span>Orders</span>
@@ -117,7 +117,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           {isAdmin && (
             <button
               onClick={handleAdminNavigation}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-md w-full text-left"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-black hover:bg-[#f8dafc] rounded-md w-full text-left"
             >
               <LayoutDashboard className="h-4 w-4" />
               <span>{isInAdminPanel ? 'User View' : 'Admin Panel'}</span>
@@ -125,7 +125,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           )}
           <button
             onClick={logout}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-gray-800 rounded-md w-full text-left"
+            className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-[#f8dafc] rounded-md w-full text-left"
           >
             <LogOut className="h-4 w-4" />
             <span>Sign Out</span>
@@ -140,7 +140,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
-          className="relative h-auto w-full flex flex-col items-start gap-1 px-3 py-2 hover:bg-white/10"
+          className="relative h-auto w-full flex flex-col items-start gap-1 px-3 py-2 hover:bg-[#f8dafc]"
         >
           <div className="flex items-center gap-3 w-full">
             {renderUserInfo()}
@@ -160,37 +160,37 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <p className="text-sm font-medium text-gray-900">{userName}</p>
-              <p className="text-xs text-gray-500">{userEmail}</p>
+              <p className="text-sm font-medium text-black">{userName}</p>
+              <p className="text-xs text-gray-600">{userEmail}</p>
             </div>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-gray-100" />
         <div className="p-1">
           <Link to="/profile">
-            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md">
-              <User className="h-4 w-4 text-gray-500" />
-              <span>My Profile</span>
+            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#f8dafc] rounded-md">
+              <User className="h-4 w-4 text-black" />
+              <span className="text-black">My Profile</span>
             </DropdownMenuItem>
           </Link>
           <Link to="/sample-orders">
-            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md">
-              <ShoppingBag className="h-4 w-4 text-gray-500" />
-              <span>Orders</span>
+            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#f8dafc] rounded-md">
+              <ShoppingBag className="h-4 w-4 text-black" />
+              <span className="text-black">Orders</span>
             </DropdownMenuItem>
           </Link>
           {isAdmin && (
             <DropdownMenuItem 
               onClick={handleAdminNavigation}
-              className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 rounded-md"
+              className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#f8dafc] rounded-md"
             >
-              <LayoutDashboard className="h-4 w-4 text-gray-500" />
-              <span>{isInAdminPanel ? 'User View' : 'Admin Panel'}</span>
+              <LayoutDashboard className="h-4 w-4 text-black" />
+              <span className="text-black">{isInAdminPanel ? 'User View' : 'Admin Panel'}</span>
             </DropdownMenuItem>
           )}
           <DropdownMenuItem 
             onClick={logout}
-            className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 text-red-600 rounded-md"
+            className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#f8dafc] text-red-600 rounded-md"
           >
             <LogOut className="h-4 w-4" />
             <span>Sign Out</span>

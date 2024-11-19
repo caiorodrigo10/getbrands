@@ -67,8 +67,8 @@ export const NavigationMenu = () => {
     const baseStyles = cn(
       "flex items-center gap-3 px-4 py-2.5 my-1 text-sm rounded-md transition-all duration-200",
       isActive
-        ? "bg-[#f8dafc] text-gray-900 font-medium"
-        : "text-gray-600 hover:bg-[#f8dafc] hover:text-gray-900",
+        ? "bg-[#f8dafc] text-black font-medium"
+        : "text-black hover:bg-[#f8dafc] hover:text-black",
       item.restricted && !hasFullAccess && "opacity-50 cursor-not-allowed"
     );
 
@@ -104,8 +104,8 @@ export const NavigationMenu = () => {
         <div className="flex flex-col h-full">
           <div className="p-6">
             <img 
-              src="https://content.app-sources.com/s/97257455971736356/uploads/Logos/Logotipo_4-7282325.png?format=webp"
-              alt="Mainer Logo"
+              src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png"
+              alt="Logo"
               className="h-8 w-auto"
             />
           </div>
@@ -128,15 +128,15 @@ export const NavigationMenu = () => {
           <div className="flex h-16 items-center justify-between gap-4">
             <div className="flex items-center gap-6">
               <img 
-                src="https://content.app-sources.com/s/97257455971736356/uploads/Logos/Logotipo_4-7282325.png?format=webp"
-                alt="Mainer Logo"
+                src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png"
+                alt="Logo"
                 className="h-8 w-auto"
               />
             </div>
 
             <Sheet>
               <SheetTrigger>
-                <Menu className="h-6 w-6 text-gray-600" />
+                <Menu className="h-6 w-6 text-black" />
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] bg-[#fafafa] p-0">
                 <div className="flex flex-col h-full">
