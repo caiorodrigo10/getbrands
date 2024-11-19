@@ -1162,7 +1162,7 @@ export type Database = {
     }
     Enums: {
       bulk_action_status: "pending" | "processing" | "completed" | "failed"
-      bulk_action_type: "import" | "delete"
+      bulk_action_type: "import" | "delete" | "contacts"
       project_pack_type: "start" | "pro" | "ultra"
     }
     CompositeTypes: {
