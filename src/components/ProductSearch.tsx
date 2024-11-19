@@ -61,7 +61,7 @@ export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSea
   };
 
   return (
-    <div className="w-full">
+    <div className="relative w-full">
       <div className="relative flex items-center w-full">
         <Search className="absolute left-3 text-gray-400 h-4 w-4" />
         <input

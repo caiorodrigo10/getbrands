@@ -37,7 +37,7 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <NavigationMenu />
-      <main className="flex-1 container py-8 px-4 md:px-6 lg:px-8">
+      <main className="flex-1 container mx-auto py-8 px-4 md:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           <div className="mb-8">
             <Button
