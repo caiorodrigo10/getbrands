@@ -58,7 +58,15 @@ const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) 
 
   const handleDeleteSelected = async () => {
     try {
-      // First, delete related sample request products
+      // First, delete related cart items
+      const { error: cartItemsError } = await supabase
+        .from('cart_items')
+        .delete()
+        .in('product_id', selectedProducts);
+
+      if (cartItemsError) throw cartItemsError;
+
+      // Then, delete related sample request products
       const { error: sampleRequestProductsError } = await supabase
         .from('sample_request_products')
         .delete()
@@ -66,7 +74,7 @@ const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) 
 
       if (sampleRequestProductsError) throw sampleRequestProductsError;
 
-      // Then delete the products
+      // Finally delete the products
       const { error: productsError } = await supabase
         .from('products')
         .delete()
