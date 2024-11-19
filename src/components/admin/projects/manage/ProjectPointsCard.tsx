@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { PACK_LABELS } from "@/types/project";
 import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
 
 interface ProjectPointsCardProps {
   project: {
@@ -30,7 +31,7 @@ interface ProjectPointsCardProps {
 }
 
 export const ProjectPointsCard = ({ project }: ProjectPointsCardProps) => {
-  const [showClientInfo, setShowClientInfo] = useState(false);
+  const [showClientInfo, setShowClientInfo] = useState(true);
   const queryClient = useQueryClient();
 
   const handlePointsChange = async (amount: number) => {
@@ -62,91 +63,103 @@ export const ProjectPointsCard = ({ project }: ProjectPointsCardProps) => {
 
   return (
     <Card className="p-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Client Information Section */}
         <div>
-          <h3 className="text-lg font-medium">Project Points</h3>
-          <div className="mt-4 space-y-2">
-            <div className="flex justify-between text-sm text-muted-foreground">
-              <span>Total Points:</span>
-              <span className="font-medium text-foreground">{project.points}</span>
-            </div>
-            <div className="flex justify-between text-sm text-muted-foreground">
-              <span>Points Used:</span>
-              <span className="font-medium text-foreground">{project.points_used || 0}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span>Available Points:</span>
-              <span className="font-medium text-primary">{availablePoints}</span>
-            </div>
-            <Progress value={progressPercentage} className="h-2 mt-2" />
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium">Client Information</h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowClientInfo(!showClientInfo)}
+              className="flex items-center gap-2"
+            >
+              {showClientInfo ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
           </div>
-          <div className="mt-4">
-            <Badge className="bg-purple-500/10 text-purple-500">
-              {PACK_LABELS[project.pack_type]}
-            </Badge>
-          </div>
+
+          {showClientInfo && (
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-muted-foreground">Client Name</p>
+                <p className="font-medium">
+                  {`${project.user?.first_name || ''} ${project.user?.last_name || ''}`.trim() || 'N/A'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Email</p>
+                <p className="font-medium">{project.user?.email || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Phone</p>
+                <p className="font-medium">{project.user?.phone || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Address</p>
+                <p className="font-medium">
+                  {[
+                    project.user?.shipping_address_street,
+                    project.user?.shipping_address_city,
+                    project.user?.shipping_address_state,
+                    project.user?.shipping_address_zip
+                  ].filter(Boolean).join(', ') || 'N/A'}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePointsChange(-1000)}
-            disabled={!project.points || project.points < 1000}
-          >
-            <Minus className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePointsChange(1000)}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
+
+        {/* Vertical Separator for Desktop */}
+        <div className="hidden md:block absolute left-1/2 top-4 bottom-4">
+          <Separator orientation="vertical" />
+        </div>
+
+        {/* Project Points Section */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-medium">Project Points</h3>
+              <div className="mt-4 space-y-2">
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>Total Points:</span>
+                  <span className="font-medium text-foreground">{project.points}</span>
+                </div>
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>Points Used:</span>
+                  <span className="font-medium text-foreground">{project.points_used || 0}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Available Points:</span>
+                  <span className="font-medium text-primary">{availablePoints}</span>
+                </div>
+                <Progress value={progressPercentage} className="h-2 mt-2" />
+              </div>
+              <div className="mt-4">
+                <Badge className="bg-purple-500/10 text-purple-500">
+                  {PACK_LABELS[project.pack_type]}
+                </Badge>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePointsChange(-1000)}
+                disabled={!project.points || project.points < 1000}
+              >
+                <Minus className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePointsChange(1000)}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
-
-      <Button
-        variant="ghost"
-        onClick={() => setShowClientInfo(!showClientInfo)}
-        className="w-full flex items-center justify-between"
-      >
-        <span>Client Information</span>
-        {showClientInfo ? (
-          <ChevronUp className="h-4 w-4" />
-        ) : (
-          <ChevronDown className="h-4 w-4" />
-        )}
-      </Button>
-
-      {showClientInfo && (
-        <div className="mt-4 space-y-3">
-          <div>
-            <p className="text-sm text-muted-foreground">Client Name</p>
-            <p className="font-medium">
-              {`${project.user?.first_name || ''} ${project.user?.last_name || ''}`.trim() || 'N/A'}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Email</p>
-            <p className="font-medium">{project.user?.email || 'N/A'}</p>
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Phone</p>
-            <p className="font-medium">{project.user?.phone || 'N/A'}</p>
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Address</p>
-            <p className="font-medium">
-              {[
-                project.user?.shipping_address_street,
-                project.user?.shipping_address_city,
-                project.user?.shipping_address_state,
-                project.user?.shipping_address_zip
-              ].filter(Boolean).join(', ') || 'N/A'}
-            </p>
-          </div>
-        </div>
-      )}
     </Card>
   );
 };
