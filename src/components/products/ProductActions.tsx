@@ -6,6 +6,7 @@ import { Product } from "@/types/product";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import NoPointsDialog from "@/components/dialogs/NoPointsDialog";
 import ProjectSelectionDialog from "@/components/dialogs/ProjectSelectionDialog";
 
