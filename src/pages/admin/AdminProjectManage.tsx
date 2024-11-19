@@ -3,20 +3,18 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, ChevronDown, ChevronUp, Plus, Minus } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import StagesTimeline from "@/components/StagesTimeline";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ClientProducts } from "@/components/admin/projects/manage/ClientProducts";
 import { ClientSamples } from "@/components/admin/projects/manage/ClientSamples";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
-import { PACK_LABELS } from "@/types/project";
+import { ProjectPointsCard } from "@/components/admin/projects/manage/ProjectPointsCard";
 
 const AdminProjectManage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [showClientInfo, setShowClientInfo] = useState(false);
   
   const { data: project, isLoading } = useQuery({
     queryKey: ["admin-project", id],
@@ -47,26 +45,6 @@ const AdminProjectManage = () => {
     },
     enabled: !!id
   });
-
-  const handleAddPoints = async () => {
-    if (!id) return;
-    const { error } = await supabase
-      .from('projects')
-      .update({ points: (project?.points || 0) + 100 })
-      .eq('id', id);
-    
-    if (error) throw error;
-  };
-
-  const handleReducePoints = async () => {
-    if (!id || !project?.points || project.points < 100) return;
-    const { error } = await supabase
-      .from('projects')
-      .update({ points: project.points - 100 })
-      .eq('id', id);
-    
-    if (error) throw error;
-  };
 
   if (isLoading) {
     return (
@@ -103,87 +81,12 @@ const AdminProjectManage = () => {
             <h1 className="text-2xl font-bold">{project.name}</h1>
             <p className="text-muted-foreground mt-1">{project.description}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge className="bg-emerald-500/10 text-emerald-500">
-              {project.status === 'em_andamento' ? 'Active' : 'Completed'}
-            </Badge>
-            <Badge className="bg-purple-500/10 text-purple-500">
-              {PACK_LABELS[project.pack_type]}
-            </Badge>
-          </div>
+          <Badge className="bg-emerald-500/10 text-emerald-500">
+            {project.status === 'em_andamento' ? 'Active' : 'Completed'}
+          </Badge>
         </div>
 
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-lg font-medium">Project Points</h3>
-              <p className="text-3xl font-bold mt-1">{project.points}</p>
-              <p className="text-sm text-muted-foreground">
-                {project.points_used || 0} points used
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleReducePoints}
-                disabled={!project.points || project.points < 100}
-              >
-                <Minus className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleAddPoints}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          <Button
-            variant="ghost"
-            onClick={() => setShowClientInfo(!showClientInfo)}
-            className="w-full flex items-center justify-between"
-          >
-            <span>Client Information</span>
-            {showClientInfo ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </Button>
-
-          {showClientInfo && (
-            <div className="mt-4 space-y-3">
-              <div>
-                <p className="text-sm text-muted-foreground">Client Name</p>
-                <p className="font-medium">
-                  {`${project.user?.first_name || ''} ${project.user?.last_name || ''}`.trim() || 'N/A'}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Email</p>
-                <p className="font-medium">{project.user?.email || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Phone</p>
-                <p className="font-medium">{project.user?.phone || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Address</p>
-                <p className="font-medium">
-                  {[
-                    project.user?.shipping_address_street,
-                    project.user?.shipping_address_city,
-                    project.user?.shipping_address_state,
-                    project.user?.shipping_address_zip
-                  ].filter(Boolean).join(', ') || 'N/A'}
-                </p>
-              </div>
-            </div>
-          )}
-        </Card>
+        <ProjectPointsCard project={project} />
 
         <Tabs defaultValue="project-stages" className="w-full">
           <TabsList className="bg-white border-b w-full justify-start rounded-none h-12 p-0">
