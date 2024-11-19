@@ -8,10 +8,9 @@ import { Product } from "@/types/product";
 import { formatCurrency } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { SelectionBar } from "./SelectionBar";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
+import { useDeleteProducts } from "./hooks/useDeleteProducts";
 
 interface AdminCatalogTableProps {
   products: Product[];
@@ -23,7 +22,7 @@ const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) 
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectAllPages, setSelectAllPages] = useState(false);
-  const { toast } = useToast();
+  const { deleteProducts } = useDeleteProducts();
 
   const handleEditProduct = (productId: string) => {
     navigate(`/admin/catalog/${productId}`);
@@ -57,46 +56,10 @@ const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) 
   };
 
   const handleDeleteSelected = async () => {
-    try {
-      // First, delete related cart items
-      const { error: cartItemsError } = await supabase
-        .from('cart_items')
-        .delete()
-        .in('product_id', selectedProducts);
-
-      if (cartItemsError) throw cartItemsError;
-
-      // Then, delete related sample request products
-      const { error: sampleRequestProductsError } = await supabase
-        .from('sample_request_products')
-        .delete()
-        .in('product_id', selectedProducts);
-
-      if (sampleRequestProductsError) throw sampleRequestProductsError;
-
-      // Finally delete the products
-      const { error: productsError } = await supabase
-        .from('products')
-        .delete()
-        .in('id', selectedProducts);
-
-      if (productsError) throw productsError;
-
-      toast({
-        title: "Success",
-        description: `Successfully deleted ${selectedProducts.length} product(s)`,
-      });
-      
+    const success = await deleteProducts(selectedProducts);
+    if (success) {
       setSelectedProducts([]);
       setShowDeleteDialog(false);
-      window.location.reload();
-    } catch (error) {
-      console.error('Delete error:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete products. Please try again.",
-      });
     }
   };
 
