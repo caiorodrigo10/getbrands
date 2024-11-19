@@ -43,10 +43,10 @@ export const ProjectPointsInfo = () => {
         </div>
         
         <Button 
-          className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white"
+          className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white h-8 px-3 py-1 text-sm"
           onClick={() => navigate("/catalog")}
         >
-          <ShoppingBag className="h-4 w-4 mr-2" />
+          <ShoppingBag className="h-3.5 w-3.5 mr-2" />
           View Catalog
         </Button>
       </div>
