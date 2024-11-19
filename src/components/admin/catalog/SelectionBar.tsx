@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Copy, Trash2 } from "lucide-react";
 
 interface SelectionBarProps {
   selectedCount: number;
@@ -7,6 +7,7 @@ interface SelectionBarProps {
   selectAllPages: boolean;
   onSelectAllPages: (checked: boolean) => void;
   onDeleteClick: () => void;
+  onDuplicateClick: () => void;
   productsInPage: number;
 }
 
@@ -16,6 +17,7 @@ export const SelectionBar = ({
   selectAllPages,
   onSelectAllPages,
   onDeleteClick,
+  onDuplicateClick,
   productsInPage,
 }: SelectionBarProps) => {
   return (
@@ -35,14 +37,24 @@ export const SelectionBar = ({
           </Button>
         )}
       </div>
-      <Button
-        variant="destructive"
-        size="sm"
-        onClick={onDeleteClick}
-      >
-        <Trash2 className="h-4 w-4 mr-2" />
-        Delete Selected
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onDuplicateClick}
+        >
+          <Copy className="h-4 w-4 mr-2" />
+          Duplicate Selected
+        </Button>
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={onDeleteClick}
+        >
+          <Trash2 className="h-4 w-4 mr-2" />
+          Delete Selected
+        </Button>
+      </div>
     </div>
   );
 };

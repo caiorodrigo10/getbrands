@@ -11,8 +11,9 @@ import { useState } from "react";
 import { SelectionBar } from "./SelectionBar";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 import { useDeleteProducts } from "./hooks/useDeleteProducts";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 interface AdminCatalogTableProps {
   products: Product[];
@@ -21,6 +22,8 @@ interface AdminCatalogTableProps {
 
 const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectAllPages, setSelectAllPages] = useState(false);
@@ -65,6 +68,69 @@ const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) 
     }
   };
 
+  const handleDuplicateSelected = async () => {
+    try {
+      // Get the selected products with their images
+      const selectedProductsData = products.filter(p => selectedProducts.includes(p.id));
+      
+      for (const product of selectedProductsData) {
+        // Create a new product
+        const { data: newProduct, error: productError } = await supabase
+          .from('products')
+          .insert({
+            name: `${product.name} (Copy)`,
+            category: product.category,
+            description: product.description,
+            from_price: product.from_price,
+            srp: product.srp,
+            is_new: product.is_new,
+            is_tiktok: product.is_tiktok,
+            image_url: product.image_url
+          })
+          .select()
+          .single();
+
+        if (productError) throw productError;
+
+        // Get all images for the original product
+        const { data: productImages } = await supabase
+          .from('product_images')
+          .select('*')
+          .eq('product_id', product.id);
+
+        // Duplicate all images for the new product
+        if (productImages) {
+          for (const image of productImages) {
+            await supabase
+              .from('product_images')
+              .insert({
+                product_id: newProduct.id,
+                image_url: image.image_url,
+                position: image.position,
+                is_primary: image.is_primary
+              });
+          }
+        }
+      }
+
+      // Clear selection and refresh the product list
+      setSelectedProducts([]);
+      queryClient.invalidateQueries({ queryKey: ['admin-catalog'] });
+
+      toast({
+        title: "Success",
+        description: `Successfully duplicated ${selectedProducts.length} product(s)`,
+      });
+    } catch (error) {
+      console.error('Error duplicating products:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to duplicate products. Please try again.",
+      });
+    }
+  };
+
   // Fetch primary images for products
   const { data: productImages } = useQuery({
     queryKey: ['product-images-catalog'],
@@ -105,6 +171,7 @@ const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) 
           selectAllPages={selectAllPages}
           onSelectAllPages={handleSelectAllPages}
           onDeleteClick={() => setShowDeleteDialog(true)}
+          onDuplicateClick={handleDuplicateSelected}
           productsInPage={products.length}
         />
       )}
