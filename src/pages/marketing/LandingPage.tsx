@@ -15,9 +15,9 @@ const LandingPage = () => {
       <SuccessMetrics />
       <ServicesSection />
       <BrandBuildingSection />
-      <CreativeSection />
       <ProductCategoriesSection />
       <WhyChooseSection />
+      <CreativeSection />
       <TestimonialsSection />
       <Footer />
     </div>
