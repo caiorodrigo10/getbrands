@@ -17,9 +17,16 @@ interface ProductImageUploadProps {
   images: ProductImage[];
   mainImageUrl?: string | null;
   onImagesUpdate: () => void;
+  onMediaLibrarySelect?: (urls: string[]) => void;
 }
 
-export function ProductImageUpload({ productId, images, mainImageUrl, onImagesUpdate }: ProductImageUploadProps) {
+export function ProductImageUpload({ 
+  productId, 
+  images, 
+  mainImageUrl, 
+  onImagesUpdate,
+  onMediaLibrarySelect 
+}: ProductImageUploadProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showMediaLibrary, setShowMediaLibrary] = useState(false);
@@ -106,48 +113,10 @@ export function ProductImageUpload({ productId, images, mainImageUrl, onImagesUp
   };
 
   const handleMediaLibrarySelect = async (selectedUrls: string[]) => {
-    try {
-      const newImages = selectedUrls.map((url, index) => ({
-        id: `temp-${Date.now()}-${index}`,
-        product_id: productId || 'temp',
-        image_url: url,
-        position: images.length + index,
-        is_primary: images.length === 0 && index === 0,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }));
-
-      // If we have a product ID, create the entries in the database
-      if (productId) {
-        for (const image of newImages) {
-          const { error } = await supabase
-            .from('product_images')
-            .insert({
-              product_id: productId,
-              image_url: image.image_url,
-              position: image.position,
-              is_primary: image.is_primary
-            });
-
-          if (error) throw error;
-        }
-      }
-      
-      // Update the local state with the new images
-      onImagesUpdate();
-      
-      toast({
-        title: "Success",
-        description: "Images added successfully",
-      });
-    } catch (error) {
-      console.error('Error adding images:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to add images. Please try again.",
-      });
+    if (onMediaLibrarySelect) {
+      onMediaLibrarySelect(selectedUrls);
     }
+    setShowMediaLibrary(false);
   };
 
   return (

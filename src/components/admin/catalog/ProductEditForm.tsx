@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { Product } from "@/types/product";
+import { Product, ProductImage } from "@/types/product";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { BasicInformationSection } from "./product-form/BasicInformationSection";
@@ -25,9 +25,17 @@ interface ProductEditFormProps {
   product: Product;
   onSubmit: (data: Product) => void;
   onCancel: () => void;
+  onMediaLibrarySelect?: (urls: string[]) => void;
+  tempImages?: ProductImage[];
 }
 
-export function ProductEditForm({ product, onSubmit, onCancel }: ProductEditFormProps) {
+export function ProductEditForm({ 
+  product, 
+  onSubmit, 
+  onCancel,
+  onMediaLibrarySelect,
+  tempImages = []
+}: ProductEditFormProps) {
   const queryClient = useQueryClient();
   
   const form = useForm<z.infer<typeof productFormSchema>>({
@@ -73,15 +81,19 @@ export function ProductEditForm({ product, onSubmit, onCancel }: ProductEditForm
     queryClient.invalidateQueries({ queryKey: ['product-images-catalog'] });
   };
 
+  // Combine temporary images with product images
+  const allImages = [...tempImages, ...productImages];
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
         <BasicInformationSection form={form} />
         <MediaSection 
           productId={product.id}
-          images={productImages}
+          images={allImages}
           mainImageUrl={product.image_url}
           onImagesUpdate={() => refetchImages()}
+          onMediaLibrarySelect={onMediaLibrarySelect}
         />
         <PricingSection form={form} />
         <OrganizationSection form={form} />
