@@ -62,11 +62,11 @@ export const ProjectPointsCard = ({ project }: ProjectPointsCardProps) => {
   const progressPercentage = ((project.points_used || 0) / project.points) * 100;
 
   return (
-    <Card className="p-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+    <Card className="p-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
         {/* Client Information Section */}
-        <div className="md:border-r border-border/30 pr-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="md:border-r border-border/30 pr-4">
+          <div className="flex items-center justify-between mb-2">
             <h3 className="text-lg font-medium">Client Information</h3>
             <Button
               variant="ghost"
@@ -110,8 +110,8 @@ export const ProjectPointsCard = ({ project }: ProjectPointsCardProps) => {
         </div>
 
         {/* Project Points Section */}
-        <div className="pl-0 md:pl-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="pl-0 md:pl-4">
+          <div className="flex items-center justify-between mb-2">
             <h3 className="text-lg font-medium">Project Points</h3>
             <Button
               variant="ghost"
