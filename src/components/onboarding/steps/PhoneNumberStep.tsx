@@ -1,56 +1,16 @@
 import { Button } from "@/components/ui/button";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
 
 interface PhoneNumberStepProps {
   value: string;
-  onAnswer: (phone: string) => void;
+  onChange: (phone: string) => void;
   onComplete: () => void;
 }
 
-export const PhoneNumberStep = ({ value, onAnswer, onComplete }: PhoneNumberStepProps) => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!value) {
-      toast.error('Please enter a phone number');
-      return;
-    }
-
-    if (!user?.id) {
-      toast.error('Authentication error. Please try logging in again.');
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          phone: value,
-          onboarding_completed: true
-        })
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      toast.success('Onboarding completed successfully');
-      onComplete();
-      navigate('/start-here');
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error('Failed to complete onboarding. Please try again.');
-    }
-  };
-
+export const PhoneNumberStep = ({ value, onChange, onComplete }: PhoneNumberStepProps) => {
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <div className="space-y-8">
       <div className="text-center">
         <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4">
           What's your phone number?
@@ -64,7 +24,7 @@ export const PhoneNumberStep = ({ value, onAnswer, onComplete }: PhoneNumberStep
         <PhoneInput
           country={'us'}
           value={value}
-          onChange={(phone) => onAnswer(phone)}
+          onChange={onChange}
           containerClass="w-full"
           inputClass="!w-full !h-14 !text-lg !p-4 !pl-14 !border !border-input !rounded-md"
           buttonClass="!border-input !h-14 !w-12"
@@ -73,12 +33,12 @@ export const PhoneNumberStep = ({ value, onAnswer, onComplete }: PhoneNumberStep
       </div>
 
       <Button
-        type="submit"
+        onClick={onComplete}
         className="w-full h-14 text-lg bg-primary text-white hover:bg-primary/90"
         disabled={!value}
       >
         Complete Onboarding
       </Button>
-    </form>
+    </div>
   );
 };

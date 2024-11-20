@@ -21,7 +21,7 @@ export const ProfileTypeStep = ({
 }: ProfileTypeStepProps) => {
   const handleSelect = (value: string) => {
     onAnswer(value);
-    onNext(); // Auto-advance after selection
+    onNext();
   };
 
   return (
