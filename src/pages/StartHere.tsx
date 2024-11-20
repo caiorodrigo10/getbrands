@@ -32,7 +32,7 @@ const StartHere = () => {
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">
-      <h1 className="text-4xl font-bold mb-8">Welcome to Mainer!</h1>
+      <h1 className="text-4xl font-bold mb-8">Welcome to GetBrands!</h1>
       
       <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
         <h2 className="text-2xl font-semibold mb-4">Getting Started</h2>
@@ -45,7 +45,7 @@ const StartHere = () => {
           <iframe
             className="w-full h-[400px] rounded-lg"
             src="https://www.youtube.com/embed/your-video-id"
-            title="Welcome to Mainer"
+            title="Welcome to GetBrands"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
