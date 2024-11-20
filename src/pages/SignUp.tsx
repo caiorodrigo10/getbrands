@@ -15,9 +15,32 @@ const SignUp = () => {
     email: "",
     password: "",
   });
+  const [errors, setErrors] = useState({
+    password: "",
+  });
+
+  const validateForm = () => {
+    const newErrors = {
+      password: "",
+    };
+    let isValid = true;
+
+    if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters long";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -116,6 +139,9 @@ const SignUp = () => {
                 className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
                 placeholder="••••••••"
               />
+              {errors.password && (
+                <p className="text-sm text-red-500 mt-1">{errors.password}</p>
+              )}
             </div>
           </div>
 
