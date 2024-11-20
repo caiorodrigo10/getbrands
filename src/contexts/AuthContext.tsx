@@ -14,6 +14,13 @@ interface AuthContextType {
   isAuthenticated: boolean;
 }
 
+interface ProfileType {
+  onboarding_completed: boolean;
+  role: string;
+  first_name: string | null;
+  last_name: string | null;
+}
+
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
@@ -41,11 +48,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const { data: profile, error } = await supabase
         .from('profiles')
-        .select('onboarding_completed, role')
+        .select('onboarding_completed, role, first_name, last_name')
         .eq('id', user.id)
         .single();
 
       if (error) throw error;
+
+      const typedProfile = profile as ProfileType;
 
       // Identify user in analytics and Gleap
       identifyUser(user.id, {
@@ -55,17 +64,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Identify user in Gleap
       Gleap.identify(user.id, {
         email: user.email,
-        name: profile?.first_name ? `${profile.first_name} ${profile.last_name}` : user.email,
+        name: typedProfile?.first_name ? `${typedProfile.first_name} ${typedProfile.last_name}` : user.email,
       });
 
       // If onboarding is not completed, always redirect to onboarding
-      if (!profile?.onboarding_completed) {
+      if (!typedProfile?.onboarding_completed) {
         navigate('/onboarding');
         return;
       }
 
       // If onboarding is completed, redirect based on role
-      const redirectPath = getRoleBasedRedirectPath(profile?.role);
+      const redirectPath = getRoleBasedRedirectPath(typedProfile?.role);
       navigate(redirectPath);
     } catch (error) {
       console.error('Error checking user profile:', error);
