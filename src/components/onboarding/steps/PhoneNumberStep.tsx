@@ -58,13 +58,15 @@ export const PhoneNumberStep = ({ onAnswer, onNext }: PhoneNumberStepProps) => {
         )}
       </div>
 
-      <Button
-        onClick={handleSubmit}
-        size="lg"
-        className="mt-4"
-      >
-        Submit
-      </Button>
+      <div className="flex justify-end">
+        <Button
+          onClick={handleSubmit}
+          size="lg"
+          className="mt-4"
+        >
+          Submit
+        </Button>
+      </div>
     </motion.div>
   );
 };

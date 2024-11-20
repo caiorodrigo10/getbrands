@@ -58,14 +58,16 @@ export const ProfileTypeStep = ({
         ))}
       </RadioGroup>
 
-      <Button
-        onClick={onNext}
-        disabled={!selected}
-        size="lg"
-        className="mt-4"
-      >
-        Next
-      </Button>
+      <div className="flex justify-end">
+        <Button
+          onClick={onNext}
+          disabled={!selected}
+          size="lg"
+          className="mt-4"
+        >
+          Next
+        </Button>
+      </div>
     </div>
   );
 };
