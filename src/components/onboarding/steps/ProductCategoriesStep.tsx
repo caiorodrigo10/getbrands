@@ -10,33 +10,39 @@ interface ProductCategoriesStepProps {
 
 const categories = [
   {
-    id: "coffee",
-    label: "Coffee & Beverages",
+    id: "beverages",
+    label: "Beverages",
+    description: "Premium Arabica coffee blends, instant coffee, and other high-quality beverage formulations.",
     icon: Coffee,
   },
   {
     id: "supplements",
-    label: "Supplements & Vitamins",
+    label: "Supplements",
+    description: "Capsules, powders, and tablets for health and wellness, such as multivitamins, minerals, and specialty supplements.",
     icon: Pill,
   },
   {
-    id: "cosmetics",
-    label: "Cosmetics & Personal Care",
+    id: "beauty",
+    label: "Beauty & Personal Care",
+    description: "Skincare products, hair care treatments, and personal care essentials like creams, serums, and lotions.",
     icon: Sparkles,
   },
   {
     id: "sports",
-    label: "Sports Nutrition & Proteins",
+    label: "Sports Nutrition",
+    description: "Protein powders, meal replacement shakes, and performance-enhancing supplements designed for active lifestyles.",
     icon: Dumbbell,
   },
   {
     id: "natural",
-    label: "Natural Products & Extracts",
+    label: "Natural & Herbal",
+    description: "Products made from plant-based ingredients, such as herbal supplements, oils, and natural extracts.",
     icon: Leaf,
   },
   {
     id: "pet",
-    label: "Pet Products",
+    label: "Pet Care",
+    description: "Pet supplements, vitamins, cosmetics, and wellness products specifically designed for animals.",
     icon: Dog,
   }
 ];
@@ -78,18 +84,23 @@ export const ProductCategoriesStep = ({
               onClick={() => toggleCategory(category.id)}
               whileHover={{ y: -2 }}
             >
-              <div className="flex items-center gap-3">
-                <Checkbox 
-                  checked={isSelected}
-                  className="h-4 w-4"
-                  onCheckedChange={() => toggleCategory(category.id)}
-                />
-                <div className="p-1.5 rounded-full bg-primary/10">
-                  <Icon className="w-4 h-4 text-primary" />
+              <div className="flex flex-col">
+                <div className="flex items-center gap-3">
+                  <Checkbox 
+                    checked={isSelected}
+                    className="h-4 w-4"
+                    onCheckedChange={() => toggleCategory(category.id)}
+                  />
+                  <div className="p-1.5 rounded-full bg-primary/10">
+                    <Icon className="w-4 h-4 text-primary" />
+                  </div>
+                  <span className="text-sm sm:text-base font-medium text-gray-900">
+                    {category.label}
+                  </span>
                 </div>
-                <span className="text-sm sm:text-base font-medium text-gray-900">
-                  {category.label}
-                </span>
+                <p className="text-xs sm:text-sm text-gray-500 mt-1 ml-10">
+                  {category.description}
+                </p>
               </div>
             </motion.div>
           );
