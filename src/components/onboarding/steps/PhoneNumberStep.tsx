@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface PhoneNumberStepProps {
   value: string;
@@ -10,7 +10,10 @@ interface PhoneNumberStepProps {
 
 export const PhoneNumberStep = ({ value, onAnswer, onNext }: PhoneNumberStepProps) => {
   const formatPhoneNumber = (input: string) => {
+    // Remove all non-digits
     const numbers = input.replace(/\D/g, '');
+    
+    // Format the number as (XXX) XXX-XXXX
     if (numbers.length <= 3) return numbers;
     if (numbers.length <= 6) return `(${numbers.slice(0, 3)}) ${numbers.slice(3)}`;
     return `(${numbers.slice(0, 3)}) ${numbers.slice(3, 6)}-${numbers.slice(6, 10)}`;
@@ -23,7 +26,7 @@ export const PhoneNumberStep = ({ value, onAnswer, onNext }: PhoneNumberStepProp
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (value.length >= 14) {
+    if (value.match(/^\(\d{3}\) \d{3}-\d{4}$/)) {
       onNext();
     }
   };
@@ -34,8 +37,8 @@ export const PhoneNumberStep = ({ value, onAnswer, onNext }: PhoneNumberStepProp
         <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4">
           What's your phone number?
         </h2>
-        <p className="text-sm sm:text-base text-gray-600">
-          We'll use this to keep you updated about your project
+        <p className="text-gray-500 text-base sm:text-lg">
+          We'll use this to keep you updated on your project progress.
         </p>
       </div>
 
@@ -56,7 +59,7 @@ export const PhoneNumberStep = ({ value, onAnswer, onNext }: PhoneNumberStepProp
         <Button
           type="submit"
           className="w-full"
-          disabled={value.length < 14}
+          disabled={!value.match(/^\(\d{3}\) \d{3}-\d{4}$/)}
         >
           Complete Onboarding
         </Button>

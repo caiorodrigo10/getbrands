@@ -1,10 +1,11 @@
 import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 
-const phoneRegex = /^\+[1-9]\d{1,14}$/;
+// Updated phone regex to handle formatted US phone numbers
+const phoneRegex = /^\(\d{3}\) \d{3}-\d{4}$/;
 
 export const onboardingSchema = z.object({
-  phone: z.string().regex(phoneRegex, 'Invalid phone number format'),
+  phone: z.string().regex(phoneRegex, 'Phone number must be in format (XXX) XXX-XXXX'),
   profile_type: z.enum(['creator', 'entrepreneur', 'marketer']),
   product_interest: z.array(z.string()),
   brand_status: z.enum(['existing', 'new']),
@@ -16,28 +17,37 @@ export type OnboardingData = z.infer<typeof onboardingSchema>;
 export const saveOnboardingData = async (userId: string, data: OnboardingData) => {
   try {
     // Validate the data
-    onboardingSchema.parse(data);
+    const validatedData = onboardingSchema.parse(data);
 
     const { error } = await supabase
       .from('profiles')
       .update({
-        phone: data.phone,
-        profile_type: data.profile_type,
-        product_interest: data.product_interest.join(','), // Convert array to comma-separated string
-        brand_status: data.brand_status,
-        launch_urgency: data.launch_urgency,
+        phone: validatedData.phone,
+        profile_type: validatedData.profile_type,
+        product_interest: validatedData.product_interest.join(','),
+        brand_status: validatedData.brand_status,
+        launch_urgency: validatedData.launch_urgency,
         onboarding_completed: true
       })
       .eq('id', userId);
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
 
-    return { status: 'success', message: 'Onboarding data saved successfully.' };
+    return { status: 'success', message: 'Onboarding completed successfully!' };
   } catch (error) {
     console.error('Error saving onboarding data:', error);
+    if (error instanceof z.ZodError) {
+      return {
+        status: 'error',
+        message: error.errors[0].message || 'Invalid input data'
+      };
+    }
     return {
       status: 'error',
-      message: 'Failed to save onboarding data. Please check your input and try again.'
+      message: 'Failed to save onboarding data. Please try again.'
     };
   }
 };
