@@ -10,6 +10,7 @@ import { ProductCategoriesStep } from "./steps/ProductCategoriesStep";
 import { ProfileTypeStep } from "./steps/ProfileTypeStep";
 import { BrandStatusStep } from "./steps/BrandStatusStep";
 import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
+import { PhoneNumberStep } from "./steps/PhoneNumberStep";
 import type { OnboardingQuizData } from "@/types/quiz";
 import { toast } from "sonner";
 
@@ -20,6 +21,7 @@ export const OnboardingQuiz = () => {
   const [answers, setAnswers] = useState<Record<string, any>>({});
 
   useEffect(() => {
+    // Check authentication status
     if (!isAuthenticated) {
       toast.error("Please log in to continue");
       navigate('/login');
@@ -66,6 +68,7 @@ export const OnboardingQuiz = () => {
         profile_type: answers.profileType || "",
         brand_status: answers.brandStatus || "",
         launch_urgency: answers.launchUrgency || "",
+        phone: answers.phone || "",
       };
 
       const { error } = await supabase
@@ -127,6 +130,15 @@ export const OnboardingQuiz = () => {
       component: <LaunchUrgencyStep 
         selected={answers.launchUrgency}
         onAnswer={(value) => handleAnswer('launchUrgency', value)}
+        onNext={handleNext}
+      />,
+      isRequired: true
+    },
+    {
+      id: '6',
+      component: <PhoneNumberStep
+        value={answers.phone || ''}
+        onAnswer={(value) => handleAnswer('phone', value)}
         onComplete={saveQuizData}
       />,
       isRequired: true

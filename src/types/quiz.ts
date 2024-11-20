@@ -10,4 +10,5 @@ export type OnboardingQuizData = {
   profile_type: string;
   brand_status: string;
   launch_urgency: string;
+  phone: string;
 };
