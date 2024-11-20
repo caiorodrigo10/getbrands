@@ -19,16 +19,19 @@ export const saveOnboardingData = async (userId: string, data: OnboardingData) =
     // Validate the data
     const validatedData = onboardingSchema.parse(data);
 
+    // Format the data for database insertion
+    const formattedData = {
+      phone: validatedData.phone,
+      profile_type: validatedData.profile_type,
+      product_interest: validatedData.product_interest.join(','),
+      brand_status: validatedData.brand_status,
+      launch_urgency: validatedData.launch_urgency,
+      onboarding_completed: true
+    };
+
     const { error } = await supabase
       .from('profiles')
-      .update({
-        phone: validatedData.phone,
-        profile_type: validatedData.profile_type,
-        product_interest: validatedData.product_interest.join(','),
-        brand_status: validatedData.brand_status,
-        launch_urgency: validatedData.launch_urgency,
-        onboarding_completed: true
-      })
+      .update(formattedData)
       .eq('id', userId);
 
     if (error) {
