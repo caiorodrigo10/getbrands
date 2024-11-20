@@ -7,24 +7,32 @@ interface WelcomeStepProps {
 
 export const WelcomeStep = ({ onNext }: WelcomeStepProps) => {
   return (
-    <motion.div 
-      className="text-center space-y-6"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
-      <h1 className="text-4xl font-bold text-gray-900">
-        Welcome to GetBrands!
-      </h1>
-      <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-        Let's answer a few quick questions to help us customize your experience.
-      </p>
-      <Button 
-        onClick={onNext}
-        size="lg"
-        className="mt-8 px-8 py-6 text-xl"
+    <div className="text-center space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-4"
       >
-        Start Quiz
-      </Button>
-    </motion.div>
+        <h2 className="text-xl sm:text-3xl font-bold text-gray-900">
+          Welcome to Your Private Label Journey
+        </h2>
+        <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto">
+          Let's get to know you better so we can provide the best possible service for your private label business.
+        </p>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <Button
+          onClick={onNext}
+          className="w-full sm:w-auto px-8"
+        >
+          Let's Begin
+        </Button>
+      </motion.div>
+    </div>
   );
 };

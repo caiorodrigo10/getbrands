@@ -22,7 +22,7 @@ export const ProfileTypeStep = ({
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+        <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4">
           Which of the following best describes you?
         </h2>
       </div>

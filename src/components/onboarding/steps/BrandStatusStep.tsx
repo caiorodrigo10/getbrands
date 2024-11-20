@@ -9,8 +9,9 @@ interface BrandStatusStepProps {
 }
 
 const brandStatuses = [
-  { id: "existing", label: "I already have a brand" },
-  { id: "new", label: "I'm creating a new brand" }
+  { id: "complete", label: "Yes, complete branding" },
+  { id: "partial", label: "Partial branding" },
+  { id: "none", label: "No, need full support" }
 ];
 
 export const BrandStatusStep = ({ 
@@ -21,8 +22,8 @@ export const BrandStatusStep = ({
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
-          Do you already have a brand or are you starting one from scratch?
+        <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4">
+          Do you already have branding?
         </h2>
       </div>
 

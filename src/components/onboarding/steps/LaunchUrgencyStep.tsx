@@ -9,9 +9,10 @@ interface LaunchUrgencyStepProps {
 }
 
 const urgencyOptions = [
-  { id: "asap", label: "I need to launch as soon as possible" },
-  { id: "3-6months", label: "I'm planning to launch in 3–6 months" },
-  { id: "exploring", label: "I'm still exploring ideas" }
+  { id: "immediate", label: "As soon as possible" },
+  { id: "next_month", label: "Within next month" },
+  { id: "next_quarter", label: "Within next quarter" },
+  { id: "flexible", label: "Flexible timeline" }
 ];
 
 export const LaunchUrgencyStep = ({ 
@@ -22,8 +23,8 @@ export const LaunchUrgencyStep = ({
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
-          What is your urgency for launching your first product?
+        <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4">
+          When would you like to launch your product?
         </h2>
       </div>
 

@@ -1,7 +1,6 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 interface PhoneNumberStepProps {
   onAnswer: (phone: string) => void;
@@ -9,53 +8,35 @@ interface PhoneNumberStepProps {
 }
 
 export const PhoneNumberStep = ({ onAnswer, onNext }: PhoneNumberStepProps) => {
-  const [phone, setPhone] = useState("");
-  const [error, setError] = useState("");
-
-  const validatePhone = (value: string) => {
-    // Basic phone validation - can be enhanced based on requirements
-    const phoneRegex = /^\+?[\d\s-]{10,}$/;
-    return phoneRegex.test(value);
-  };
-
-  const handleSubmit = () => {
-    if (!validatePhone(phone)) {
-      setError("Please enter a valid phone number");
-      toast.error("Please enter a valid phone number");
-      return;
-    }
-    
-    onAnswer(phone);
-    onNext();
-  };
-
   return (
-    <motion.div 
-      className="space-y-6"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
+    <div className="space-y-8">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
-          Please provide your phone number so we can stay in touch
+        <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4">
+          What's your phone number?
         </h2>
+        <p className="text-sm sm:text-base text-gray-600">
+          We'll use this to keep you updated about your project
+        </p>
       </div>
 
-      <div className="max-w-md mx-auto space-y-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
         <Input
           type="tel"
-          placeholder="+1 555-555-5555"
-          value={phone}
-          onChange={(e) => {
-            setPhone(e.target.value);
-            setError("");
-          }}
-          className={`text-lg p-6 ${error ? 'border-red-500' : ''}`}
+          placeholder="(555) 555-5555"
+          className="w-full text-lg p-4"
+          onChange={(e) => onAnswer(e.target.value)}
         />
-        {error && (
-          <p className="text-sm text-red-500">{error}</p>
-        )}
-      </div>
-    </motion.div>
+      </motion.div>
+
+      <Button
+        onClick={onNext}
+        className="w-full"
+      >
+        Continue
+      </Button>
+    </div>
   );
 };
