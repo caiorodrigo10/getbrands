@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { identifyUser } from "@/lib/analytics";
 import { useNavigate } from "react-router-dom";
 import { getRoleBasedRedirectPath } from "@/lib/roleRedirection";
+import Gleap from "gleap";
 
 interface AuthContextType {
   user: User | null;
@@ -46,8 +47,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) throw error;
 
+      // Identify user in analytics and Gleap
       identifyUser(user.id, {
         email: user.email,
+      });
+      
+      // Identify user in Gleap
+      Gleap.identify(user.id, {
+        email: user.email,
+        name: profile?.first_name ? `${profile.first_name} ${profile.last_name}` : user.email,
       });
 
       // If onboarding is not completed, always redirect to onboarding
@@ -99,6 +107,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
+    // Clear Gleap identification on logout
+    Gleap.clearIdentity();
   };
 
   return (
