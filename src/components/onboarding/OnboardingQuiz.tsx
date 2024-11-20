@@ -16,6 +16,7 @@ import { CompletionStep } from "./steps/CompletionStep";
 export type QuizStep = {
   id: number;
   component: React.ReactNode;
+  isMultiSelect?: boolean;
 };
 
 export const OnboardingQuiz = () => {
@@ -39,18 +40,10 @@ export const OnboardingQuiz = () => {
     const newAnswers = { ...answers, [stepId]: answer };
     setAnswers(newAnswers);
 
-    // If this is the phone number step, update the user's profile
-    if (stepId === 'phone') {
-      try {
-        const { error } = await supabase
-          .from('profiles')
-          .update({ phone_number: answer })
-          .eq('id', (await supabase.auth.getUser()).data.user?.id);
-
-        if (error) throw error;
-      } catch (error) {
-        toast.error("Failed to save phone number");
-      }
+    // Auto advance for single selection steps
+    const currentStepData = steps[currentStep];
+    if (!currentStepData.isMultiSelect && currentStep < steps.length - 1) {
+      handleNext();
     }
   };
 
@@ -62,7 +55,8 @@ export const OnboardingQuiz = () => {
         selected={answers.categories || []}
         onAnswer={(value) => handleAnswer('categories', value)}
         onNext={handleNext}
-      /> 
+      />,
+      isMultiSelect: true
     },
     { 
       id: 3, 
@@ -121,7 +115,7 @@ export const OnboardingQuiz = () => {
         </AnimatePresence>
 
         {currentStep > 0 && currentStep < steps.length - 1 && (
-          <div className="flex justify-between mt-6">
+          <div className="flex justify-between items-center mt-6">
             <Button
               variant="outline"
               onClick={handleBack}
@@ -129,6 +123,15 @@ export const OnboardingQuiz = () => {
             >
               Back
             </Button>
+            {steps[currentStep].isMultiSelect && (
+              <Button
+                onClick={handleNext}
+                className="w-32"
+                disabled={!answers[Object.keys(answers)[currentStep - 1]]?.length}
+              >
+                Next
+              </Button>
+            )}
           </div>
         )}
       </div>
