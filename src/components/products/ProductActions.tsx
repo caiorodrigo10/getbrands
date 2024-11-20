@@ -100,16 +100,16 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
         return;
       }
 
+      if (isRestrictedRole) {
+        setShowPermissionDeniedDialog(true);
+        return;
+      }
+
       // Filter projects with sufficient points
       const projectsWithSufficientPoints = userProjects?.filter(project => {
         const availablePoints = (project.points || 0) - (project.points_used || 0);
         return availablePoints >= 1000;
       }) || [];
-
-      if (isRestrictedRole) {
-        setShowPermissionDeniedDialog(true);
-        return;
-      }
 
       if (projectsWithSufficientPoints.length > 0) {
         setProjects(projectsWithSufficientPoints);
