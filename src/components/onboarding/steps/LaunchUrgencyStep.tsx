@@ -3,12 +3,12 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 interface LaunchUrgencyStepProps {
-  value: string;
-  onChange: (value: string) => void;
+  selected: string;
+  onAnswer: (value: string) => void;
   onNext: () => void;
 }
 
-export function LaunchUrgencyStep({ value, onChange, onNext }: LaunchUrgencyStepProps) {
+export function LaunchUrgencyStep({ selected, onAnswer, onNext }: LaunchUrgencyStepProps) {
   const options = [
     { value: "immediate", label: "Immediately (1-2 months)" },
     { value: "soon", label: "Soon (3-6 months)" },
@@ -30,9 +30,9 @@ export function LaunchUrgencyStep({ value, onChange, onNext }: LaunchUrgencyStep
             key={option.value}
             className={cn(
               "p-4 cursor-pointer transition-all hover:border-primary",
-              value === option.value && "border-2 border-primary"
+              selected === option.value && "border-2 border-primary"
             )}
-            onClick={() => onChange(option.value)}
+            onClick={() => onAnswer(option.value)}
           >
             <div className="font-medium">{option.label}</div>
           </Card>
@@ -41,7 +41,7 @@ export function LaunchUrgencyStep({ value, onChange, onNext }: LaunchUrgencyStep
 
       <Button 
         onClick={onNext} 
-        disabled={!value}
+        disabled={!selected}
         className="w-full"
       >
         Continue

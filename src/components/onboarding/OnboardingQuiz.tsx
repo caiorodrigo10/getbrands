@@ -62,24 +62,24 @@ export function OnboardingQuiz() {
     {
       component: ProfileTypeStep,
       props: {
-        value: quizData.profileType,
-        onChange: (value: string) => setQuizData({ ...quizData, profileType: value }),
+        selected: quizData.profileType,
+        onAnswer: (value: string) => setQuizData({ ...quizData, profileType: value }),
         onNext: handleNext,
       },
     },
     {
       component: BrandStatusStep,
       props: {
-        value: quizData.brandStatus,
-        onChange: (value: string) => setQuizData({ ...quizData, brandStatus: value }),
+        selected: quizData.brandStatus,
+        onAnswer: (value: string) => setQuizData({ ...quizData, brandStatus: value }),
         onNext: handleNext,
       },
     },
     {
       component: LaunchUrgencyStep,
       props: {
-        value: quizData.launchUrgency,
-        onChange: (value: string) => setQuizData({ ...quizData, launchUrgency: value }),
+        selected: quizData.launchUrgency,
+        onAnswer: (value: string) => setQuizData({ ...quizData, launchUrgency: value }),
         onNext: handleNext,
       },
     },
@@ -88,7 +88,7 @@ export function OnboardingQuiz() {
       props: {
         value: quizData.phone,
         onChange: (value: string) => setQuizData({ ...quizData, phone: value }),
-        onNext: handleComplete,
+        onComplete: handleComplete,
       },
     },
   ];
