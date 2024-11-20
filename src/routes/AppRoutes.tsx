@@ -21,6 +21,7 @@ import Success from "@/pages/checkout/Success";
 import ProfitCalculator from "@/pages/ProfitCalculator";
 import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
+import OnboardingQuizPage from "@/pages/OnboardingQuiz";
 
 export const AppRoutes = () => (
   <Routes>
@@ -30,6 +31,7 @@ export const AppRoutes = () => (
     {/* Public Routes */}
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<SignUp />} />
+    <Route path="/onboarding" element={<OnboardingQuizPage />} />
     
     {/* Admin Routes */}
     <Route path="/admin/*" element={
