@@ -10,6 +10,9 @@ import { BrandStatusStep } from "./steps/BrandStatusStep";
 import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { PhoneNumberStep } from "./steps/PhoneNumberStep";
 import { CompletionStep } from "./steps/CompletionStep";
+import { useAuth } from "@/contexts/AuthContext";
+import { saveOnboardingData } from "@/services/onboardingService";
+import { toast } from "sonner";
 
 export type QuizStep = {
   id: number;
@@ -19,6 +22,7 @@ export type QuizStep = {
 
 export const OnboardingQuiz = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
 
@@ -38,10 +42,33 @@ export const OnboardingQuiz = () => {
     const newAnswers = { ...answers, [stepId]: answer };
     setAnswers(newAnswers);
 
-    // Auto advance for single selection steps
     const currentStepData = steps[currentStep];
     if (!currentStepData.isMultiSelect && currentStep < steps.length - 1) {
       handleNext();
+    }
+  };
+
+  const handleComplete = async () => {
+    if (!user?.id) {
+      toast.error('You must be logged in to complete the onboarding');
+      return;
+    }
+
+    const onboardingData = {
+      phone: answers.phone,
+      profile_type: answers.profileType,
+      product_interest: answers.categories || [],
+      brand_status: answers.brandStatus,
+      launch_urgency: answers.launchUrgency
+    };
+
+    const result = await saveOnboardingData(user.id, onboardingData);
+    
+    if (result.status === 'success') {
+      toast.success(result.message);
+      navigate('/dashboard');
+    } else {
+      toast.error(result.message);
     }
   };
 
@@ -89,7 +116,7 @@ export const OnboardingQuiz = () => {
     },
     { 
       id: 7, 
-      component: <CompletionStep onComplete={() => navigate("/dashboard")} /> 
+      component: <CompletionStep onComplete={handleComplete} /> 
     }
   ];
 

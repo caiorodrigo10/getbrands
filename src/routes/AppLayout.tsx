@@ -1,13 +1,12 @@
-import { NavigationMenu } from "@/components/NavigationMenu";
 import { Outlet } from "react-router-dom";
+import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 
-export const AppLayout = () => (
-  <div className="min-h-screen bg-background">
-    <NavigationMenu />
-    <main className="md:pl-64 w-full">
-      <div className="max-w-[1000px] mx-auto px-4 py-6 mt-16 md:mt-0">
-        <Outlet />
-      </div>
-    </main>
-  </div>
-);
+export const AppLayout = () => {
+  useOnboardingStatus();
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Outlet />
+    </div>
+  );
+};
