@@ -9,9 +9,9 @@ interface LaunchUrgencyStepProps {
 }
 
 const urgencyOptions = [
-  { id: "immediate", label: "As soon as possible" },
-  { id: "one_to_three", label: "Within 1-3 months" },
-  { id: "flexible", label: "Flexible timeline" }
+  { id: "As soon as possible", label: "As soon as possible" },
+  { id: "Within 1-3 months", label: "Within 1-3 months" },
+  { id: "Flexible timeline", label: "Flexible timeline" }
 ];
 
 export const LaunchUrgencyStep = ({ 
