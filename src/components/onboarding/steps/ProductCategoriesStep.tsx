@@ -78,20 +78,18 @@ export const ProductCategoriesStep = ({
               onClick={() => toggleCategory(category.id)}
               whileHover={{ y: -2 }}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-6">
                 <Checkbox 
                   checked={isSelected}
                   className="h-5 w-5"
                   onCheckedChange={() => toggleCategory(category.id)}
                 />
-                <div className="flex-1 flex items-center justify-center gap-4">
-                  <span className="text-lg font-medium text-gray-900">
-                    {category.label}
-                  </span>
-                </div>
                 <div className="p-2 rounded-full bg-primary/10">
                   <Icon className="w-6 h-6 text-primary" />
                 </div>
+                <span className="text-lg font-medium text-gray-900">
+                  {category.label}
+                </span>
               </div>
             </motion.div>
           );
