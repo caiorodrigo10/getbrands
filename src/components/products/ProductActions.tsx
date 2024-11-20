@@ -14,9 +14,10 @@ import { useProductSelection } from "./hooks/useProductSelection";
 
 interface ProductActionsProps {
   product: Product;
+  onSelectProduct?: () => void;
 }
 
-export const ProductActions = ({ product }: ProductActionsProps) => {
+export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { addItem } = useCart();
   const { toast } = useToast();
@@ -115,6 +116,11 @@ export const ProductActions = ({ product }: ProductActionsProps) => {
         setShowProjectDialog(true);
       } else {
         setShowInsufficientPointsDialog(true);
+      }
+
+      // Call the parent's onSelectProduct if provided
+      if (onSelectProduct) {
+        onSelectProduct();
       }
     } catch (error) {
       console.error('Error loading projects:', error);
