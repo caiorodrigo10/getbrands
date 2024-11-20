@@ -1,14 +1,22 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { saveOnboardingData } from "@/services/onboardingService";
+import { saveOnboardingData, OnboardingData } from "@/services/onboardingService";
 import { useNavigate } from "react-router-dom";
+
+type OnboardingAnswers = {
+  phone?: string;
+  profileType?: 'Creator/Influencer' | 'Entrepreneur' | 'Digital Marketer';
+  categories?: string[];
+  brandStatus?: 'existing' | 'new';
+  launchUrgency?: 'immediate' | 'one_to_three' | 'flexible';
+};
 
 export const useOnboardingQuiz = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [answers, setAnswers] = useState<OnboardingAnswers>({});
 
   const validateCurrentStep = (step: any) => {
     if (!step) return true;
@@ -60,7 +68,7 @@ export const useOnboardingQuiz = () => {
       return;
     }
 
-    const onboardingData = {
+    const onboardingData: OnboardingData = {
       phone: answers.phone,
       profile_type: answers.profileType as 'Creator/Influencer' | 'Entrepreneur' | 'Digital Marketer',
       product_interest: answers.categories || [],
