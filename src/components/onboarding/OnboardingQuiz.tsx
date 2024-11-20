@@ -18,6 +18,7 @@ export type QuizStep = {
   id: number;
   component: React.ReactNode;
   isMultiSelect?: boolean;
+  isRequired?: boolean;
 };
 
 export const OnboardingQuiz = () => {
@@ -26,7 +27,23 @@ export const OnboardingQuiz = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
 
+  const validateCurrentStep = () => {
+    const currentStepData = steps[currentStep];
+    if (!currentStepData) return true;
+
+    if (currentStepData.isRequired) {
+      const answer = answers[Object.keys(answers)[currentStep - 1]];
+      if (!answer || (Array.isArray(answer) && answer.length === 0)) {
+        toast.error("Por favor, preencha todos os campos obrigatórios");
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleNext = () => {
+    if (!validateCurrentStep()) return;
+    
     if (currentStep < steps.length - 1) {
       setCurrentStep(prev => prev + 1);
     }
@@ -48,13 +65,15 @@ export const OnboardingQuiz = () => {
   };
 
   const handleComplete = async () => {
+    if (!validateCurrentStep()) return;
+
     if (!user?.id) {
-      toast.error('You must be logged in to complete the onboarding');
+      toast.error('Você precisa estar logado para completar o onboarding');
       return;
     }
 
     if (!answers.phone) {
-      toast.error('Please enter your phone number');
+      toast.error('Por favor, insira seu número de telefone');
       return;
     }
 
@@ -79,7 +98,8 @@ export const OnboardingQuiz = () => {
   const steps: QuizStep[] = [
     { 
       id: 1, 
-      component: <WelcomeStep onNext={handleNext} /> 
+      component: <WelcomeStep onNext={handleNext} />,
+      isRequired: false
     },
     { 
       id: 2, 
@@ -88,7 +108,8 @@ export const OnboardingQuiz = () => {
         onAnswer={(value) => handleAnswer('categories', value)}
         onNext={handleNext}
       />,
-      isMultiSelect: true
+      isMultiSelect: true,
+      isRequired: true
     },
     { 
       id: 3, 
@@ -96,7 +117,8 @@ export const OnboardingQuiz = () => {
         selected={answers.profileType}
         onAnswer={(value) => handleAnswer('profileType', value)}
         onNext={handleNext}
-      /> 
+      />,
+      isRequired: true
     },
     { 
       id: 4, 
@@ -104,7 +126,8 @@ export const OnboardingQuiz = () => {
         selected={answers.brandStatus}
         onAnswer={(value) => handleAnswer('brandStatus', value)}
         onNext={handleNext}
-      /> 
+      />,
+      isRequired: true
     },
     { 
       id: 5, 
@@ -112,7 +135,8 @@ export const OnboardingQuiz = () => {
         selected={answers.launchUrgency}
         onAnswer={(value) => handleAnswer('launchUrgency', value)}
         onNext={handleNext}
-      /> 
+      />,
+      isRequired: true
     },
     {
       id: 6,
@@ -120,7 +144,8 @@ export const OnboardingQuiz = () => {
         value={answers.phone || ''}
         onAnswer={(value) => handleAnswer('phone', value)}
         onNext={handleComplete}
-      />
+      />,
+      isRequired: true
     }
   ];
 
@@ -159,7 +184,7 @@ export const OnboardingQuiz = () => {
               onClick={handleBack}
               className="w-32 text-gray-900 hover:text-gray-900"
             >
-              Back
+              Voltar
             </Button>
             {currentStep < steps.length - 1 && (
               <Button
@@ -167,7 +192,7 @@ export const OnboardingQuiz = () => {
                 className="w-32 text-white hover:text-white"
                 disabled={steps[currentStep]?.isMultiSelect ? !answers[Object.keys(answers)[currentStep - 1]]?.length : false}
               >
-                Next
+                Próximo
               </Button>
             )}
           </div>
