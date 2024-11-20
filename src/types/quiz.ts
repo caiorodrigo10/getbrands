@@ -1,16 +1,14 @@
-export type QuizAnswer = {
-  questionId: string;
-  answer: string | string[];
-};
-
 export type QuizStep = {
   id: string;
-  title: string;
-  description?: string;
-  type: 'single' | 'multiple';
-  options?: {
-    id: string;
-    label: string;
-    description?: string;
-  }[];
+  question: string;
+  options: string[];
+  type: "single" | "multiple";
+};
+
+export type OnboardingQuizData = {
+  product_interest: string[];
+  profile_type: string;
+  brand_status: string;
+  launch_urgency: string;
+  phone: string;
 };

@@ -13,7 +13,7 @@ export const useUserPermissions = () => {
       if (!user?.id) return null;
       const { data } = await supabase
         .from("profiles")
-        .select("role, profile_type")
+        .select("role")
         .eq("id", user.id)
         .single();
       return data;
@@ -22,8 +22,8 @@ export const useUserPermissions = () => {
   });
 
   const isAdmin = profile?.role === 'admin';
-  const isMember = profile?.profile_type === 'member';
-  const isSampler = profile?.profile_type === 'sampler';
+  const isMember = profile?.role === 'member';
+  const isSampler = profile?.role === 'sampler';
 
   const hasFullAccess = isAdmin;
   const hasLimitedAccess = isMember || isSampler;
