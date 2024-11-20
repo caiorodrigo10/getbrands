@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 
-export const CompletionStep = () => {
-  const navigate = useNavigate();
+interface CompletionStepProps {
+  onComplete: () => void;
+}
 
+export const CompletionStep = ({ onComplete }: CompletionStepProps) => {
   return (
     <motion.div 
       className="text-center space-y-6"
@@ -18,7 +19,7 @@ export const CompletionStep = () => {
         We're setting up your experience. Get ready to create your brand!
       </p>
       <Button 
-        onClick={() => navigate("/dashboard")}
+        onClick={onComplete}
         size="lg"
         className="mt-8 px-8 py-6 text-xl"
       >

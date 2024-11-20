@@ -2,11 +2,15 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { WelcomeStep } from "./steps/WelcomeStep";
 import { ProductCategoriesStep } from "./steps/ProductCategoriesStep";
 import { ProfileTypeStep } from "./steps/ProfileTypeStep";
 import { BrandStatusStep } from "./steps/BrandStatusStep";
 import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
+import { PhoneNumberStep } from "./steps/PhoneNumberStep";
 import { CompletionStep } from "./steps/CompletionStep";
 
 export type QuizStep = {
@@ -15,6 +19,7 @@ export type QuizStep = {
 };
 
 export const OnboardingQuiz = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
 
@@ -30,8 +35,23 @@ export const OnboardingQuiz = () => {
     }
   };
 
-  const handleAnswer = (stepId: string, answer: any) => {
-    setAnswers(prev => ({ ...prev, [stepId]: answer }));
+  const handleAnswer = async (stepId: string, answer: any) => {
+    const newAnswers = { ...answers, [stepId]: answer };
+    setAnswers(newAnswers);
+
+    // If this is the phone number step, update the user's profile
+    if (stepId === 'phone') {
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .update({ phone_number: answer })
+          .eq('id', (await supabase.auth.getUser()).data.user?.id);
+
+        if (error) throw error;
+      } catch (error) {
+        toast.error("Failed to save phone number");
+      }
+    }
   };
 
   const steps: QuizStep[] = [
@@ -68,7 +88,17 @@ export const OnboardingQuiz = () => {
         onNext={handleNext}
       /> 
     },
-    { id: 6, component: <CompletionStep /> }
+    {
+      id: 6,
+      component: <PhoneNumberStep
+        onAnswer={(value) => handleAnswer('phone', value)}
+        onNext={handleNext}
+      />
+    },
+    { 
+      id: 7, 
+      component: <CompletionStep onComplete={() => navigate("/dashboard")} /> 
+    }
   ];
 
   const progress = ((currentStep) / (steps.length - 1)) * 100;

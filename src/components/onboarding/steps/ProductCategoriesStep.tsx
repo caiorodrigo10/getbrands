@@ -24,7 +24,21 @@ const categories = [
     label: "Cosmetics & Personal Care",
     image: "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07"
   },
-  // ... Add more categories with their respective images
+  {
+    id: "sports",
+    label: "Sports Nutrition & Proteins",
+    image: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1"
+  },
+  {
+    id: "natural",
+    label: "Natural Products & Extracts",
+    image: "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07"
+  },
+  {
+    id: "pet",
+    label: "Pet Products",
+    image: "https://images.unsplash.com/photo-1582562124811-c09040d0a901"
+  }
 ];
 
 export const ProductCategoriesStep = ({ 
@@ -45,9 +59,7 @@ export const ProductCategoriesStep = ({
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
           Which product categories are you interested in creating?
         </h2>
-        <p className="text-gray-600">
-          Select all that apply
-        </p>
+        <p className="text-gray-600">Select all that apply</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
