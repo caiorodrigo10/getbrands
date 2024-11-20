@@ -58,12 +58,19 @@ export const useOnboardingQuiz = () => {
       return;
     }
 
+    // Map the launch urgency value to match the database enum
+    const mappedLaunchUrgency = {
+      immediate: 'immediate',
+      one_to_three: 'one_to_three',
+      flexible: 'flexible'
+    }[answers.launchUrgency] || 'flexible';
+
     const onboardingData = {
       phone: answers.phone,
       profile_type: answers.profileType,
       product_interest: answers.categories || [],
       brand_status: answers.brandStatus,
-      launch_urgency: answers.launchUrgency
+      launch_urgency: mappedLaunchUrgency
     };
 
     const result = await saveOnboardingData(user.id, onboardingData);
