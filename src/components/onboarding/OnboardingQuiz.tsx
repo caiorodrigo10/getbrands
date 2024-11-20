@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,6 +36,17 @@ export const OnboardingQuiz = () => {
 
   const handleAnswer = (stepId: string, answer: any) => {
     setAnswers(prev => ({ ...prev, [stepId]: answer }));
+  };
+
+  const isStepValid = (step: number) => {
+    if (step === 0) return true; // Welcome step
+    if (step === steps.length - 1) return true; // Completion step
+    
+    const currentAnswer = answers[Object.keys(answers)[step - 1]];
+    if (Array.isArray(currentAnswer)) {
+      return currentAnswer.length > 0;
+    }
+    return !!currentAnswer;
   };
 
   const saveQuizData = async () => {
@@ -183,7 +193,7 @@ export const OnboardingQuiz = () => {
               <Button
                 onClick={handleNext}
                 className="w-32 text-white hover:text-white"
-                disabled={steps[currentStep]?.isMultiSelect ? !answers[Object.keys(answers)[currentStep - 1]]?.length : false}
+                disabled={!isStepValid(currentStep)}
               >
                 Next
               </Button>

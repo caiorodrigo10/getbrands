@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 interface PhoneNumberStepProps {
   value: string;
@@ -9,24 +10,9 @@ interface PhoneNumberStepProps {
 }
 
 export const PhoneNumberStep = ({ value, onAnswer, onNext }: PhoneNumberStepProps) => {
-  const formatPhoneNumber = (input: string) => {
-    // Remove all non-digits
-    const numbers = input.replace(/\D/g, '');
-    
-    // Format the number as (XXX) XXX-XXXX
-    if (numbers.length <= 3) return numbers;
-    if (numbers.length <= 6) return `(${numbers.slice(0, 3)}) ${numbers.slice(3)}`;
-    return `(${numbers.slice(0, 3)}) ${numbers.slice(3, 6)}-${numbers.slice(6, 10)}`;
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatPhoneNumber(e.target.value);
-    onAnswer(formatted);
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (value.match(/^\(\d{3}\) \d{3}-\d{4}$/)) {
+    if (value) {
       onNext();
     }
   };
@@ -47,19 +33,19 @@ export const PhoneNumberStep = ({ value, onAnswer, onNext }: PhoneNumberStepProp
         animate={{ opacity: 1, y: 0 }}
         className="space-y-4"
       >
-        <Input
-          type="tel"
-          placeholder="(555) 555-5555"
-          className="w-full text-lg p-4"
+        <PhoneInput
+          country={'us'}
           value={value}
-          onChange={handleChange}
-          maxLength={14}
+          onChange={(phone) => onAnswer(phone)}
+          containerClass="w-full"
+          inputClass="w-full text-lg p-4 border border-input rounded-md"
+          buttonClass="!border-input"
         />
 
         <Button
           type="submit"
           className="w-full"
-          disabled={!value.match(/^\(\d{3}\) \d{3}-\d{4}$/)}
+          disabled={!value}
         >
           Complete Onboarding
         </Button>
