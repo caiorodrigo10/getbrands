@@ -99,7 +99,11 @@ export const OnboardingQuiz = () => {
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white py-12">
       <div className="max-w-xl mx-auto space-y-8 px-4 sm:px-6">
         <div className="flex justify-center mb-8">
-          <img src="/lovable-uploads/943cac07-9354-4831-82fc-be2471d67daa.png" alt="Logo" className="h-12" />
+          <img 
+            src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png" 
+            alt="Logo" 
+            className="h-12" 
+          />
         </div>
         
         <Progress value={progress} className="w-full h-2" />
