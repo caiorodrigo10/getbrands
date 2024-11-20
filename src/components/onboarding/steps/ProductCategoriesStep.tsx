@@ -54,15 +54,15 @@ export const ProductCategoriesStep = ({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-xl mx-auto">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
           Which product categories are you interested in creating?
         </h2>
         <p className="text-gray-600">Select all that apply</p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {categories.map((category) => {
           const isSelected = selected.includes(category.id);
           const Icon = category.icon;
@@ -78,16 +78,16 @@ export const ProductCategoriesStep = ({
               onClick={() => toggleCategory(category.id)}
               whileHover={{ y: -2 }}
             >
-              <div className="flex items-center gap-6">
+              <div className="flex items-center gap-4">
                 <Checkbox 
                   checked={isSelected}
                   className="h-5 w-5"
                   onCheckedChange={() => toggleCategory(category.id)}
                 />
                 <div className="p-2 rounded-full bg-primary/10">
-                  <Icon className="w-6 h-6 text-primary" />
+                  <Icon className="w-5 h-5 text-primary" />
                 </div>
-                <span className="text-lg font-medium text-gray-900">
+                <span className="text-base sm:text-lg font-medium text-gray-900">
                   {category.label}
                 </span>
               </div>

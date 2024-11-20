@@ -96,8 +96,8 @@ export const OnboardingQuiz = () => {
   const progress = ((currentStep) / (steps.length - 1)) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white py-12 px-4">
-      <div className="max-w-3xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white py-12">
+      <div className="max-w-2xl mx-auto space-y-8 px-4 sm:px-6 lg:px-8">
         <Progress value={progress} className="w-full h-2" />
         
         <AnimatePresence mode="wait">
