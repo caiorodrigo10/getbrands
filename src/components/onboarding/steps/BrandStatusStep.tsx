@@ -9,8 +9,8 @@ interface BrandStatusStepProps {
 }
 
 const brandStatuses = [
-  { id: "existing", label: "I already have a brand" },
-  { id: "new", label: "I'm creating a new brand" }
+  { id: "I already have a brand", label: "I already have a brand" },
+  { id: "I'm creating a new brand", label: "I'm creating a new brand" }
 ];
 
 export const BrandStatusStep = ({ 
