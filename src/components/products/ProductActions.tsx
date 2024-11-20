@@ -8,6 +8,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import ProjectSelectionDialog from "@/components/dialogs/ProjectSelectionDialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { CalendarDays } from "lucide-react";
 
 interface ProductActionsProps {
   product: Product;
@@ -17,11 +25,29 @@ interface ProductActionsProps {
 export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showProjectDialog, setShowProjectDialog] = useState(false);
+  const [showInsufficientPointsDialog, setShowInsufficientPointsDialog] = useState(false);
+  const [showPermissionDeniedDialog, setShowPermissionDeniedDialog] = useState(false);
   const [projects, setProjects] = useState<any[]>([]);
   const { addItem } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  const { data: userProfile } = useQuery({
+    queryKey: ["user-profile", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
 
   const handleRequestSample = async () => {
     setIsLoading(true);
@@ -54,6 +80,10 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
       return;
     }
 
+    const userRole = userProfile?.role;
+    const isRestrictedRole = userRole === "member" || userRole === "sampler";
+    const isPrivilegedRole = userRole === "admin" || userRole === "customer";
+
     try {
       const { data: userProjects, error: projectsError } = await supabase
         .from('projects')
@@ -70,11 +100,29 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
         return;
       }
 
-      if (userProjects?.length) {
-        setProjects(userProjects);
-        setShowProjectDialog(true);
-      } else {
+      if (!userProjects?.length) {
         navigate("/checkout/points");
+        return;
+      }
+
+      // Filter projects with sufficient points
+      const projectsWithSufficientPoints = userProjects.filter(project => {
+        const availablePoints = (project.points || 0) - (project.points_used || 0);
+        return availablePoints >= 1000;
+      });
+
+      if (isRestrictedRole) {
+        setShowPermissionDeniedDialog(true);
+        return;
+      }
+
+      if (isPrivilegedRole) {
+        if (projectsWithSufficientPoints.length > 0) {
+          setProjects(projectsWithSufficientPoints);
+          setShowProjectDialog(true);
+        } else {
+          setShowInsufficientPointsDialog(true);
+        }
       }
     } catch (error) {
       console.error('Error loading projects:', error);
@@ -151,6 +199,10 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
     }
   };
 
+  const handleScheduleCall = () => {
+    navigate("/schedule-call");
+  };
+
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:gap-4 px-4 sm:px-0">
       <Button 
@@ -179,6 +231,51 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
           product={product}
         />
       )}
+
+      <Dialog open={showInsufficientPointsDialog} onOpenChange={setShowInsufficientPointsDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Insufficient Points</DialogTitle>
+            <DialogDescription>
+              You don't have enough points to select this product.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Button 
+              className="w-full"
+              onClick={handleScheduleCall}
+            >
+              <CalendarDays className="mr-2 h-4 w-4" />
+              Schedule a Call with Our Team
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => setShowInsufficientPointsDialog(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showPermissionDeniedDialog} onOpenChange={setShowPermissionDeniedDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Permission Denied</DialogTitle>
+            <DialogDescription>
+              Users with this profile don't have permission to select products.
+            </DialogDescription>
+          </DialogHeader>
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => setShowPermissionDeniedDialog(false)}
+          >
+            Close
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
