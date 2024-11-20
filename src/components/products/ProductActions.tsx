@@ -9,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import ProjectSelectionDialog from "@/components/dialogs/ProjectSelectionDialog";
 import { InsufficientPointsDialog } from "./dialogs/InsufficientPointsDialog";
 import { PermissionDeniedDialog } from "./dialogs/PermissionDeniedDialog";
-import { useProductSelection } from "./hooks/useProductSelection";
 
 interface ProductActionsProps {
   product: Product;
@@ -18,10 +17,14 @@ interface ProductActionsProps {
 
 export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [showProjectDialog, setShowProjectDialog] = useState(false);
+  const [showInsufficientPointsDialog, setShowInsufficientPointsDialog] = useState(false);
+  const [showPermissionDeniedDialog, setShowPermissionDeniedDialog] = useState(false);
+  const [projects, setProjects] = useState<any[]>([]);
   const { addItem } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { currentDialog, setCurrentDialog, projects, handleSelectProduct } = useProductSelection(product);
+  const { user } = useAuth();
 
   const handleRequestSample = async () => {
     setIsLoading(true);
@@ -40,6 +43,60 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSelectProduct = async () => {
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "You must be logged in to select products.",
+      });
+      return;
+    }
+
+    const userRole = user?.role;
+    const isRestrictedRole = userRole === "member" || userRole === "sampler";
+
+    if (isRestrictedRole) {
+      setShowPermissionDeniedDialog(true);
+      return;
+    }
+
+    try {
+      const { data: userProjects, error: projectsError } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (projectsError) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load projects. Please try again.",
+        });
+        return;
+      }
+
+      const projectsWithSufficientPoints = userProjects?.filter(project => {
+        const availablePoints = (project.points || 0) - (project.points_used || 0);
+        return availablePoints >= 1000;
+      }) || [];
+
+      if (projectsWithSufficientPoints.length > 0) {
+        setProjects(projectsWithSufficientPoints);
+        setShowProjectDialog(true);
+      } else {
+        setShowInsufficientPointsDialog(true);
+      }
+    } catch (error) {
+      console.error('Error loading projects:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+      });
     }
   };
 
@@ -134,8 +191,8 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
 
       {product && (
         <ProjectSelectionDialog
-          open={currentDialog === "project"}
-          onOpenChange={(open) => !open && setCurrentDialog(null)}
+          open={showProjectDialog}
+          onOpenChange={setShowProjectDialog}
           projects={projects}
           onConfirm={handleProjectSelection}
           product={product}
@@ -143,14 +200,14 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
       )}
 
       <InsufficientPointsDialog
-        open={currentDialog === "insufficientPoints"}
-        onOpenChange={(open) => !open && setCurrentDialog(null)}
+        open={showInsufficientPointsDialog}
+        onOpenChange={setShowInsufficientPointsDialog}
         onScheduleCall={handleScheduleCall}
       />
 
       <PermissionDeniedDialog
-        open={currentDialog === "permissionDenied"}
-        onOpenChange={(open) => !open && setCurrentDialog(null)}
+        open={showPermissionDeniedDialog}
+        onOpenChange={setShowPermissionDeniedDialog}
       />
     </div>
   );
