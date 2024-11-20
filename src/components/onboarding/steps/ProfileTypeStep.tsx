@@ -9,9 +9,9 @@ interface ProfileTypeStepProps {
 }
 
 const profileTypes = [
-  { id: "creator", label: "Creator/Influencer" },
-  { id: "entrepreneur", label: "Entrepreneur" },
-  { id: "marketer", label: "Digital Marketer" }
+  { id: "Creator/Influencer", label: "Creator/Influencer" },
+  { id: "Entrepreneur", label: "Entrepreneur" },
+  { id: "Digital Marketer", label: "Digital Marketer" }
 ];
 
 export const ProfileTypeStep = ({ 
