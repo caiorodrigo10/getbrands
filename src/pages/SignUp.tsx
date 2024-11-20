@@ -42,7 +42,7 @@ const SignUp = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -50,12 +50,16 @@ const SignUp = () => {
             first_name: formData.firstName,
             last_name: formData.lastName,
           },
+          emailRedirectTo: `${window.location.origin}/login`,
         },
       });
 
-      if (error) throw error;
+      if (signUpError) throw signUpError;
+
+      // Sign out after successful registration to clear any session data
+      await supabase.auth.signOut();
       
-      // Directly navigate to login without showing the verification toast
+      // Navigate to login page
       navigate("/login");
     } catch (error) {
       console.error("Error signing up:", error);
