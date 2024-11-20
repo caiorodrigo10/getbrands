@@ -54,7 +54,7 @@ export const ProductCategoriesStep = ({
   };
 
   return (
-    <div className="space-y-8 max-w-xl mx-auto">
+    <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
           Which product categories are you interested in creating?
@@ -78,7 +78,7 @@ export const ProductCategoriesStep = ({
               onClick={() => toggleCategory(category.id)}
               whileHover={{ y: -2 }}
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <Checkbox 
                   checked={isSelected}
                   className="h-5 w-5"

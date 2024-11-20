@@ -97,7 +97,11 @@ export const OnboardingQuiz = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white py-12">
-      <div className="max-w-2xl mx-auto space-y-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-xl mx-auto space-y-8 px-4 sm:px-6">
+        <div className="flex justify-center mb-8">
+          <img src="/lovable-uploads/943cac07-9354-4831-82fc-be2471d67daa.png" alt="Logo" className="h-12" />
+        </div>
+        
         <Progress value={progress} className="w-full h-2" />
         
         <AnimatePresence mode="wait">
