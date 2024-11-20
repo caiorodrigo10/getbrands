@@ -1,18 +1,13 @@
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useNavigate } from "react-router-dom";
 import { WelcomeStep } from "./steps/WelcomeStep";
 import { ProductCategoriesStep } from "./steps/ProductCategoriesStep";
 import { ProfileTypeStep } from "./steps/ProfileTypeStep";
 import { BrandStatusStep } from "./steps/BrandStatusStep";
 import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { PhoneNumberStep } from "./steps/PhoneNumberStep";
-import { CompletionStep } from "./steps/CompletionStep";
-import { useAuth } from "@/contexts/AuthContext";
-import { saveOnboardingData } from "@/services/onboardingService";
-import { toast } from "sonner";
+import { useOnboardingQuiz } from "./hooks/useOnboardingQuiz";
 
 export type QuizStep = {
   id: number;
@@ -22,91 +17,27 @@ export type QuizStep = {
 };
 
 export const OnboardingQuiz = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, any>>({});
-
-  const validateCurrentStep = () => {
-    const currentStepData = steps[currentStep];
-    if (!currentStepData) return true;
-
-    if (currentStepData.isRequired) {
-      const answer = answers[Object.keys(answers)[currentStep - 1]];
-      if (!answer || (Array.isArray(answer) && answer.length === 0)) {
-        toast.error("Por favor, preencha todos os campos obrigatórios");
-        return false;
-      }
-    }
-    return true;
-  };
-
-  const handleNext = () => {
-    if (!validateCurrentStep()) return;
-    
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(prev => prev + 1);
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
-    }
-  };
-
-  const handleAnswer = async (stepId: string, answer: any) => {
-    const newAnswers = { ...answers, [stepId]: answer };
-    setAnswers(newAnswers);
-
-    if (!steps[currentStep]?.isMultiSelect && currentStep < steps.length - 1) {
-      handleNext();
-    }
-  };
-
-  const handleComplete = async () => {
-    if (!validateCurrentStep()) return;
-
-    if (!user?.id) {
-      toast.error('Você precisa estar logado para completar o onboarding');
-      return;
-    }
-
-    if (!answers.phone) {
-      toast.error('Por favor, insira seu número de telefone');
-      return;
-    }
-
-    const onboardingData = {
-      phone: answers.phone,
-      profile_type: answers.profileType,
-      product_interest: answers.categories || [],
-      brand_status: answers.brandStatus,
-      launch_urgency: answers.launchUrgency
-    };
-
-    const result = await saveOnboardingData(user.id, onboardingData);
-    
-    if (result.status === 'success') {
-      toast.success(result.message);
-      navigate('/start-here');
-    } else {
-      toast.error(result.message);
-    }
-  };
+  const {
+    currentStep,
+    answers,
+    handleNext,
+    handleBack,
+    handleAnswer,
+    handleComplete
+  } = useOnboardingQuiz();
 
   const steps: QuizStep[] = [
     { 
       id: 1, 
-      component: <WelcomeStep onNext={handleNext} />,
+      component: <WelcomeStep onNext={() => handleNext(steps)} />,
       isRequired: false
     },
     { 
       id: 2, 
       component: <ProductCategoriesStep 
         selected={answers.categories || []}
-        onAnswer={(value) => handleAnswer('categories', value)}
-        onNext={handleNext}
+        onAnswer={(value) => handleAnswer('categories', value, steps)}
+        onNext={() => handleNext(steps)}
       />,
       isMultiSelect: true,
       isRequired: true
@@ -115,8 +46,8 @@ export const OnboardingQuiz = () => {
       id: 3, 
       component: <ProfileTypeStep 
         selected={answers.profileType}
-        onAnswer={(value) => handleAnswer('profileType', value)}
-        onNext={handleNext}
+        onAnswer={(value) => handleAnswer('profileType', value, steps)}
+        onNext={() => handleNext(steps)}
       />,
       isRequired: true
     },
@@ -124,8 +55,8 @@ export const OnboardingQuiz = () => {
       id: 4, 
       component: <BrandStatusStep 
         selected={answers.brandStatus}
-        onAnswer={(value) => handleAnswer('brandStatus', value)}
-        onNext={handleNext}
+        onAnswer={(value) => handleAnswer('brandStatus', value, steps)}
+        onNext={() => handleNext(steps)}
       />,
       isRequired: true
     },
@@ -133,8 +64,8 @@ export const OnboardingQuiz = () => {
       id: 5, 
       component: <LaunchUrgencyStep 
         selected={answers.launchUrgency}
-        onAnswer={(value) => handleAnswer('launchUrgency', value)}
-        onNext={handleNext}
+        onAnswer={(value) => handleAnswer('launchUrgency', value, steps)}
+        onNext={() => handleNext(steps)}
       />,
       isRequired: true
     },
@@ -142,14 +73,13 @@ export const OnboardingQuiz = () => {
       id: 6,
       component: <PhoneNumberStep
         value={answers.phone || ''}
-        onAnswer={(value) => handleAnswer('phone', value)}
+        onAnswer={(value) => handleAnswer('phone', value, steps)}
         onNext={handleComplete}
       />,
       isRequired: true
     }
   ];
 
-  // Ensure we have valid steps before calculating progress
   const progress = steps.length > 0 ? ((currentStep) / (steps.length - 1)) * 100 : 0;
 
   return (
@@ -184,15 +114,15 @@ export const OnboardingQuiz = () => {
               onClick={handleBack}
               className="w-32 text-gray-900 hover:text-gray-900"
             >
-              Voltar
+              Back
             </Button>
             {currentStep < steps.length - 1 && (
               <Button
-                onClick={handleNext}
+                onClick={() => handleNext(steps)}
                 className="w-32 text-white hover:text-white"
                 disabled={steps[currentStep]?.isMultiSelect ? !answers[Object.keys(answers)[currentStep - 1]]?.length : false}
               >
-                Próximo
+                Next
               </Button>
             )}
           </div>
