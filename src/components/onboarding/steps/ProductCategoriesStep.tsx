@@ -71,7 +71,7 @@ export const ProductCategoriesStep = ({
             <motion.div
               key={category.id}
               className={`
-                relative rounded-lg border py-2 px-4 cursor-pointer
+                relative rounded-lg border py-3.5 sm:py-4 px-4 cursor-pointer
                 transition-all duration-200
                 ${isSelected ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50'}
               `}
