@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Check, Coffee, Pill, Sparkles, Dumbbell, Leaf, Dog } from "lucide-react";
+import { Coffee, Pill, Sparkles, Dumbbell, Leaf, Dog } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface ProductCategoriesStepProps {
@@ -79,19 +79,19 @@ export const ProductCategoriesStep = ({
               whileHover={{ y: -2 }}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="p-2 rounded-full bg-primary/10">
-                    <Icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <span className="text-lg font-medium text-gray-900">
-                    {category.label}
-                  </span>
-                </div>
                 <Checkbox 
                   checked={isSelected}
                   className="h-5 w-5"
                   onCheckedChange={() => toggleCategory(category.id)}
                 />
+                <div className="flex-1 flex items-center justify-center gap-4">
+                  <span className="text-lg font-medium text-gray-900">
+                    {category.label}
+                  </span>
+                </div>
+                <div className="p-2 rounded-full bg-primary/10">
+                  <Icon className="w-6 h-6 text-primary" />
+                </div>
               </div>
             </motion.div>
           );
