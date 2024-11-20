@@ -170,7 +170,7 @@ export const OnboardingQuiz = () => {
           </motion.div>
         </AnimatePresence>
 
-        {currentStep > 0 && currentStep < steps.length - 1 && (
+        {currentStep > 0 && currentStep < steps.length - 2 && (
           <div className="flex justify-between items-center mt-6">
             <Button
               variant="outline"
