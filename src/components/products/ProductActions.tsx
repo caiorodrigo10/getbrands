@@ -111,6 +111,10 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
         return availablePoints >= 1000;
       }) || [];
 
+      // Reset any previously shown dialogs
+      setShowInsufficientPointsDialog(false);
+      setShowProjectDialog(false);
+
       if (projectsWithSufficientPoints.length > 0) {
         setProjects(projectsWithSufficientPoints);
         setShowProjectDialog(true);
