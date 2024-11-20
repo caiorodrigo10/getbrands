@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 interface LaunchUrgencyStepProps {
   selected: string;
   onAnswer: (urgency: string) => void;
-  onNext: () => void;
+  onComplete?: () => void;
 }
 
 const urgencyOptions = [
@@ -17,11 +17,13 @@ const urgencyOptions = [
 export const LaunchUrgencyStep = ({ 
   selected, 
   onAnswer,
-  onNext 
+  onComplete 
 }: LaunchUrgencyStepProps) => {
   const handleSelect = (value: string) => {
     onAnswer(value);
-    onNext(); // Auto-advance after selection
+    if (onComplete) {
+      onComplete(); // Call onComplete if provided
+    }
   };
 
   return (
