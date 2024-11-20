@@ -3,13 +3,33 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 interface PhoneNumberStepProps {
+  value: string;
   onAnswer: (phone: string) => void;
   onNext: () => void;
 }
 
-export const PhoneNumberStep = ({ onAnswer, onNext }: PhoneNumberStepProps) => {
+export const PhoneNumberStep = ({ value, onAnswer, onNext }: PhoneNumberStepProps) => {
+  const formatPhoneNumber = (input: string) => {
+    const numbers = input.replace(/\D/g, '');
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 6) return `(${numbers.slice(0, 3)}) ${numbers.slice(3)}`;
+    return `(${numbers.slice(0, 3)}) ${numbers.slice(3, 6)}-${numbers.slice(6, 10)}`;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    onAnswer(formatted);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (value.length >= 14) {
+      onNext();
+    }
+  };
+
   return (
-    <div className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-8">
       <div className="text-center">
         <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4">
           What's your phone number?
@@ -22,21 +42,25 @@ export const PhoneNumberStep = ({ onAnswer, onNext }: PhoneNumberStepProps) => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        className="space-y-4"
       >
         <Input
           type="tel"
           placeholder="(555) 555-5555"
           className="w-full text-lg p-4"
-          onChange={(e) => onAnswer(e.target.value)}
+          value={value}
+          onChange={handleChange}
+          maxLength={14}
         />
-      </motion.div>
 
-      <Button
-        onClick={onNext}
-        className="w-full"
-      >
-        Continue
-      </Button>
-    </div>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={value.length < 14}
+        >
+          Complete Onboarding
+        </Button>
+      </motion.div>
+    </form>
   );
 };

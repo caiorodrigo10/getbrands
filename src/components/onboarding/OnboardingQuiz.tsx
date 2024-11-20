@@ -53,6 +53,11 @@ export const OnboardingQuiz = () => {
       return;
     }
 
+    if (!answers.phone) {
+      toast.error('Please enter your phone number');
+      return;
+    }
+
     const onboardingData = {
       phone: answers.phone,
       profile_type: answers.profileType,
@@ -65,7 +70,7 @@ export const OnboardingQuiz = () => {
     
     if (result.status === 'success') {
       toast.success(result.message);
-      navigate('/dashboard');
+      navigate('/start-here');
     } else {
       toast.error(result.message);
     }
@@ -112,13 +117,10 @@ export const OnboardingQuiz = () => {
     {
       id: 6,
       component: <PhoneNumberStep
+        value={answers.phone || ''}
         onAnswer={(value) => handleAnswer('phone', value)}
-        onNext={handleNext}
+        onNext={handleComplete}
       />
-    },
-    { 
-      id: 7, 
-      component: <CompletionStep onComplete={handleComplete} /> 
     }
   ];
 
@@ -150,7 +152,7 @@ export const OnboardingQuiz = () => {
           </motion.div>
         </AnimatePresence>
 
-        {currentStep > 0 && currentStep < steps.length - 1 && (
+        {currentStep > 0 && currentStep < steps.length && (
           <div className="flex justify-between items-center mt-6">
             <Button
               variant="outline"
@@ -159,13 +161,15 @@ export const OnboardingQuiz = () => {
             >
               Back
             </Button>
-            <Button
-              onClick={handleNext}
-              className="w-32 text-white hover:text-white"
-              disabled={steps[currentStep]?.isMultiSelect ? !answers[Object.keys(answers)[currentStep - 1]]?.length : false}
-            >
-              Next
-            </Button>
+            {currentStep < steps.length - 1 && (
+              <Button
+                onClick={handleNext}
+                className="w-32 text-white hover:text-white"
+                disabled={steps[currentStep]?.isMultiSelect ? !answers[Object.keys(answers)[currentStep - 1]]?.length : false}
+              >
+                Next
+              </Button>
+            )}
           </div>
         )}
       </div>
