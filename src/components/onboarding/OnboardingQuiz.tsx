@@ -7,7 +7,9 @@ import { ProfileTypeStep } from "./steps/ProfileTypeStep";
 import { BrandStatusStep } from "./steps/BrandStatusStep";
 import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { PhoneNumberStep } from "./steps/PhoneNumberStep";
-import { useOnboardingQuiz } from "./hooks/useOnboardingQuiz";
+import { CompletionStep } from "./steps/CompletionStep";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export type QuizStep = {
   id: number;
@@ -17,27 +19,42 @@ export type QuizStep = {
 };
 
 export const OnboardingQuiz = () => {
-  const {
-    currentStep,
-    answers,
-    handleNext,
-    handleBack,
-    handleAnswer,
-    handleComplete
-  } = useOnboardingQuiz();
+  const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, any>>({});
+
+  const handleNext = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(prev => prev + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(prev => prev - 1);
+    }
+  };
+
+  const handleAnswer = (stepId: string, answer: any) => {
+    setAnswers(prev => ({ ...prev, [stepId]: answer }));
+  };
+
+  const handleComplete = () => {
+    navigate('/start-here');
+  };
 
   const steps: QuizStep[] = [
     { 
       id: 1, 
-      component: <WelcomeStep onNext={() => handleNext(steps)} />,
+      component: <WelcomeStep onNext={handleNext} />,
       isRequired: false
     },
     { 
       id: 2, 
       component: <ProductCategoriesStep 
         selected={answers.categories || []}
-        onAnswer={(value) => handleAnswer('categories', value, steps)}
-        onNext={() => handleNext(steps)}
+        onAnswer={(value) => handleAnswer('categories', value)}
+        onNext={handleNext}
       />,
       isMultiSelect: true,
       isRequired: true
@@ -46,8 +63,8 @@ export const OnboardingQuiz = () => {
       id: 3, 
       component: <ProfileTypeStep 
         selected={answers.profileType}
-        onAnswer={(value) => handleAnswer('profileType', value, steps)}
-        onNext={() => handleNext(steps)}
+        onAnswer={(value) => handleAnswer('profileType', value)}
+        onNext={handleNext}
       />,
       isRequired: true
     },
@@ -55,8 +72,8 @@ export const OnboardingQuiz = () => {
       id: 4, 
       component: <BrandStatusStep 
         selected={answers.brandStatus}
-        onAnswer={(value) => handleAnswer('brandStatus', value, steps)}
-        onNext={() => handleNext(steps)}
+        onAnswer={(value) => handleAnswer('brandStatus', value)}
+        onNext={handleNext}
       />,
       isRequired: true
     },
@@ -64,8 +81,8 @@ export const OnboardingQuiz = () => {
       id: 5, 
       component: <LaunchUrgencyStep 
         selected={answers.launchUrgency}
-        onAnswer={(value) => handleAnswer('launchUrgency', value, steps)}
-        onNext={() => handleNext(steps)}
+        onAnswer={(value) => handleAnswer('launchUrgency', value)}
+        onNext={handleNext}
       />,
       isRequired: true
     },
@@ -73,14 +90,19 @@ export const OnboardingQuiz = () => {
       id: 6,
       component: <PhoneNumberStep
         value={answers.phone || ''}
-        onAnswer={(value) => handleAnswer('phone', value, steps)}
-        onNext={handleComplete}
+        onAnswer={(value) => handleAnswer('phone', value)}
+        onNext={handleNext}
       />,
       isRequired: true
+    },
+    {
+      id: 7,
+      component: <CompletionStep onComplete={handleComplete} />,
+      isRequired: false
     }
   ];
 
-  const progress = steps.length > 0 ? ((currentStep) / (steps.length - 1)) * 100 : 0;
+  const progress = ((currentStep) / (steps.length - 1)) * 100;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white py-12">
@@ -107,7 +129,7 @@ export const OnboardingQuiz = () => {
           </motion.div>
         </AnimatePresence>
 
-        {currentStep > 0 && currentStep < steps.length && (
+        {currentStep > 0 && currentStep < steps.length - 1 && (
           <div className="flex justify-between items-center mt-6">
             <Button
               variant="outline"
@@ -116,15 +138,13 @@ export const OnboardingQuiz = () => {
             >
               Back
             </Button>
-            {currentStep < steps.length - 1 && (
-              <Button
-                onClick={() => handleNext(steps)}
-                className="w-32 text-white hover:text-white"
-                disabled={steps[currentStep]?.isMultiSelect ? !answers[Object.keys(answers)[currentStep - 1]]?.length : false}
-              >
-                Next
-              </Button>
-            )}
+            <Button
+              onClick={handleNext}
+              className="w-32 text-white hover:text-white"
+              disabled={steps[currentStep]?.isMultiSelect ? !answers[Object.keys(answers)[currentStep - 1]]?.length : false}
+            >
+              Next
+            </Button>
           </div>
         )}
       </div>
