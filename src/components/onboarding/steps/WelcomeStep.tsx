@@ -13,7 +13,7 @@ export const WelcomeStep = ({ onNext }: WelcomeStepProps) => {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-4"
       >
-        <h2 className="text-xl sm:text-3xl font-bold text-gray-900">
+        <h2 className="text-2xl sm:text-4xl font-bold text-gray-900">
           Welcome to Your Private Label Journey
         </h2>
         <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto">
