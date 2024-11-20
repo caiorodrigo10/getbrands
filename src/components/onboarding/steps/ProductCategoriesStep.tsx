@@ -54,15 +54,15 @@ export const ProductCategoriesStep = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="text-center">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
           Which product categories are you interested in creating?
         </h2>
-        <p className="text-gray-600">Select all that apply</p>
+        <p className="text-gray-600 mb-4">Select all that apply</p>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {categories.map((category) => {
           const isSelected = selected.includes(category.id);
           const Icon = category.icon;
@@ -71,7 +71,7 @@ export const ProductCategoriesStep = ({
             <motion.div
               key={category.id}
               className={`
-                relative rounded-lg border p-4 cursor-pointer
+                relative rounded-lg border py-2 px-4 cursor-pointer
                 transition-all duration-200
                 ${isSelected ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50'}
               `}
@@ -81,13 +81,13 @@ export const ProductCategoriesStep = ({
               <div className="flex items-center gap-3">
                 <Checkbox 
                   checked={isSelected}
-                  className="h-5 w-5"
+                  className="h-4 w-4"
                   onCheckedChange={() => toggleCategory(category.id)}
                 />
-                <div className="p-2 rounded-full bg-primary/10">
-                  <Icon className="w-5 h-5 text-primary" />
+                <div className="p-1.5 rounded-full bg-primary/10">
+                  <Icon className="w-4 h-4 text-primary" />
                 </div>
-                <span className="text-base sm:text-lg font-medium text-gray-900">
+                <span className="text-sm sm:text-base font-medium text-gray-900">
                   {category.label}
                 </span>
               </div>
