@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { identifyUser } from "@/lib/analytics";
+import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   user: User | null;
@@ -30,6 +31,26 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  const checkOnboardingStatus = async (userId: string) => {
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('onboarding_completed')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+
+      // If onboarding is not completed, redirect to onboarding
+      if (!profile?.onboarding_completed) {
+        navigate('/onboarding');
+      }
+    } catch (error) {
+      console.error('Error checking onboarding status:', error);
+    }
+  };
 
   useEffect(() => {
     // Get initial session
@@ -39,6 +60,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         identifyUser(session.user.id, {
           email: session.user.email,
         });
+        checkOnboardingStatus(session.user.id);
       }
       setLoading(false);
     });
@@ -52,6 +74,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         identifyUser(session.user.id, {
           email: session.user.email,
         });
+        checkOnboardingStatus(session.user.id);
       }
       setLoading(false);
     });
