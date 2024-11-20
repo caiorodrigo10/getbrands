@@ -59,6 +59,10 @@ const SignUp = () => {
       });
 
       if (signUpError) {
+        if (signUpError.message.includes("User already registered")) {
+          toast.error("This email is already registered. Please try logging in instead.");
+          return;
+        }
         throw signUpError;
       }
 
