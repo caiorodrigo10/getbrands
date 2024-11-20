@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
@@ -19,28 +18,34 @@ export const PhoneNumberStep = ({ value, onAnswer, onComplete }: PhoneNumberStep
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!value) return;
+    
+    if (!value) {
+      toast.error('Please enter a phone number');
+      return;
+    }
+
+    if (!user?.id) {
+      toast.error('Authentication error. Please try logging in again.');
+      return;
+    }
 
     try {
-      // Update the user's profile with the phone number and mark onboarding as completed
       const { error } = await supabase
         .from('profiles')
         .update({
           phone: value,
           onboarding_completed: true
         })
-        .eq('id', user?.id);
+        .eq('id', user.id);
 
       if (error) throw error;
 
-      // Call onComplete to update parent component state
+      toast.success('Onboarding completed successfully');
       onComplete();
-      
-      // Navigate to start-here page
       navigate('/start-here');
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error('Failed to complete onboarding');
+      toast.error('Failed to complete onboarding. Please try again.');
     }
   };
 
@@ -55,31 +60,25 @@ export const PhoneNumberStep = ({ value, onAnswer, onComplete }: PhoneNumberStep
         </p>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-4"
-      >
-        <div className="phone-input-container [&_.react-tel-input]:w-full [&_.react-tel-input_.form-control]:!w-full [&_.react-tel-input_.flag-dropdown]:!h-14 [&_.react-tel-input_.selected-flag]:!h-14 [&_.react-tel-input_.flag-dropdown]:!border-input [&_.react-tel-input_.flag-dropdown]:border-r-0">
-          <PhoneInput
-            country={'us'}
-            value={value}
-            onChange={(phone) => onAnswer(phone)}
-            containerClass="w-full"
-            inputClass="!w-full !h-14 !text-lg !p-4 !pl-14 !border !border-input !rounded-md"
-            buttonClass="!border-input !h-14 !w-12"
-            dropdownClass="!w-[300px]"
-          />
-        </div>
+      <div className="phone-input-container [&_.react-tel-input]:w-full [&_.react-tel-input_.form-control]:!w-full [&_.react-tel-input_.flag-dropdown]:!h-14 [&_.react-tel-input_.selected-flag]:!h-14 [&_.react-tel-input_.flag-dropdown]:!border-input [&_.react-tel-input_.flag-dropdown]:border-r-0">
+        <PhoneInput
+          country={'us'}
+          value={value}
+          onChange={(phone) => onAnswer(phone)}
+          containerClass="w-full"
+          inputClass="!w-full !h-14 !text-lg !p-4 !pl-14 !border !border-input !rounded-md"
+          buttonClass="!border-input !h-14 !w-12"
+          dropdownClass="!w-[300px]"
+        />
+      </div>
 
-        <Button
-          type="submit"
-          className="w-full h-14 text-lg bg-primary text-white hover:bg-primary/90"
-          disabled={!value}
-        >
-          Complete Onboarding
-        </Button>
-      </motion.div>
+      <Button
+        type="submit"
+        className="w-full h-14 text-lg bg-primary text-white hover:bg-primary/90"
+        disabled={!value}
+      >
+        Complete Onboarding
+      </Button>
     </form>
   );
 };
