@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
+import { Coffee, Pill, Sparkles, Dumbbell, Leaf, Dog } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Coffee, Palette, Pill, Dog } from "lucide-react";
 
 interface ProductCategoriesStepProps {
   selected: string[];
@@ -10,76 +10,70 @@ interface ProductCategoriesStepProps {
 
 const categories = [
   {
-    id: "cosmetics",
-    label: "Cosmetics",
-    icon: Palette,
-  },
-  {
     id: "coffee",
-    label: "Coffee",
+    label: "Coffee & Beverages",
     icon: Coffee,
   },
   {
     id: "supplements",
-    label: "Supplements",
+    label: "Supplements & Vitamins",
     icon: Pill,
   },
   {
-    id: "pet_products",
+    id: "cosmetics",
+    label: "Cosmetics & Personal Care",
+    icon: Sparkles,
+  },
+  {
+    id: "sports",
+    label: "Sports Nutrition & Proteins",
+    icon: Dumbbell,
+  },
+  {
+    id: "natural",
+    label: "Natural Products & Extracts",
+    icon: Leaf,
+  },
+  {
+    id: "pet",
     label: "Pet Products",
     icon: Dog,
-  },
+  }
 ];
 
-export const ProductCategoriesStep = ({
-  selected,
+export const ProductCategoriesStep = ({ 
+  selected, 
   onAnswer,
+  onNext 
 }: ProductCategoriesStepProps) => {
   const toggleCategory = (categoryId: string) => {
-    let newSelected;
-    if (selected.includes(categoryId)) {
-      newSelected = selected.filter((id) => id !== categoryId);
-    } else {
-      newSelected = [...selected, categoryId];
-    }
+    const newSelected = selected.includes(categoryId)
+      ? selected.filter(id => id !== categoryId)
+      : [...selected, categoryId];
     onAnswer(newSelected);
   };
 
   return (
     <div className="space-y-8">
-      {/* Logo */}
-      <div className="flex justify-center mb-8">
-        <img
-          src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
-          alt="GetBrands Logo"
-          className="h-12 w-auto"
-        />
-      </div>
-
       <div className="text-center">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
           Which product categories are you interested in creating?
         </h2>
-        <p className="text-lg text-gray-600">
-          Select all that apply. You can always change this later.
-        </p>
+        <p className="text-gray-600">Select all that apply</p>
       </div>
 
-      <div className="grid gap-4">
+      <div className="space-y-4">
         {categories.map((category) => {
-          const Icon = category.icon;
           const isSelected = selected.includes(category.id);
-
+          const Icon = category.icon;
+          
           return (
             <motion.div
               key={category.id}
               className={`
-                p-4 rounded-lg border-2 cursor-pointer
-                ${
-                  isSelected
-                    ? "border-primary bg-primary/5"
-                    : "border-gray-200 hover:border-primary/50"
-                }
+                relative rounded-lg border p-4 cursor-pointer
+                transition-all duration-200
+                ${isSelected ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50'}
               `}
               onClick={() => toggleCategory(category.id)}
               whileHover={{ y: -2 }}
