@@ -54,26 +54,35 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
       return;
     }
 
-    const { data: userProjects, error: projectsError } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('status', 'active');
+    try {
+      const { data: userProjects, error: projectsError } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('status', 'active');
 
-    if (projectsError) {
+      if (projectsError) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load projects. Please try again.",
+        });
+        return;
+      }
+
+      if (userProjects?.length) {
+        setProjects(userProjects);
+        setShowProjectDialog(true);
+      } else {
+        navigate("/checkout/points");
+      }
+    } catch (error) {
+      console.error('Error loading projects:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to load projects. Please try again.",
+        description: "An unexpected error occurred. Please try again.",
       });
-      return;
-    }
-
-    if (userProjects?.length) {
-      setProjects(userProjects);
-      setShowProjectDialog(true);
-    } else {
-      navigate("/checkout/points");
     }
   };
 
@@ -129,8 +138,7 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
           project: {
             name: currentProject.name
           }
-        },
-        replace: true
+        }
       });
 
     } catch (error) {
