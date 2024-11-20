@@ -26,16 +26,16 @@ export const NavigationMenu = () => {
       restricted: true
     },
     { 
-      label: "Catalog", 
-      path: "/catalog", 
-      icon: Grid3X3,
-      restricted: false
-    },
-    { 
       label: "My Products", 
       path: "/products", 
       icon: Palette,
       restricted: true
+    },
+    { 
+      label: "Catalog", 
+      path: "/catalog", 
+      icon: Grid3X3,
+      restricted: false
     },
     { 
       label: "Orders", 
