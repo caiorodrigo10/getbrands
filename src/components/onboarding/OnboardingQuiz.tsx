@@ -98,14 +98,7 @@ export const OnboardingQuiz = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white py-12 px-4">
       <div className="max-w-3xl mx-auto space-y-8">
-        <div className="flex flex-col items-center space-y-8">
-          <img 
-            src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
-            alt="GetBrands Logo"
-            className="h-12 w-auto"
-          />
-          <Progress value={progress} className="w-full h-2" />
-        </div>
+        <Progress value={progress} className="w-full h-2" />
         
         <AnimatePresence mode="wait">
           <motion.div
@@ -124,13 +117,13 @@ export const OnboardingQuiz = () => {
             <Button
               variant="outline"
               onClick={handleBack}
-              className="w-32"
+              className="w-32 text-gray-900 hover:text-gray-900"
             >
               Back
             </Button>
             <Button
               onClick={handleNext}
-              className="w-32"
+              className="w-32 text-white hover:text-white"
               disabled={steps[currentStep].isMultiSelect ? !answers[Object.keys(answers)[currentStep - 1]]?.length : false}
             >
               Next
