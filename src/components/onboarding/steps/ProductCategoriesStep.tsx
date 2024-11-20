@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Coffee, Pill, Sparkles, Dumbbell, Leaf, Dog } from "lucide-react";
+import { Coffee, Pill, Sparkles, Dumbbell, Dog } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface ProductCategoriesStepProps {
@@ -32,12 +32,6 @@ const categories = [
     label: "Sports Nutrition",
     description: "Protein powders, pre-workouts, and meal replacement shakes.",
     icon: Dumbbell,
-  },
-  {
-    id: "natural",
-    label: "Natural & Herbal",
-    description: "Herbal supplements, essential oils, and natural extracts.",
-    icon: Leaf,
   },
   {
     id: "pet",
