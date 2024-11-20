@@ -170,7 +170,7 @@ export const OnboardingQuiz = () => {
           </motion.div>
         </AnimatePresence>
 
-        {currentStep > 0 && currentStep < steps.length - 2 && (
+        {currentStep > 0 && currentStep < steps.length - 1 && (
           <div className="flex justify-between items-center mt-6">
             <Button
               variant="outline"
@@ -179,13 +179,15 @@ export const OnboardingQuiz = () => {
             >
               Back
             </Button>
-            <Button
-              onClick={handleNext}
-              className="w-32 text-white hover:text-white"
-              disabled={steps[currentStep]?.isMultiSelect ? !answers[Object.keys(answers)[currentStep - 1]]?.length : false}
-            >
-              Next
-            </Button>
+            {currentStep < steps.length - 2 && (
+              <Button
+                onClick={handleNext}
+                className="w-32 text-white hover:text-white"
+                disabled={steps[currentStep]?.isMultiSelect ? !answers[Object.keys(answers)[currentStep - 1]]?.length : false}
+              >
+                Next
+              </Button>
+            )}
           </div>
         )}
       </div>
