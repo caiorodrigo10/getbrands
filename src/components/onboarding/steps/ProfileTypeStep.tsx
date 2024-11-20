@@ -19,6 +19,11 @@ export const ProfileTypeStep = ({
   onAnswer,
   onNext 
 }: ProfileTypeStepProps) => {
+  const handleSelect = (value: string) => {
+    onAnswer(value);
+    onNext(); // Auto-advance after selection
+  };
+
   return (
     <div className="space-y-8">
       <div className="text-center">
@@ -29,7 +34,7 @@ export const ProfileTypeStep = ({
 
       <RadioGroup
         value={selected}
-        onValueChange={onAnswer}
+        onValueChange={handleSelect}
         className="grid gap-4"
       >
         {profileTypes.map((type, index) => (
