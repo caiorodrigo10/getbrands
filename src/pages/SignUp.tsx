@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "react-router-dom";
+import { toast } from "sonner";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -42,27 +43,51 @@ const SignUp = () => {
     setIsLoading(true);
 
     try {
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
           data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
+            role: 'member',
           },
-          emailRedirectTo: `${window.location.origin}/login`,
         },
       });
 
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        throw signUpError;
+      }
 
-      // Sign out after successful registration to clear any session data
-      await supabase.auth.signOut();
-      
-      // Navigate to login page
-      navigate("/login");
-    } catch (error) {
+      if (data?.user) {
+        // Check if the profile was created
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .select()
+          .eq('id', data.user.id)
+          .single();
+
+        if (profileError) {
+          // If profile doesn't exist, create it manually
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              id: data.user.id,
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+              email: formData.email,
+              role: 'member',
+            });
+
+          if (insertError) throw insertError;
+        }
+
+        toast.success("Account created successfully! Please check your email to verify your account.");
+        navigate("/login");
+      }
+    } catch (error: any) {
       console.error("Error signing up:", error);
+      toast.error(error.message || "Failed to create account. Please try again.");
     } finally {
       setIsLoading(false);
     }
