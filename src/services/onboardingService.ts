@@ -33,8 +33,11 @@ export const saveOnboardingData = async (userId: string, data: OnboardingData) =
       .eq('id', userId);
 
     if (error) {
-      console.error('Supabase error:', error);
-      throw error;
+      console.error('Error saving onboarding data:', error);
+      return {
+        status: 'error',
+        message: 'Failed to save onboarding data. Please try again.'
+      };
     }
 
     return { status: 'success', message: 'Onboarding completed successfully!' };
