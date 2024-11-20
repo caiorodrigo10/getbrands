@@ -2,6 +2,10 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface PhoneNumberStepProps {
   value: string;
@@ -10,10 +14,33 @@ interface PhoneNumberStepProps {
 }
 
 export const PhoneNumberStep = ({ value, onAnswer, onComplete }: PhoneNumberStepProps) => {
-  const handleSubmit = (e: React.FormEvent) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (value) {
+    if (!value) return;
+
+    try {
+      // Update the user's profile with the phone number and mark onboarding as completed
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          phone: value,
+          onboarding_completed: true
+        })
+        .eq('id', user?.id);
+
+      if (error) throw error;
+
+      // Call onComplete to update parent component state
       onComplete();
+      
+      // Navigate to start-here page
+      navigate('/start-here');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Failed to complete onboarding');
     }
   };
 
