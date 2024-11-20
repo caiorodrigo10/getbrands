@@ -22,7 +22,7 @@ export const saveOnboardingData = async (userId: string, data: OnboardingData) =
       phone: validatedData.phone,
       profile_type: validatedData.profile_type,
       product_interest: validatedData.product_interest.join(','), // Convert array to comma-separated string
-      brand_status: validatedData.brand_status,
+      brand_status: validatedData.brand_status === 'existing' ? 'I already have a brand' : 'I\'m creating a new brand',
       launch_urgency: validatedData.launch_urgency,
       onboarding_completed: true
     };

@@ -346,45 +346,6 @@ export type Database = {
         }
         Relationships: []
       }
-      onboarding_responses: {
-        Row: {
-          answers: Json
-          created_at: string
-          id: string
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          answers: Json
-          created_at?: string
-          id?: string
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          answers?: Json
-          created_at?: string
-          id?: string
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "onboarding_responses_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "crm_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "onboarding_responses_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       package_quizzes: {
         Row: {
           additional_notes: string | null
