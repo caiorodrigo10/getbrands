@@ -55,14 +55,6 @@ export const ProductCategoriesStep = ({
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-center mb-8">
-        <img 
-          src="/digibrands-logo.svg" 
-          alt="DigiBrands Logo" 
-          className="h-12"
-        />
-      </div>
-
       <div className="text-center">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
           Which product categories are you interested in creating?
