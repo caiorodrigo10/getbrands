@@ -9,6 +9,11 @@ import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { PhoneNumberStep } from "./steps/PhoneNumberStep";
 import { useAuth } from "@/contexts/AuthContext";
 
+type Step = {
+  component: React.ComponentType<any>;
+  props: Record<string, any>;
+};
+
 export function OnboardingQuiz() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -52,7 +57,7 @@ export function OnboardingQuiz() {
     }
   };
 
-  const steps = [
+  const steps: Step[] = [
     {
       component: WelcomeStep,
       props: {
@@ -94,12 +99,11 @@ export function OnboardingQuiz() {
   ];
 
   const CurrentStepComponent = steps[currentStep].component;
-  const currentProps = steps[currentStep].props;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-purple-50 p-4">
       <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-lg">
-        <CurrentStepComponent {...currentProps} />
+        <CurrentStepComponent {...steps[currentStep].props} />
       </div>
     </div>
   );
