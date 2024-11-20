@@ -6,14 +6,14 @@ import 'react-phone-input-2/lib/style.css';
 interface PhoneNumberStepProps {
   value: string;
   onAnswer: (phone: string) => void;
-  onNext: () => void;
+  onComplete: () => void;
 }
 
-export const PhoneNumberStep = ({ value, onAnswer, onNext }: PhoneNumberStepProps) => {
+export const PhoneNumberStep = ({ value, onAnswer, onComplete }: PhoneNumberStepProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (value) {
-      onNext();
+      onComplete();
     }
   };
 

@@ -11,7 +11,6 @@ import { ProfileTypeStep } from "./steps/ProfileTypeStep";
 import { BrandStatusStep } from "./steps/BrandStatusStep";
 import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { PhoneNumberStep } from "./steps/PhoneNumberStep";
-import { CompletionStep } from "./steps/CompletionStep";
 import type { OnboardingQuizData } from "@/types/quiz";
 
 export const OnboardingQuiz = () => {
@@ -38,7 +37,6 @@ export const OnboardingQuiz = () => {
 
   const isStepValid = (step: number) => {
     if (step === 0) return true; // Welcome step
-    if (step === steps.length - 1) return true; // Completion step
     
     const currentAnswer = answers[Object.keys(answers)[step - 1]];
     if (Array.isArray(currentAnswer)) {
@@ -123,18 +121,13 @@ export const OnboardingQuiz = () => {
       component: <PhoneNumberStep
         value={answers.phone || ''}
         onAnswer={(value) => handleAnswer('phone', value)}
-        onNext={handleNext}
+        onComplete={saveQuizData}
       />,
       isRequired: true
-    },
-    {
-      id: '7',
-      component: <CompletionStep onComplete={saveQuizData} />,
-      isRequired: false
     }
   ];
 
-  const progress = ((currentStep) / (steps.length - 1)) * 100;
+  const progress = ((currentStep) / (steps.length)) * 100;
 
   return (
     <div className="min-h-screen bg-white py-12">
@@ -161,7 +154,7 @@ export const OnboardingQuiz = () => {
           </motion.div>
         </AnimatePresence>
 
-        {currentStep > 0 && currentStep < steps.length - 1 && (
+        {currentStep > 0 && currentStep < steps.length && (
           <div className="flex justify-between items-center mt-6">
             <Button
               variant="outline"
@@ -170,7 +163,7 @@ export const OnboardingQuiz = () => {
             >
               Back
             </Button>
-            {currentStep < steps.length - 2 && (
+            {currentStep < steps.length - 1 && (
               <Button
                 onClick={handleNext}
                 className="w-32 bg-primary text-white hover:bg-primary/90 disabled:bg-primary disabled:opacity-50"
