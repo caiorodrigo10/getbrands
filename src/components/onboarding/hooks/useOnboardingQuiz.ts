@@ -41,8 +41,9 @@ export const useOnboardingQuiz = () => {
     const newAnswers = { ...answers, [stepId]: answer };
     setAnswers(newAnswers);
 
+    // Only auto-advance for single select fields, without validation
     if (!steps[currentStep]?.isMultiSelect && currentStep < steps.length - 1) {
-      handleNext(steps);
+      setCurrentStep(prev => prev + 1);
     }
   };
 
