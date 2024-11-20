@@ -1,68 +1,51 @@
-import { motion } from "framer-motion";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface LaunchUrgencyStepProps {
-  selected: string;
-  onAnswer: (urgency: string) => void;
-  onComplete?: () => void;
+  value: string;
+  onChange: (value: string) => void;
+  onNext: () => void;
 }
 
-const urgencyOptions = [
-  { id: "As soon as possible", label: "As soon as possible" },
-  { id: "Within 1-3 months", label: "Within 1-3 months" },
-  { id: "Flexible timeline", label: "Flexible timeline" }
-];
-
-export const LaunchUrgencyStep = ({ 
-  selected, 
-  onAnswer,
-  onComplete 
-}: LaunchUrgencyStepProps) => {
-  const handleSelect = (value: string) => {
-    onAnswer(value);
-    if (onComplete) {
-      onComplete(); // Call onComplete if provided
-    }
-  };
+export function LaunchUrgencyStep({ value, onChange, onNext }: LaunchUrgencyStepProps) {
+  const options = [
+    { value: "immediate", label: "Immediately (1-2 months)" },
+    { value: "soon", label: "Soon (3-6 months)" },
+    { value: "planning", label: "Planning Phase (6+ months)" },
+  ];
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4">
-          When are you looking to launch?
-        </h2>
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <h2 className="text-2xl font-bold">When are you planning to launch?</h2>
+        <p className="text-muted-foreground">
+          This helps us understand your timeline and prioritize your needs
+        </p>
       </div>
 
-      <RadioGroup
-        value={selected}
-        onValueChange={handleSelect}
-        className="grid gap-4"
-      >
-        {urgencyOptions.map((option, index) => (
-          <motion.div
-            key={option.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ 
-              opacity: 1, 
-              y: 0,
-              transition: { delay: index * 0.1 }
-            }}
+      <div className="grid gap-4">
+        {options.map((option) => (
+          <Card
+            key={option.value}
+            className={cn(
+              "p-4 cursor-pointer transition-all hover:border-primary",
+              value === option.value && "border-2 border-primary"
+            )}
+            onClick={() => onChange(option.value)}
           >
-            <Label
-              htmlFor={option.id}
-              className={`
-                flex items-center space-x-3 p-4 sm:p-6 rounded-xl border-2 cursor-pointer
-                transition-all duration-200
-                ${selected === option.id ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50'}
-              `}
-            >
-              <RadioGroupItem value={option.id} id={option.id} />
-              <span className="text-base sm:text-xl">{option.label}</span>
-            </Label>
-          </motion.div>
+            <div className="font-medium">{option.label}</div>
+          </Card>
         ))}
-      </RadioGroup>
+      </div>
+
+      <Button 
+        onClick={onNext} 
+        disabled={!value}
+        className="w-full"
+      >
+        Continue
+      </Button>
     </div>
   );
-};
+}

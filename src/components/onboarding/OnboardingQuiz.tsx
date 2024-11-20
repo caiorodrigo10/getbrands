@@ -1,191 +1,106 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 import { WelcomeStep } from "./steps/WelcomeStep";
-import { ProductCategoriesStep } from "./steps/ProductCategoriesStep";
 import { ProfileTypeStep } from "./steps/ProfileTypeStep";
 import { BrandStatusStep } from "./steps/BrandStatusStep";
 import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
-import type { OnboardingQuizData } from "@/types/quiz";
-import { toast } from "sonner";
+import { PhoneNumberStep } from "./steps/PhoneNumberStep";
+import { useAuth } from "@/contexts/AuthContext";
 
-export const OnboardingQuiz = () => {
+export function OnboardingQuiz() {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, any>>({});
-
-  useEffect(() => {
-    // Check authentication status
-    if (!isAuthenticated) {
-      toast.error("Please log in to continue");
-      navigate('/login');
-      return;
-    }
-  }, [isAuthenticated, navigate]);
+  const [quizData, setQuizData] = useState({
+    profileType: "",
+    brandStatus: "",
+    launchUrgency: "",
+    phone: "",
+  });
 
   const handleNext = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(prev => prev + 1);
-    }
+    setCurrentStep((prev) => prev + 1);
   };
 
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
-    }
-  };
-
-  const handleAnswer = (stepId: string, answer: any) => {
-    setAnswers(prev => ({ ...prev, [stepId]: answer }));
-  };
-
-  const isStepValid = (step: number) => {
-    if (step === 0) return true; // Welcome step
-    
-    const currentAnswer = answers[Object.keys(answers)[step - 1]];
-    if (Array.isArray(currentAnswer)) {
-      return currentAnswer.length > 0;
-    }
-    return !!currentAnswer;
-  };
-
-  const saveQuizData = async () => {
-    if (!user?.id) {
-      toast.error("Authentication error. Please log in again.");
-      navigate('/login');
-      return;
-    }
-
+  const handleComplete = async () => {
     try {
-      const quizData: OnboardingQuizData = {
-        product_interest: answers.categories || [],
-        profile_type: answers.profileType || "",
-        brand_status: answers.brandStatus || "",
-        launch_urgency: answers.launchUrgency || "",
-      };
+      if (!user?.id) {
+        toast.error("User not found");
+        return;
+      }
 
       const { error } = await supabase
         .from("profiles")
         .update({
-          ...quizData,
+          profile_type: quizData.profileType,
+          brand_status: quizData.brandStatus,
+          launch_urgency: quizData.launchUrgency,
+          phone: quizData.phone,
           onboarding_completed: true,
         })
         .eq("id", user.id);
 
-      if (error) {
-        console.error("Error saving quiz data:", error);
-        throw error;
-      }
-      
-      navigate('/start-here');
-    } catch (error) {
-      console.error("Error saving quiz data:", error);
-      toast.error("Failed to save your answers. Please try again.");
+      if (error) throw error;
+
+      toast.success("Profile updated successfully!");
+      navigate("/dashboard");
+    } catch (error: any) {
+      console.error("Error updating profile:", error);
+      toast.error(error.message || "Failed to update profile");
     }
   };
 
   const steps = [
-    { 
-      id: '1', 
-      component: <WelcomeStep onNext={handleNext} />,
-      isRequired: false
+    {
+      component: WelcomeStep,
+      props: {
+        onNext: handleNext,
+      },
     },
-    { 
-      id: '2', 
-      component: <ProductCategoriesStep 
-        selected={answers.categories || []}
-        onAnswer={(value) => handleAnswer('categories', value)}
-        onNext={handleNext}
-      />,
-      isMultiSelect: true,
-      isRequired: true
+    {
+      component: ProfileTypeStep,
+      props: {
+        value: quizData.profileType,
+        onChange: (value: string) => setQuizData({ ...quizData, profileType: value }),
+        onNext: handleNext,
+      },
     },
-    { 
-      id: '3', 
-      component: <ProfileTypeStep 
-        selected={answers.profileType}
-        onAnswer={(value) => handleAnswer('profileType', value)}
-        onNext={handleNext}
-      />,
-      isRequired: true
+    {
+      component: BrandStatusStep,
+      props: {
+        value: quizData.brandStatus,
+        onChange: (value: string) => setQuizData({ ...quizData, brandStatus: value }),
+        onNext: handleNext,
+      },
     },
-    { 
-      id: '4', 
-      component: <BrandStatusStep 
-        selected={answers.brandStatus}
-        onAnswer={(value) => handleAnswer('brandStatus', value)}
-        onNext={handleNext}
-      />,
-      isRequired: true
+    {
+      component: LaunchUrgencyStep,
+      props: {
+        value: quizData.launchUrgency,
+        onChange: (value: string) => setQuizData({ ...quizData, launchUrgency: value }),
+        onNext: handleNext,
+      },
     },
-    { 
-      id: '5', 
-      component: <LaunchUrgencyStep 
-        selected={answers.launchUrgency}
-        onAnswer={(value) => handleAnswer('launchUrgency', value)}
-        onComplete={saveQuizData}
-      />,
-      isRequired: true
-    }
+    {
+      component: PhoneNumberStep,
+      props: {
+        value: quizData.phone,
+        onChange: (value: string) => setQuizData({ ...quizData, phone: value }),
+        onNext: handleComplete,
+      },
+    },
   ];
 
-  const progress = ((currentStep) / (steps.length)) * 100;
-
-  if (!isAuthenticated) {
-    return null;
-  }
+  const CurrentStepComponent = steps[currentStep].component;
+  const currentProps = steps[currentStep].props;
 
   return (
-    <div className="min-h-screen bg-white py-12">
-      <div className="max-w-xl mx-auto space-y-8 px-4 sm:px-6">
-        <div className="flex justify-center mb-8">
-          <img 
-            src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png" 
-            alt="Logo" 
-            className="h-12" 
-          />
-        </div>
-        
-        <Progress value={progress} className="w-full h-2" />
-        
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentStep}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="min-h-[400px]"
-          >
-            {steps[currentStep]?.component}
-          </motion.div>
-        </AnimatePresence>
-
-        {currentStep > 0 && currentStep < steps.length && (
-          <div className="flex justify-between items-center mt-6">
-            <Button
-              variant="outline"
-              onClick={handleBack}
-              className="w-32 text-gray-900 hover:text-gray-900"
-            >
-              Back
-            </Button>
-            {currentStep < steps.length - 1 && (
-              <Button
-                onClick={handleNext}
-                className="w-32 bg-primary text-white hover:bg-primary/90 disabled:bg-primary disabled:opacity-50"
-                disabled={!isStepValid(currentStep)}
-              >
-                Next
-              </Button>
-            )}
-          </div>
-        )}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-purple-50 p-4">
+      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-lg">
+        <CurrentStepComponent {...currentProps} />
       </div>
     </div>
   );
-};
+}
