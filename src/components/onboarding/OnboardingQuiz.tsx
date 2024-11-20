@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -12,12 +12,22 @@ import { BrandStatusStep } from "./steps/BrandStatusStep";
 import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { PhoneNumberStep } from "./steps/PhoneNumberStep";
 import type { OnboardingQuizData } from "@/types/quiz";
+import { toast } from "sonner";
 
 export const OnboardingQuiz = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
+
+  useEffect(() => {
+    // Check authentication status
+    if (!isAuthenticated) {
+      toast.error("Please log in to continue");
+      navigate('/login');
+      return;
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -46,7 +56,11 @@ export const OnboardingQuiz = () => {
   };
 
   const saveQuizData = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      toast.error("Authentication error. Please log in again.");
+      navigate('/login');
+      return;
+    }
 
     try {
       const quizData: OnboardingQuizData = {
@@ -65,11 +79,15 @@ export const OnboardingQuiz = () => {
         })
         .eq("id", user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error saving quiz data:", error);
+        throw error;
+      }
       
       navigate('/start-here');
     } catch (error) {
       console.error("Error saving quiz data:", error);
+      toast.error("Failed to save your answers. Please try again.");
     }
   };
 
@@ -128,6 +146,10 @@ export const OnboardingQuiz = () => {
   ];
 
   const progress = ((currentStep) / (steps.length)) * 100;
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-white py-12">
