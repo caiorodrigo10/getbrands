@@ -123,15 +123,13 @@ export const OnboardingQuiz = () => {
             >
               Back
             </Button>
-            {steps[currentStep].isMultiSelect && (
-              <Button
-                onClick={handleNext}
-                className="w-32"
-                disabled={!answers[Object.keys(answers)[currentStep - 1]]?.length}
-              >
-                Next
-              </Button>
-            )}
+            <Button
+              onClick={handleNext}
+              className="w-32"
+              disabled={steps[currentStep].isMultiSelect ? !answers[Object.keys(answers)[currentStep - 1]]?.length : false}
+            >
+              Next
+            </Button>
           </div>
         )}
       </div>
