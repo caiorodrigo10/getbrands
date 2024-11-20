@@ -12,37 +12,37 @@ const categories = [
   {
     id: "beverages",
     label: "Beverages",
-    description: "Premium Arabica coffee blends, instant coffee, and other high-quality beverage formulations.",
+    description: "Premium coffee blends, instant coffee, and ready-to-drink beverages.",
     icon: Coffee,
   },
   {
     id: "supplements",
     label: "Supplements",
-    description: "Capsules, powders, and tablets for health and wellness, such as multivitamins, minerals, and specialty supplements.",
+    description: "Vitamins, minerals, and specialty supplements in capsules and powders.",
     icon: Pill,
   },
   {
     id: "beauty",
     label: "Beauty & Personal Care",
-    description: "Skincare products, hair care treatments, and personal care essentials like creams, serums, and lotions.",
+    description: "Skincare products, hair care treatments, and body lotions.",
     icon: Sparkles,
   },
   {
     id: "sports",
     label: "Sports Nutrition",
-    description: "Protein powders, meal replacement shakes, and performance-enhancing supplements designed for active lifestyles.",
+    description: "Protein powders, pre-workouts, and meal replacement shakes.",
     icon: Dumbbell,
   },
   {
     id: "natural",
     label: "Natural & Herbal",
-    description: "Products made from plant-based ingredients, such as herbal supplements, oils, and natural extracts.",
+    description: "Herbal supplements, essential oils, and natural extracts.",
     icon: Leaf,
   },
   {
     id: "pet",
     label: "Pet Care",
-    description: "Pet supplements, vitamins, cosmetics, and wellness products specifically designed for animals.",
+    description: "Pet supplements, vitamins, and wellness products.",
     icon: Dog,
   }
 ];
