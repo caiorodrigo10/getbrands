@@ -20,13 +20,8 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
   const [isLoading, setIsLoading] = useState(false);
   const { addItem } = useCart();
   const { toast } = useToast();
-  const { user } = useAuth();
   const navigate = useNavigate();
-  
-  // Define a single state for controlling dialogs
-  type DialogState = "project" | "insufficientPoints" | "permissionDenied" | null;
-  const [currentDialog, setCurrentDialog] = useState<DialogState>(null);
-  const [projects, setProjects] = useState<any[]>([]);
+  const { currentDialog, setCurrentDialog, projects, handleSelectProduct } = useProductSelection(product);
 
   const handleRequestSample = async () => {
     setIsLoading(true);
@@ -45,70 +40,6 @@ export const ProductActions = ({ product, onSelectProduct }: ProductActionsProps
       });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleSelectProduct = async () => {
-    if (!user) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "You must be logged in to select products.",
-      });
-      return;
-    }
-
-    const userRole = user?.role;
-    const isRestrictedRole = userRole === "member" || userRole === "sampler";
-
-    try {
-      const { data: userProjects, error: projectsError } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('status', 'active');
-
-      if (projectsError) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to load projects. Please try again.",
-        });
-        return;
-      }
-
-      if (isRestrictedRole) {
-        setCurrentDialog("permissionDenied");
-        return;
-      }
-
-      // Filter projects with sufficient points
-      const projectsWithSufficientPoints = userProjects?.filter(project => {
-        const availablePoints = (project.points || 0) - (project.points_used || 0);
-        return availablePoints >= 1000;
-      }) || [];
-
-      // Clear any existing dialog state
-      setCurrentDialog(null);
-
-      if (projectsWithSufficientPoints.length > 0) {
-        setProjects(projectsWithSufficientPoints);
-        setCurrentDialog("project");
-      } else {
-        setCurrentDialog("insufficientPoints");
-      }
-
-      // Call the parent's onSelectProduct if provided
-      if (onSelectProduct) {
-        onSelectProduct();
-      }
-    } catch (error) {
-      console.error('Error loading projects:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-      });
     }
   };
 
