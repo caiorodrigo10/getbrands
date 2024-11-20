@@ -21,7 +21,7 @@ export const saveOnboardingData = async (userId: string, data: OnboardingData) =
     const formattedData = {
       phone: validatedData.phone,
       profile_type: validatedData.profile_type,
-      product_interest: validatedData.product_interest,
+      product_interest: validatedData.product_interest.join(','), // Convert array to comma-separated string
       brand_status: validatedData.brand_status,
       launch_urgency: validatedData.launch_urgency,
       onboarding_completed: true

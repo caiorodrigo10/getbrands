@@ -62,9 +62,11 @@ export const useOnboardingQuiz = () => {
 
     const onboardingData = {
       phone: answers.phone,
-      profile_type: answers.profileType,
+      profile_type: answers.profileType as 'Creator/Influencer' | 'Entrepreneur' | 'Digital Marketer',
       product_interest: answers.categories || [],
-      brand_status: answers.brandStatus === 'existing' ? 'I already have a brand' : 'I\'m creating a new brand',
+      brand_status: answers.brandStatus === 'existing' 
+        ? 'I already have a brand' 
+        : 'I\'m creating a new brand',
       launch_urgency: answers.launchUrgency === 'immediate' 
         ? 'As soon as possible'
         : answers.launchUrgency === 'one_to_three'
