@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "react-router-dom";
 
 const SignUp = () => {
-  const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -56,20 +54,11 @@ const SignUp = () => {
       });
 
       if (error) throw error;
-
-      toast({
-        title: "Account created successfully!",
-        description: "Please check your email to verify your account.",
-      });
       
+      // Directly navigate to login without showing the verification toast
       navigate("/login");
     } catch (error) {
       console.error("Error signing up:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to create account. Please try again.",
-      });
     } finally {
       setIsLoading(false);
     }
