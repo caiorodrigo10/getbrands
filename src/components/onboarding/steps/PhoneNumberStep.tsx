@@ -33,13 +33,13 @@ export const PhoneNumberStep = ({ value, onAnswer, onNext }: PhoneNumberStepProp
         animate={{ opacity: 1, y: 0 }}
         className="space-y-4"
       >
-        <div className="phone-input-container [&_.react-tel-input]:w-full [&_.react-tel-input_.form-control]:!w-full [&_.react-tel-input_.flag-dropdown]:border-r-0">
+        <div className="phone-input-container [&_.react-tel-input]:w-full [&_.react-tel-input_.form-control]:!w-full [&_.react-tel-input_.flag-dropdown]:!h-14 [&_.react-tel-input_.selected-flag]:!h-14 [&_.react-tel-input_.flag-dropdown]:!border-input [&_.react-tel-input_.flag-dropdown]:border-r-0">
           <PhoneInput
             country={'us'}
             value={value}
             onChange={(phone) => onAnswer(phone)}
             containerClass="w-full"
-            inputClass="!w-full h-14 !text-lg !p-4 !pl-14 border border-input rounded-md"
+            inputClass="!w-full !h-14 !text-lg !p-4 !pl-14 !border !border-input !rounded-md"
             buttonClass="!border-input !h-14 !w-12"
             dropdownClass="!w-[300px]"
           />
@@ -47,7 +47,7 @@ export const PhoneNumberStep = ({ value, onAnswer, onNext }: PhoneNumberStepProp
 
         <Button
           type="submit"
-          className="w-full h-14 text-lg"
+          className="w-full h-14 text-lg bg-primary text-white hover:bg-primary/90"
           disabled={!value}
         >
           Complete Onboarding
