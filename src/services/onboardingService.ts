@@ -29,7 +29,10 @@ export const saveOnboardingData = async (userId: string, data: OnboardingData) =
 
     const { error } = await supabase
       .from('profiles')
-      .update(formattedData)
+      .update({
+        ...formattedData,
+        brand_status: supabase.sql`${formattedData.brand_status}::brand_status_enum`
+      })
       .eq('id', userId);
 
     if (error) {
