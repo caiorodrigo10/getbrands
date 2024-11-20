@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { WelcomeStep } from "./steps/WelcomeStep";
@@ -18,7 +17,6 @@ import type { OnboardingQuizData } from "@/types/quiz";
 export const OnboardingQuiz = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
 
@@ -50,14 +48,7 @@ export const OnboardingQuiz = () => {
   };
 
   const saveQuizData = async () => {
-    if (!user?.id) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "User not authenticated",
-      });
-      return;
-    }
+    if (!user?.id) return;
 
     try {
       const quizData: OnboardingQuizData = {
@@ -77,20 +68,10 @@ export const OnboardingQuiz = () => {
         .eq("id", user.id);
 
       if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Your profile has been updated successfully",
-      });
       
       navigate('/start-here');
     } catch (error) {
       console.error("Error saving quiz data:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to save your responses. Please try again.",
-      });
     }
   };
 
