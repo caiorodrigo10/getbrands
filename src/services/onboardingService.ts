@@ -1,15 +1,13 @@
 import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 
-// Updated phone regex to handle formatted US phone numbers
-const phoneRegex = /^\(\d{3}\) \d{3}-\d{4}$/;
-
+// Updated validation schema to match database constraints
 export const onboardingSchema = z.object({
-  phone: z.string().regex(phoneRegex, 'Phone number must be in format (XXX) XXX-XXXX'),
-  profile_type: z.enum(['creator', 'entrepreneur', 'marketer']),
+  phone: z.string().regex(/^\(\d{3}\) \d{3}-\d{4}$/, 'Phone number must be in format (XXX) XXX-XXXX'),
+  profile_type: z.enum(['Creator/Influencer', 'Entrepreneur', 'Digital Marketer']),
   product_interest: z.array(z.string()),
-  brand_status: z.enum(['existing', 'new']),
-  launch_urgency: z.enum(['immediate', 'one_to_three', 'flexible'])
+  brand_status: z.enum(['I already have a brand', 'I\'m creating a new brand']),
+  launch_urgency: z.enum(['As soon as possible', 'Within 1-3 months', 'Flexible timeline'])
 });
 
 export type OnboardingData = z.infer<typeof onboardingSchema>;
@@ -23,7 +21,7 @@ export const saveOnboardingData = async (userId: string, data: OnboardingData) =
     const formattedData = {
       phone: validatedData.phone,
       profile_type: validatedData.profile_type,
-      product_interest: validatedData.product_interest.join(','),
+      product_interest: validatedData.product_interest,
       brand_status: validatedData.brand_status,
       launch_urgency: validatedData.launch_urgency,
       onboarding_completed: true

@@ -16,7 +16,6 @@ export const useOnboardingQuiz = () => {
     if (step.isRequired) {
       const answer = answers[Object.keys(answers)[currentStep - 1]];
       if (!answer || (Array.isArray(answer) && answer.length === 0)) {
-        toast.error("Please fill in all required fields");
         return false;
       }
     }
@@ -24,7 +23,10 @@ export const useOnboardingQuiz = () => {
   };
 
   const handleNext = (steps: any[]) => {
-    if (!validateCurrentStep(steps[currentStep])) return;
+    if (!validateCurrentStep(steps[currentStep])) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
     
     if (currentStep < steps.length - 1) {
       setCurrentStep(prev => prev + 1);
@@ -58,19 +60,16 @@ export const useOnboardingQuiz = () => {
       return;
     }
 
-    // Map the launch urgency value to match the database enum
-    const mappedLaunchUrgency = {
-      immediate: 'immediate',
-      one_to_three: 'one_to_three',
-      flexible: 'flexible'
-    }[answers.launchUrgency] || 'flexible';
-
     const onboardingData = {
       phone: answers.phone,
       profile_type: answers.profileType,
       product_interest: answers.categories || [],
-      brand_status: answers.brandStatus,
-      launch_urgency: mappedLaunchUrgency
+      brand_status: answers.brandStatus === 'existing' ? 'I already have a brand' : 'I\'m creating a new brand',
+      launch_urgency: answers.launchUrgency === 'immediate' 
+        ? 'As soon as possible'
+        : answers.launchUrgency === 'one_to_three'
+        ? 'Within 1-3 months'
+        : 'Flexible timeline'
     };
 
     const result = await saveOnboardingData(user.id, onboardingData);
