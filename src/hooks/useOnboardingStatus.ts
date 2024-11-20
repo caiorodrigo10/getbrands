@@ -21,8 +21,8 @@ export const useOnboardingStatus = () => {
 
         if (error) throw error;
 
-        // Check if onboarding is not completed and redirect if necessary
-        if (profile && !profile.onboarding_completed) {
+        // Only redirect to onboarding if we're not already there
+        if (profile && !profile.onboarding_completed && window.location.pathname !== '/onboarding') {
           navigate('/onboarding');
         }
       } catch (error) {

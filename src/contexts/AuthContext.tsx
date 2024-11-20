@@ -3,6 +3,7 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { identifyUser } from "@/lib/analytics";
 import { useNavigate } from "react-router-dom";
+import { getRoleBasedRedirectPath } from "@/lib/roleRedirection";
 
 interface AuthContextType {
   user: User | null;
@@ -33,22 +34,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const checkOnboardingStatus = async (userId: string) => {
+  const handleUserSession = async (user: User | null) => {
+    if (!user) return;
+
     try {
       const { data: profile, error } = await supabase
         .from('profiles')
-        .select('onboarding_completed')
-        .eq('id', userId)
+        .select('onboarding_completed, role')
+        .eq('id', user.id)
         .single();
 
       if (error) throw error;
 
-      // If onboarding is not completed, redirect to onboarding
+      identifyUser(user.id, {
+        email: user.email,
+      });
+
+      // If onboarding is not completed, always redirect to onboarding
       if (!profile?.onboarding_completed) {
         navigate('/onboarding');
+        return;
       }
+
+      // If onboarding is completed, redirect based on role
+      const redirectPath = getRoleBasedRedirectPath(profile?.role);
+      navigate(redirectPath);
     } catch (error) {
-      console.error('Error checking onboarding status:', error);
+      console.error('Error checking user profile:', error);
     }
   };
 
@@ -57,10 +69,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        identifyUser(session.user.id, {
-          email: session.user.email,
-        });
-        checkOnboardingStatus(session.user.id);
+        handleUserSession(session.user);
       }
       setLoading(false);
     });
@@ -71,10 +80,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        identifyUser(session.user.id, {
-          email: session.user.email,
-        });
-        checkOnboardingStatus(session.user.id);
+        handleUserSession(session.user);
       }
       setLoading(false);
     });
