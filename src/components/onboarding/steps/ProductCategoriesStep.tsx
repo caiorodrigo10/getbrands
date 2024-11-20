@@ -12,13 +12,13 @@ const categories = [
   {
     id: "beverages",
     label: "Beverages",
-    description: "Premium coffee blends, instant coffee, and ready-to-drink beverages.",
+    description: "Premium coffee, instant coffee, and RTD beverages.",
     icon: Coffee,
   },
   {
     id: "supplements",
     label: "Supplements",
-    description: "Vitamins, minerals, and specialty supplements in capsules and powders.",
+    description: "Vitamins, minerals, and specialty capsules.",
     icon: Pill,
   },
   {
