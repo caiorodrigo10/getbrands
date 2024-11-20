@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -13,6 +15,7 @@ const SignUp = () => {
     lastName: "",
     email: "",
     password: "",
+    phone: "",
   });
   const [errors, setErrors] = useState({
     password: "",
@@ -76,6 +79,7 @@ const SignUp = () => {
               first_name: formData.firstName,
               last_name: formData.lastName,
               email: formData.email,
+              phone: formData.phone,
               role: 'member',
             });
 
@@ -160,6 +164,16 @@ const SignUp = () => {
               {errors.password && (
                 <p className="text-sm text-red-500 mt-1">{errors.password}</p>
               )}
+            </div>
+            <div className="phone-input-container [&_.react-tel-input]:w-full [&_.react-tel-input_.form-control]:!w-full [&_.react-tel-input_.form-control]:!h-[42px] [&_.react-tel-input_.flag-dropdown]:!h-[42px] [&_.react-tel-input_.selected-flag]:!h-[40px] [&_.react-tel-input_.flag-dropdown]:!border-gray-200 [&_.react-tel-input_.form-control]:!bg-gray-50 [&_.react-tel-input_.form-control]:!border-gray-200 [&_.react-tel-input_.form-control]:!text-base">
+              <PhoneInput
+                country={'us'}
+                value={formData.phone}
+                onChange={(phone) => setFormData({ ...formData, phone: phone })}
+                inputProps={{
+                  required: true,
+                }}
+              />
             </div>
           </div>
 
