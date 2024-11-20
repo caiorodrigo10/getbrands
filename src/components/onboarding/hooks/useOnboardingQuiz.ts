@@ -8,8 +8,8 @@ type OnboardingAnswers = {
   phone?: string;
   profileType?: 'Creator/Influencer' | 'Entrepreneur' | 'Digital Marketer';
   categories?: string[];
-  brandStatus?: 'existing' | 'new';
-  launchUrgency?: 'immediate' | 'one_to_three' | 'flexible';
+  brandStatus?: 'I already have a brand' | 'I\'m creating a new brand';
+  launchUrgency?: 'As soon as possible' | 'Within 1-3 months' | 'Flexible timeline';
 };
 
 export const useOnboardingQuiz = () => {
@@ -72,14 +72,8 @@ export const useOnboardingQuiz = () => {
       phone: answers.phone,
       profile_type: answers.profileType as 'Creator/Influencer' | 'Entrepreneur' | 'Digital Marketer',
       product_interest: answers.categories || [],
-      brand_status: answers.brandStatus === 'existing' 
-        ? 'I already have a brand' 
-        : 'I\'m creating a new brand',
-      launch_urgency: answers.launchUrgency === 'immediate' 
-        ? 'As soon as possible'
-        : answers.launchUrgency === 'one_to_three'
-        ? 'Within 1-3 months'
-        : 'Flexible timeline'
+      brand_status: answers.brandStatus as 'I already have a brand' | 'I\'m creating a new brand',
+      launch_urgency: answers.launchUrgency as 'As soon as possible' | 'Within 1-3 months' | 'Flexible timeline'
     };
 
     const result = await saveOnboardingData(user.id, onboardingData);
