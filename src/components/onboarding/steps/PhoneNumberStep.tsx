@@ -33,23 +33,38 @@ export const PhoneNumberStep = ({ value, onAnswer, onNext }: PhoneNumberStepProp
         animate={{ opacity: 1, y: 0 }}
         className="space-y-4"
       >
-        <PhoneInput
-          country={'us'}
-          value={value}
-          onChange={(phone) => onAnswer(phone)}
-          containerClass="w-full"
-          inputClass="w-full text-lg p-4 border border-input rounded-md"
-          buttonClass="!border-input"
-        />
+        <div className="phone-input-container">
+          <PhoneInput
+            country={'us'}
+            value={value}
+            onChange={(phone) => onAnswer(phone)}
+            containerClass="w-full"
+            inputClass="!w-full h-14 !text-lg !p-4 !pl-14 border border-input rounded-md"
+            buttonClass="!border-input !h-14 !w-12"
+            dropdownClass="!w-[300px]"
+          />
+        </div>
 
         <Button
           type="submit"
-          className="w-full"
+          className="w-full h-14 text-lg"
           disabled={!value}
         >
           Complete Onboarding
         </Button>
       </motion.div>
+
+      <style jsx global>{`
+        .phone-input-container .react-tel-input {
+          width: 100%;
+        }
+        .phone-input-container .react-tel-input .form-control {
+          width: 100%;
+        }
+        .phone-input-container .react-tel-input .flag-dropdown {
+          border-right: none;
+        }
+      `}</style>
     </form>
   );
 };
