@@ -510,19 +510,14 @@ export type Database = {
           billing_city: string | null
           billing_state: string | null
           billing_zip: string | null
-          brand_status: string | null
           created_at: string
           email: string | null
           first_name: string | null
           id: string
           instagram_handle: string | null
           last_name: string | null
-          launch_urgency: string | null
           name: string | null
-          onboarding_completed: boolean | null
           phone: string | null
-          product_interest: string | null
-          profile_type: string | null
           role: string
           shipping_address_city: string | null
           shipping_address_state: string | null
@@ -538,19 +533,14 @@ export type Database = {
           billing_city?: string | null
           billing_state?: string | null
           billing_zip?: string | null
-          brand_status?: string | null
           created_at?: string
           email?: string | null
           first_name?: string | null
           id: string
           instagram_handle?: string | null
           last_name?: string | null
-          launch_urgency?: string | null
           name?: string | null
-          onboarding_completed?: boolean | null
           phone?: string | null
-          product_interest?: string | null
-          profile_type?: string | null
           role?: string
           shipping_address_city?: string | null
           shipping_address_state?: string | null
@@ -566,19 +556,14 @@ export type Database = {
           billing_city?: string | null
           billing_state?: string | null
           billing_zip?: string | null
-          brand_status?: string | null
           created_at?: string
           email?: string | null
           first_name?: string | null
           id?: string
           instagram_handle?: string | null
           last_name?: string | null
-          launch_urgency?: string | null
           name?: string | null
-          onboarding_completed?: boolean | null
           phone?: string | null
-          product_interest?: string | null
-          profile_type?: string | null
           role?: string
           shipping_address_city?: string | null
           shipping_address_state?: string | null

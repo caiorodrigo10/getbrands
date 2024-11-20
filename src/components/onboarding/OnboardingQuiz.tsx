@@ -10,13 +10,7 @@ import { PhoneNumberStep } from "./steps/PhoneNumberStep";
 import { CompletionStep } from "./steps/CompletionStep";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-export type QuizStep = {
-  id: number;
-  component: React.ReactNode;
-  isMultiSelect?: boolean;
-  isRequired?: boolean;
-};
+import { QuizStep } from "@/types/quiz";
 
 export const OnboardingQuiz = () => {
   const navigate = useNavigate();
@@ -45,12 +39,12 @@ export const OnboardingQuiz = () => {
 
   const steps: QuizStep[] = [
     { 
-      id: 1, 
+      id: '1', 
       component: <WelcomeStep onNext={handleNext} />,
       isRequired: false
     },
     { 
-      id: 2, 
+      id: '2', 
       component: <ProductCategoriesStep 
         selected={answers.categories || []}
         onAnswer={(value) => handleAnswer('categories', value)}
@@ -60,7 +54,7 @@ export const OnboardingQuiz = () => {
       isRequired: true
     },
     { 
-      id: 3, 
+      id: '3', 
       component: <ProfileTypeStep 
         selected={answers.profileType}
         onAnswer={(value) => handleAnswer('profileType', value)}
@@ -69,7 +63,7 @@ export const OnboardingQuiz = () => {
       isRequired: true
     },
     { 
-      id: 4, 
+      id: '4', 
       component: <BrandStatusStep 
         selected={answers.brandStatus}
         onAnswer={(value) => handleAnswer('brandStatus', value)}
@@ -78,7 +72,7 @@ export const OnboardingQuiz = () => {
       isRequired: true
     },
     { 
-      id: 5, 
+      id: '5', 
       component: <LaunchUrgencyStep 
         selected={answers.launchUrgency}
         onAnswer={(value) => handleAnswer('launchUrgency', value)}
@@ -87,7 +81,7 @@ export const OnboardingQuiz = () => {
       isRequired: true
     },
     {
-      id: 6,
+      id: '6',
       component: <PhoneNumberStep
         value={answers.phone || ''}
         onAnswer={(value) => handleAnswer('phone', value)}
@@ -96,7 +90,7 @@ export const OnboardingQuiz = () => {
       isRequired: true
     },
     {
-      id: 7,
+      id: '7',
       component: <CompletionStep onComplete={handleComplete} />,
       isRequired: false
     }
