@@ -192,7 +192,7 @@ export const OnboardingQuiz = () => {
             {currentStep < steps.length - 2 && (
               <Button
                 onClick={handleNext}
-                className="w-32 text-white hover:text-white"
+                className="w-32 bg-primary text-white hover:bg-primary/90 disabled:bg-primary disabled:opacity-50"
                 disabled={!isStepValid(currentStep)}
               >
                 Next
