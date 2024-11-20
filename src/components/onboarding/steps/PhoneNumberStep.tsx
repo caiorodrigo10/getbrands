@@ -38,10 +38,8 @@ export const PhoneNumberStep = ({ value, onAnswer, onNext }: PhoneNumberStepProp
           value={value}
           onChange={(phone) => onAnswer(phone)}
           containerClass="w-full"
-          inputClass="w-full h-14 text-lg px-12 border border-input rounded-md"
-          buttonClass="!border-input !h-14 !w-12"
-          dropdownClass="!w-[300px]"
-          searchClass="!w-full"
+          inputClass="w-full text-lg p-4 border border-input rounded-md"
+          buttonClass="!border-input"
         />
 
         <Button
