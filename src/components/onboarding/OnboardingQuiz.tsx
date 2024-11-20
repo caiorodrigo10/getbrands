@@ -42,8 +42,7 @@ export const OnboardingQuiz = () => {
     const newAnswers = { ...answers, [stepId]: answer };
     setAnswers(newAnswers);
 
-    const currentStepData = steps[currentStep];
-    if (!currentStepData.isMultiSelect && currentStep < steps.length - 1) {
+    if (!steps[currentStep]?.isMultiSelect && currentStep < steps.length - 1) {
       handleNext();
     }
   };
@@ -73,7 +72,10 @@ export const OnboardingQuiz = () => {
   };
 
   const steps: QuizStep[] = [
-    { id: 1, component: <WelcomeStep onNext={handleNext} /> },
+    { 
+      id: 1, 
+      component: <WelcomeStep onNext={handleNext} /> 
+    },
     { 
       id: 2, 
       component: <ProductCategoriesStep 
@@ -120,7 +122,8 @@ export const OnboardingQuiz = () => {
     }
   ];
 
-  const progress = ((currentStep) / (steps.length - 1)) * 100;
+  // Ensure we have valid steps before calculating progress
+  const progress = steps.length > 0 ? ((currentStep) / (steps.length - 1)) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white py-12">
@@ -143,7 +146,7 @@ export const OnboardingQuiz = () => {
             exit={{ opacity: 0, x: -20 }}
             className="min-h-[400px]"
           >
-            {steps[currentStep].component}
+            {steps[currentStep]?.component}
           </motion.div>
         </AnimatePresence>
 
@@ -159,7 +162,7 @@ export const OnboardingQuiz = () => {
             <Button
               onClick={handleNext}
               className="w-32 text-white hover:text-white"
-              disabled={steps[currentStep].isMultiSelect ? !answers[Object.keys(answers)[currentStep - 1]]?.length : false}
+              disabled={steps[currentStep]?.isMultiSelect ? !answers[Object.keys(answers)[currentStep - 1]]?.length : false}
             >
               Next
             </Button>
