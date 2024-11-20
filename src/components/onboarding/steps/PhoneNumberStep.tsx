@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
@@ -56,16 +55,6 @@ export const PhoneNumberStep = ({ onAnswer, onNext }: PhoneNumberStepProps) => {
         {error && (
           <p className="text-sm text-red-500">{error}</p>
         )}
-      </div>
-
-      <div className="flex justify-end">
-        <Button
-          onClick={handleSubmit}
-          size="lg"
-          className="mt-4"
-        >
-          Submit
-        </Button>
       </div>
     </motion.div>
   );

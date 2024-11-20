@@ -95,17 +95,6 @@ export const ProductCategoriesStep = ({
           </motion.div>
         ))}
       </div>
-
-      <div className="flex justify-end">
-        <Button
-          onClick={onNext}
-          disabled={selected.length === 0}
-          size="lg"
-          className="mt-4"
-        >
-          Next
-        </Button>
-      </div>
     </div>
   );
 };

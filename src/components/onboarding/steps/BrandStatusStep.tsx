@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
@@ -56,17 +55,6 @@ export const BrandStatusStep = ({
           </motion.div>
         ))}
       </RadioGroup>
-
-      <div className="flex justify-end">
-        <Button
-          onClick={onNext}
-          disabled={!selected}
-          size="lg"
-          className="mt-4"
-        >
-          Next
-        </Button>
-      </div>
     </div>
   );
 };
