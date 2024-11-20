@@ -5,7 +5,6 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useUserPermissions } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
-import { toast } from "sonner";
 import { ProjectPointsInfo } from "./navigation/ProjectPointsInfo";
 
 export const NavigationMenu = () => {
@@ -54,7 +53,6 @@ export const NavigationMenu = () => {
 
   const handleRestrictedNavigation = (path: string) => {
     if (!hasFullAccess) {
-      toast.error("You need to upgrade your plan to access this feature");
       navigate("/start-here");
       return;
     }
