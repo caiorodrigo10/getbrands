@@ -45,13 +45,13 @@ export const BrandStatusStep = ({
             <Label
               htmlFor={status.id}
               className={`
-                flex items-center space-x-3 p-6 rounded-xl border-2 cursor-pointer
+                flex items-center space-x-3 p-4 sm:p-6 rounded-xl border-2 cursor-pointer
                 transition-all duration-200
                 ${selected === status.id ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50'}
               `}
             >
               <RadioGroupItem value={status.id} id={status.id} />
-              <span className="text-xl">{status.label}</span>
+              <span className="text-base sm:text-xl">{status.label}</span>
             </Label>
           </motion.div>
         ))}

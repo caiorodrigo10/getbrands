@@ -45,13 +45,13 @@ export const ProfileTypeStep = ({
             <Label
               htmlFor={type.id}
               className={`
-                flex items-center space-x-3 p-6 rounded-xl border-2 cursor-pointer
+                flex items-center space-x-3 p-4 sm:p-6 rounded-xl border-2 cursor-pointer
                 transition-all duration-200
                 ${selected === type.id ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50'}
               `}
             >
               <RadioGroupItem value={type.id} id={type.id} />
-              <span className="text-xl">{type.label}</span>
+              <span className="text-base sm:text-xl">{type.label}</span>
             </Label>
           </motion.div>
         ))}
