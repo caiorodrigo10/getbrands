@@ -49,8 +49,7 @@ const StartHere = () => {
             title="GetBrands Onboarding v1"
             allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
-            className="w-full h-[400px] rounded-lg"
-            style={{ border: 0, margin: '0 auto' }}
+            style={{ width: '100%', aspectRatio: '16/9', border: 0, margin: '0 auto' }}
           />
         </div>
 
