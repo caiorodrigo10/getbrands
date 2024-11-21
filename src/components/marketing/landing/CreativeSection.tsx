@@ -34,9 +34,13 @@ export const CreativeSection = () => {
               On-brand creative, built end-to-end
             </h2>
             
-            {/* Video Player */}
-            <div className="mb-10">
-              <div id="vid_673f75ed6f75d1000a4d35bd" style={{ position: 'relative', width: '100%', padding: '56.25% 0 0' }} className="rounded-2xl overflow-hidden">
+            {/* Video Player Container */}
+            <div className="mb-10 rounded-2xl overflow-hidden shadow-lg">
+              <div 
+                id="vid_673f75ed6f75d1000a4d35bd" 
+                style={{ position: 'relative', width: '100%', padding: '56.25% 0 0' }}
+                className="rounded-2xl overflow-hidden"
+              >
                 <img 
                   id="thumb_673f75ed6f75d1000a4d35bd" 
                   src="https://images.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f75ed6f75d1000a4d35bd/thumbnail.jpg" 
@@ -46,21 +50,22 @@ export const CreativeSection = () => {
                     left: 0, 
                     width: '100%', 
                     height: '100%', 
-                    objectFit: 'cover', 
+                    objectFit: 'cover',
                     display: 'block',
                   }} 
-                  alt="thumbnail" 
+                  alt="thumbnail"
                   className="rounded-2xl"
                 />
                 <div 
                   id="backdrop_673f75ed6f75d1000a4d35bd" 
                   style={{ 
-                    WebkitBackdropFilter: 'blur(5px)', 
-                    backdropFilter: 'blur(5px)', 
                     position: 'absolute', 
                     top: 0, 
-                    height: '100%', 
-                    width: '100%' 
+                    left: 0,
+                    width: '100%', 
+                    height: '100%',
+                    backdropFilter: 'blur(5px)',
+                    WebkitBackdropFilter: 'blur(5px)',
                   }}
                   className="rounded-2xl"
                 />
