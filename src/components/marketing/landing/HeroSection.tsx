@@ -1,63 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export const HeroSection = () => {
-  const [scriptError, setScriptError] = useState(false);
-
   useEffect(() => {
-    const initializePlayer = () => {
-      const videoContainer = document.getElementById("vid_673f63f57558ba000b569976");
-      
-      if (videoContainer) {
-        // Remove any existing script to prevent duplicates
-        const existingScript = document.getElementById("scr_673f63f57558ba000b569976");
-        if (existingScript) {
-          existingScript.remove();
-        }
+    const s = document.createElement("script");
+    s.src = "https://scripts.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/player.js";
+    s.async = true;
+    document.head.appendChild(s);
 
-        // Create and append the new script with error handling
-        const script = document.createElement("script");
-        script.src = "https://scripts.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/player.js";
-        script.async = true;
-        script.id = "scr_673f63f57558ba000b569976";
-        script.crossOrigin = "anonymous"; // Add CORS header
-        
-        // Error handling for script loading
-        script.onerror = () => {
-          console.error("Error loading video player script");
-          setScriptError(true);
-        };
-
-        // Only append script once container is ready
-        document.body.appendChild(script);
-      }
-    };
-
-    // Add global error handler for the video player
-    window.onerror = (message, source, lineno, colno, error) => {
-      if (source?.includes('converteai.net')) {
-        console.error('Video player error:', message);
-        setScriptError(true);
-        return true; // Prevent the error from bubbling up
-      }
-      return false;
-    };
-
-    // Initial attempt to initialize
-    initializePlayer();
-
-    // Cleanup function
     return () => {
-      const scriptElement = document.getElementById("scr_673f63f57558ba000b569976");
+      // Cleanup: remove script on unmount
+      const scriptElement = document.querySelector('script[src*="673f63f57558ba000b569976"]');
       if (scriptElement) {
         scriptElement.remove();
       }
-      // Remove global error handler
-      window.onerror = null;
     };
-  }, []); // Empty dependency array to run only once on mount
+  }, []);
 
   return (
     <>
@@ -107,33 +67,30 @@ export const HeroSection = () => {
 
             {/* Right Column - Video */}
             <div className="max-w-2xl mx-auto lg:mx-0">
-              {!scriptError ? (
-                <div id="vid_673f63f57558ba000b569976" style={{ position: 'relative', width: '100%', padding: '56.25% 0 0' }}>
-                  <img 
-                    id="thumb_673f63f57558ba000b569976" 
-                    src="https://images.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/thumbnail.jpg" 
-                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                    alt="Video thumbnail"
-                  />
-                  <div 
-                    id="backdrop_673f63f57558ba000b569976" 
-                    style={{ 
-                      WebkitBackdropFilter: 'blur(5px)',
-                      backdropFilter: 'blur(5px)',
-                      position: 'absolute',
-                      top: 0,
-                      height: '100%',
-                      width: '100%'
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="relative w-full pt-[56.25%] bg-gray-100 rounded-lg">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <p className="text-gray-500">Video player unavailable</p>
-                  </div>
-                </div>
-              )}
+              <div id="vid_673f63f57558ba000b569976" style={{ position: 'relative', width: '100%', padding: '56.25% 0 0' }}>
+                <img 
+                  id="thumb_673f63f57558ba000b569976" 
+                  src="https://images.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/thumbnail.jpg" 
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  alt="thumbnail"
+                />
+                <div 
+                  id="backdrop_673f63f57558ba000b569976" 
+                  style={{ 
+                    WebkitBackdropFilter: 'blur(5px)',
+                    backdropFilter: 'blur(5px)',
+                    position: 'absolute',
+                    top: 0,
+                    height: '100%',
+                    width: '100%'
+                  }}
+                />
+              </div>
+              <style>{`
+                .elementor-element:has(#smartplayer) {
+                  width: 100%;
+                }
+              `}</style>
             </div>
           </div>
         </div>
