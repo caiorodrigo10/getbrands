@@ -142,7 +142,7 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
           </div>
 
           <ProductActions 
-            product={product}
+            productId={product.id}
             onSelectProduct={onSelectProduct}
           />
         </div>
