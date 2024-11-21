@@ -6,19 +6,31 @@ import { useEffect } from "react";
 
 export const HeroSection = () => {
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://scripts.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/player.js";
-    script.async = true;
-    script.id = "scr_673f63f57558ba000b569976";
-    document.head.appendChild(script);
+    // Wait for the video container to be available in the DOM
+    const videoContainer = document.getElementById("vid_673f63f57558ba000b569976");
+    
+    if (videoContainer) {
+      // Create and append the script only after container exists
+      const script = document.createElement("script");
+      script.src = "https://scripts.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/player.js";
+      script.async = true;
+      script.id = "scr_673f63f57558ba000b569976";
+      
+      // Error handling for script loading
+      script.onerror = (error) => {
+        console.error("Error loading video player script:", error);
+      };
+      
+      document.head.appendChild(script);
 
-    return () => {
-      const scriptElement = document.getElementById("scr_673f63f57558ba000b569976");
-      if (scriptElement) {
-        scriptElement.remove();
-      }
-    };
-  }, []);
+      return () => {
+        const scriptElement = document.getElementById("scr_673f63f57558ba000b569976");
+        if (scriptElement) {
+          scriptElement.remove();
+        }
+      };
+    }
+  }, []); // Empty dependency array to run only once on mount
 
   return (
     <>
