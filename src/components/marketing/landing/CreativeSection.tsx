@@ -26,7 +26,7 @@ export const CreativeSection = () => {
             
             {/* Video Player */}
             <div className="mb-10">
-              <div id="vid_673f75ed6f75d1000a4d35bd" style={{ position: 'relative', width: '100%', padding: '56.25% 0 0' }}>
+              <div id="vid_673f75ed6f75d1000a4d35bd" className="rounded-xl overflow-hidden" style={{ position: 'relative', width: '100%', padding: '56.25% 0 0' }}>
                 <img 
                   id="thumb_673f75ed6f75d1000a4d35bd" 
                   src="https://images.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f75ed6f75d1000a4d35bd/thumbnail.jpg" 
