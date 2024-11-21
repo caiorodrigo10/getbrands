@@ -32,6 +32,23 @@ const StartHere = () => {
     }
   }, [profile, navigate]);
 
+  // Add script for video player
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://scripts.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f76196fbe5b000be3566d/player.js";
+    script.async = true;
+    script.id = "scr_673f76196fbe5b000be3566d";
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup script on unmount
+      const existingScript = document.getElementById("scr_673f76196fbe5b000be3566d");
+      if (existingScript) {
+        existingScript.remove();
+      }
+    };
+  }, []);
+
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto py-12 px-4">
@@ -55,14 +72,41 @@ const StartHere = () => {
         Welcome! Watch our quick intro video to learn how to make the most of our platform and start creating amazing products.
       </p>
       
-      <div className="aspect-w-16 aspect-h-9 mb-8">
-        <iframe
-          src="https://player.scaleup.com.br/embed/4456fb2b508b847d985ee7107da9085616868f3e"
-          title="GetBrands Onboarding v2"
-          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          style={{ width: '100%', aspectRatio: '16/9', border: 0, margin: '0 auto' }}
-        />
+      <div className="aspect-w-16 aspect-h-9 mb-8 rounded-xl overflow-hidden">
+        <div
+          id="vid_673f76196fbe5b000be3566d"
+          style={{
+            position: 'relative',
+            width: '100%',
+            padding: '56.25% 0 0'
+          }}
+        >
+          <img
+            id="thumb_673f76196fbe5b000be3566d"
+            src="https://images.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f76196fbe5b000be3566d/thumbnail.jpg"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              display: 'block'
+            }}
+            alt="thumbnail"
+          />
+          <div
+            id="backdrop_673f76196fbe5b000be3566d"
+            style={{
+              WebkitBackdropFilter: 'blur(5px)',
+              backdropFilter: 'blur(5px)',
+              position: 'absolute',
+              top: 0,
+              height: '100%',
+              width: '100%'
+            }}
+          />
+        </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
