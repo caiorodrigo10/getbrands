@@ -1,8 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Instagram, ShoppingBag } from "lucide-react";
+import { useEffect } from "react";
 
 export const CreativeSection = () => {
+  useEffect(() => {
+    // Add the video player script
+    const script = document.createElement("script");
+    script.src = "https://scripts.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/player.js";
+    script.async = true;
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup script on unmount
+      document.head.removeChild(script);
+    };
+  }, []);
+
   return (
     <>
       <section className="py-32 bg-white">
@@ -11,6 +25,38 @@ export const CreativeSection = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 leading-tight">
               On-brand creative, built end-to-end
             </h2>
+            
+            {/* Video Player */}
+            <div className="mb-10">
+              <div id="vid_673f63f57558ba000b569976" style={{ position: 'relative', width: '100%', padding: '56.25% 0 0' }}>
+                <img 
+                  id="thumb_673f63f57558ba000b569976" 
+                  src="https://images.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/thumbnail.jpg" 
+                  style={{ 
+                    position: 'absolute', 
+                    top: 0, 
+                    left: 0, 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover', 
+                    display: 'block' 
+                  }} 
+                  alt="thumbnail" 
+                />
+                <div 
+                  id="backdrop_673f63f57558ba000b569976" 
+                  style={{ 
+                    WebkitBackdropFilter: 'blur(5px)', 
+                    backdropFilter: 'blur(5px)', 
+                    position: 'absolute', 
+                    top: 0, 
+                    height: '100%', 
+                    width: '100%' 
+                  }}
+                />
+              </div>
+            </div>
+            
             <p className="text-lg text-gray-600 mb-10 leading-relaxed">
               From brand strategy to product launch, we create your complete brand identity. 
               Schedule a call to start building your brand today.
