@@ -45,8 +45,8 @@ const StartHere = () => {
         
         <div className="aspect-w-16 aspect-h-9 mb-8">
           <iframe
-            src="https://player.scaleup.com.br/embed/7d7ee52e472110f1ca60bc757bfbd433d9ae38ad"
-            title="GetBrands Onboarding v1"
+            src="https://player.scaleup.com.br/embed/4456fb2b508b847d985ee7107da9085616868f3e"
+            title="GetBrands Onboarding v2"
             allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
             style={{ width: '100%', aspectRatio: '16/9', border: 0, margin: '0 auto' }}
