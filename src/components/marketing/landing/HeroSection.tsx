@@ -38,7 +38,7 @@ export const HeroSection = () => {
             </p>
 
             <div className="flex justify-center gap-4">
-              <Link to="/signup">
+              <Link to="/login">
                 <Button 
                   size="lg"
                   className="bg-[#f0562e] hover:bg-[#f0562e]/90 text-white font-semibold px-8"
