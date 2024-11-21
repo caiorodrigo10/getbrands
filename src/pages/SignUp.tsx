@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
-import PhoneInput from 'react-phone-input-2';
-import 'react-phone-input-2/lib/style.css';
+import { SignUpFormFields } from "@/components/auth/signup/SignUpFormFields";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -30,6 +28,11 @@ const SignUp = () => {
     if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters long";
       isValid = false;
+    }
+
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
+      isValid = false;
+      toast.error("Please fill in all fields");
     }
 
     setErrors(newErrors);
@@ -116,67 +119,11 @@ const SignUp = () => {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSignUp}>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Input
-                  id="firstName"
-                  type="text"
-                  value={formData.firstName}
-                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                  required
-                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
-                  placeholder="First name"
-                />
-              </div>
-              <div>
-                <Input
-                  id="lastName"
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  required
-                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
-                  placeholder="Last name"
-                />
-              </div>
-            </div>
-            <div>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
-                placeholder="your@email.com"
-              />
-            </div>
-            <div>
-              <Input
-                id="password"
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                required
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
-                placeholder="••••••••"
-              />
-              {errors.password && (
-                <p className="text-sm text-red-500 mt-1">{errors.password}</p>
-              )}
-            </div>
-            <div className="phone-input-container [&_.react-tel-input]:w-full [&_.react-tel-input_.form-control]:!w-full [&_.react-tel-input_.form-control]:!h-[42px] [&_.react-tel-input_.flag-dropdown]:!h-[42px] [&_.react-tel-input_.selected-flag]:!h-[40px] [&_.react-tel-input_.flag-dropdown]:!border-gray-200 [&_.react-tel-input_.form-control]:!bg-gray-50 [&_.react-tel-input_.form-control]:!border-gray-200 [&_.react-tel-input_.form-control]:!text-base">
-              <PhoneInput
-                country={'us'}
-                value={formData.phone}
-                onChange={(phone) => setFormData({ ...formData, phone: phone })}
-                inputProps={{
-                  required: true,
-                }}
-              />
-            </div>
-          </div>
+          <SignUpFormFields 
+            formData={formData}
+            errors={errors}
+            setFormData={setFormData}
+          />
 
           <Button
             type="submit"
