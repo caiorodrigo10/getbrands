@@ -1,11 +1,13 @@
 import { motion } from "framer-motion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { QuizNavigation } from "./QuizNavigation";
 
 interface ProfileTypeStepProps {
   selected: string;
   onAnswer: (type: string) => void;
   onNext: () => void;
+  onBack: () => void;
 }
 
 const profileTypes = [
@@ -17,15 +19,11 @@ const profileTypes = [
 export const ProfileTypeStep = ({ 
   selected, 
   onAnswer,
-  onNext 
+  onNext,
+  onBack
 }: ProfileTypeStepProps) => {
-  const handleSelect = (value: string) => {
-    onAnswer(value);
-    onNext();
-  };
-
   return (
-    <div className="space-y-8">
+    <div className="w-full max-w-2xl mx-auto space-y-8">
       <div className="text-center">
         <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4">
           Which of the following best describes you?
@@ -34,7 +32,7 @@ export const ProfileTypeStep = ({
 
       <RadioGroup
         value={selected}
-        onValueChange={handleSelect}
+        onValueChange={onAnswer}
         className="grid gap-4"
       >
         {profileTypes.map((type, index) => (
@@ -61,6 +59,12 @@ export const ProfileTypeStep = ({
           </motion.div>
         ))}
       </RadioGroup>
+
+      <QuizNavigation
+        onNext={onNext}
+        onBack={onBack}
+        isNextDisabled={!selected}
+      />
     </div>
   );
 };

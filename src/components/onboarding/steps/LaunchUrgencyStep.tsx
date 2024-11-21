@@ -1,14 +1,15 @@
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { QuizNavigation } from "./QuizNavigation";
 
 interface LaunchUrgencyStepProps {
   selected: string;
   onAnswer: (value: string) => void;
   onComplete: () => void;
+  onBack: () => void;
 }
 
-export function LaunchUrgencyStep({ selected, onAnswer, onComplete }: LaunchUrgencyStepProps) {
+export function LaunchUrgencyStep({ selected, onAnswer, onComplete, onBack }: LaunchUrgencyStepProps) {
   const options = [
     { value: "immediate", label: "Immediately (1-2 months)" },
     { value: "soon", label: "Soon (3-6 months)" },
@@ -16,10 +17,10 @@ export function LaunchUrgencyStep({ selected, onAnswer, onComplete }: LaunchUrge
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-2xl mx-auto space-y-6">
       <div className="space-y-2">
-        <h2 className="text-2xl font-bold">When are you planning to launch?</h2>
-        <p className="text-muted-foreground">
+        <h2 className="text-2xl font-bold text-center">When are you planning to launch?</h2>
+        <p className="text-muted-foreground text-center">
           This helps us understand your timeline and prioritize your needs
         </p>
       </div>
@@ -39,13 +40,12 @@ export function LaunchUrgencyStep({ selected, onAnswer, onComplete }: LaunchUrge
         ))}
       </div>
 
-      <Button 
-        onClick={onComplete} 
-        disabled={!selected}
-        className="w-full"
-      >
-        Complete Onboarding
-      </Button>
+      <QuizNavigation
+        onNext={onComplete}
+        onBack={onBack}
+        nextLabel="Complete"
+        isNextDisabled={!selected}
+      />
     </div>
   );
 }
