@@ -7,13 +7,17 @@ export const CreativeSection = () => {
   useEffect(() => {
     // Add the video player script
     const script = document.createElement("script");
+    script.id = "scr_673f63f57558ba000b569976"; // Add id to track the script
     script.src = "https://scripts.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/player.js";
     script.async = true;
     document.head.appendChild(script);
 
     return () => {
-      // Cleanup script on unmount
-      document.head.removeChild(script);
+      // Cleanup script on unmount - safely remove if it exists
+      const existingScript = document.getElementById("scr_673f63f57558ba000b569976");
+      if (existingScript && existingScript.parentNode) {
+        existingScript.parentNode.removeChild(existingScript);
+      }
     };
   }, []);
 
