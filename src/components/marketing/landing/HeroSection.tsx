@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { BrandLogosSection } from "./BrandLogosSection";
 import { useEffect } from "react";
 
 export const HeroSection = () => {
@@ -61,24 +60,37 @@ export const HeroSection = () => {
         </div>
 
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <img
-              src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
-              alt="GetBrands Logo"
-              className="h-12 mx-auto mb-8"
-            />
-            
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Create your own private label on demand
-            </h1>
-            
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              We specialize in cosmetics, supplements, and coffee. From idea to launch, 
-              we build your brand from the ground up.
-            </p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left Column - Text Content */}
+            <div className="text-left">
+              <img
+                src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
+                alt="GetBrands Logo"
+                className="h-12 mb-8"
+              />
+              
+              <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                Create your own private label on demand
+              </h1>
+              
+              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                We specialize in cosmetics, supplements, and coffee. From idea to launch, 
+                we build your brand from the ground up.
+              </p>
 
-            {/* Video Player */}
-            <div className="max-w-2xl mx-auto mb-8">
+              <Link to="/login">
+                <Button 
+                  size="lg"
+                  className="bg-[#f0562e] hover:bg-[#f0562e]/90 text-white font-semibold px-8"
+                >
+                  Start Now
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+            </div>
+
+            {/* Right Column - Video */}
+            <div className="max-w-2xl mx-auto lg:mx-0">
               <div id="vid_673f63f57558ba000b569976" style={{ position: 'relative', width: '100%', padding: '56.25% 0 0' }}>
                 <img 
                   id="thumb_673f63f57558ba000b569976" 
@@ -99,20 +111,9 @@ export const HeroSection = () => {
                 />
               </div>
             </div>
-
-            <Link to="/login">
-              <Button 
-                size="lg"
-                className="bg-[#f0562e] hover:bg-[#f0562e]/90 text-white font-semibold px-8"
-              >
-                Start Now
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
           </div>
         </div>
       </section>
-      <BrandLogosSection />
     </>
   );
 };
