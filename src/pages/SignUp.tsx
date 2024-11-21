@@ -67,7 +67,6 @@ const SignUp = () => {
       }
 
       if (data?.user) {
-        // Check if the profile was created
         const { error: profileError } = await supabase
           .from('profiles')
           .select()
@@ -75,7 +74,6 @@ const SignUp = () => {
           .single();
 
         if (profileError) {
-          // If profile doesn't exist, create it manually
           const { error: insertError } = await supabase
             .from('profiles')
             .insert({
@@ -90,7 +88,6 @@ const SignUp = () => {
           if (insertError) throw insertError;
         }
 
-        toast.success("Account created successfully! Please check your email to verify your account.");
         navigate("/login");
       }
     } catch (error: any) {
