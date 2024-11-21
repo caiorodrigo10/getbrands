@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { identifyUser } from "@/lib/analytics";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { getRoleBasedRedirectPath } from "@/lib/roleRedirection";
 import Gleap from "gleap";
 
@@ -41,8 +41,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleUserSession = async (user: User | null) => {
+  const handleUserSession = async (user: User | null, isInitialLogin = false) => {
     if (!user) return;
 
     try {
@@ -67,15 +68,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         name: typedProfile?.first_name ? `${typedProfile.first_name} ${typedProfile.last_name}` : user.email,
       });
 
-      // If onboarding is not completed, always redirect to onboarding
-      if (!typedProfile?.onboarding_completed) {
-        navigate('/onboarding');
-        return;
-      }
+      // Only redirect if it's the initial login
+      if (isInitialLogin) {
+        // If onboarding is not completed, always redirect to onboarding
+        if (!typedProfile?.onboarding_completed) {
+          navigate('/onboarding');
+          return;
+        }
 
-      // If onboarding is completed, redirect based on role
-      const redirectPath = getRoleBasedRedirectPath(typedProfile?.role);
-      navigate(redirectPath);
+        // If onboarding is completed and it's initial login, redirect based on role
+        const redirectPath = getRoleBasedRedirectPath(typedProfile?.role);
+        navigate(redirectPath);
+      }
     } catch (error) {
       console.error('Error checking user profile:', error);
     }
@@ -86,7 +90,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        handleUserSession(session.user);
+        handleUserSession(session.user, false); // Not initial login
       }
       setLoading(false);
     });
@@ -95,9 +99,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      const isInitialLogin = _event === 'SIGNED_IN';
       setUser(session?.user ?? null);
       if (session?.user) {
-        handleUserSession(session.user);
+        handleUserSession(session.user, isInitialLogin);
       }
       setLoading(false);
     });
