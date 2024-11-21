@@ -45,11 +45,12 @@ const StartHere = () => {
         
         <div className="aspect-w-16 aspect-h-9 mb-8">
           <iframe
-            className="w-full h-[400px] rounded-lg"
-            src="https://www.youtube.com/embed/7FlC8Wk1xFA?controls=0&showinfo=0&rel=0&modestbranding=1&color=white&vq=hd1080&playsinline=1"
-            title="Welcome to GetBrands"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            src="https://player.scaleup.com.br/embed/7d7ee52e472110f1ca60bc757bfbd433d9ae38ad"
+            title="GetBrands Onboarding v1"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
+            className="w-full h-[400px] rounded-lg"
+            style={{ border: 0, margin: '0 auto' }}
           />
         </div>
 
