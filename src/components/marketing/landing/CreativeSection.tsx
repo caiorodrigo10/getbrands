@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Instagram, ShoppingBag } from "lucide-react";
+import { Instagram, ShoppingBag, ArrowRight } from "lucide-react";
 import { useEffect } from "react";
 
 export const CreativeSection = () => {
@@ -51,12 +51,26 @@ export const CreativeSection = () => {
               From brand strategy to product launch, we create your complete brand identity. 
               Schedule a call to start building your brand today.
             </p>
-            <Button 
-              size="lg"
-              className="bg-[#F16529] hover:bg-[#F16529]/90 text-white font-semibold px-8 py-6 text-lg"
-            >
-              BOOK A CALL
-            </Button>
+            
+            <div className="flex justify-center gap-4">
+              <Link to="/login">
+                <Button 
+                  size="lg"
+                  className="bg-[#f0562e] hover:bg-[#f0562e]/90 text-white font-semibold px-8"
+                >
+                  Start Now
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              
+              <Button 
+                size="lg"
+                variant="outline"
+                className="border-2 border-[#f0562e] text-[#f0562e] hover:bg-[#f0562e]/10 font-semibold px-8"
+              >
+                Book a Demo
+              </Button>
+            </div>
           </div>
         </div>
       </section>
