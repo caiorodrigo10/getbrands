@@ -1,65 +1,51 @@
-import { motion } from "framer-motion";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface BrandStatusStepProps {
   selected: string;
-  onAnswer: (status: string) => void;
+  onAnswer: (value: string) => void;
   onNext: () => void;
 }
 
-const brandStatuses = [
-  { id: "I already have a brand", label: "I already have a brand" },
-  { id: "I'm creating a new brand", label: "I'm creating a new brand" }
-];
-
-export const BrandStatusStep = ({ 
-  selected, 
-  onAnswer,
-  onNext 
-}: BrandStatusStepProps) => {
-  const handleSelect = (value: string) => {
-    onAnswer(value);
-    onNext(); // Auto-advance after selection
-  };
+export function BrandStatusStep({ selected, onAnswer, onNext }: BrandStatusStepProps) {
+  const options = [
+    { value: "no_brand", label: "Starting from scratch" },
+    { value: "partial_brand", label: "Have some branding elements" },
+    { value: "complete_brand", label: "Complete brand identity" },
+  ];
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4">
-          Do you already have branding?
-        </h2>
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <h2 className="text-2xl font-bold">What's your current brand status?</h2>
+        <p className="text-muted-foreground">
+          Tell us about your current branding situation
+        </p>
       </div>
 
-      <RadioGroup
-        value={selected}
-        onValueChange={handleSelect}
-        className="grid gap-4"
-      >
-        {brandStatuses.map((status, index) => (
-          <motion.div
-            key={status.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ 
-              opacity: 1, 
-              y: 0,
-              transition: { delay: index * 0.1 }
-            }}
+      <div className="grid gap-4">
+        {options.map((option) => (
+          <Card
+            key={option.value}
+            className={cn(
+              "p-4 cursor-pointer transition-all hover:border-primary",
+              selected === option.value && "border-2 border-primary"
+            )}
+            onClick={() => onAnswer(option.value)}
           >
-            <Label
-              htmlFor={status.id}
-              className={`
-                flex items-center space-x-3 p-4 sm:p-6 rounded-xl border-2 cursor-pointer
-                transition-all duration-200
-                ${selected === status.id ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50'}
-              `}
-            >
-              <RadioGroupItem value={status.id} id={status.id} />
-              <span className="text-base sm:text-xl">{status.label}</span>
-            </Label>
-          </motion.div>
+            <div className="font-medium">{option.label}</div>
+          </Card>
         ))}
-      </RadioGroup>
+      </div>
+
+      <Button 
+        onClick={onNext} 
+        disabled={!selected}
+        className="w-full"
+      >
+        Continue
+      </Button>
     </div>
   );
-};
+}

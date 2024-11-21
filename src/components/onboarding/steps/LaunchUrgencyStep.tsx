@@ -5,10 +5,10 @@ import { cn } from "@/lib/utils";
 interface LaunchUrgencyStepProps {
   selected: string;
   onAnswer: (value: string) => void;
-  onNext: () => void;
+  onComplete: () => void;
 }
 
-export function LaunchUrgencyStep({ selected, onAnswer, onNext }: LaunchUrgencyStepProps) {
+export function LaunchUrgencyStep({ selected, onAnswer, onComplete }: LaunchUrgencyStepProps) {
   const options = [
     { value: "immediate", label: "Immediately (1-2 months)" },
     { value: "soon", label: "Soon (3-6 months)" },
@@ -40,11 +40,11 @@ export function LaunchUrgencyStep({ selected, onAnswer, onNext }: LaunchUrgencyS
       </div>
 
       <Button 
-        onClick={onNext} 
+        onClick={onComplete} 
         disabled={!selected}
         className="w-full"
       >
-        Continue
+        Complete Onboarding
       </Button>
     </div>
   );

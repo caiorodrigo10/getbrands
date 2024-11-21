@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { WelcomeStep } from "./steps/WelcomeStep";
+import { ProductCategoriesStep } from "./steps/ProductCategoriesStep";
 import { ProfileTypeStep } from "./steps/ProfileTypeStep";
 import { BrandStatusStep } from "./steps/BrandStatusStep";
 import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
-import { PhoneNumberStep } from "./steps/PhoneNumberStep";
 import { useAuth } from "@/contexts/AuthContext";
 
 type Step = {
@@ -19,10 +19,10 @@ export function OnboardingQuiz() {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [quizData, setQuizData] = useState({
+    productCategories: [] as string[],
     profileType: "",
     brandStatus: "",
     launchUrgency: "",
-    phone: "",
   });
 
   const handleNext = () => {
@@ -39,10 +39,10 @@ export function OnboardingQuiz() {
       const { error } = await supabase
         .from("profiles")
         .update({
+          product_interest: quizData.productCategories,
           profile_type: quizData.profileType,
           brand_status: quizData.brandStatus,
           launch_urgency: quizData.launchUrgency,
-          phone: quizData.phone,
           onboarding_completed: true,
         })
         .eq("id", user.id);
@@ -61,6 +61,14 @@ export function OnboardingQuiz() {
     {
       component: WelcomeStep,
       props: {
+        onNext: handleNext,
+      },
+    },
+    {
+      component: ProductCategoriesStep,
+      props: {
+        selected: quizData.productCategories,
+        onAnswer: (value: string[]) => setQuizData({ ...quizData, productCategories: value }),
         onNext: handleNext,
       },
     },
@@ -85,14 +93,6 @@ export function OnboardingQuiz() {
       props: {
         selected: quizData.launchUrgency,
         onAnswer: (value: string) => setQuizData({ ...quizData, launchUrgency: value }),
-        onNext: handleNext,
-      },
-    },
-    {
-      component: PhoneNumberStep,
-      props: {
-        value: quizData.phone,
-        onChange: (value: string) => setQuizData({ ...quizData, phone: value }),
         onComplete: handleComplete,
       },
     },
