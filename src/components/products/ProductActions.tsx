@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { useProductActions } from "@/hooks/useProductActions";
-import { useUserPermissions } from "@/lib/permissions";
 
 interface ProductActionsProps {
   productId: string;
@@ -9,10 +8,6 @@ interface ProductActionsProps {
 
 export const ProductActions = ({ productId, onSelectProduct }: ProductActionsProps) => {
   const { isLoading, handleRequestSample } = useProductActions(productId);
-  const { isAdmin, isMember } = useUserPermissions();
-
-  // Show select product button only for admin and member roles
-  const showSelectButton = isAdmin || isMember;
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:gap-4 mt-6 px-4 sm:px-0">
@@ -24,16 +19,14 @@ export const ProductActions = ({ productId, onSelectProduct }: ProductActionsPro
       >
         {isLoading ? "Adding to cart..." : "Order Sample"}
       </Button>
-      {showSelectButton && (
-        <Button 
-          size="lg"
-          className="w-full bg-primary hover:bg-primary-dark text-white h-14 sm:h-12 text-base font-medium rounded-full"
-          onClick={onSelectProduct}
-          disabled={isLoading}
-        >
-          Select Product
-        </Button>
-      )}
+      <Button 
+        size="lg"
+        className="w-full bg-primary hover:bg-primary-dark text-white h-14 sm:h-12 text-base font-medium rounded-full"
+        onClick={onSelectProduct}
+        disabled={isLoading}
+      >
+        Select Product
+      </Button>
     </div>
   );
 };
