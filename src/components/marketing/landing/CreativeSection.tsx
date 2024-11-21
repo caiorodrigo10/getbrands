@@ -5,18 +5,22 @@ import { useEffect } from "react";
 
 export const CreativeSection = () => {
   useEffect(() => {
-    // Add the video player script
+    // Create and append the script
     const script = document.createElement("script");
-    script.id = "scr_673f75ed6f75d1000a4d35bd"; // Updated script ID
     script.src = "https://scripts.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f75ed6f75d1000a4d35bd/player.js";
     script.async = true;
-    document.head.appendChild(script);
+    script.id = "scr_673f75ed6f75d1000a4d35bd";
+    
+    // Only append if the script doesn't already exist
+    if (!document.getElementById(script.id)) {
+      document.body.appendChild(script);
+    }
 
     return () => {
-      // Cleanup script on unmount - safely remove if it exists
-      const existingScript = document.getElementById("scr_673f75ed6f75d1000a4d35bd");
-      if (existingScript && existingScript.parentNode) {
-        existingScript.parentNode.removeChild(existingScript);
+      // Cleanup: remove the script on unmount
+      const existingScript = document.getElementById(script.id);
+      if (existingScript) {
+        existingScript.remove();
       }
     };
   }, []);
