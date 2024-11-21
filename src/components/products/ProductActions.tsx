@@ -12,9 +12,8 @@ export const ProductActions = ({ productId, onSelectProduct }: ProductActionsPro
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:gap-4 mt-6 px-4 sm:px-0">
       <Button 
-        variant="outline" 
         size="lg"
-        className="w-full bg-[#0ecf88] hover:bg-[#0ecf88]/90 text-white h-14 sm:h-12 text-base font-medium rounded-full"
+        className="w-full bg-[#08af71] hover:bg-[#08af71]/90 text-white h-14 sm:h-12 text-base font-medium rounded-full"
         onClick={handleRequestSample}
         disabled={isLoading}
       >
