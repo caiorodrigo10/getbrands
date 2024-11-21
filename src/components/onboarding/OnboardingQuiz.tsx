@@ -29,6 +29,10 @@ export function OnboardingQuiz() {
     setCurrentStep((prev) => prev + 1);
   };
 
+  const handleBack = () => {
+    setCurrentStep((prev) => prev - 1);
+  };
+
   const handleComplete = async () => {
     try {
       if (!user?.id) {
@@ -70,6 +74,7 @@ export function OnboardingQuiz() {
         selected: quizData.productCategories,
         onAnswer: (value: string[]) => setQuizData({ ...quizData, productCategories: value }),
         onNext: handleNext,
+        onBack: handleBack,
       },
     },
     {
@@ -78,6 +83,7 @@ export function OnboardingQuiz() {
         selected: quizData.profileType,
         onAnswer: (value: string) => setQuizData({ ...quizData, profileType: value }),
         onNext: handleNext,
+        onBack: handleBack,
       },
     },
     {
@@ -86,6 +92,7 @@ export function OnboardingQuiz() {
         selected: quizData.brandStatus,
         onAnswer: (value: string) => setQuizData({ ...quizData, brandStatus: value }),
         onNext: handleNext,
+        onBack: handleBack,
       },
     },
     {
@@ -94,6 +101,7 @@ export function OnboardingQuiz() {
         selected: quizData.launchUrgency,
         onAnswer: (value: string) => setQuizData({ ...quizData, launchUrgency: value }),
         onComplete: handleComplete,
+        onBack: handleBack,
       },
     },
   ];
