@@ -7,14 +7,14 @@ export const CreativeSection = () => {
   useEffect(() => {
     // Add the video player script
     const script = document.createElement("script");
-    script.id = "scr_673f63f57558ba000b569976"; // Add id to track the script
-    script.src = "https://scripts.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/player.js";
+    script.id = "scr_673f75ed6f75d1000a4d35bd"; // Updated script ID
+    script.src = "https://scripts.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f75ed6f75d1000a4d35bd/player.js";
     script.async = true;
     document.head.appendChild(script);
 
     return () => {
       // Cleanup script on unmount - safely remove if it exists
-      const existingScript = document.getElementById("scr_673f63f57558ba000b569976");
+      const existingScript = document.getElementById("scr_673f75ed6f75d1000a4d35bd");
       if (existingScript && existingScript.parentNode) {
         existingScript.parentNode.removeChild(existingScript);
       }
@@ -32,10 +32,10 @@ export const CreativeSection = () => {
             
             {/* Video Player */}
             <div className="mb-10">
-              <div id="vid_673f63f57558ba000b569976" style={{ position: 'relative', width: '100%', padding: '56.25% 0 0' }}>
+              <div id="vid_673f75ed6f75d1000a4d35bd" style={{ position: 'relative', width: '100%', padding: '56.25% 0 0' }}>
                 <img 
-                  id="thumb_673f63f57558ba000b569976" 
-                  src="https://images.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/thumbnail.jpg" 
+                  id="thumb_673f75ed6f75d1000a4d35bd" 
+                  src="https://images.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f75ed6f75d1000a4d35bd/thumbnail.jpg" 
                   style={{ 
                     position: 'absolute', 
                     top: 0, 
@@ -48,7 +48,7 @@ export const CreativeSection = () => {
                   alt="thumbnail" 
                 />
                 <div 
-                  id="backdrop_673f63f57558ba000b569976" 
+                  id="backdrop_673f75ed6f75d1000a4d35bd" 
                   style={{ 
                     WebkitBackdropFilter: 'blur(5px)', 
                     backdropFilter: 'blur(5px)', 
