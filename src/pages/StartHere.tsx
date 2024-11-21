@@ -39,8 +39,7 @@ const StartHere = () => {
       <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
         <h2 className="text-2xl font-semibold mb-4">Getting Started</h2>
         <p className="text-gray-600 mb-6">
-          Welcome to our platform! We're excited to help you start your journey in creating amazing products.
-          Watch our introduction video below to learn more about how to make the most of our platform.
+          Welcome! Watch our quick intro video to learn how to make the most of our platform and start creating amazing products.
         </p>
         
         <div className="aspect-w-16 aspect-h-9 mb-8">
