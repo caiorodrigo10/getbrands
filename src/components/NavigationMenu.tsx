@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import UserMenu from "./UserMenu";
-import { Menu, LayoutDashboard, FolderGit2, Grid3X3, Palette, Calculator, Package2 } from "lucide-react";
+import { Menu, LayoutDashboard, FolderGit2, Grid3X3, Palette, Calculator, Package2, PlayCircle } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useUserPermissions } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
@@ -10,7 +10,9 @@ import { ProjectPointsInfo } from "./navigation/ProjectPointsInfo";
 export const NavigationMenu = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { hasFullAccess } = useUserPermissions();
+  const { hasFullAccess, isMember, isSampler } = useUserPermissions();
+
+  const showStartHere = isMember || isSampler;
 
   const menuItems = [
     { 
@@ -31,6 +33,14 @@ export const NavigationMenu = () => {
       icon: Palette,
       restricted: true
     },
+    ...(showStartHere ? [
+      { 
+        label: "Start Here", 
+        path: "/start-here", 
+        icon: PlayCircle,
+        restricted: false
+      }
+    ] : []),
     { 
       label: "Catalog", 
       path: "/catalog", 
