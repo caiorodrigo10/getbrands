@@ -124,20 +124,20 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
             </Button>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 py-4 border-y border-gray-200">
-            <div>
-              <p className="text-gray-600">Shipping cost</p>
-              <p className="text-lg">From ${(4.50).toFixed(2)}</p>
+          <div className="space-y-3 py-4 border-y border-gray-200">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-600">Shipping cost</span>
+              <span className="text-lg">From ${(4.50).toFixed(2)}</span>
             </div>
-            <div>
-              <p className="text-gray-600">SRP</p>
-              <p className="text-lg">${product.srp.toFixed(2)}</p>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-600">Suggested retail price</span>
+              <span className="text-lg">${product.srp.toFixed(2)}</span>
             </div>
-            <div className="col-span-2">
-              <p className="text-gray-600">Potential profit</p>
-              <p className="text-lg text-green-600 font-semibold">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-600">Potential profit</span>
+              <span className="text-lg text-[#08af71] font-semibold">
                 ${(product.srp - product.from_price).toFixed(2)}
-              </p>
+              </span>
             </div>
           </div>
 
