@@ -14,11 +14,11 @@ export const ProductActions = ({ productId, onSelectProduct }: ProductActionsPro
       <Button 
         variant="outline" 
         size="lg"
-        className="w-full bg-primary hover:bg-primary-dark text-white h-14 sm:h-12 text-base font-medium rounded-full"
+        className="w-full bg-[#0ecf88] hover:bg-[#0ecf88]/90 text-white h-14 sm:h-12 text-base font-medium rounded-full"
         onClick={handleRequestSample}
         disabled={isLoading}
       >
-        {isLoading ? "Adding to cart..." : "Request Sample"}
+        {isLoading ? "Adding to cart..." : "Order Sample"}
       </Button>
       <Button 
         size="lg"
