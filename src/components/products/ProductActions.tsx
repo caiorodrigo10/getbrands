@@ -14,7 +14,7 @@ export const ProductActions = ({ productId, onSelectProduct }: ProductActionsPro
       <Button 
         variant="outline" 
         size="lg"
-        className="w-full text-orange-500 hover:text-orange-600 border-2 border-orange-500 hover:bg-orange-50 h-14 sm:h-12 text-base font-medium rounded-full"
+        className="w-full bg-primary hover:bg-primary-dark text-white h-14 sm:h-12 text-base font-medium rounded-full"
         onClick={handleRequestSample}
         disabled={isLoading}
       >
