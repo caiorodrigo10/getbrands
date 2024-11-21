@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const HeroSection = () => {
+  const [scriptError, setScriptError] = useState(false);
+
   useEffect(() => {
     const initializePlayer = () => {
       const videoContainer = document.getElementById("vid_673f63f57558ba000b569976");
@@ -15,20 +17,32 @@ export const HeroSection = () => {
           existingScript.remove();
         }
 
-        // Create and append the new script
+        // Create and append the new script with error handling
         const script = document.createElement("script");
         script.src = "https://scripts.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/player.js";
         script.async = true;
         script.id = "scr_673f63f57558ba000b569976";
+        script.crossOrigin = "anonymous"; // Add CORS header
         
         // Error handling for script loading
-        script.onerror = (error) => {
-          console.error("Error loading video player script:", error);
+        script.onerror = () => {
+          console.error("Error loading video player script");
+          setScriptError(true);
         };
 
         // Only append script once container is ready
         document.body.appendChild(script);
       }
+    };
+
+    // Add global error handler for the video player
+    window.onerror = (message, source, lineno, colno, error) => {
+      if (source?.includes('converteai.net')) {
+        console.error('Video player error:', message);
+        setScriptError(true);
+        return true; // Prevent the error from bubbling up
+      }
+      return false;
     };
 
     // Initial attempt to initialize
@@ -40,6 +54,8 @@ export const HeroSection = () => {
       if (scriptElement) {
         scriptElement.remove();
       }
+      // Remove global error handler
+      window.onerror = null;
     };
   }, []); // Empty dependency array to run only once on mount
 
@@ -91,25 +107,33 @@ export const HeroSection = () => {
 
             {/* Right Column - Video */}
             <div className="max-w-2xl mx-auto lg:mx-0">
-              <div id="vid_673f63f57558ba000b569976" style={{ position: 'relative', width: '100%', padding: '56.25% 0 0' }}>
-                <img 
-                  id="thumb_673f63f57558ba000b569976" 
-                  src="https://images.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/thumbnail.jpg" 
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                  alt="thumbnail"
-                />
-                <div 
-                  id="backdrop_673f63f57558ba000b569976" 
-                  style={{ 
-                    WebkitBackdropFilter: 'blur(5px)',
-                    backdropFilter: 'blur(5px)',
-                    position: 'absolute',
-                    top: 0,
-                    height: '100%',
-                    width: '100%'
-                  }}
-                />
-              </div>
+              {!scriptError ? (
+                <div id="vid_673f63f57558ba000b569976" style={{ position: 'relative', width: '100%', padding: '56.25% 0 0' }}>
+                  <img 
+                    id="thumb_673f63f57558ba000b569976" 
+                    src="https://images.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/thumbnail.jpg" 
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    alt="Video thumbnail"
+                  />
+                  <div 
+                    id="backdrop_673f63f57558ba000b569976" 
+                    style={{ 
+                      WebkitBackdropFilter: 'blur(5px)',
+                      backdropFilter: 'blur(5px)',
+                      position: 'absolute',
+                      top: 0,
+                      height: '100%',
+                      width: '100%'
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="relative w-full pt-[56.25%] bg-gray-100 rounded-lg">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <p className="text-gray-500">Video player unavailable</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
