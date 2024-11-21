@@ -101,10 +101,8 @@ export function OnboardingQuiz() {
   const CurrentStepComponent = steps[currentStep].component;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-purple-50 p-4">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-lg">
-        <CurrentStepComponent {...steps[currentStep].props} />
-      </div>
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <CurrentStepComponent {...steps[currentStep].props} />
     </div>
   );
 }
