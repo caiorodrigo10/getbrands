@@ -131,7 +131,7 @@ export const NavigationMenu = () => {
       </header>
 
       {/* Mobile Menu - Horizontal */}
-      <header className="md:hidden fixed top-0 left-0 right-0 border-b border-gray-200 bg-[#fafafa]">
+      <header className="md:hidden fixed top-0 left-0 right-0 border-b border-gray-200 bg-[#fafafa] z-50">
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between gap-4">
             <div className="flex items-center gap-6">
@@ -146,7 +146,7 @@ export const NavigationMenu = () => {
               <SheetTrigger>
                 <Menu className="h-6 w-6 text-black" />
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] bg-[#fafafa] p-0">
+              <SheetContent side="right" className="w-[300px] bg-[#fafafa] p-0 z-[100]">
                 <div className="flex flex-col h-full">
                   <div className="p-4 border-b border-gray-200">
                     <UserMenu isMobile={true} />
