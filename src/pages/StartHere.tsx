@@ -1,8 +1,10 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 
 const StartHere = () => {
   const { user } = useAuth();
@@ -41,14 +43,35 @@ const StartHere = () => {
           Watch our introduction video below to learn more about how to make the most of our platform.
         </p>
         
-        <div className="aspect-w-16 aspect-h-9 mb-6">
+        <div className="aspect-w-16 aspect-h-9 mb-8">
           <iframe
             className="w-full h-[400px] rounded-lg"
-            src="https://www.youtube.com/embed/your-video-id"
+            src="https://www.youtube.com/embed/7FlC8Wk1xFA"
             title="Welcome to GetBrands"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <Link to="/catalog">
+            <Button 
+              className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white"
+              size="lg"
+            >
+              Explore Product Catalog
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+          
+          <Button 
+            className="w-full"
+            size="lg"
+            variant="outline"
+          >
+            Schedule a Demo
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
         </div>
       </div>
 
