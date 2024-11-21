@@ -1,76 +1,19 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { Instagram, ShoppingBag } from "lucide-react";
-import { useEffect } from "react";
+import { ShoppingBag, Instagram } from "lucide-react";
+import { VideoPlayer } from "./VideoPlayer";
+import { HowItWorks } from "./HowItWorks";
 
 export const CreativeSection = () => {
-  useEffect(() => {
-    // Create and append the script
-    const script = document.createElement("script");
-    script.src = "https://scripts.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f75ed6f75d1000a4d35bd/player.js";
-    script.async = true;
-    script.id = "scr_673f75ed6f75d1000a4d35bd";
-    
-    // Only append if the script doesn't already exist
-    if (!document.getElementById(script.id)) {
-      document.body.appendChild(script);
-    }
-
-    return () => {
-      // Cleanup: remove the script on unmount
-      const existingScript = document.getElementById(script.id);
-      if (existingScript) {
-        existingScript.remove();
-      }
-    };
-  }, []);
-
   return (
     <>
       <section className="py-32 bg-white">
-        <div className="container mx-auto px-8">
+        <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 leading-tight">
               On-brand creative, built end-to-end
             </h2>
             
-            {/* Video Player Container */}
-            <div className="mb-10 rounded-2xl overflow-hidden shadow-lg">
-              <div 
-                id="vid_673f75ed6f75d1000a4d35bd" 
-                style={{ position: 'relative', width: '100%', padding: '56.25% 0 0' }}
-                className="rounded-2xl overflow-hidden"
-              >
-                <img 
-                  id="thumb_673f75ed6f75d1000a4d35bd" 
-                  src="https://images.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f75ed6f75d1000a4d35bd/thumbnail.jpg" 
-                  style={{ 
-                    position: 'absolute', 
-                    top: 0, 
-                    left: 0, 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover',
-                    display: 'block',
-                  }} 
-                  alt="thumbnail"
-                  className="rounded-2xl"
-                />
-                <div 
-                  id="backdrop_673f75ed6f75d1000a4d35bd" 
-                  style={{ 
-                    position: 'absolute', 
-                    top: 0, 
-                    left: 0,
-                    width: '100%', 
-                    height: '100%',
-                    backdropFilter: 'blur(5px)',
-                    WebkitBackdropFilter: 'blur(5px)',
-                  }}
-                  className="rounded-2xl"
-                />
-              </div>
-            </div>
+            <VideoPlayer />
             
             <p className="text-lg text-gray-600 mb-10 leading-relaxed">
               From brand strategy to product launch, we create your complete brand identity. 
@@ -86,45 +29,7 @@ export const CreativeSection = () => {
         </div>
       </section>
 
-      <section className="py-24 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6">How it works</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600 text-xl font-semibold mb-6">
-                1
-              </div>
-              <h3 className="text-2xl font-bold mb-4">Select Products</h3>
-              <p className="text-gray-600">
-                Choose from our wide range of high-quality products that match your brand vision and market needs.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600 text-xl font-semibold mb-6">
-                2
-              </div>
-              <h3 className="text-2xl font-bold mb-4">Create Your Brand</h3>
-              <p className="text-gray-600">
-                We develop your brand identity and design custom packaging that stands out in the market.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600 text-xl font-semibold mb-6">
-                3
-              </div>
-              <h3 className="text-2xl font-bold mb-4">Sell</h3>
-              <p className="text-gray-600">
-                Launch your products and start selling with our complete support and guidance.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HowItWorks />
 
       <section className="py-24 bg-[#F2FCE2]">
         <div className="container mx-auto px-4">
