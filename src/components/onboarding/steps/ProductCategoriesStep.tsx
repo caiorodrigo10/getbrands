@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Coffee, Pill, Sparkles, Dumbbell, Dog } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button"; 
 
 interface ProductCategoriesStepProps {
   selected: string[];
@@ -54,7 +55,7 @@ export const ProductCategoriesStep = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-2">
           Which product categories are you interested in creating?
@@ -99,6 +100,16 @@ export const ProductCategoriesStep = ({
             </motion.div>
           );
         })}
+      </div>
+
+      <div className="flex justify-end mt-6">
+        <Button 
+          onClick={onNext}
+          disabled={selected.length === 0}
+          className="w-full sm:w-auto"
+        >
+          Next
+        </Button>
       </div>
     </div>
   );
