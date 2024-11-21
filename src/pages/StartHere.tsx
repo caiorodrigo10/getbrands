@@ -10,7 +10,7 @@ const StartHere = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading } = useQuery({
     queryKey: ["user-profile", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
@@ -31,6 +31,14 @@ const StartHere = () => {
       navigate("/dashboard");
     }
   }, [profile, navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="max-w-4xl mx-auto py-12 px-4">
+        <h1 className="text-2xl md:text-4xl font-bold mb-8">Loading...</h1>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">
