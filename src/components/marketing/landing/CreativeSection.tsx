@@ -6,12 +6,13 @@ import { useEffect } from "react";
 export const CreativeSection = () => {
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = "https://scripts.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f75ed6f75d1000a4d35bd/player.js";
+    script.src = "https://scripts.converteai.net/lib/js/smartplayer/v1/sdk.min.js";
+    script.setAttribute("data-id", "673f63f57558ba000b569976");
     script.async = true;
     document.head.appendChild(script);
 
     return () => {
-      document.head.removeChild(script);
+      script.remove();
     };
   }, []);
 
@@ -26,32 +27,23 @@ export const CreativeSection = () => {
             
             {/* Video Player */}
             <div className="mb-10">
-              <div id="vid_673f75ed6f75d1000a4d35bd" style={{ position: 'relative', width: '100%', padding: '56.25% 0 0' }}>
-                <img 
-                  id="thumb_673f75ed6f75d1000a4d35bd" 
-                  src="https://images.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f75ed6f75d1000a4d35bd/thumbnail.jpg" 
-                  style={{ 
-                    position: 'absolute', 
-                    top: 0, 
-                    left: 0, 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover', 
-                    display: 'block'
-                  }} 
-                  alt="thumbnail" 
-                />
-                <div 
-                  id="backdrop_673f75ed6f75d1000a4d35bd" 
-                  style={{ 
-                    WebkitBackdropFilter: 'blur(5px)', 
-                    backdropFilter: 'blur(5px)', 
-                    position: 'absolute', 
-                    top: 0, 
-                    height: '100%', 
-                    width: '100%' 
-                  }}
-                />
+              <div id="ifr_673f63f57558ba000b569976_wrapper" style={{ margin: '0 auto', width: '100%' }}>
+                <div style={{ padding: '56.25% 0 0 0', position: 'relative' }} id="ifr_673f63f57558ba000b569976_aspect">
+                  <iframe 
+                    frameBorder="0" 
+                    allowFullScreen 
+                    src="https://scripts.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/embed.html" 
+                    id="ifr_673f63f57558ba000b569976" 
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%'
+                    }}
+                    referrerPolicy="origin"
+                  />
+                </div>
               </div>
             </div>
 
