@@ -2,8 +2,24 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BrandLogosSection } from "./BrandLogosSection";
+import { useEffect } from "react";
 
 export const HeroSection = () => {
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://scripts.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/player.js";
+    script.async = true;
+    script.id = "scr_673f63f57558ba000b569976";
+    document.head.appendChild(script);
+
+    return () => {
+      const scriptElement = document.getElementById("scr_673f63f57558ba000b569976");
+      if (scriptElement) {
+        scriptElement.remove();
+      }
+    };
+  }, []);
+
   return (
     <>
       <section className="relative bg-white pt-20 pb-16 lg:pt-32">
@@ -36,6 +52,29 @@ export const HeroSection = () => {
               We specialize in cosmetics, supplements, and coffee. From idea to launch, 
               we build your brand from the ground up.
             </p>
+
+            {/* Video Player */}
+            <div className="max-w-2xl mx-auto mb-8">
+              <div id="vid_673f63f57558ba000b569976" style={{ position: 'relative', width: '100%', padding: '56.25% 0 0' }}>
+                <img 
+                  id="thumb_673f63f57558ba000b569976" 
+                  src="https://images.converteai.net/5719503f-d81c-468d-9d79-d4381d85c6da/players/673f63f57558ba000b569976/thumbnail.jpg" 
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  alt="thumbnail"
+                />
+                <div 
+                  id="backdrop_673f63f57558ba000b569976" 
+                  style={{ 
+                    WebkitBackdropFilter: 'blur(5px)',
+                    backdropFilter: 'blur(5px)',
+                    position: 'absolute',
+                    top: 0,
+                    height: '100%',
+                    width: '100%'
+                  }}
+                />
+              </div>
+            </div>
 
             <Link to="/login">
               <Button 
