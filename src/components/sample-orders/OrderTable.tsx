@@ -1,7 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from "@/components/ui/dropdown-menu";
-import { Package, MoreVertical, Truck, ChevronDown, ChevronUp } from "lucide-react";
+import { Package, Truck, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useToast } from "@/components/ui/use-toast";
@@ -36,76 +35,8 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
     return subtotal + shippingCost;
   };
 
-  const handleStatusChange = async (orderId: string, newStatus: string) => {
-    if (updatingStatus) return;
-
-    try {
-      setUpdatingStatus(true);
-      const { error } = await supabase
-        .from('sample_requests')
-        .update({ status: newStatus })
-        .eq('id', orderId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: `Order status updated to ${newStatus}`,
-      });
-
-      if (onOrdersChange) {
-        onOrdersChange();
-      }
-    } catch (error: any) {
-      console.error('Error updating status:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to update status",
-      });
-    } finally {
-      setUpdatingStatus(false);
-    }
-  };
-
-  const handleCancelOrder = async (orderId: string) => {
-    if (isDeleting) return;
-
-    try {
-      setIsDeleting(true);
-      const { error } = await supabase
-        .from('sample_requests')
-        .update({ status: 'canceled' })
-        .eq('id', orderId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Order canceled successfully",
-      });
-
-      if (onOrdersChange) {
-        onOrdersChange();
-      }
-    } catch (error) {
-      console.error('Error canceling order:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to cancel order. Please try again.",
-      });
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
   const toggleOrderExpansion = (orderId: string) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
-  };
-
-  const viewOrderDetails = (order: any) => {
-    setSelectedOrder(order);
   };
 
   return (
@@ -122,7 +53,6 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
               <TableHead className="whitespace-nowrap">Tracking #</TableHead>
               <TableHead className="whitespace-nowrap">Status</TableHead>
               <TableHead className="whitespace-nowrap">Total</TableHead>
-              <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -174,71 +104,11 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
                   <TableCell className="whitespace-nowrap">
                     {formatCurrency(calculateOrderTotal(order))}
                   </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-white">
-                        <DropdownMenuItem onClick={() => viewOrderDetails(order)}>
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuSub>
-                          <DropdownMenuSubTrigger>Change Status</DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent className="bg-white">
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(order.id, 'pending')}
-                              disabled={updatingStatus}
-                            >
-                              Set as Pending
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(order.id, 'processing')}
-                              disabled={updatingStatus}
-                            >
-                              Set as Processing
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(order.id, 'shipped')}
-                              disabled={updatingStatus}
-                            >
-                              Set as Shipped
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(order.id, 'completed')}
-                              disabled={updatingStatus}
-                            >
-                              Set as Completed
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(order.id, 'canceled')}
-                              disabled={updatingStatus}
-                            >
-                              Set as Canceled
-                            </DropdownMenuItem>
-                          </DropdownMenuSubContent>
-                        </DropdownMenuSub>
-                        {order.tracking_number && (
-                          <DropdownMenuItem>Track Shipment</DropdownMenuItem>
-                        )}
-                        {order.status?.toLowerCase() === "pending" && (
-                          <DropdownMenuItem 
-                            onClick={() => handleCancelOrder(order.id)}
-                            disabled={isDeleting}
-                          >
-                            Cancel Order
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
                 </TableRow>
                 <AnimatePresence>
                   {expandedOrderId === order.id && (
                     <TableRow>
-                      <TableCell colSpan={9}>
+                      <TableCell colSpan={8}>
                         <OrderExpandedDetails order={order} />
                       </TableCell>
                     </TableRow>
