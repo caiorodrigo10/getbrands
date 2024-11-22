@@ -29,7 +29,10 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
 
       const { error } = await supabase
         .from('sample_requests')
-        .update({ status: newStatus })
+        .update({ 
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', orderId);
 
       if (error) throw error;
@@ -136,6 +139,12 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-white">
+                      <DropdownMenuItem 
+                        onClick={() => handleStatusChange(order.id, 'pending')}
+                        disabled={updatingOrderId === order.id}
+                      >
+                        Mark as Pending
+                      </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => handleStatusChange(order.id, 'processing')}
                         disabled={updatingOrderId === order.id}
