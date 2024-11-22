@@ -115,7 +115,7 @@ const AdminProjectsTable = ({ projects }: AdminProjectsTableProps) => {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => navigate(`/admin/projects/${project.id}/manage`)}
+                  onClick={() => navigate(`/admin/projects/${project.id}`)}
                 >
                   Manage
                 </Button>
