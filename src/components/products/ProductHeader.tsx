@@ -103,7 +103,6 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
         <div className="space-y-4">
           <h1 className="text-4xl font-bold">{product.name}</h1>
           <p className="text-xl text-gray-600">Ships exclusively to US</p>
-          <p className="text-gray-700 text-lg">{product.description}</p>
         </div>
         <div className="text-4xl font-bold mb-4">
           ${product.from_price.toFixed(2)}
