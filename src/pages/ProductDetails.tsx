@@ -157,7 +157,7 @@ const ProductDetails = () => {
       />
       
       <div className="mt-16">
-        <ProductBenefits />
+        <ProductBenefits product={product} />
       </div>
 
       <div className="mt-16">
