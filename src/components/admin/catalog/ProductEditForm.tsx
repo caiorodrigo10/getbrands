@@ -53,11 +53,9 @@ export function ProductEditForm({
     },
   });
 
-  // Only fetch images if we have a valid product ID
   const { data: productImages = [], refetch: refetchImages } = useQuery({
     queryKey: ['product-images', product.id],
     queryFn: async () => {
-      // Return empty array for new products (no ID yet)
       if (!product.id) return [];
       
       const { data, error } = await supabase
@@ -69,17 +67,19 @@ export function ProductEditForm({
       if (error) throw error;
       return data || [];
     },
-    enabled: Boolean(product.id), // Only run query if product.id exists
+    enabled: Boolean(product.id),
   });
 
   const handleSubmit = async (values: z.infer<typeof productFormSchema>) => {
     try {
-      await onSubmit({
+      const updatedProduct = {
         ...product,
         ...values,
-      });
+        description: values.description?.trim() || null,
+      };
       
-      // Invalidate both queries to force a refresh
+      await onSubmit(updatedProduct);
+      
       queryClient.invalidateQueries({ queryKey: ['admin-catalog'] });
       queryClient.invalidateQueries({ queryKey: ['product-images-catalog'] });
 
@@ -88,6 +88,7 @@ export function ProductEditForm({
         description: "Product saved successfully",
       });
     } catch (error) {
+      console.error('Error saving product:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -96,7 +97,6 @@ export function ProductEditForm({
     }
   };
 
-  // Combine temporary images with product images
   const allImages = [...tempImages, ...productImages];
 
   return (
