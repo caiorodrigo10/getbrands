@@ -77,7 +77,7 @@ const ProductSelectedSuccess = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button
               variant="outline"
-              className="flex-1 max-w-[200px]"
+              className="flex-1 max-w-[300px]"
               onClick={() => navigate("/catalogo")}
             >
               Continue Selecting Products
