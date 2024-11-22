@@ -1,7 +1,10 @@
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Bold, Italic, Link, List, MoreHorizontal, Underline } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import ReactMarkdown from 'react-markdown';
+
+<lov-add-dependency>react-markdown@latest</lov-add-dependency>
 
 interface RichTextEditorProps {
   value: string;
@@ -10,6 +13,7 @@ interface RichTextEditorProps {
 
 export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isPreview, setIsPreview] = useState(false);
 
   const handleFormat = (command: string, value?: string) => {
     if (!textareaRef.current) return;
@@ -20,15 +24,16 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
     const selectedText = value || textarea.value.substring(start, end);
 
     let formattedText = '';
+    let surroundText = '';
     switch (command) {
       case 'bold':
-        formattedText = `**${selectedText}**`;
+        surroundText = '**';
         break;
       case 'italic':
-        formattedText = `*${selectedText}*`;
+        surroundText = '*';
         break;
       case 'underline':
-        formattedText = `_${selectedText}_`;
+        surroundText = '__';
         break;
       case 'link':
         const url = prompt('Enter URL:');
@@ -37,10 +42,14 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
         }
         break;
       case 'list':
-        formattedText = `\n- ${selectedText}`;
+        formattedText = selectedText.split('\n').map(line => `- ${line}`).join('\n');
         break;
       default:
         return;
+    }
+
+    if (!formattedText) {
+      formattedText = `${surroundText}${selectedText}${surroundText}`;
     }
 
     const newValue = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
@@ -49,7 +58,10 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
     // Reset selection
     setTimeout(() => {
       textarea.focus();
-      textarea.setSelectionRange(start, start + formattedText.length);
+      textarea.setSelectionRange(
+        start + surroundText.length,
+        start + formattedText.length - surroundText.length
+      );
     }, 0);
   };
 
@@ -97,16 +109,28 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
         >
           <List className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <MoreHorizontal className="h-4 w-4" />
+        <div className="flex-1" />
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={() => setIsPreview(!isPreview)}
+        >
+          {isPreview ? 'Edit' : 'Preview'}
         </Button>
       </div>
-      <Textarea 
-        ref={textareaRef}
-        value={value} 
-        onChange={(e) => onChange(e.target.value)}
-        className="min-h-[200px] resize-y"
-      />
+      
+      {isPreview ? (
+        <div className="min-h-[200px] p-4 border rounded-md prose prose-sm max-w-none">
+          <ReactMarkdown>{value}</ReactMarkdown>
+        </div>
+      ) : (
+        <Textarea 
+          ref={textareaRef}
+          value={value} 
+          onChange={(e) => onChange(e.target.value)}
+          className="min-h-[200px] resize-y font-mono"
+        />
+      )}
     </div>
   );
 };
