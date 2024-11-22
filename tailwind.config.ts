@@ -81,6 +81,7 @@ export default {
             },
             'em': {
               fontStyle: 'italic',
+              color: 'inherit',
             },
             'ul': {
               listStyleType: 'disc',
@@ -95,6 +96,10 @@ export default {
               '&:hover': {
                 color: '#d64a26',
               },
+            },
+            'p': {
+              marginTop: '1em',
+              marginBottom: '1em',
             },
           },
         },
