@@ -16,7 +16,7 @@ export const ProductBenefits = ({ product }: ProductBenefitsProps) => {
           </div>
         </div>
         
-        <div className="hidden lg:block w-[35%]" />
+        <div className="hidden lg:block w-[30%]" />
       </div>
     </div>
   );
