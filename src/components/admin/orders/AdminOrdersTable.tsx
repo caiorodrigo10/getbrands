@@ -17,13 +17,9 @@ interface AdminOrdersTableProps {
 const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
   const { toast } = useToast();
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
-  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
-    if (updatingStatus === orderId) return;
-    
     try {
-      setUpdatingStatus(orderId);
       const { error } = await supabase
         .from('sample_requests')
         .update({ status: newStatus })
@@ -35,9 +31,6 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
         title: "Success",
         description: "Order status updated successfully",
       });
-
-      // Refresh the page to show updated status
-      window.location.reload();
     } catch (error) {
       console.error('Error updating order status:', error);
       toast({
@@ -45,8 +38,6 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
         title: "Error",
         description: "Failed to update order status",
       });
-    } finally {
-      setUpdatingStatus(null);
     }
   };
 
@@ -124,37 +115,21 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        disabled={updatingStatus === order.id}
-                      >
+                      <Button variant="ghost" size="icon">
                         <MoreVertical className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem 
-                        onClick={() => handleStatusChange(order.id, 'processing')}
-                        disabled={updatingStatus === order.id}
-                      >
+                      <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'processing')}>
                         Mark as Processing
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleStatusChange(order.id, 'shipped')}
-                        disabled={updatingStatus === order.id}
-                      >
+                      <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'shipped')}>
                         Mark as Shipped
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleStatusChange(order.id, 'completed')}
-                        disabled={updatingStatus === order.id}
-                      >
+                      <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'completed')}>
                         Mark as Completed
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleStatusChange(order.id, 'canceled')}
-                        disabled={updatingStatus === order.id}
-                      >
+                      <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'canceled')}>
                         Mark as Canceled
                       </DropdownMenuItem>
                     </DropdownMenuContent>
