@@ -7,7 +7,7 @@ interface ProductBenefitsProps {
 
 export const ProductBenefits = ({ product }: ProductBenefitsProps) => {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 px-6 md:px-8">
       <h2 className="text-2xl font-bold">Product Description</h2>
       <div className="prose prose-lg max-w-none">
         <ReactMarkdown>{product.description || 'No description available.'}</ReactMarkdown>
