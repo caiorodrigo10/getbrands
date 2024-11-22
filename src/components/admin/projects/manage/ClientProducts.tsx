@@ -1,10 +1,11 @@
 import { Card } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Pencil } from "lucide-react";
+import { Pencil, Plus, Minus } from "lucide-react";
+import { toast } from "sonner";
 
 interface ClientProductsProps {
   projectId: string;
@@ -12,6 +13,7 @@ interface ClientProductsProps {
 
 export const ClientProducts = ({ projectId }: ClientProductsProps) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
   const { data: projectDetails } = useQuery({
     queryKey: ["project-details", projectId],
@@ -46,14 +48,35 @@ export const ClientProducts = ({ projectId }: ClientProductsProps) => {
     },
   });
 
+  const handlePointsChange = async (amount: number) => {
+    if (!projectDetails) return;
+    
+    const newPoints = (projectDetails.points || 0) + amount;
+    
+    if (newPoints < 0) {
+      toast.error("Points cannot be negative");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .update({ points: newPoints })
+        .eq('id', projectId);
+
+      if (error) throw error;
+
+      await queryClient.invalidateQueries({ queryKey: ["project-details", projectId] });
+      toast.success(`Points ${amount > 0 ? 'added' : 'removed'} successfully`);
+    } catch (error) {
+      console.error('Error updating points:', error);
+      toast.error("Failed to update points");
+    }
+  };
+
   const handleEditProduct = (projectProductId: string) => {
     navigate(`/admin/projects/${projectId}/products/${projectProductId}`);
   };
-
-  const totalPoints = projectDetails?.points || 0;
-  const usedPoints = projectDetails?.points_used || 0;
-  const remainingPoints = totalPoints - usedPoints;
-  const progressPercentage = (usedPoints / totalPoints) * 100;
 
   if (!projectDetails?.project_products?.length) {
     return (
@@ -63,18 +86,42 @@ export const ClientProducts = ({ projectId }: ClientProductsProps) => {
     );
   }
 
+  const totalPoints = projectDetails?.points || 0;
+  const usedPoints = projectDetails?.points_used || 0;
+  const remainingPoints = totalPoints - usedPoints;
+  const progressPercentage = (usedPoints / totalPoints) * 100;
+
   return (
     <Card className="p-4">
       <div className="space-y-4">
-        <div>
-          <div className="flex justify-between text-sm text-muted-foreground mb-2">
-            <span>Project Points Usage</span>
-            <span>{remainingPoints} points remaining</span>
+        <div className="flex items-center justify-between">
+          <div className="space-y-2 flex-1 mr-4">
+            <div className="flex justify-between text-sm text-muted-foreground mb-2">
+              <span>Project Points Usage</span>
+              <span>{remainingPoints} points remaining</span>
+            </div>
+            <Progress value={progressPercentage} className="h-2" />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>{usedPoints} used</span>
+              <span>{totalPoints} total</span>
+            </div>
           </div>
-          <Progress value={progressPercentage} className="h-2" />
-          <div className="flex justify-between text-xs text-muted-foreground mt-1">
-            <span>{usedPoints} used</span>
-            <span>{totalPoints} total</span>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePointsChange(-1000)}
+              disabled={!projectDetails?.points || projectDetails.points < 1000}
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePointsChange(1000)}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
