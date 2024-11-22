@@ -3,7 +3,6 @@ import { Badge } from "@/components/ui/badge";
 import { PACK_LABELS } from "@/types/project";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 
 interface ProjectPointsCardProps {
   project: {
@@ -31,21 +30,17 @@ export const ProjectPointsCard = ({ project }: ProjectPointsCardProps) => {
   return (
     <Card className="p-4">
       <div className="relative">
-        <div className="flex items-center justify-between mb-4">
+        <div 
+          className="flex items-center justify-between mb-4 cursor-pointer"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-medium">Client Information</h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="p-0 h-auto"
-            >
-              {isExpanded ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
-            </Button>
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
           </div>
           <Badge className="bg-purple-500/10 text-purple-500">
             {PACK_LABELS[project.pack_type]}
