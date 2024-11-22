@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import OrderStatusBadge from "@/components/sample-orders/OrderStatusBadge";
 import AdminOrderExpandedDetails from "./AdminOrderExpandedDetails";
 import { formatCurrency } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface AdminOrdersTableProps {
   orders: any[];
@@ -16,10 +17,14 @@ interface AdminOrdersTableProps {
 
 const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
+      setUpdatingOrderId(orderId);
+
       const { error } = await supabase
         .from('sample_requests')
         .update({ status: newStatus })
@@ -27,9 +32,12 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
 
       if (error) throw error;
 
+      // Invalidate and refetch orders data
+      await queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+
       toast({
         title: "Success",
-        description: "Order status updated successfully",
+        description: `Order status updated to ${newStatus}`,
       });
     } catch (error) {
       console.error('Error updating order status:', error);
@@ -38,6 +46,8 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
         title: "Error",
         description: "Failed to update order status",
       });
+    } finally {
+      setUpdatingOrderId(null);
     }
   };
 
@@ -115,21 +125,37 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        disabled={updatingOrderId === order.id}
+                      >
                         <MoreVertical className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'processing')}>
+                      <DropdownMenuItem 
+                        onClick={() => handleStatusChange(order.id, 'processing')}
+                        disabled={updatingOrderId === order.id}
+                      >
                         Mark as Processing
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'shipped')}>
+                      <DropdownMenuItem 
+                        onClick={() => handleStatusChange(order.id, 'shipped')}
+                        disabled={updatingOrderId === order.id}
+                      >
                         Mark as Shipped
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'completed')}>
+                      <DropdownMenuItem 
+                        onClick={() => handleStatusChange(order.id, 'completed')}
+                        disabled={updatingOrderId === order.id}
+                      >
                         Mark as Completed
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'canceled')}>
+                      <DropdownMenuItem 
+                        onClick={() => handleStatusChange(order.id, 'canceled')}
+                        disabled={updatingOrderId === order.id}
+                      >
                         Mark as Canceled
                       </DropdownMenuItem>
                     </DropdownMenuContent>
