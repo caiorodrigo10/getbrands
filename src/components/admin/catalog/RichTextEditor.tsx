@@ -4,8 +4,6 @@ import { Bold, Italic, Link, List, MoreHorizontal, Underline } from "lucide-reac
 import { useRef, useState } from "react";
 import ReactMarkdown from 'react-markdown';
 
-<lov-add-dependency>react-markdown@latest</lov-add-dependency>
-
 interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
@@ -72,7 +70,11 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
           variant="ghost" 
           size="sm" 
           className="h-8 w-8 p-0"
-          onClick={() => handleFormat('bold')}
+          onClick={(e) => {
+            e.preventDefault();
+            handleFormat('bold');
+          }}
+          type="button"
         >
           <Bold className="h-4 w-4" />
         </Button>
@@ -80,7 +82,11 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
           variant="ghost" 
           size="sm" 
           className="h-8 w-8 p-0"
-          onClick={() => handleFormat('italic')}
+          onClick={(e) => {
+            e.preventDefault();
+            handleFormat('italic');
+          }}
+          type="button"
         >
           <Italic className="h-4 w-4" />
         </Button>
@@ -88,7 +94,11 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
           variant="ghost" 
           size="sm" 
           className="h-8 w-8 p-0"
-          onClick={() => handleFormat('underline')}
+          onClick={(e) => {
+            e.preventDefault();
+            handleFormat('underline');
+          }}
+          type="button"
         >
           <Underline className="h-4 w-4" />
         </Button>
@@ -97,7 +107,11 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
           variant="ghost" 
           size="sm" 
           className="h-8 w-8 p-0"
-          onClick={() => handleFormat('link')}
+          onClick={(e) => {
+            e.preventDefault();
+            handleFormat('link');
+          }}
+          type="button"
         >
           <Link className="h-4 w-4" />
         </Button>
@@ -105,7 +119,11 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
           variant="ghost" 
           size="sm" 
           className="h-8 w-8 p-0"
-          onClick={() => handleFormat('list')}
+          onClick={(e) => {
+            e.preventDefault();
+            handleFormat('list');
+          }}
+          type="button"
         >
           <List className="h-4 w-4" />
         </Button>
@@ -113,7 +131,11 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
         <Button 
           variant="ghost" 
           size="sm"
-          onClick={() => setIsPreview(!isPreview)}
+          onClick={(e) => {
+            e.preventDefault();
+            setIsPreview(!isPreview);
+          }}
+          type="button"
         >
           {isPreview ? 'Edit' : 'Preview'}
         </Button>
