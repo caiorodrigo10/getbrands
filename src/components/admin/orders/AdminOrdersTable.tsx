@@ -22,6 +22,8 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
+    if (updatingOrderId) return; // Prevent multiple simultaneous updates
+
     try {
       setUpdatingOrderId(orderId);
 
@@ -32,19 +34,19 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
 
       if (error) throw error;
 
-      // Invalidate and refetch orders data
+      // Force a refetch of the orders data
       await queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
 
       toast({
-        title: "Success",
-        description: `Order status updated to ${newStatus}`,
+        title: "Status updated",
+        description: `Order status has been changed to ${newStatus}`,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating order status:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update order status",
+        description: error.message || "Failed to update order status",
       });
     } finally {
       setUpdatingOrderId(null);
@@ -55,7 +57,7 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
   };
 
-  if (orders.length === 0) {
+  if (!orders || orders.length === 0) {
     return (
       <div className="text-center py-12 border rounded-md">
         <p className="text-lg text-muted-foreground">No orders found matching your criteria.</p>
