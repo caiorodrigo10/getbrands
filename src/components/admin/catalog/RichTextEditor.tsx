@@ -1,8 +1,9 @@
-import { Textarea } from "@/components/ui/textarea";
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Link from '@tiptap/extension-link';
+import Underline from '@tiptap/extension-underline';
 import { Button } from "@/components/ui/button";
-import { Bold, Italic, Link, List, MoreHorizontal, Underline } from "lucide-react";
-import { useRef, useState } from "react";
-import ReactMarkdown from 'react-markdown';
+import { Bold, Italic, Link as LinkIcon, List, Underline as UnderlineIcon } from "lucide-react";
 
 interface RichTextEditorProps {
   value: string;
@@ -10,57 +11,27 @@ interface RichTextEditorProps {
 }
 
 export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [isPreview, setIsPreview] = useState(false);
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Link,
+      Underline,
+    ],
+    content: value,
+    onUpdate: ({ editor }) => {
+      onChange(editor.getHTML());
+    },
+  });
 
-  const handleFormat = (command: string, value?: string) => {
-    if (!textareaRef.current) return;
+  if (!editor) {
+    return null;
+  }
 
-    const textarea = textareaRef.current;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = value || textarea.value.substring(start, end);
-
-    let formattedText = '';
-    let surroundText = '';
-    switch (command) {
-      case 'bold':
-        surroundText = '**';
-        break;
-      case 'italic':
-        surroundText = '*';
-        break;
-      case 'underline':
-        surroundText = '__';
-        break;
-      case 'link':
-        const url = prompt('Enter URL:');
-        if (url) {
-          formattedText = `[${selectedText}](${url})`;
-        }
-        break;
-      case 'list':
-        formattedText = selectedText.split('\n').map(line => `- ${line}`).join('\n');
-        break;
-      default:
-        return;
+  const handleLinkClick = () => {
+    const url = window.prompt('Enter URL:');
+    if (url) {
+      editor.chain().focus().setLink({ href: url }).run();
     }
-
-    if (!formattedText) {
-      formattedText = `${surroundText}${selectedText}${surroundText}`;
-    }
-
-    const newValue = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
-    onChange(newValue);
-
-    // Reset selection
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(
-        start + surroundText.length,
-        start + formattedText.length - surroundText.length
-      );
-    }, 0);
   };
 
   return (
@@ -70,89 +41,59 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
           variant="ghost" 
           size="sm" 
           className="h-8 w-8 p-0"
-          onClick={(e) => {
-            e.preventDefault();
-            handleFormat('bold');
-          }}
+          onClick={() => editor.chain().focus().toggleBold().run()}
           type="button"
+          data-active={editor.isActive('bold')}
         >
-          <Bold className="h-4 w-4" />
+          <Bold className={`h-4 w-4 ${editor.isActive('bold') ? 'text-primary' : ''}`} />
         </Button>
         <Button 
           variant="ghost" 
           size="sm" 
           className="h-8 w-8 p-0"
-          onClick={(e) => {
-            e.preventDefault();
-            handleFormat('italic');
-          }}
+          onClick={() => editor.chain().focus().toggleItalic().run()}
           type="button"
+          data-active={editor.isActive('italic')}
         >
-          <Italic className="h-4 w-4" />
+          <Italic className={`h-4 w-4 ${editor.isActive('italic') ? 'text-primary' : ''}`} />
         </Button>
         <Button 
           variant="ghost" 
           size="sm" 
           className="h-8 w-8 p-0"
-          onClick={(e) => {
-            e.preventDefault();
-            handleFormat('underline');
-          }}
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
           type="button"
+          data-active={editor.isActive('underline')}
         >
-          <Underline className="h-4 w-4" />
+          <UnderlineIcon className={`h-4 w-4 ${editor.isActive('underline') ? 'text-primary' : ''}`} />
         </Button>
         <div className="h-4 w-px bg-gray-200 mx-1" />
         <Button 
           variant="ghost" 
           size="sm" 
           className="h-8 w-8 p-0"
-          onClick={(e) => {
-            e.preventDefault();
-            handleFormat('link');
-          }}
+          onClick={handleLinkClick}
           type="button"
+          data-active={editor.isActive('link')}
         >
-          <Link className="h-4 w-4" />
+          <LinkIcon className={`h-4 w-4 ${editor.isActive('link') ? 'text-primary' : ''}`} />
         </Button>
         <Button 
           variant="ghost" 
           size="sm" 
           className="h-8 w-8 p-0"
-          onClick={(e) => {
-            e.preventDefault();
-            handleFormat('list');
-          }}
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
           type="button"
+          data-active={editor.isActive('bulletList')}
         >
-          <List className="h-4 w-4" />
-        </Button>
-        <div className="flex-1" />
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={(e) => {
-            e.preventDefault();
-            setIsPreview(!isPreview);
-          }}
-          type="button"
-        >
-          {isPreview ? 'Edit' : 'Preview'}
+          <List className={`h-4 w-4 ${editor.isActive('bulletList') ? 'text-primary' : ''}`} />
         </Button>
       </div>
       
-      {isPreview ? (
-        <div className="min-h-[200px] p-4 border rounded-md prose prose-sm max-w-none">
-          <ReactMarkdown>{value}</ReactMarkdown>
-        </div>
-      ) : (
-        <Textarea 
-          ref={textareaRef}
-          value={value} 
-          onChange={(e) => onChange(e.target.value)}
-          className="min-h-[200px] resize-y font-mono"
-        />
-      )}
+      <EditorContent 
+        editor={editor} 
+        className="min-h-[200px] p-4 border rounded-md prose prose-sm max-w-none focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
+      />
     </div>
   );
 };
