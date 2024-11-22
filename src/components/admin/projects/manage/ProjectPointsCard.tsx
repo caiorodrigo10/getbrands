@@ -1,6 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PACK_LABELS } from "@/types/project";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 interface ProjectPointsCardProps {
   project: {
@@ -23,17 +26,33 @@ interface ProjectPointsCardProps {
 }
 
 export const ProjectPointsCard = ({ project }: ProjectPointsCardProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   return (
     <Card className="p-4">
       <div className="relative">
-        {/* Client Information Section */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
             <h3 className="text-lg font-medium">Client Information</h3>
-            <Badge className="bg-purple-500/10 text-purple-500">
-              {PACK_LABELS[project.pack_type]}
-            </Badge>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="p-0 h-auto"
+            >
+              {isExpanded ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </Button>
           </div>
+          <Badge className="bg-purple-500/10 text-purple-500">
+            {PACK_LABELS[project.pack_type]}
+          </Badge>
+        </div>
+        
+        {isExpanded && (
           <div className="space-y-3">
             <div>
               <p className="text-sm text-muted-foreground">Client Name</p>
@@ -61,7 +80,7 @@ export const ProjectPointsCard = ({ project }: ProjectPointsCardProps) => {
               </p>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </Card>
   );
