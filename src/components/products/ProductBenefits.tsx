@@ -13,7 +13,7 @@ export const ProductBenefits = ({ product }: ProductBenefitsProps) => {
 
   return (
     <div className="space-y-8">
-      <div className="flex gap-8">
+      <div className="flex flex-col md:flex-row gap-8">
         <div className="flex-1">
           <h2 className="text-2xl font-bold">Product Description</h2>
           <div className="prose prose-lg max-w-none">
@@ -21,7 +21,7 @@ export const ProductBenefits = ({ product }: ProductBenefitsProps) => {
           </div>
         </div>
         
-        <div className="w-[35%] bg-orange-100 p-6 rounded-lg flex flex-col items-start space-y-4">
+        <div className="hidden md:flex w-[35%] bg-orange-100 p-6 rounded-lg flex-col items-start space-y-4">
           <h3 className="text-lg font-semibold text-orange-800">
             Want to develop this product with your brand?
           </h3>
