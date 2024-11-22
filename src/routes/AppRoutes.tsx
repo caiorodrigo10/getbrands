@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AppLayout } from "./AppLayout";
 import { MarketingRoutes } from "./MarketingRoutes";
@@ -25,6 +25,9 @@ import OnboardingQuizPage from "@/pages/OnboardingQuiz";
 
 export const AppRoutes = () => (
   <Routes>
+    {/* Root Route */}
+    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+    
     {/* Marketing Routes */}
     {MarketingRoutes}
     
