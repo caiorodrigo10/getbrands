@@ -73,6 +73,32 @@ export default {
           fontWeight: '600',
         }],
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            'strong': {
+              fontWeight: '700',
+            },
+            'em': {
+              fontStyle: 'italic',
+            },
+            'ul': {
+              listStyleType: 'disc',
+              marginLeft: '1.5em',
+            },
+            'ol': {
+              listStyleType: 'decimal',
+              marginLeft: '1.5em',
+            },
+            'a': {
+              color: '#f0562e',
+              '&:hover': {
+                color: '#d64a26',
+              },
+            },
+          },
+        },
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -89,5 +115,8 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require("@tailwindcss/typography")
+  ],
 } satisfies Config;
