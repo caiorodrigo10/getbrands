@@ -13,9 +13,27 @@ const AdminProductEdit = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const isNewProduct = id === 'new';
+
   const { data: product, isLoading } = useQuery({
     queryKey: ["admin-product", id],
     queryFn: async () => {
+      if (isNewProduct) {
+        return {
+          id: '',
+          name: '',
+          category: '',
+          description: '',
+          from_price: 0,
+          srp: 0,
+          is_new: false,
+          is_tiktok: false,
+          image_url: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+      }
+
       const { data, error } = await supabase
         .from("products")
         .select("*")
@@ -25,37 +43,59 @@ const AdminProductEdit = () => {
       if (error) throw error;
       return data;
     },
+    enabled: Boolean(id),
   });
 
   const handleUpdateProduct = async (updatedProduct: Product) => {
     try {
-      const { error } = await supabase
-        .from('products')
-        .update({
-          name: updatedProduct.name,
-          category: updatedProduct.category,
-          description: updatedProduct.description,
-          from_price: updatedProduct.from_price,
-          srp: updatedProduct.srp,
-          is_new: updatedProduct.is_new,
-          is_tiktok: updatedProduct.is_tiktok,
-        })
-        .eq('id', updatedProduct.id);
+      if (isNewProduct) {
+        const { error } = await supabase
+          .from('products')
+          .insert({
+            name: updatedProduct.name,
+            category: updatedProduct.category,
+            description: updatedProduct.description,
+            from_price: updatedProduct.from_price,
+            srp: updatedProduct.srp,
+            is_new: updatedProduct.is_new,
+            is_tiktok: updatedProduct.is_tiktok,
+          });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "Product updated successfully",
-      });
+        toast({
+          title: "Success",
+          description: "Product created successfully",
+        });
+      } else {
+        const { error } = await supabase
+          .from('products')
+          .update({
+            name: updatedProduct.name,
+            category: updatedProduct.category,
+            description: updatedProduct.description,
+            from_price: updatedProduct.from_price,
+            srp: updatedProduct.srp,
+            is_new: updatedProduct.is_new,
+            is_tiktok: updatedProduct.is_tiktok,
+          })
+          .eq('id', updatedProduct.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "Product updated successfully",
+        });
+      }
       
       navigate("/admin/catalog");
     } catch (error) {
-      console.error('Error updating product:', error);
+      console.error('Error saving product:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update product",
+        description: "Failed to save product",
       });
     }
   };
@@ -82,9 +122,14 @@ const AdminProductEdit = () => {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h1 className="text-2xl font-semibold">Edit Product</h1>
+          <h1 className="text-2xl font-semibold">
+            {isNewProduct ? "Create New Product" : "Edit Product"}
+          </h1>
           <p className="text-muted-foreground mt-1">
-            Make changes to your product information
+            {isNewProduct 
+              ? "Add a new product to your catalog"
+              : "Make changes to your product information"
+            }
           </p>
         </div>
       </div>
