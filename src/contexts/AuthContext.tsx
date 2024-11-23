@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { identifyUser } from "@/lib/analytics";
+import { identifyUser, trackEvent } from "@/lib/analytics";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getRoleBasedRedirectPath } from "@/lib/roleRedirection";
 import Gleap from "gleap";
@@ -43,6 +43,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const handleUserIdentification = async (user: User, profile: ProfileType) => {
+    // Identify user in analytics with all relevant traits
+    identifyUser(user.id, {
+      email: user.email,
+      first_name: profile.first_name,
+      last_name: profile.last_name,
+      full_name: `${profile.first_name} ${profile.last_name}`.trim(),
+      role: profile.role,
+      created_at: user.created_at,
+      last_sign_in: user.last_sign_in_at,
+      onboarding_completed: profile.onboarding_completed,
+    });
+
+    // Track login event with user properties
+    trackEvent("User Logged In", {
+      user_id: user.id,
+      email: user.email,
+      login_method: "email",
+      role: profile.role,
+    });
+    
+    // Identify user in Gleap
+    Gleap.identify(user.id, {
+      email: user.email,
+      name: profile.first_name ? `${profile.first_name} ${profile.last_name}` : user.email,
+    });
+  };
+
   const handleUserSession = async (user: User | null, isInitialLogin = false) => {
     if (!user) return;
 
@@ -57,26 +85,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       const typedProfile = profile as ProfileType;
 
-      // Identify user in analytics and Gleap
-      identifyUser(user.id, {
-        email: user.email,
-      });
-      
-      // Identify user in Gleap
-      Gleap.identify(user.id, {
-        email: user.email,
-        name: typedProfile?.first_name ? `${typedProfile.first_name} ${typedProfile.last_name}` : user.email,
-      });
+      // Identify user with all available information
+      await handleUserIdentification(user, typedProfile);
 
       // Only redirect if it's the initial login
       if (isInitialLogin) {
-        // If onboarding is not completed, always redirect to onboarding
         if (!typedProfile?.onboarding_completed) {
           navigate('/onboarding');
           return;
         }
 
-        // If onboarding is completed and it's initial login, redirect based on role
         const redirectPath = getRoleBasedRedirectPath(typedProfile?.role);
         navigate(redirectPath);
       }
@@ -90,7 +108,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        handleUserSession(session.user, false); // Not initial login
+        handleUserSession(session.user, false);
       }
       setLoading(false);
     });
