@@ -4,12 +4,12 @@ import { trackEvent } from "@/lib/analytics";
 
 export const useProductActions = (productId: string) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { addToCart } = useCart();
+  const { addItem } = useCart();
 
   const handleRequestSample = async () => {
     try {
       setIsLoading(true);
-      await addToCart(productId);
+      await addItem(productId);
       
       // Track sample request event
       trackEvent("Sample Requested", {
