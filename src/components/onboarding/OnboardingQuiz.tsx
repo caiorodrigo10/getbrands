@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 type Step = {
   component: React.ComponentType<any>;
   props: Record<string, any>;
+  autoAdvance?: boolean;
 };
 
 export function OnboardingQuiz() {
@@ -67,42 +68,58 @@ export function OnboardingQuiz() {
       props: {
         onNext: handleNext,
       },
+      autoAdvance: true,
     },
     {
       component: ProductCategoriesStep,
       props: {
         selected: quizData.productCategories,
-        onAnswer: (value: string[]) => setQuizData({ ...quizData, productCategories: value }),
+        onAnswer: (value: string[]) => {
+          setQuizData({ ...quizData, productCategories: value });
+        },
         onNext: handleNext,
         onBack: handleBack,
       },
+      autoAdvance: false, // Multiple selection step
     },
     {
       component: ProfileTypeStep,
       props: {
         selected: quizData.profileType,
-        onAnswer: (value: string) => setQuizData({ ...quizData, profileType: value }),
+        onAnswer: (value: string) => {
+          setQuizData({ ...quizData, profileType: value });
+          if (steps[2].autoAdvance) handleNext();
+        },
         onNext: handleNext,
         onBack: handleBack,
       },
+      autoAdvance: true, // Single selection step
     },
     {
       component: BrandStatusStep,
       props: {
         selected: quizData.brandStatus,
-        onAnswer: (value: string) => setQuizData({ ...quizData, brandStatus: value }),
+        onAnswer: (value: string) => {
+          setQuizData({ ...quizData, brandStatus: value });
+          if (steps[3].autoAdvance) handleNext();
+        },
         onNext: handleNext,
         onBack: handleBack,
       },
+      autoAdvance: true, // Single selection step
     },
     {
       component: LaunchUrgencyStep,
       props: {
         selected: quizData.launchUrgency,
-        onAnswer: (value: string) => setQuizData({ ...quizData, launchUrgency: value }),
+        onAnswer: (value: string) => {
+          setQuizData({ ...quizData, launchUrgency: value });
+          // Don't auto advance on the last step since it needs to complete
+        },
         onComplete: handleComplete,
         onBack: handleBack,
       },
+      autoAdvance: false, // Last step, needs explicit completion
     },
   ];
 
