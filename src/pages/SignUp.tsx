@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { SignUpFormFields } from "@/components/auth/signup/SignUpFormFields";
+import { trackEvent } from "@/lib/analytics";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -90,6 +91,15 @@ const SignUp = () => {
 
           if (insertError) throw insertError;
         }
+
+        // Track signup event
+        trackEvent('user_signed_up', {
+          userId: data.user.id,
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          signupMethod: 'email',
+        });
 
         navigate("/login");
       }
