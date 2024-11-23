@@ -17,6 +17,12 @@ export function LaunchUrgencyStep({ selected, onAnswer, onComplete, onBack }: La
     { value: "planning", label: "Planning Phase (6+ months)" },
   ];
 
+  const handleOptionSelect = (value: string) => {
+    onAnswer(value);
+    // Automatically complete when an option is selected
+    onComplete();
+  };
+
   return (
     <div className="w-full max-w-2xl mx-auto space-y-8">
       <div className="text-center">
@@ -30,7 +36,7 @@ export function LaunchUrgencyStep({ selected, onAnswer, onComplete, onBack }: La
 
       <RadioGroup
         value={selected}
-        onValueChange={onAnswer}
+        onValueChange={handleOptionSelect}
         className="grid gap-4"
       >
         {options.map((option, index) => (

@@ -55,7 +55,7 @@ export function OnboardingQuiz() {
       if (error) throw error;
 
       toast.success("Profile updated successfully!");
-      navigate("/dashboard");
+      navigate("/start-here");
     } catch (error: any) {
       console.error("Error updating profile:", error);
       toast.error(error.message || "Failed to update profile");
@@ -114,7 +114,6 @@ export function OnboardingQuiz() {
         selected: quizData.launchUrgency,
         onAnswer: (value: string) => {
           setQuizData({ ...quizData, launchUrgency: value });
-          // Don't auto advance on the last step since it needs to complete
         },
         onComplete: handleComplete,
         onBack: handleBack,
