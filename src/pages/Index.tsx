@@ -1,4 +1,15 @@
+import { useEffect } from "react";
+import { trackPage } from "@/lib/analytics";
+
 const Index = () => {
+  useEffect(() => {
+    // Track home page visit
+    trackPage({
+      page_name: "Home",
+      path: "/",
+    });
+  }, []);
+
   return (
     <div className="space-y-6">
       <h1>Welcome to Mainer Portal</h1>
