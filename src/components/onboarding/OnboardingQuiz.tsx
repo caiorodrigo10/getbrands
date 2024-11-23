@@ -8,12 +8,19 @@ import { ProfileTypeStep } from "./steps/ProfileTypeStep";
 import { BrandStatusStep } from "./steps/BrandStatusStep";
 import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { useAuth } from "@/contexts/AuthContext";
-import { trackEvent } from "@/lib/analytics";
+import { 
+  trackOnboardingStarted,
+  trackOnboardingStepCompleted,
+  trackOnboardingAbandoned,
+  trackEvent,
+  trackError
+} from "@/lib/analytics";
 
 type Step = {
   component: React.ComponentType<any>;
   props: Record<string, any>;
   autoAdvance?: boolean;
+  name: string; // Added name for analytics
 };
 
 export function OnboardingQuiz() {
@@ -27,7 +34,20 @@ export function OnboardingQuiz() {
     launchUrgency: "",
   });
 
+  // Track onboarding start when component mounts
+  useState(() => {
+    if (user?.id) {
+      trackOnboardingStarted(user.id);
+    }
+  });
+
   const handleNext = () => {
+    // Track step completion
+    trackOnboardingStepCompleted(
+      currentStep,
+      steps[currentStep].name,
+      { ...quizData }
+    );
     setCurrentStep((prev) => prev + 1);
   };
 
@@ -38,6 +58,7 @@ export function OnboardingQuiz() {
   const handleComplete = async () => {
     try {
       if (!user?.id) {
+        trackError("Onboarding Error", "User not found", "OnboardingQuiz");
         toast.error("User not found");
         return;
       }
@@ -55,7 +76,7 @@ export function OnboardingQuiz() {
 
       if (error) throw error;
 
-      // Track onboarding completion event
+      // Track onboarding completion
       trackEvent("Onboarding Completed", {
         product_categories: quizData.productCategories,
         profile_type: quizData.profileType,
@@ -68,13 +89,22 @@ export function OnboardingQuiz() {
       navigate("/start-here");
     } catch (error: any) {
       console.error("Error updating profile:", error);
+      trackError("Profile Update Error", error.message, "OnboardingQuiz");
       toast.error(error.message || "Failed to update profile");
+    }
+  };
+
+  // Track abandonment when user leaves the page
+  window.onbeforeunload = () => {
+    if (currentStep > 0 && currentStep < steps.length - 1) {
+      trackOnboardingAbandoned(currentStep);
     }
   };
 
   const steps: Step[] = [
     {
       component: WelcomeStep,
+      name: "Welcome",
       props: {
         onNext: handleNext,
       },
@@ -82,6 +112,7 @@ export function OnboardingQuiz() {
     },
     {
       component: ProductCategoriesStep,
+      name: "Product Categories",
       props: {
         selected: quizData.productCategories,
         onAnswer: (value: string[]) => {
@@ -90,10 +121,11 @@ export function OnboardingQuiz() {
         onNext: handleNext,
         onBack: handleBack,
       },
-      autoAdvance: false, // Multiple selection step
+      autoAdvance: false,
     },
     {
       component: ProfileTypeStep,
+      name: "Profile Type",
       props: {
         selected: quizData.profileType,
         onAnswer: (value: string) => {
@@ -103,10 +135,11 @@ export function OnboardingQuiz() {
         onNext: handleNext,
         onBack: handleBack,
       },
-      autoAdvance: true, // Single selection step
+      autoAdvance: true,
     },
     {
       component: BrandStatusStep,
+      name: "Brand Status",
       props: {
         selected: quizData.brandStatus,
         onAnswer: (value: string) => {
@@ -116,10 +149,11 @@ export function OnboardingQuiz() {
         onNext: handleNext,
         onBack: handleBack,
       },
-      autoAdvance: true, // Single selection step
+      autoAdvance: true,
     },
     {
       component: LaunchUrgencyStep,
+      name: "Launch Urgency",
       props: {
         selected: quizData.launchUrgency,
         onAnswer: (value: string) => {
@@ -128,7 +162,7 @@ export function OnboardingQuiz() {
         onComplete: handleComplete,
         onBack: handleBack,
       },
-      autoAdvance: false, // Last step, needs explicit completion
+      autoAdvance: false,
     },
   ];
 
