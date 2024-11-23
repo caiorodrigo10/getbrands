@@ -11,28 +11,44 @@ declare global {
 
 // Track page views with additional metadata
 export const trackPage = (properties?: Record<string, any>) => {
-  if (window.analytics) {
-    window.analytics.page({
-      ...properties,
-      timestamp: new Date().toISOString(),
-    });
+  try {
+    if (window.analytics) {
+      window.analytics.page({
+        url: window.location.href,
+        path: window.location.pathname,
+        ...properties,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  } catch (error) {
+    console.error('Error tracking page view:', error);
   }
 };
 
 // Track specific events
 export const trackEvent = (eventName: string, properties?: Record<string, any>) => {
-  if (window.analytics) {
-    window.analytics.track(eventName, {
-      ...properties,
-      timestamp: new Date().toISOString(),
-    });
+  try {
+    if (window.analytics) {
+      window.analytics.track(eventName, {
+        url: window.location.href,
+        path: window.location.pathname,
+        ...properties,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  } catch (error) {
+    console.error('Error tracking event:', error);
   }
 };
 
 // Identify users
 export const identifyUser = (userId: string, traits?: Record<string, any>) => {
-  if (window.analytics) {
-    window.analytics.identify(userId, traits);
+  try {
+    if (window.analytics) {
+      window.analytics.identify(userId, traits);
+    }
+  } catch (error) {
+    console.error('Error identifying user:', error);
   }
 };
 
