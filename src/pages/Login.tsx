@@ -50,6 +50,8 @@ const Login = () => {
             access_type: 'offline',
             prompt: 'consent',
           },
+          scopes: 'email profile',
+          flowType: 'pkce'
         }
       });
       
