@@ -3,8 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { trackEvent } from "@/lib/analytics";
 import ProjectSelectionDialog from "@/components/dialogs/ProjectSelectionDialog";
 import { ProductHeader } from "@/components/products/ProductHeader";
 import { ProductBenefits } from "@/components/products/ProductBenefits";
@@ -31,6 +32,23 @@ const ProductDetails = () => {
       return data;
     },
   });
+
+  useEffect(() => {
+    if (product) {
+      // Track product view with detailed product information
+      trackEvent("Product Viewed", {
+        product_id: product.id,
+        product_name: product.name,
+        product_category: product.category,
+        price_range: {
+          from: product.from_price,
+          srp: product.srp
+        },
+        is_new: product.is_new,
+        is_tiktok: product.is_tiktok
+      });
+    }
+  }, [product]);
 
   const handleSelectProduct = async () => {
     if (!user) {
@@ -110,6 +128,15 @@ const ProductDetails = () => {
         });
 
       if (insertError) throw insertError;
+
+      // Track product selection event
+      trackEvent("Product Selected", {
+        product_id: id,
+        product_name: product?.name,
+        product_category: product?.category,
+        project_id: projectId,
+        project_name: currentProject.name
+      });
 
       navigate("/products/success", {
         state: {

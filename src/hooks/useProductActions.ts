@@ -1,38 +1,25 @@
 import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
-import { Product } from "@/types/product";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { trackEvent } from "@/lib/analytics";
 
 export const useProductActions = (productId: string) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { addItem } = useCart();
-  const { user } = useAuth();
-  const navigate = useNavigate();
+  const { addToCart } = useCart();
 
   const handleRequestSample = async () => {
-    if (!user) {
-      return;
-    }
-
-    setIsLoading(true);
     try {
-      const { data: product } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', productId)
-        .single();
-
-      if (!product) throw new Error('Product not found');
-
-      await addItem(product);
+      setIsLoading(true);
+      await addToCart(productId);
       
-      // Removed toast notification here
-      
-      navigate("/pedido-amostra");
+      // Track sample request event
+      trackEvent("Sample Requested", {
+        product_id: productId
+      });
+
+      return true;
     } catch (error) {
       console.error('Error requesting sample:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
