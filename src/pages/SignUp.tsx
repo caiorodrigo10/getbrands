@@ -98,6 +98,7 @@ const SignUp = () => {
           email: formData.email,
           firstName: formData.firstName,
           lastName: formData.lastName,
+          phone: formData.phone,
           signupMethod: 'email',
         });
 
