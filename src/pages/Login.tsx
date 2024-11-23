@@ -12,6 +12,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,8 +27,13 @@ const Login = () => {
 
     try {
       await login(email, password);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to login. Please try again.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -35,21 +41,28 @@ const Login = () => {
 
   const handleGoogleLogin = async () => {
     try {
+      setIsGoogleLoading(true);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`
+          redirectTo: `${window.location.origin}/dashboard`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         }
       });
       
       if (error) throw error;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error logging in with Google:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to login with Google. Please try again.",
+        description: error.message || "Failed to login with Google. Please try again.",
       });
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
@@ -115,14 +128,19 @@ const Login = () => {
               type="button"
               variant="outline"
               onClick={handleGoogleLogin}
+              disabled={isGoogleLoading}
               className="w-full border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-2.5 rounded-lg flex items-center justify-center space-x-2"
             >
-              <img 
-                src="https://www.svgrepo.com/show/475656/google-color.svg"
-                alt="Google Logo"
-                className="w-5 h-5"
-              />
-              <span>Google</span>
+              {isGoogleLoading ? (
+                <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+              ) : (
+                <img 
+                  src="https://www.svgrepo.com/show/475656/google-color.svg"
+                  alt="Google Logo"
+                  className="w-5 h-5"
+                />
+              )}
+              <span>{isGoogleLoading ? "Connecting..." : "Google"}</span>
             </Button>
           </div>
         </form>
