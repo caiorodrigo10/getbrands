@@ -33,9 +33,25 @@ const ProductDetails = () => {
     },
   });
 
+  // Get product images
+  const { data: productImages } = useQuery({
+    queryKey: ['product-images', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('product_images')
+        .select('*')
+        .eq('product_id', id)
+        .order('position');
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!id,
+  });
+
   useEffect(() => {
     if (product) {
-      // Track product view with detailed product information
+      // Enhanced product view tracking with more details
       trackEvent("Product Viewed", {
         product_id: product.id,
         product_name: product.name,
@@ -44,11 +60,22 @@ const ProductDetails = () => {
           from: product.from_price,
           srp: product.srp
         },
+        profit_margin: product.srp - product.from_price,
         is_new: product.is_new,
-        is_tiktok: product.is_tiktok
+        is_tiktok: product.is_tiktok,
+        description: product.description,
+        main_image_url: product.image_url,
+        gallery_images: productImages?.map(img => ({
+          url: img.image_url,
+          is_primary: img.is_primary,
+          position: img.position
+        })),
+        created_at: product.created_at,
+        updated_at: product.updated_at,
+        total_images: productImages?.length || 0
       });
     }
-  }, [product]);
+  }, [product, productImages]);
 
   const handleSelectProduct = async () => {
     if (!user) {
