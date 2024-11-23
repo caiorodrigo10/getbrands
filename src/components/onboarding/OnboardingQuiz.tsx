@@ -8,6 +8,7 @@ import { ProfileTypeStep } from "./steps/ProfileTypeStep";
 import { BrandStatusStep } from "./steps/BrandStatusStep";
 import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackEvent } from "@/lib/analytics";
 
 type Step = {
   component: React.ComponentType<any>;
@@ -53,6 +54,15 @@ export function OnboardingQuiz() {
         .eq("id", user.id);
 
       if (error) throw error;
+
+      // Track onboarding completion event
+      trackEvent("Onboarding Completed", {
+        product_categories: quizData.productCategories,
+        profile_type: quizData.profileType,
+        brand_status: quizData.brandStatus,
+        launch_urgency: quizData.launchUrgency,
+        steps_completed: currentStep + 1,
+      });
 
       toast.success("Profile updated successfully!");
       navigate("/start-here");
