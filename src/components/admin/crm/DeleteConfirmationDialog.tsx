@@ -13,12 +13,14 @@ interface DeleteConfirmationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
+  selectAllPages?: boolean;
 }
 
 export const DeleteConfirmationDialog = ({
   open,
   onOpenChange,
   onConfirm,
+  selectAllPages,
 }: DeleteConfirmationDialogProps) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -26,7 +28,7 @@ export const DeleteConfirmationDialog = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the selected users and all of their data.
+            This action cannot be undone. This will permanently delete {selectAllPages ? "all" : "the selected"} users and all of their data.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

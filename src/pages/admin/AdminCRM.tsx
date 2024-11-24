@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { CRMTable } from "@/components/admin/crm/CRMTable";
 import { ImportContactsDialog } from "@/components/admin/crm/ImportContactsDialog";
-import { Database } from "@/integrations/supabase/types";
 import {
   Pagination,
   PaginationContent,
@@ -105,7 +104,11 @@ const AdminCRM = () => {
         </Button>
       </div>
 
-      <CRMTable users={filteredUsers || []} onUserUpdated={refetch} />
+      <CRMTable 
+        users={filteredUsers || []} 
+        onUserUpdated={refetch}
+        totalUsers={usersData?.totalUsers || 0}
+      />
 
       {usersData?.totalPages && usersData.totalPages > 1 && (
         <div className="flex justify-center mt-6">

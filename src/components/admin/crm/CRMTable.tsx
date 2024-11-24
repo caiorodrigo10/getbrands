@@ -34,11 +34,13 @@ interface CRMUser {
 interface CRMTableProps {
   users: CRMUser[];
   onUserUpdated: () => void;
+  totalUsers: number;
 }
 
-export const CRMTable = ({ users, onUserUpdated }: CRMTableProps) => {
+export const CRMTable = ({ users, onUserUpdated, totalUsers }: CRMTableProps) => {
   const [selectedUser, setSelectedUser] = useState<CRMUser | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [selectAllPages, setSelectAllPages] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -48,10 +50,21 @@ export const CRMTable = ({ users, onUserUpdated }: CRMTableProps) => {
       setSelectedUsers([...selectedUsers, userId]);
     } else {
       setSelectedUsers(selectedUsers.filter(id => id !== userId));
+      setSelectAllPages(false);
     }
   };
 
   const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedUsers(users.map(user => user.id));
+    } else {
+      setSelectedUsers([]);
+      setSelectAllPages(false);
+    }
+  };
+
+  const handleSelectAllPages = (checked: boolean) => {
+    setSelectAllPages(checked);
     if (checked) {
       setSelectedUsers(users.map(user => user.id));
     } else {
@@ -76,6 +89,7 @@ export const CRMTable = ({ users, onUserUpdated }: CRMTableProps) => {
 
       // Clear selection and refresh data
       setSelectedUsers([]);
+      setSelectAllPages(false);
       setShowDeleteDialog(false);
       queryClient.invalidateQueries({ queryKey: ["crm-users"] });
       onUserUpdated();
@@ -119,8 +133,12 @@ export const CRMTable = ({ users, onUserUpdated }: CRMTableProps) => {
     <>
       {selectedUsers.length > 0 && (
         <CRMSelectionBar
-          selectedCount={selectedUsers.length}
+          selectedCount={selectAllPages ? totalUsers : selectedUsers.length}
+          totalCount={totalUsers}
+          selectAllPages={selectAllPages}
+          onSelectAllPages={handleSelectAllPages}
           onDeleteClick={() => setShowDeleteDialog(true)}
+          usersInPage={users.length}
         />
       )}
 
@@ -130,7 +148,7 @@ export const CRMTable = ({ users, onUserUpdated }: CRMTableProps) => {
             <TableRow>
               <TableHead className="w-12">
                 <Checkbox
-                  checked={selectedUsers.length === users.length}
+                  checked={selectedUsers.length === users.length || selectAllPages}
                   onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
                 />
               </TableHead>
@@ -148,7 +166,7 @@ export const CRMTable = ({ users, onUserUpdated }: CRMTableProps) => {
               <TableRow key={user.id}>
                 <TableCell>
                   <Checkbox
-                    checked={selectedUsers.includes(user.id)}
+                    checked={selectedUsers.includes(user.id) || selectAllPages}
                     onCheckedChange={(checked) => handleSelectUser(user.id, checked as boolean)}
                   />
                 </TableCell>
@@ -204,6 +222,7 @@ export const CRMTable = ({ users, onUserUpdated }: CRMTableProps) => {
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
         onConfirm={handleDeleteSelected}
+        selectAllPages={selectAllPages}
       />
     </>
   );
