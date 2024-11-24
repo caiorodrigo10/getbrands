@@ -2,6 +2,10 @@ import { motion } from "framer-motion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { QuizNavigation } from "./QuizNavigation";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { trackEvent } from "@/lib/analytics";
+import { toast } from "sonner";
 
 interface LaunchUrgencyStepProps {
   selected: string;
@@ -11,16 +15,40 @@ interface LaunchUrgencyStepProps {
 }
 
 export function LaunchUrgencyStep({ selected, onAnswer, onComplete, onBack }: LaunchUrgencyStepProps) {
+  const { user } = useAuth();
   const options = [
     { value: "immediate", label: "Immediately (1-2 months)" },
     { value: "soon", label: "Soon (3-6 months)" },
     { value: "planning", label: "Planning Phase (6+ months)" },
   ];
 
-  const handleOptionSelect = (value: string) => {
-    onAnswer(value);
-    // Automatically complete when an option is selected
-    onComplete();
+  const handleOptionSelect = async (value: string) => {
+    try {
+      // Update the local state first
+      onAnswer(value);
+
+      if (user?.id) {
+        // Update the profile in Supabase
+        const { error } = await supabase
+          .from('profiles')
+          .update({ launch_urgency: value })
+          .eq('id', user.id);
+
+        if (error) throw error;
+
+        // Track the event in Segment
+        trackEvent('launch_urgency_selected', {
+          userId: user.id,
+          launch_urgency: value
+        });
+      }
+
+      // Complete the step
+      onComplete();
+    } catch (error) {
+      console.error('Error updating launch urgency:', error);
+      toast.error("Failed to save your selection. Please try again.");
+    }
   };
 
   return (
