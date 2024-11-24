@@ -18,13 +18,11 @@ const SignUp = () => {
   });
   const [errors, setErrors] = useState({
     password: "",
-    phone: "",
   });
 
   const validateForm = () => {
     const newErrors = {
       password: "",
-      phone: "",
     };
     let isValid = true;
 
@@ -33,12 +31,7 @@ const SignUp = () => {
       isValid = false;
     }
 
-    if (!formData.phone || formData.phone.length < 10) {
-      newErrors.phone = "Valid phone number is required";
-      isValid = false;
-    }
-
-    if (!formData.firstName || !formData.lastName || !formData.email) {
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
       isValid = false;
       toast.error("Please fill in all fields");
     }
@@ -64,7 +57,6 @@ const SignUp = () => {
           data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
-            phone: formData.phone,
             role: 'member',
           },
         },
@@ -100,7 +92,7 @@ const SignUp = () => {
           if (insertError) throw insertError;
         }
 
-        // Track signup event with all user properties
+        // Track signup event
         trackEvent('user_signed_up', {
           userId: data.user.id,
           email: formData.email,

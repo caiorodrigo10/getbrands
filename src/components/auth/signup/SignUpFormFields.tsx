@@ -12,7 +12,6 @@ interface SignUpFormFieldsProps {
   };
   errors: {
     password: string;
-    phone?: string;
   };
   setFormData: (data: any) => void;
 }
@@ -69,24 +68,15 @@ export const SignUpFormFields = ({ formData, errors, setFormData }: SignUpFormFi
           <p className="text-sm text-red-500 mt-1">{errors.password}</p>
         )}
       </div>
-      <div>
+      <div className="phone-input-container [&_.react-tel-input]:w-full [&_.react-tel-input_.form-control]:!w-full [&_.react-tel-input_.form-control]:!h-[42px] [&_.react-tel-input_.flag-dropdown]:!h-[42px] [&_.react-tel-input_.selected-flag]:!h-[40px] [&_.react-tel-input_.flag-dropdown]:!border-gray-200 [&_.react-tel-input_.form-control]:!bg-gray-50 [&_.react-tel-input_.form-control]:!border-gray-200 [&_.react-tel-input_.form-control]:!text-base">
         <PhoneInput
           country={'us'}
           value={formData.phone}
           onChange={(phone) => setFormData({ ...formData, phone: phone })}
           inputProps={{
             required: true,
-            className: errors.phone ? 'error' : ''
           }}
-          containerClass="!w-full"
-          inputClass="!w-full !h-[42px] !bg-gray-50 !border-gray-200 !rounded-lg !pl-12 !text-base"
-          buttonClass="!border-gray-200 !rounded-l-lg !bg-gray-50"
-          dropdownClass="!rounded-lg !border-gray-200"
-          buttonStyle={{ backgroundColor: 'rgb(249 250 251)' }}
         />
-        {errors.phone && (
-          <p className="text-sm text-red-500 mt-1">{errors.phone}</p>
-        )}
       </div>
     </div>
   );

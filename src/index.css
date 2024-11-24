@@ -81,8 +81,3 @@
   from { width: 0; }
   to { width: var(--progress-width, 0%); }
 }
-
-/* Phone Input Custom Styles */
-.react-tel-input .form-control.error {
-  @apply border-red-500;
-}
