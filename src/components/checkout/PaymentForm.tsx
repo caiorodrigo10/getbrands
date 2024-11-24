@@ -7,6 +7,8 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatCurrency } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { trackCheckoutStep, trackCheckoutCompleted } from "@/lib/analytics/ecommerce";
+import { useEffect } from "react";
 
 interface PaymentFormProps {
   clientSecret: string;
@@ -23,6 +25,10 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
 
+  useEffect(() => {
+    trackCheckoutStep(3, items, { total, shipping_cost: shippingCost });
+  }, [items, total, shippingCost]);
+
   const createSampleRequest = async () => {
     if (!user) throw new Error("User not authenticated");
 
@@ -30,6 +36,9 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
     const shippingCity = localStorage.getItem('shipping_city') || '';
     const shippingState = localStorage.getItem('shipping_state') || '';
     const shippingZip = localStorage.getItem('shipping_zip') || '';
+    const firstName = localStorage.getItem('firstName') || '';
+    const lastName = localStorage.getItem('lastName') || '';
+    const phone = localStorage.getItem('phone') || '';
 
     const { data: sampleRequest, error: sampleRequestError } = await supabase
       .from('sample_requests')
@@ -40,6 +49,8 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         shipping_city: shippingCity,
         shipping_state: shippingState,
         shipping_zip: shippingZip,
+        first_name: firstName,
+        last_name: lastName
       })
       .select()
       .single();
@@ -96,6 +107,23 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
       if (paymentError) {
         throw paymentError;
       }
+
+      // Track successful checkout
+      trackCheckoutCompleted(
+        orderId,
+        items,
+        {
+          firstName: localStorage.getItem('firstName'),
+          lastName: localStorage.getItem('lastName'),
+          phone: localStorage.getItem('phone'),
+          address1: localStorage.getItem('shipping_address'),
+          city: localStorage.getItem('shipping_city'),
+          state: localStorage.getItem('shipping_state'),
+          zipCode: localStorage.getItem('shipping_zip'),
+        },
+        total,
+        shippingCost
+      );
 
       clearCart();
       navigate('/checkout/success');

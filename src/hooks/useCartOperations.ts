@@ -4,6 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Product } from "@/types/product";
 import { CartItem } from "@/types/cart";
 import { User } from "@supabase/supabase-js";
+import { trackAddToCart } from "@/lib/analytics/ecommerce";
 
 export const useCartOperations = (user: User | null) => {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -95,7 +96,12 @@ export const useCartOperations = (user: User | null) => {
 
       if (error) throw error;
 
-      setItems((currentItems) => [...currentItems, { ...product, quantity: 1 }]);
+      const cartItem = { ...product, quantity: 1 };
+      setItems((currentItems) => [...currentItems, cartItem]);
+      
+      // Track the add to cart event
+      trackAddToCart(cartItem);
+
     } catch (error) {
       console.error('Error adding item to cart:', error);
       throw error;

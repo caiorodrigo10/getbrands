@@ -1,15 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useShippingForm } from "@/hooks/useShippingForm";
 import { ShippingFormContainer } from "@/components/shipping/ShippingFormContainer";
 import { useToast } from "@/components/ui/use-toast";
+import { useCart } from "@/contexts/CartContext";
+import { trackCheckoutStep } from "@/lib/analytics/ecommerce";
 
 const Shipping = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const form = useShippingForm();
+  const { items } = useCart();
+
+  useEffect(() => {
+    trackCheckoutStep(2, items);
+  }, [items]);
 
   const handleCancel = () => {
     navigate("/checkout/cart");

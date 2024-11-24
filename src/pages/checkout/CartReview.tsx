@@ -3,10 +3,16 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { formatCurrency } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
+import { trackCheckoutStep } from "@/lib/analytics/ecommerce";
+import { useEffect } from "react";
 
 const CartReview = () => {
   const navigate = useNavigate();
   const { items } = useCart();
+
+  useEffect(() => {
+    trackCheckoutStep(1, items);
+  }, [items]);
 
   const handleContinue = () => {
     navigate("/checkout/shipping");
