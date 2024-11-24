@@ -24,37 +24,34 @@ export function LaunchUrgencyStep({ selected, onAnswer, onComplete, onBack }: La
 
   const handleOptionSelect = async (value: string) => {
     try {
-      // Update the local state first
       onAnswer(value);
 
-      if (user?.id) {
-        // Update the profile in Supabase
-        const { error } = await supabase
-          .from('profiles')
-          .update({ 
-            launch_urgency: value,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', user.id)
-          .single();
-
-        if (error) {
-          console.error('Supabase error:', error);
-          throw new Error('Failed to update launch urgency');
-        }
-
-        // Track the event in Segment
-        trackEvent('launch_urgency_selected', {
-          userId: user.id,
-          launch_urgency: value
-        });
-
-        toast.success("Launch timeline preference saved!");
-      } else {
+      if (!user?.id) {
         throw new Error('User not authenticated');
       }
 
-      // Complete the step
+      // Update the profile in Supabase
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          launch_urgency: value,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Supabase error:', error);
+        throw new Error('Failed to update launch urgency');
+      }
+
+      // Track the event in Segment
+      trackEvent('launch_urgency_selected', {
+        userId: user.id,
+        launch_urgency: value
+      });
+
+      toast.success("Launch timeline preference saved!");
       onComplete();
     } catch (error: any) {
       console.error('Error updating launch urgency:', error);

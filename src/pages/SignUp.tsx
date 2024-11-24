@@ -79,28 +79,21 @@ const SignUp = () => {
       }
 
       if (data?.user) {
+        // Update the profiles table directly
         const { error: profileError } = await supabase
           .from('profiles')
-          .select()
-          .eq('id', data.user.id)
-          .single();
+          .upsert({
+            id: data.user.id,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            role: 'member',
+            updated_at: new Date().toISOString()
+          });
 
-        if (profileError) {
-          const { error: insertError } = await supabase
-            .from('profiles')
-            .insert({
-              id: data.user.id,
-              first_name: formData.firstName,
-              last_name: formData.lastName,
-              email: formData.email,
-              phone: formData.phone,
-              role: 'member',
-            });
+        if (profileError) throw profileError;
 
-          if (insertError) throw insertError;
-        }
-
-        // Track signup event with phone number
         trackEvent('user_signed_up', {
           userId: data.user.id,
           email: formData.email,
@@ -110,6 +103,7 @@ const SignUp = () => {
           signupMethod: 'email',
         });
 
+        toast.success("Account created successfully! Please check your email to verify your account.");
         navigate("/login");
       }
     } catch (error: any) {
