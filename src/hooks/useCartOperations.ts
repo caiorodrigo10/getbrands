@@ -78,7 +78,8 @@ export const useCartOperations = (user: User | null) => {
       // If item exists, don't add it again
       if (existingItems && existingItems.length > 0) {
         toast({
-          title: "Info",
+          variant: "destructive",
+          title: "Error",
           description: "This item is already in your cart.",
         });
         return;
@@ -95,11 +96,6 @@ export const useCartOperations = (user: User | null) => {
       if (error) throw error;
 
       setItems((currentItems) => [...currentItems, { ...product, quantity: 1 }]);
-      
-      toast({
-        title: "Success",
-        description: "Item added to cart successfully.",
-      });
     } catch (error) {
       console.error('Error adding item to cart:', error);
       throw error;

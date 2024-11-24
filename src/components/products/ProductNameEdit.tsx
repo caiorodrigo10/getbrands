@@ -31,10 +31,6 @@ export const ProductNameEdit = ({ projectProductId, currentName, onNameUpdate }:
 
       onNameUpdate(name);
       setIsEditing(false);
-      toast({
-        title: "Success",
-        description: "Product name updated successfully",
-      });
     } catch (error) {
       toast({
         title: "Error",

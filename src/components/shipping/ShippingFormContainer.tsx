@@ -5,7 +5,7 @@ import { AddressSelectionSection } from "./AddressSelectionSection";
 import { AddressFormSection } from "./AddressFormSection";
 import type { ShippingFormData, Address } from "@/types/shipping";
 import type { UseFormReturn } from "react-hook-form";
-import type { User } from "@supabase/supabase-js";
+import type { User } from "@supabase/auth-helpers-react";
 
 interface ShippingFormContainerProps {
   user: User;
