@@ -100,7 +100,7 @@ const SignUp = () => {
           if (insertError) throw insertError;
         }
 
-        // Track signup event
+        // Track signup event with phone number
         trackEvent('user_signed_up', {
           userId: data.user.id,
           email: formData.email,
