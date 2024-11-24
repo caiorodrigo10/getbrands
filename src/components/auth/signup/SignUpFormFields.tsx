@@ -69,7 +69,7 @@ export const SignUpFormFields = ({ formData, errors, setFormData }: SignUpFormFi
           <p className="text-sm text-red-500 mt-1">{errors.password}</p>
         )}
       </div>
-      <div className="phone-input-container [&_.react-tel-input]:w-full [&_.react-tel-input_.form-control]:!w-full [&_.react-tel-input_.form-control]:!h-[42px] [&_.react-tel-input_.flag-dropdown]:!h-[42px] [&_.react-tel-input_.selected-flag]:!h-[40px] [&_.react-tel-input_.flag-dropdown]:!border-gray-200 [&_.react-tel-input_.form-control]:!bg-gray-50 [&_.react-tel-input_.form-control]:!border-gray-200 [&_.react-tel-input_.form-control]:!text-base [&_.react-tel-input_.selected-flag]:!bg-transparent [&_.react-tel-input_.selected-flag]:hover:!bg-transparent [&_.react-tel-input_.flag-dropdown]:!bg-transparent [&_.react-tel-input_.country-list]:!bg-white">
+      <div className="phone-input-container [&_.react-tel-input]:w-full [&_.react-tel-input_.form-control]:!w-full [&_.react-tel-input_.form-control]:!h-[42px] [&_.react-tel-input_.flag-dropdown]:!h-[42px] [&_.react-tel-input_.selected-flag]:!h-[40px] [&_.react-tel-input_.flag-dropdown]:!border-gray-200 [&_.react-tel-input_.form-control]:!bg-gray-50 [&_.react-tel-input_.form-control]:!border-gray-200 [&_.react-tel-input_.form-control]:!text-base [&_.react-tel-input_.selected-flag]:!bg-transparent [&_.react-tel-input_.selected-flag]:hover:!bg-transparent [&_.react-tel-input_.flag-dropdown]:!bg-transparent [&_.react-tel-input_.country-list]:!bg-white [&_.react-tel-input_.selected-flag]:!flex [&_.react-tel-input_.selected-flag]:!items-center [&_.react-tel-input_.selected-flag]:!gap-2">
         <PhoneInput
           country={'us'}
           value={formData.phone}
@@ -79,8 +79,8 @@ export const SignUpFormFields = ({ formData, errors, setFormData }: SignUpFormFi
             className: "!w-full !px-4 !py-2 !bg-gray-50 !border !border-gray-200 !rounded-lg focus:!ring-2 focus:!ring-primary/20"
           }}
           containerClass="!w-full"
-          inputClass="!w-full !h-[42px] !text-base"
-          buttonClass="!border-0 !bg-transparent"
+          inputClass="!w-full !h-[42px] !text-base !pl-[85px]"
+          buttonClass="!border-0 !bg-transparent !w-[85px] !flex !justify-between !items-center !px-3"
           dropdownClass="!w-[300px]"
         />
         {errors.phone && (
