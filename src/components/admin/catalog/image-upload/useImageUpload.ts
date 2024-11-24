@@ -28,7 +28,6 @@ export const useImageUpload = (productId: string, onImagesUpdate: () => void) =>
         const fileExt = file.name.split('.').pop();
         const fileName = `${productId || 'temp'}/${crypto.randomUUID()}.${fileExt}`;
 
-        // Upload to storage
         const { error: uploadError, data: uploadData } = await supabase.storage
           .from('product-images')
           .upload(fileName, file, {
@@ -41,12 +40,10 @@ export const useImageUpload = (productId: string, onImagesUpdate: () => void) =>
           continue;
         }
 
-        // Get the public URL
         const { data: { publicUrl } } = supabase.storage
           .from('product-images')
           .getPublicUrl(fileName);
 
-        // Only insert into database if we have a valid product ID
         if (productId) {
           const { error: dbError } = await supabase
             .from('product_images')
@@ -75,11 +72,6 @@ export const useImageUpload = (productId: string, onImagesUpdate: () => void) =>
       }
 
       onImagesUpdate();
-      
-      toast({
-        title: "Success",
-        description: "Images uploaded successfully",
-      });
     } catch (error) {
       console.error('Error uploading images:', error);
       toast({
@@ -89,7 +81,6 @@ export const useImageUpload = (productId: string, onImagesUpdate: () => void) =>
       });
     } finally {
       setIsUploading(false);
-      // Reset the input value to allow uploading the same file again
       const input = document.getElementById('image-upload') as HTMLInputElement;
       if (input) input.value = '';
     }

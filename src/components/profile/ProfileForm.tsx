@@ -74,11 +74,6 @@ export const ProfileForm = () => {
         .eq("id", user?.id);
 
       if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({

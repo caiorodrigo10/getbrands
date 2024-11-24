@@ -8,7 +8,6 @@ export const useDeleteProducts = () => {
 
   const deleteProducts = async (selectedProducts: string[]) => {
     try {
-      // First, delete related cart items
       const { error: cartItemsError } = await supabase
         .from('cart_items')
         .delete()
@@ -16,7 +15,6 @@ export const useDeleteProducts = () => {
 
       if (cartItemsError) throw cartItemsError;
 
-      // Then, delete related sample request products
       const { error: sampleRequestProductsError } = await supabase
         .from('sample_request_products')
         .delete()
@@ -24,7 +22,6 @@ export const useDeleteProducts = () => {
 
       if (sampleRequestProductsError) throw sampleRequestProductsError;
 
-      // Finally delete the products
       const { error: productsError } = await supabase
         .from('products')
         .delete()
@@ -32,12 +29,6 @@ export const useDeleteProducts = () => {
 
       if (productsError) throw productsError;
 
-      toast({
-        title: "Success",
-        description: `Successfully deleted ${selectedProducts.length} product(s)`,
-      });
-
-      // Invalidate and refetch products query
       queryClient.invalidateQueries({ queryKey: ["admin-catalog"] });
       
       return true;

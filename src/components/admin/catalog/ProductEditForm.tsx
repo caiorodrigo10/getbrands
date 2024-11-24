@@ -82,11 +82,6 @@ export function ProductEditForm({
       
       queryClient.invalidateQueries({ queryKey: ['admin-catalog'] });
       queryClient.invalidateQueries({ queryKey: ['product-images-catalog'] });
-
-      toast({
-        title: "Success",
-        description: "Product saved successfully",
-      });
     } catch (error) {
       console.error('Error saving product:', error);
       toast({

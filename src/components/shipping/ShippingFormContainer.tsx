@@ -30,14 +30,12 @@ export const ShippingFormContainer = ({
     queryFn: async () => {
       if (!user?.id) return [];
       
-      // Get user profile data
       const { data: profileData } = await supabase
         .from("profiles")
         .select("first_name, last_name, phone")
         .eq("id", user.id)
         .single();
 
-      // Get addresses that were used in orders
       const { data: addressData, error } = await supabase
         .from("addresses")
         .select("*")
@@ -48,7 +46,6 @@ export const ShippingFormContainer = ({
 
       if (error) throw error;
 
-      // Set form values from localStorage or profile
       const savedData = {
         firstName: localStorage.getItem('firstName') || profileData?.first_name || "",
         lastName: localStorage.getItem('lastName') || profileData?.last_name || "",
@@ -66,7 +63,6 @@ export const ShippingFormContainer = ({
         billingZipCode: localStorage.getItem('shipping_zip') || "",
       };
 
-      // Only set form values if they're not already set
       const currentValues = form.getValues();
       if (!currentValues.firstName && !currentValues.lastName) {
         form.reset(savedData);
@@ -81,7 +77,6 @@ export const ShippingFormContainer = ({
     try {
       if (!user?.id) throw new Error("User not authenticated");
 
-      // Save to localStorage
       localStorage.setItem('firstName', values.firstName);
       localStorage.setItem('lastName', values.lastName);
       localStorage.setItem('phone', values.phone);
@@ -99,7 +94,6 @@ export const ShippingFormContainer = ({
         localStorage.setItem('billing_zip', values.billingZipCode || '');
       }
 
-      // Save to addresses table without marking as used_in_order
       const { error } = await supabase
         .from('addresses')
         .insert({
@@ -117,11 +111,6 @@ export const ShippingFormContainer = ({
         });
 
       if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Address saved successfully",
-      });
       
       setIsAddressSaved(true);
     } catch (error) {

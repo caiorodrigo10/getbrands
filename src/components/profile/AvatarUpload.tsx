@@ -39,11 +39,6 @@ export function AvatarUpload({ user, avatarUrl, setAvatarUrl }: AvatarUploadProp
         .eq("id", user.id);
 
       setAvatarUrl(publicUrl);
-      
-      toast({
-        title: "Avatar updated",
-        description: "Your profile picture has been updated successfully.",
-      });
     } catch (error) {
       toast({
         variant: "destructive",

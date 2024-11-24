@@ -52,11 +52,6 @@ export const SavedAddressSelect = ({
         if (!oldData) return [];
         return oldData.filter(address => address.id !== addressId);
       });
-
-      toast({
-        title: "Success",
-        description: "Address deleted successfully.",
-      });
     } catch (error) {
       console.error("Error deleting address:", error);
       toast({
