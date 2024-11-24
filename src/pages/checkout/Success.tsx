@@ -27,7 +27,10 @@ const Success = () => {
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
-      if (!user) return;
+      if (!user) {
+        navigate('/login');
+        return;
+      }
 
       try {
         const { data, error } = await supabase
@@ -39,12 +42,15 @@ const Success = () => {
             shipping_city,
             shipping_state,
             shipping_zip,
+            first_name,
+            last_name,
             sample_request_products (
               product:products (
                 name,
                 id,
                 from_price,
-                image_url
+                image_url,
+                category
               )
             )
           `)
@@ -95,6 +101,29 @@ const Success = () => {
     );
   }
 
+  if (!orderDetails) {
+    return (
+      <div className="min-h-screen bg-background">
+        <NavigationMenu />
+        <main className="p-8">
+          <div className="max-w-3xl mx-auto">
+            <Card className="text-center">
+              <CardHeader>
+                <CardTitle>No Order Found</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="mb-4">We couldn't find your order details.</p>
+                <Button onClick={() => navigate('/catalogo')}>
+                  Return to Catalog
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {showConfetti && <Confetti />}
@@ -104,16 +133,19 @@ const Success = () => {
           <Card className="mb-8 border-green-200 bg-green-50">
             <CardHeader className="text-center pb-6">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <CardTitle className="text-2xl mb-2">Payment Successful!</CardTitle>
+              <CardTitle className="text-2xl mb-2">Order Confirmed!</CardTitle>
               <p className="text-muted-foreground">
-                Thank you for your order. We'll send you updates about your sample via email.
+                Thank you for your order. We'll send you updates about your samples via email.
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Order #{orderDetails.id.slice(0, 8)}
               </p>
             </CardHeader>
           </Card>
 
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle>Shipping Status</CardTitle>
+              <CardTitle>Order Status</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between relative">
@@ -122,7 +154,7 @@ const Success = () => {
                   <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                     <Package className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-sm font-medium">Pending</span>
+                  <span className="text-sm font-medium">Order Placed</span>
                 </div>
                 <div className="flex flex-col items-center gap-2 bg-background p-2">
                   <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
