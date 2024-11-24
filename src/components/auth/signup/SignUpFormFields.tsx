@@ -12,7 +12,6 @@ interface SignUpFormFieldsProps {
   };
   errors: {
     password: string;
-    phone?: string;
   };
   setFormData: (data: any) => void;
 }
@@ -69,23 +68,15 @@ export const SignUpFormFields = ({ formData, errors, setFormData }: SignUpFormFi
           <p className="text-sm text-red-500 mt-1">{errors.password}</p>
         )}
       </div>
-      <div className="phone-input-container [&_.react-tel-input]:w-full [&_.react-tel-input_.form-control]:!w-full [&_.react-tel-input_.form-control]:!h-[42px] [&_.react-tel-input_.flag-dropdown]:!h-[42px] [&_.react-tel-input_.selected-flag]:!h-[40px] [&_.react-tel-input_.flag-dropdown]:!border-gray-200 [&_.react-tel-input_.form-control]:!bg-gray-50 [&_.react-tel-input_.form-control]:!border-gray-200 [&_.react-tel-input_.form-control]:!text-base [&_.react-tel-input_.selected-flag]:!bg-transparent [&_.react-tel-input_.selected-flag]:hover:!bg-transparent [&_.react-tel-input_.flag-dropdown]:!bg-transparent [&_.react-tel-input_.country-list]:!bg-white [&_.react-tel-input_.selected-flag]:before:!content-['|'] [&_.react-tel-input_.selected-flag]:before:!absolute [&_.react-tel-input_.selected-flag]:before:!right-0 [&_.react-tel-input_.selected-flag]:before:!text-gray-300 [&_.react-tel-input_.selected-flag]:before:!text-lg [&_.react-tel-input_.selected-flag]:!w-[85px] [&_.react-tel-input_.form-control]:!pl-[90px]">
+      <div className="phone-input-container [&_.react-tel-input]:w-full [&_.react-tel-input_.form-control]:!w-full [&_.react-tel-input_.form-control]:!h-[42px] [&_.react-tel-input_.flag-dropdown]:!h-[42px] [&_.react-tel-input_.selected-flag]:!h-[40px] [&_.react-tel-input_.flag-dropdown]:!border-gray-200 [&_.react-tel-input_.form-control]:!bg-gray-50 [&_.react-tel-input_.form-control]:!border-gray-200 [&_.react-tel-input_.form-control]:!text-base">
         <PhoneInput
           country={'us'}
           value={formData.phone}
           onChange={(phone) => setFormData({ ...formData, phone: phone })}
           inputProps={{
             required: true,
-            className: "!w-full !px-4 !py-2 !bg-gray-50 !border !border-gray-200 !rounded-lg focus:!ring-2 focus:!ring-primary/20"
           }}
-          containerClass="!w-full"
-          inputClass="!w-full !h-[42px] !text-base"
-          buttonClass="!border-0 !bg-transparent !w-[85px] !flex !items-center !justify-center !absolute !left-0"
-          dropdownClass="!w-[300px]"
         />
-        {errors.phone && (
-          <p className="text-sm text-red-500 mt-1">{errors.phone}</p>
-        )}
       </div>
     </div>
   );

@@ -18,13 +18,11 @@ const SignUp = () => {
   });
   const [errors, setErrors] = useState({
     password: "",
-    phone: "",
   });
 
   const validateForm = () => {
     const newErrors = {
       password: "",
-      phone: "",
     };
     let isValid = true;
 
@@ -33,12 +31,7 @@ const SignUp = () => {
       isValid = false;
     }
 
-    if (!formData.phone || formData.phone.length < 10) {
-      newErrors.phone = "Please enter a valid phone number";
-      isValid = false;
-    }
-
-    if (!formData.firstName || !formData.lastName || !formData.email) {
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
       isValid = false;
       toast.error("Please fill in all fields");
     }
@@ -64,7 +57,6 @@ const SignUp = () => {
           data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
-            phone: formData.phone,
             role: 'member',
           },
         },
