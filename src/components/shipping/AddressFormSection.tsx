@@ -7,6 +7,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ShippingButtons } from "@/components/checkout/ShippingButtons";
 import { UseFormReturn } from "react-hook-form";
 import { ShippingFormData } from "@/types/shipping";
+import { BillingAddressFields } from "@/components/shipping/BillingAddressFields";
+import { useToast } from "@/components/ui/use-toast";
 
 interface AddressFormSectionProps {
   form: UseFormReturn<ShippingFormData>;
@@ -26,9 +28,38 @@ export const AddressFormSection = ({
   setIsAddressSaved,
 }: AddressFormSectionProps) => {
   const useSameForBilling = form.watch("useSameForBilling");
+  const { toast } = useToast();
 
   const handleSubmit = async () => {
     const values = form.getValues();
+    const isValid = await form.trigger();
+
+    if (!isValid) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please fill in all required fields for both shipping and billing addresses.",
+      });
+      return;
+    }
+
+    // If not using same billing address, validate billing fields
+    if (!useSameForBilling) {
+      const hasBillingFields = values.billingAddress1 && 
+                              values.billingCity && 
+                              values.billingState && 
+                              values.billingZipCode;
+      
+      if (!hasBillingFields) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Please fill in all required billing address fields.",
+        });
+        return;
+      }
+    }
+
     await onSubmit(values);
     setIsAddressSaved(true);
   };
@@ -59,8 +90,13 @@ export const AddressFormSection = ({
                 form.setValue("billingCity", values.city);
                 form.setValue("billingState", values.state);
                 form.setValue("billingZipCode", values.zipCode);
-              }
-              if (!checked) {
+              } else {
+                // Clear billing address fields
+                form.setValue("billingAddress1", "");
+                form.setValue("billingAddress2", "");
+                form.setValue("billingCity", "");
+                form.setValue("billingState", "");
+                form.setValue("billingZipCode", "");
                 setIsAddressSaved(false);
               }
             }}
@@ -74,19 +110,7 @@ export const AddressFormSection = ({
         </div>
 
         {!useSameForBilling && (
-          <div className="mt-6 border-t pt-6">
-            <h3 className="text-lg font-medium mb-4">Billing Address</h3>
-            <AddressFields
-              form={form}
-              formFields={{
-                address1: "billingAddress1",
-                address2: "billingAddress2",
-                city: "billingCity",
-                state: "billingState",
-                zipCode: "billingZipCode",
-              }}
-            />
-          </div>
+          <BillingAddressFields form={form} />
         )}
 
         <ShippingButtons

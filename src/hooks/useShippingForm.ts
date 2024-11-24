@@ -6,18 +6,18 @@ import type { ShippingFormData } from "@/types/shipping";
 const formSchema = z.object({
   firstName: z.string().min(2, "First name is too short"),
   lastName: z.string().min(2, "Last name is too short"),
-  address1: z.string().min(5, "Address is too short"),
+  address1: z.string().min(5, "Address is required"),
   address2: z.string().optional(),
-  city: z.string().min(2, "City is too short"),
-  state: z.string().min(2, "Invalid state"),
-  zipCode: z.string().min(5, "Invalid ZIP code"),
-  phone: z.string().min(10, "Invalid phone number"),
-  useSameForBilling: z.boolean().default(true),
-  billingAddress1: z.string().min(5, "Address is too short").optional(),
+  city: z.string().min(2, "City is required"),
+  state: z.string().min(2, "State is required"),
+  zipCode: z.string().min(5, "ZIP code is required"),
+  phone: z.string().min(10, "Phone number is required"),
+  useSameForBilling: z.boolean(),
+  billingAddress1: z.string().min(5, "Billing address is required").optional().or(z.string()),
   billingAddress2: z.string().optional(),
-  billingCity: z.string().min(2, "City is too short").optional(),
-  billingState: z.string().min(2, "Invalid state").optional(),
-  billingZipCode: z.string().min(5, "Invalid ZIP code").optional(),
+  billingCity: z.string().min(2, "Billing city is required").optional().or(z.string()),
+  billingState: z.string().min(2, "Billing state is required").optional().or(z.string()),
+  billingZipCode: z.string().min(5, "Billing ZIP code is required").optional().or(z.string()),
 });
 
 export const useShippingForm = () => {
@@ -39,5 +39,6 @@ export const useShippingForm = () => {
       billingState: "",
       billingZipCode: "",
     },
+    mode: "onChange",
   });
 };
