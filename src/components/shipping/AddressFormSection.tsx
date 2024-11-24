@@ -43,7 +43,6 @@ export const AddressFormSection = ({
       return;
     }
 
-    // If not using same billing address, validate billing fields
     if (!useSameForBilling) {
       const hasBillingFields = values.billingAddress1 && 
                               values.billingCity && 
@@ -65,7 +64,6 @@ export const AddressFormSection = ({
   };
 
   React.useEffect(() => {
-    // Pre-fill useSameForBilling as true by default
     form.setValue("useSameForBilling", true);
   }, [form]);
 
@@ -83,7 +81,6 @@ export const AddressFormSection = ({
             onCheckedChange={(checked) => {
               form.setValue("useSameForBilling", checked as boolean);
               if (checked) {
-                // Copy shipping address to billing address
                 const values = form.getValues();
                 form.setValue("billingAddress1", values.address1);
                 form.setValue("billingAddress2", values.address2);
@@ -91,7 +88,6 @@ export const AddressFormSection = ({
                 form.setValue("billingState", values.state);
                 form.setValue("billingZipCode", values.zipCode);
               } else {
-                // Clear billing address fields
                 form.setValue("billingAddress1", "");
                 form.setValue("billingAddress2", "");
                 form.setValue("billingCity", "");
