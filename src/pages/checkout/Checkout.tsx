@@ -6,6 +6,7 @@ import PedidoAmostra from "../PedidoAmostra";
 import Shipping from "./Shipping";
 import Payment from "./Payment";
 import { NavigationMenu } from "@/components/NavigationMenu";
+import { CartProvider } from "@/contexts/CartContext";
 
 const steps = [
   { id: "confirmation", name: "Confirmation", path: "/checkout/confirmation", icon: CheckCircle },
@@ -79,13 +80,15 @@ const Checkout = () => {
           </div>
 
           <div className="bg-card rounded-lg border border-border/50 shadow-sm p-4 md:p-6 lg:p-8">
-            <Routes>
-              <Route path="confirmation" element={<PedidoAmostra />} />
-              <Route path="shipping" element={<Shipping />} />
-              <Route path="payment" element={<Payment />} />
-              <Route path="points" element={<PedidoAmostra />} />
-              <Route index element={<Navigate to="/checkout/confirmation" replace />} />
-            </Routes>
+            <CartProvider>
+              <Routes>
+                <Route path="confirmation" element={<PedidoAmostra />} />
+                <Route path="shipping" element={<Shipping />} />
+                <Route path="payment" element={<Payment />} />
+                <Route path="points" element={<PedidoAmostra />} />
+                <Route index element={<Navigate to="/checkout/confirmation" replace />} />
+              </Routes>
+            </CartProvider>
           </div>
         </div>
       </main>
