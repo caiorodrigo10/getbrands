@@ -10,16 +10,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { Database } from "@/integrations/supabase/types";
 import { useState } from "react";
 import { UserProfileEditModal } from "./UserProfileEditModal";
-
-type Project = {
-  id: string;
-  name: string;
-  status: string | null;
-  pack_type: Database["public"]["Enums"]["project_pack_type"];
-};
+import { Checkbox } from "@/components/ui/checkbox";
+import { CRMSelectionBar } from "./CRMSelectionBar";
+import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface CRMUser {
   id: string;
@@ -30,7 +28,7 @@ interface CRMUser {
   avatar_url: string | null;
   role: string | null;
   created_at: string;
-  projects: Project[] | null;
+  projects: any[] | null;
 }
 
 interface CRMTableProps {
@@ -38,41 +36,104 @@ interface CRMTableProps {
   onUserUpdated: () => void;
 }
 
-const getUserTypeBadge = (role: string | null, hasProjects: boolean) => {
-  const effectiveType = hasProjects ? "customer" : role || "lead";
+export const CRMTable = ({ users, onUserUpdated }: CRMTableProps) => {
+  const [selectedUser, setSelectedUser] = useState<CRMUser | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const styles = {
-    lead: "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20",
-    member: "bg-blue-500/10 text-blue-500 hover:bg-blue-500/20",
-    sampler: "bg-purple-500/10 text-purple-500 hover:bg-purple-500/20",
-    customer: "bg-green-500/10 text-green-500 hover:bg-green-500/20",
-    admin: "bg-red-500/10 text-red-500 hover:bg-red-500/20"
-  }[effectiveType] || "bg-gray-500/10 text-gray-500 hover:bg-gray-500/20";
+  const handleSelectUser = (userId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedUsers([...selectedUsers, userId]);
+    } else {
+      setSelectedUsers(selectedUsers.filter(id => id !== userId));
+    }
+  };
 
-  const labels = {
-    lead: "Lead",
-    member: "Member",
-    sampler: "Sampler",
-    customer: "Customer",
-    admin: "Admin"
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedUsers(users.map(user => user.id));
+    } else {
+      setSelectedUsers([]);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    try {
+      // Delete profiles
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .in('id', selectedUsers);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Successfully deleted ${selectedUsers.length} user(s)`,
+      });
+
+      // Clear selection and refresh data
+      setSelectedUsers([]);
+      setShowDeleteDialog(false);
+      queryClient.invalidateQueries({ queryKey: ["crm-users"] });
+      onUserUpdated();
+    } catch (error: any) {
+      console.error('Error deleting users:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete users. Please try again.",
+      });
+    }
+  };
+
+  const getUserTypeBadge = (role: string | null, hasProjects: boolean) => {
+    const effectiveType = hasProjects ? "customer" : role || "lead";
+
+    const styles = {
+      lead: "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20",
+      member: "bg-blue-500/10 text-blue-500 hover:bg-blue-500/20",
+      sampler: "bg-purple-500/10 text-purple-500 hover:bg-purple-500/20",
+      customer: "bg-green-500/10 text-green-500 hover:bg-green-500/20",
+      admin: "bg-red-500/10 text-red-500 hover:bg-red-500/20"
+    }[effectiveType] || "bg-gray-500/10 text-gray-500 hover:bg-gray-500/20";
+
+    const labels = {
+      lead: "Lead",
+      member: "Member",
+      sampler: "Sampler",
+      customer: "Customer",
+      admin: "Admin"
+    };
+
+    return (
+      <Badge className={`${styles} transition-colors`} variant="outline">
+        {labels[effectiveType as keyof typeof labels] || "Unknown"}
+      </Badge>
+    );
   };
 
   return (
-    <Badge className={`${styles} transition-colors`} variant="outline">
-      {labels[effectiveType as keyof typeof labels] || "Unknown"}
-    </Badge>
-  );
-};
-
-export const CRMTable = ({ users, onUserUpdated }: CRMTableProps) => {
-  const [selectedUser, setSelectedUser] = useState<CRMUser | null>(null);
-
-  return (
     <>
+      {selectedUsers.length > 0 && (
+        <CRMSelectionBar
+          selectedCount={selectedUsers.length}
+          onDeleteClick={() => setShowDeleteDialog(true)}
+        />
+      )}
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-12">
+                <Checkbox
+                  checked={selectedUsers.length === users.length}
+                  onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
+                />
+              </TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>
@@ -85,6 +146,12 @@ export const CRMTable = ({ users, onUserUpdated }: CRMTableProps) => {
           <TableBody>
             {users.map((user) => (
               <TableRow key={user.id}>
+                <TableCell>
+                  <Checkbox
+                    checked={selectedUsers.includes(user.id)}
+                    onCheckedChange={(checked) => handleSelectUser(user.id, checked as boolean)}
+                  />
+                </TableCell>
                 <TableCell>
                   {[user.first_name, user.last_name].filter(Boolean).join(" ")}
                 </TableCell>
@@ -132,6 +199,12 @@ export const CRMTable = ({ users, onUserUpdated }: CRMTableProps) => {
           onUserUpdated={onUserUpdated}
         />
       )}
+
+      <DeleteConfirmationDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={handleDeleteSelected}
+      />
     </>
   );
 };
