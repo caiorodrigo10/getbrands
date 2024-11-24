@@ -24,28 +24,28 @@ export function LaunchUrgencyStep({ selected, onAnswer, onComplete, onBack }: La
 
   const handleOptionSelect = async (value: string) => {
     try {
-      onAnswer(value);
-
       if (!user?.id) {
         throw new Error('User not authenticated');
       }
 
+      // First update local state
+      onAnswer(value);
+
       // Update the profile in Supabase
       const { error } = await supabase
         .from('profiles')
-        .update({ 
+        .update({
           launch_urgency: value,
           updated_at: new Date().toISOString()
         })
-        .eq('id', user.id)
-        .single();
+        .eq('id', user.id);
 
       if (error) {
         console.error('Supabase error:', error);
         throw new Error('Failed to update launch urgency');
       }
 
-      // Track the event in Segment
+      // Track the event in analytics
       trackEvent('launch_urgency_selected', {
         userId: user.id,
         launch_urgency: value
