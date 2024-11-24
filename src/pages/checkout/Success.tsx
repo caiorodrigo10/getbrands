@@ -89,8 +89,8 @@ const Success = () => {
     return (
       <div className="min-h-screen bg-background">
         <NavigationMenu />
-        <main className="flex-1 w-full">
-          <div className="max-w-3xl mx-auto px-4">
+        <main className="md:pl-64 w-full">
+          <div className="max-w-3xl mx-auto px-4 py-8">
             <div className="flex items-center justify-center p-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
@@ -104,8 +104,8 @@ const Success = () => {
     return (
       <div className="min-h-screen bg-background">
         <NavigationMenu />
-        <main className="flex-1 w-full">
-          <div className="max-w-3xl mx-auto px-4">
+        <main className="md:pl-64 w-full">
+          <div className="max-w-3xl mx-auto px-4 py-8">
             <Card className="text-center">
               <CardHeader>
                 <CardTitle>No Order Found</CardTitle>
@@ -126,9 +126,9 @@ const Success = () => {
   return (
     <div className="min-h-screen bg-background relative">
       {showConfetti && <Confetti />}
-      <NavigationMenu className="z-50" /> {/* Increased z-index */}
-      <main className="flex-1 w-full">
-        <div className="max-w-3xl mx-auto px-4 py-8 relative"> {/* Added relative positioning */}
+      <NavigationMenu />
+      <main className="md:pl-64 w-full">
+        <div className="max-w-3xl mx-auto px-4 py-8">
           <Card className="mb-8 border-green-200 bg-green-50">
             <CardHeader className="text-center pb-6">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
