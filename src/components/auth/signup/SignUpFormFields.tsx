@@ -79,7 +79,7 @@ export const SignUpFormFields = ({ formData, errors, setFormData }: SignUpFormFi
             className: "!w-full !px-4 !py-2 !bg-gray-50 !border !border-gray-200 !rounded-lg focus:!ring-2 focus:!ring-primary/20"
           }}
           containerClass="!w-full"
-          inputClass="!w-full !h-[42px] !text-base !pl-[40px] !text-right"
+          inputClass="!w-full !h-[42px] !text-base !pl-[40px] !text-right !pr-[85px]"
           buttonClass="!border-0 !bg-transparent !w-[40px] !flex !items-center !justify-center"
           dropdownClass="!w-[300px]"
         />
