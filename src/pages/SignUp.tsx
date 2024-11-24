@@ -103,7 +103,6 @@ const SignUp = () => {
           signupMethod: 'email',
         });
 
-        toast.success("Account created successfully! Please check your email to verify your account.");
         navigate("/login");
       }
     } catch (error: any) {
