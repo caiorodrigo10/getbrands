@@ -31,23 +31,34 @@ export function LaunchUrgencyStep({ selected, onAnswer, onComplete, onBack }: La
         // Update the profile in Supabase
         const { error } = await supabase
           .from('profiles')
-          .update({ launch_urgency: value })
-          .eq('id', user.id);
+          .update({ 
+            launch_urgency: value,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id)
+          .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase error:', error);
+          throw new Error('Failed to update launch urgency');
+        }
 
         // Track the event in Segment
         trackEvent('launch_urgency_selected', {
           userId: user.id,
           launch_urgency: value
         });
+
+        toast.success("Launch timeline preference saved!");
+      } else {
+        throw new Error('User not authenticated');
       }
 
       // Complete the step
       onComplete();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating launch urgency:', error);
-      toast.error("Failed to save your selection. Please try again.");
+      toast.error(error.message || "Failed to save your selection. Please try again.");
     }
   };
 
