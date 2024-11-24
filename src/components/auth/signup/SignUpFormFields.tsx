@@ -12,6 +12,7 @@ interface SignUpFormFieldsProps {
   };
   errors: {
     password: string;
+    phone?: string;
   };
   setFormData: (data: any) => void;
 }
@@ -68,15 +69,19 @@ export const SignUpFormFields = ({ formData, errors, setFormData }: SignUpFormFi
           <p className="text-sm text-red-500 mt-1">{errors.password}</p>
         )}
       </div>
-      <div className="phone-input-container [&_.react-tel-input]:w-full [&_.react-tel-input_.form-control]:!w-full [&_.react-tel-input_.form-control]:!h-[42px] [&_.react-tel-input_.flag-dropdown]:!h-[42px] [&_.react-tel-input_.selected-flag]:!h-[40px] [&_.react-tel-input_.flag-dropdown]:!border-gray-200 [&_.react-tel-input_.form-control]:!bg-gray-50 [&_.react-tel-input_.form-control]:!border-gray-200 [&_.react-tel-input_.form-control]:!text-base">
+      <div className="phone-input-container [&_.react-tel-input]:w-full [&_.react-tel-input_.form-control]:!w-full [&_.react-tel-input_.form-control]:!h-[42px] [&_.react-tel-input_.flag-dropdown]:!h-[42px] [&_.react-tel-input_.selected-flag]:!h-[40px] [&_.react-tel-input_.flag-dropdown]:!border-gray-200 [&_.react-tel-input_.form-control]:!bg-gray-50 [&_.react-tel-input_.form-control]:!border-gray-200 [&_.react-tel-input_.form-control]:!text-base [&_.react-tel-input_.selected-flag]:after:!content-['|'] [&_.react-tel-input_.selected-flag]:after:!absolute [&_.react-tel-input_.selected-flag]:after:!right-0 [&_.react-tel-input_.selected-flag]:after:!h-full [&_.react-tel-input_.selected-flag]:after:!flex [&_.react-tel-input_.selected-flag]:after:!items-center [&_.react-tel-input_.selected-flag]:after:!text-gray-300">
         <PhoneInput
           country={'us'}
           value={formData.phone}
           onChange={(phone) => setFormData({ ...formData, phone: phone })}
           inputProps={{
             required: true,
+            className: "!pl-[72px]"
           }}
         />
+        {errors.phone && (
+          <p className="text-sm text-red-500 mt-1">{errors.phone}</p>
+        )}
       </div>
     </div>
   );
