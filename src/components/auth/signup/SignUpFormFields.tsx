@@ -79,8 +79,8 @@ export const SignUpFormFields = ({ formData, errors, setFormData }: SignUpFormFi
             className: "!w-full !px-4 !py-2 !bg-gray-50 !border !border-gray-200 !rounded-lg focus:!ring-2 focus:!ring-primary/20"
           }}
           containerClass="!w-full"
-          inputClass="!w-full !h-[42px] !text-base !pl-[40px] !text-right !pr-[85px]"
-          buttonClass="!border-0 !bg-transparent !w-[40px] !flex !items-center !justify-center"
+          inputClass="!w-full !h-[42px] !text-base !pl-4"
+          buttonClass="!border-0 !bg-transparent !w-[40px] !flex !items-center !justify-center !absolute !right-0"
           dropdownClass="!w-[300px]"
         />
         {errors.phone && (
