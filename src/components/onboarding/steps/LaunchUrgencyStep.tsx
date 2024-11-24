@@ -14,7 +14,12 @@ interface LaunchUrgencyStepProps {
   onBack: () => void;
 }
 
-export function LaunchUrgencyStep({ selected, onAnswer, onComplete, onBack }: LaunchUrgencyStepProps) {
+export const LaunchUrgencyStep = ({ 
+  selected, 
+  onAnswer,
+  onComplete,
+  onBack
+}: LaunchUrgencyStepProps) => {
   const { user } = useAuth();
   const options = [
     { value: "immediate", label: "Immediately (1-2 months)" },
@@ -31,10 +36,10 @@ export function LaunchUrgencyStep({ selected, onAnswer, onComplete, onBack }: La
       // First update local state
       onAnswer(value);
 
-      // Update the profile in Supabase
+      // Then update Supabase
       const { error } = await supabase
         .from('profiles')
-        .update({
+        .update({ 
           launch_urgency: value,
           updated_at: new Date().toISOString()
         })
@@ -42,7 +47,7 @@ export function LaunchUrgencyStep({ selected, onAnswer, onComplete, onBack }: La
 
       if (error) {
         console.error('Supabase error:', error);
-        throw new Error('Failed to update launch urgency');
+        throw error;
       }
 
       // Track the event in analytics
@@ -52,7 +57,6 @@ export function LaunchUrgencyStep({ selected, onAnswer, onComplete, onBack }: La
       });
 
       toast.success("Launch timeline preference saved!");
-      onComplete();
     } catch (error: any) {
       console.error('Error updating launch urgency:', error);
       toast.error(error.message || "Failed to save your selection. Please try again.");
@@ -108,4 +112,4 @@ export function LaunchUrgencyStep({ selected, onAnswer, onComplete, onBack }: La
       />
     </div>
   );
-}
+};
