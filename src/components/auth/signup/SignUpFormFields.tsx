@@ -12,6 +12,7 @@ interface SignUpFormFieldsProps {
   };
   errors: {
     password: string;
+    phone?: string;
   };
   setFormData: (data: any) => void;
 }
@@ -75,8 +76,12 @@ export const SignUpFormFields = ({ formData, errors, setFormData }: SignUpFormFi
           onChange={(phone) => setFormData({ ...formData, phone: phone })}
           inputProps={{
             required: true,
+            className: "!w-full !px-4 !py-2 !bg-gray-50 !border !border-gray-200 !rounded-lg focus:!ring-2 focus:!ring-primary/20"
           }}
         />
+        {errors.phone && (
+          <p className="text-sm text-red-500 mt-1">{errors.phone}</p>
+        )}
       </div>
     </div>
   );
