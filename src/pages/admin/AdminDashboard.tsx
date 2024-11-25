@@ -1,7 +1,7 @@
 import { Users, ShoppingBag, Package, TrendingUp, Star, Circle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import StatsCard from "@/components/admin/dashboard/StatsCard";
-import { SalesFunnel } from "@/components/admin/dashboard/SalesFunnel";
+import SalesFunnel from "@/components/admin/dashboard/SalesFunnel";
 import MonthlyRevenue from "@/components/admin/dashboard/MonthlyRevenue";
 import ProjectStatus from "@/components/admin/dashboard/ProjectStatus";
 
