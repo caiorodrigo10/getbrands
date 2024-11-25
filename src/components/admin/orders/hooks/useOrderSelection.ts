@@ -65,13 +65,13 @@ export const useOrderSelection = (totalOrders: number) => {
   };
 
   return {
-    selectedOrders,
     selectAllPages,
-    excludedOrders,
     handleSelectOrder,
     handleSelectAll,
     handleSelectAllPages,
     getSelectedCount,
     isOrderSelected,
+    selectedOrders,
+    excludedOrders
   };
 };
