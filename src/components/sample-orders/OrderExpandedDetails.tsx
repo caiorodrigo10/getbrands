@@ -4,11 +4,13 @@ import { Card } from "@/components/ui/card";
 import { calculateOrderSubtotal } from "@/lib/orderCalculations";
 
 interface OrderProduct {
-  id: string;
-  name: string;
-  image_url: string | null;
-  from_price: number;
-  quantity?: number;
+  product: {
+    id: string;
+    name: string;
+    image_url: string | null;
+  };
+  quantity: number;
+  unit_price: number;
 }
 
 interface OrderExpandedDetailsProps {
@@ -43,19 +45,19 @@ const OrderExpandedDetails = ({ order }: OrderExpandedDetailsProps) => {
         {/* Mobile Product List */}
         <div className="block sm:hidden space-y-3">
           <h4 className="font-medium text-base">Products</h4>
-          {order.products.map((product) => (
-            <Card key={product.id} className="p-3">
+          {order.products.map((item) => (
+            <Card key={item.product.id} className="p-3">
               <div className="flex gap-3">
                 <img
-                  src={product.image_url || "/placeholder.svg"}
-                  alt={product.name}
+                  src={item.product.image_url || "/placeholder.svg"}
+                  alt={item.product.name}
                   className="w-16 h-16 object-cover rounded-md"
                 />
                 <div className="flex-1 min-w-0">
-                  <h5 className="font-medium text-sm truncate">{product.name}</h5>
-                  <p className="text-xs text-gray-500">SKU: {product.id.slice(0, 8)}</p>
+                  <h5 className="font-medium text-sm truncate">{item.product.name}</h5>
+                  <p className="text-xs text-gray-500">SKU: {item.product.id.slice(0, 8)}</p>
                   <p className="text-sm font-medium mt-1">
-                    {product.quantity || 1} x {formatCurrency(product.from_price)}
+                    {item.quantity} x {formatCurrency(item.unit_price)}
                   </p>
                 </div>
               </div>
@@ -67,18 +69,18 @@ const OrderExpandedDetails = ({ order }: OrderExpandedDetailsProps) => {
         <div className="hidden sm:block">
           <h4 className="font-semibold text-lg mb-4">Product Details</h4>
           <div className="space-y-4">
-            {order.products.map((product) => (
-              <div key={product.id} className="flex items-start gap-4 bg-white p-4 rounded-lg">
+            {order.products.map((item) => (
+              <div key={item.product.id} className="flex items-start gap-4 bg-white p-4 rounded-lg">
                 <img
-                  src={product.image_url || "/placeholder.svg"}
-                  alt={product.name}
+                  src={item.product.image_url || "/placeholder.svg"}
+                  alt={item.product.name}
                   className="w-20 h-20 object-cover rounded"
                 />
                 <div>
-                  <h5 className="font-medium">{product.name}</h5>
-                  <p className="text-sm text-gray-600">SKU: {product.id.slice(0, 8)}</p>
+                  <h5 className="font-medium">{item.product.name}</h5>
+                  <p className="text-sm text-gray-600">SKU: {item.product.id.slice(0, 8)}</p>
                   <p className="text-sm font-medium mt-2">
-                    {product.quantity || 1} x {formatCurrency(product.from_price)}
+                    {item.quantity} x {formatCurrency(item.unit_price)}
                   </p>
                 </div>
               </div>
