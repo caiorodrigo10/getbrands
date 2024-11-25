@@ -25,6 +25,9 @@ interface OrderExpandedDetailsProps {
     first_name?: string;
     last_name?: string;
     shipping_cost?: number;
+    customer?: {
+      email?: string;
+    };
   };
 }
 
@@ -41,115 +44,81 @@ const OrderExpandedDetails = ({ order }: OrderExpandedDetailsProps) => {
       transition={{ duration: 0.2 }}
       className="overflow-hidden"
     >
-      <div className="p-3 sm:p-6 space-y-4 sm:space-y-6 bg-gray-50">
-        {/* Mobile Product List */}
-        <div className="block sm:hidden space-y-3">
-          <h4 className="font-medium text-base">Products</h4>
-          {order.products.map((item) => (
-            <Card key={item.product.id} className="p-3">
-              <div className="flex gap-3">
-                <img
-                  src={item.product.image_url || "/placeholder.svg"}
-                  alt={item.product.name}
-                  className="w-16 h-16 object-cover rounded-md"
-                />
-                <div className="flex-1 min-w-0">
-                  <h5 className="font-medium text-sm truncate">{item.product.name}</h5>
-                  <p className="text-xs text-gray-500">SKU: {item.product.id.slice(0, 8)}</p>
-                  <p className="text-sm font-medium mt-1">
-                    {item.quantity} x {formatCurrency(item.unit_price)}
+      <div className="p-6 space-y-6">
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Customer Details Column */}
+          <div>
+            <h3 className="text-xl font-semibold mb-4">Customer Details</h3>
+            <Card className="p-6">
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-lg font-medium">
+                    {order.first_name} {order.last_name}
+                  </h4>
+                  <p className="text-gray-600">{order.customer?.email}</p>
+                </div>
+                <div>
+                  <h4 className="font-medium mb-2">Shipping Address:</h4>
+                  <p className="text-gray-600">{order.shipping_address}</p>
+                  <p className="text-gray-600">
+                    {order.shipping_city}, {order.shipping_state} {order.shipping_zip}
                   </p>
                 </div>
               </div>
             </Card>
-          ))}
-        </div>
+          </div>
 
-        {/* Desktop Product List */}
-        <div className="hidden sm:block">
-          <h4 className="font-semibold text-lg mb-4">Product Details</h4>
-          <div className="space-y-4">
-            {order.products.map((item) => (
-              <div key={item.product.id} className="flex items-start gap-4 bg-white p-4 rounded-lg">
-                <img
-                  src={item.product.image_url || "/placeholder.svg"}
-                  alt={item.product.name}
-                  className="w-20 h-20 object-cover rounded"
-                />
-                <div>
-                  <h5 className="font-medium">{item.product.name}</h5>
-                  <p className="text-sm text-gray-600">SKU: {item.product.id.slice(0, 8)}</p>
-                  <p className="text-sm font-medium mt-2">
-                    {item.quantity} x {formatCurrency(item.unit_price)}
-                  </p>
+          {/* Order Details Column */}
+          <div>
+            <h3 className="text-xl font-semibold mb-4">Order Details</h3>
+            <Card className="p-6">
+              <div className="space-y-6">
+                {/* Products List */}
+                <div className="space-y-4">
+                  {order.products.map((item) => (
+                    <div key={item.product.id} className="flex items-center gap-4">
+                      <img
+                        src={item.product.image_url || "/placeholder.svg"}
+                        alt={item.product.name}
+                        className="w-16 h-16 object-cover rounded-lg"
+                      />
+                      <div className="flex-1">
+                        <h5 className="font-medium">{item.product.name}</h5>
+                        <p className="text-sm text-gray-600">
+                          SKU: {item.product.id.slice(0, 8)}
+                        </p>
+                        <p className="text-sm font-medium mt-1">
+                          x {formatCurrency(item.unit_price)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Shipping Address - Mobile */}
-        <div className="block sm:hidden">
-          <h4 className="font-medium text-base mb-2">Shipping Address</h4>
-          <Card className="p-3">
-            {order.first_name && order.last_name && (
-              <p className="text-sm font-medium">
-                {order.first_name} {order.last_name}
-              </p>
-            )}
-            <p className="text-sm">{order.shipping_address}</p>
-            <p className="text-sm">
-              {order.shipping_city}, {order.shipping_state} {order.shipping_zip}
-            </p>
-            {order.tracking_number && (
-              <div className="mt-2 pt-2 border-t">
-                <p className="text-xs font-medium">Tracking Number:</p>
-                <p className="text-xs text-gray-600">{order.tracking_number}</p>
-              </div>
-            )}
-          </Card>
-        </div>
+                {/* Order Summary */}
+                <div className="border-t pt-4 space-y-2">
+                  <div className="flex justify-between text-gray-600">
+                    <span>Subtotal:</span>
+                    <span>{formatCurrency(subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-600">
+                    <span>Shipping:</span>
+                    <span>{formatCurrency(shippingCost)}</span>
+                  </div>
+                  <div className="flex justify-between font-medium text-lg pt-2 border-t">
+                    <span>Total:</span>
+                    <span>{formatCurrency(total)}</span>
+                  </div>
+                </div>
 
-        {/* Shipping Address - Desktop */}
-        <div className="hidden sm:block">
-          <h4 className="font-semibold text-lg mb-3">Shipping Address</h4>
-          <div className="bg-white p-4 rounded-lg">
-            {order.first_name && order.last_name && (
-              <p className="font-medium mb-2">
-                {order.first_name} {order.last_name}
-              </p>
-            )}
-            <p>{order.shipping_address}</p>
-            <p>
-              {order.shipping_city}, {order.shipping_state} {order.shipping_zip}
-            </p>
-            {order.tracking_number && (
-              <div className="mt-4 pt-4 border-t">
-                <p className="text-sm font-medium">Tracking Number:</p>
-                <p className="text-sm text-gray-600">{order.tracking_number}</p>
+                {order.tracking_number && (
+                  <div className="border-t pt-4">
+                    <p className="text-sm font-medium">Tracking Number:</p>
+                    <p className="text-sm text-gray-600">{order.tracking_number}</p>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* Payment Summary */}
-        <div className="bg-white p-3 sm:p-4 rounded-lg max-w-sm ml-auto">
-          <h4 className="font-medium text-base sm:text-lg mb-3">Order Summary</h4>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span>Subtotal:</span>
-              <span>{formatCurrency(subtotal)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Shipping:</span>
-              <span>{formatCurrency(shippingCost)}</span>
-            </div>
-            <div className="border-t pt-2 mt-2">
-              <div className="flex justify-between font-medium">
-                <span>Total:</span>
-                <span>{formatCurrency(total)}</span>
-              </div>
-            </div>
+            </Card>
           </div>
         </div>
       </div>
