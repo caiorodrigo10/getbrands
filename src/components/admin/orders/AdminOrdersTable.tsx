@@ -15,6 +15,8 @@ import { OrderSelectionBar } from "./OrderSelectionBar";
 import { DeleteConfirmationDialog } from "../catalog/DeleteConfirmationDialog";
 import { useDeleteOrders } from "./hooks/useDeleteOrders";
 import { useOrderSelection } from "./hooks/useOrderSelection";
+import { OrderTableHeader } from "./components/OrderTableHeader";
+import { OrderTableRow } from "./components/OrderTableRow";
 
 interface AdminOrdersTableProps {
   orders: any[];
@@ -89,7 +91,7 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
     );
   }
 
-  const selectedCount = getSelectedCount(orders);
+  const selectedCount = getSelectedCount();
 
   return (
     <div className="space-y-4">
@@ -111,7 +113,7 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
               <TableHead className="w-[50px]">
                 <Checkbox
                   checked={orders.every(order => isOrderSelected(order.id))}
-                  onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
+                  onCheckedChange={(checked) => handleSelectAll(checked as boolean, orders)}
                 />
               </TableHead>
               <TableHead>Customer</TableHead>
@@ -124,115 +126,111 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map((order) => {
-              const totalItems = order.products?.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0) || 0;
-              
-              return (
-                <React.Fragment key={order.id}>
-                  <TableRow>
-                    <TableCell>
-                      <Checkbox
-                        checked={isOrderSelected(order.id)}
-                        onCheckedChange={(checked) => handleSelectOrder(order.id, checked as boolean)}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-medium">
-                          {order.customer?.first_name} {order.customer?.last_name}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          {order.customer?.email}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>SPL{order.id.slice(0, 6)}</TableCell>
-                    <TableCell>
-                      {new Date(order.created_at).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </TableCell>
-                    <TableCell>{totalItems} items</TableCell>
-                    <TableCell>
-                      <OrderStatusBadge status={order.status} />
-                    </TableCell>
-                    <TableCell>
-                      {formatCurrency(order.total || 0)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => toggleOrderExpansion(order.id)}
-                        >
-                          {expandedOrderId === order.id ? (
-                            <ChevronUp className="h-4 w-4" />
-                          ) : (
-                            <ChevronDown className="h-4 w-4" />
-                          )}
-                        </Button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              disabled={updatingOrderId === order.id}
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="bg-white">
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(order.id, 'pending')}
-                              disabled={updatingOrderId === order.id}
-                            >
-                              Mark as Pending
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(order.id, 'processing')}
-                              disabled={updatingOrderId === order.id}
-                            >
-                              Mark as Processing
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(order.id, 'shipped')}
-                              disabled={updatingOrderId === order.id}
-                            >
-                              Mark as Shipped
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(order.id, 'completed')}
-                              disabled={updatingOrderId === order.id}
-                            >
-                              Mark as Completed
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(order.id, 'canceled')}
-                              disabled={updatingOrderId === order.id}
-                            >
-                              Mark as Canceled
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                  <AnimatePresence>
-                    {expandedOrderId === order.id && (
-                      <TableRow key={`${order.id}-expanded`}>
-                        <TableCell colSpan={8}>
-                          <AdminOrderExpandedDetails order={order} />
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </AnimatePresence>
-                </React.Fragment>
-              );
-            })}
+            {orders.map((order) => (
+              <React.Fragment key={order.id}>
+                <TableRow>
+                  <TableCell>
+                    <Checkbox
+                      checked={isOrderSelected(order.id)}
+                      onCheckedChange={(checked) => handleSelectOrder(order.id, checked as boolean)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <span className="font-medium">
+                        {order.customer?.first_name} {order.customer?.last_name}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        {order.customer?.email}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>SPL{order.id.slice(0, 6)}</TableCell>
+                  <TableCell>
+                    {new Date(order.created_at).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </TableCell>
+                  <TableCell>{order.products?.length || 0} items</TableCell>
+                  <TableCell>
+                    <OrderStatusBadge status={order.status} />
+                  </TableCell>
+                  <TableCell>
+                    {formatCurrency(order.total || 0)}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => toggleOrderExpansion(order.id)}
+                      >
+                        {expandedOrderId === order.id ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            disabled={updatingOrderId === order.id}
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-white">
+                          <DropdownMenuItem 
+                            onClick={() => handleStatusChange(order.id, 'pending')}
+                            disabled={updatingOrderId === order.id}
+                          >
+                            Mark as Pending
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleStatusChange(order.id, 'processing')}
+                            disabled={updatingOrderId === order.id}
+                          >
+                            Mark as Processing
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleStatusChange(order.id, 'shipped')}
+                            disabled={updatingOrderId === order.id}
+                          >
+                            Mark as Shipped
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleStatusChange(order.id, 'completed')}
+                            disabled={updatingOrderId === order.id}
+                          >
+                            Mark as Completed
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleStatusChange(order.id, 'canceled')}
+                            disabled={updatingOrderId === order.id}
+                          >
+                            Mark as Canceled
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableCell>
+                </TableRow>
+                <AnimatePresence>
+                  {expandedOrderId === order.id && (
+                    <TableRow key={`${order.id}-expanded`}>
+                      <TableCell colSpan={8}>
+                        <AdminOrderExpandedDetails order={order} />
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </AnimatePresence>
+              </React.Fragment>
+            ))}
           </TableBody>
         </Table>
       </div>

@@ -21,19 +21,28 @@ export const useOrderSelection = (totalOrders: number) => {
     }
   };
 
-  const handleSelectAll = (checked: boolean) => {
+  const handleSelectAll = (checked: boolean, currentPageOrders: any[]) => {
     if (checked) {
-      setSelectedOrders(orders => orders);
+      if (selectAllPages) {
+        setExcludedOrders([]);
+      } else {
+        const currentPageOrderIds = currentPageOrders.map(order => order.id);
+        setSelectedOrders(currentPageOrderIds);
+      }
     } else {
-      setSelectedOrders([]);
-      setSelectAllPages(false);
-      setExcludedOrders([]);
+      if (selectAllPages) {
+        const currentPageOrderIds = currentPageOrders.map(order => order.id);
+        setExcludedOrders([...excludedOrders, ...currentPageOrderIds]);
+      } else {
+        setSelectedOrders([]);
+      }
     }
   };
 
   const handleSelectAllPages = (checked: boolean) => {
     setSelectAllPages(checked);
     if (checked) {
+      setSelectedOrders([]);
       setExcludedOrders([]);
     } else {
       setSelectedOrders([]);
@@ -41,7 +50,7 @@ export const useOrderSelection = (totalOrders: number) => {
     }
   };
 
-  const getSelectedCount = (ordersInCurrentPage: any[]) => {
+  const getSelectedCount = () => {
     if (selectAllPages) {
       return totalOrders - excludedOrders.length;
     }
