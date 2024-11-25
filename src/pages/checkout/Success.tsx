@@ -32,6 +32,8 @@ const Success = () => {
           .select(`
             *,
             products:sample_request_products(
+              quantity,
+              unit_price,
               product:products(*)
             )
           `)
@@ -40,14 +42,9 @@ const Success = () => {
 
         if (error) throw error;
 
-        // Calculate subtotal from products
-        const subtotal = data.products.reduce((sum: number, item: any) => {
-          return sum + (item.product.from_price || 0);
-        }, 0);
-
         setOrderDetails({
           orderId: data.id,
-          amount: subtotal + (data.shipping_cost || 0),
+          amount: data.total,
           status: data.status,
           products: data.products,
           shippingAddress: {
@@ -62,7 +59,7 @@ const Success = () => {
           },
           paymentIntentId,
           shippingCost: data.shipping_cost || 0,
-          subtotal
+          subtotal: data.subtotal
         });
       } catch (error: any) {
         console.error('Error fetching order details:', error);

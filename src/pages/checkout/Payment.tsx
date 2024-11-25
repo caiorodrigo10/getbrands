@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useShippingCalculation } from "@/hooks/useShippingCalculation";
 import PaymentForm from "@/components/checkout/PaymentForm";
 import PaymentSummary from "@/components/checkout/PaymentSummary";
+import { calculateOrderSubtotal, calculateShippingCost } from "@/lib/orderCalculations";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
 
@@ -24,7 +25,7 @@ const Payment = () => {
     totalItems
   );
 
-  const subtotal = items.reduce((sum, item) => sum + item.from_price * item.quantity, 0);
+  const subtotal = calculateOrderSubtotal(items);
   const total = subtotal + (shippingCost || 0);
 
   useEffect(() => {
@@ -34,7 +35,14 @@ const Payment = () => {
           body: { 
             amount: Math.round(total * 100),
             currency: 'usd',
-            shipping_amount: Math.round(shippingCost * 100)
+            shipping_amount: Math.round(shippingCost * 100),
+            items: items.map(item => ({
+              product_id: item.id,
+              quantity: item.quantity,
+              unit_price: item.from_price
+            })),
+            subtotal: subtotal,
+            total: total
           },
         });
 
@@ -52,10 +60,10 @@ const Payment = () => {
       }
     };
 
-    if (total > 0 && !isLoadingShipping && shippingCost !== undefined) {
+    if (items.length > 0 && !isLoadingShipping) {
       createPaymentIntent();
     }
-  }, [total, toast, isLoadingShipping, shippingCost, subtotal]);
+  }, [items, toast, isLoadingShipping]);
 
   if (!clientSecret || isLoadingShipping) {
     return (

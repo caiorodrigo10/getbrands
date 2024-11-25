@@ -1,5 +1,3 @@
-import { useShippingCalculation } from "@/hooks/useShippingCalculation";
-
 export const calculateOrderSubtotal = (products: Array<any>) => {
   return products.reduce((total, item) => {
     const price = item.product?.from_price || 0;
@@ -8,9 +6,8 @@ export const calculateOrderSubtotal = (products: Array<any>) => {
   }, 0);
 };
 
-// Esta função só deve ser usada para cálculos em tempo real (carrinho/checkout)
 export const calculateShippingCost = (products: Array<any>) => {
-  const totalItems = products.length;
+  const totalItems = products.reduce((sum, item) => sum + (item.quantity || 1), 0);
   
   if (totalItems <= 3) {
     return 10.00;
@@ -24,7 +21,6 @@ export const calculateShippingCost = (products: Array<any>) => {
 
 export const calculateOrderTotal = (products: Array<any>, historicalShippingCost?: number) => {
   const subtotal = calculateOrderSubtotal(products);
-  // Se tiver um valor histórico de frete, use-o
   const shipping = historicalShippingCost ?? calculateShippingCost(products);
   return subtotal + shipping;
 };

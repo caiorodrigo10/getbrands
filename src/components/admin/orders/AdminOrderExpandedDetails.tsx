@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { calculateOrderSubtotal } from "@/lib/orderCalculations";
 
 interface AdminOrderExpandedDetailsProps {
   order: {
@@ -16,10 +15,11 @@ interface AdminOrderExpandedDetailsProps {
     shipping_state: string;
     shipping_zip: string;
     products: Array<{
+      quantity: number;
+      unit_price: number;
       product: {
         name: string;
         id: string;
-        from_price: number;
         image_url: string | null;
       };
     }>;
@@ -32,6 +32,8 @@ interface AdminOrderExpandedDetailsProps {
       email: string;
     };
     shipping_cost?: number;
+    subtotal: number;
+    total: number;
   };
 }
 
@@ -61,10 +63,6 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
       });
     }
   };
-
-  const subtotal = calculateOrderSubtotal(order.products);
-  const shippingCost = order.shipping_cost || 0;
-  const total = subtotal + shippingCost;
 
   return (
     <motion.div
@@ -99,7 +97,7 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
             <h4 className="font-semibold text-lg mb-4">Order Details</h4>
             <Card className="p-4">
               <div className="space-y-4">
-                {order.products.map(({ product }) => (
+                {order.products.map(({ product, quantity, unit_price }) => (
                   <div key={product.id} className="flex items-start gap-3">
                     <img
                       src={product.image_url || "/placeholder.svg"}
@@ -112,7 +110,7 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
                         SKU: {product.id.slice(0, 8)}
                       </p>
                       <p className="text-sm font-medium mt-1">
-                        {formatCurrency(product.from_price)}
+                        {quantity}x {formatCurrency(unit_price)}
                       </p>
                     </div>
                   </div>
@@ -121,15 +119,15 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
                 <div className="pt-4 border-t space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Subtotal:</span>
-                    <span>{formatCurrency(subtotal)}</span>
+                    <span>{formatCurrency(order.subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Shipping:</span>
-                    <span>{formatCurrency(shippingCost)}</span>
+                    <span>{formatCurrency(order.shipping_cost || 0)}</span>
                   </div>
                   <div className="flex justify-between font-medium pt-2 border-t">
                     <span>Total:</span>
-                    <span>{formatCurrency(total)}</span>
+                    <span>{formatCurrency(order.total)}</span>
                   </div>
                 </div>
               </div>

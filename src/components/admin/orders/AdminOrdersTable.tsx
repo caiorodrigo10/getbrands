@@ -10,7 +10,6 @@ import OrderStatusBadge from "@/components/sample-orders/OrderStatusBadge";
 import AdminOrderExpandedDetails from "./AdminOrderExpandedDetails";
 import { formatCurrency } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { calculateOrderSubtotal } from "@/lib/orderCalculations";
 
 interface AdminOrdersTableProps {
   orders: any[];
@@ -85,8 +84,7 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
         </TableHeader>
         <TableBody>
           {orders.map((order) => {
-            const subtotal = calculateOrderSubtotal(order.products || []);
-            const total = subtotal + (order.shipping_cost || 0);
+            const totalItems = order.products?.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0) || 0;
             
             return (
               <React.Fragment key={order.id}>
@@ -123,12 +121,12 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
                       minute: "2-digit",
                     })}
                   </TableCell>
-                  <TableCell>{order.products?.length || 0} items</TableCell>
+                  <TableCell>{totalItems} items</TableCell>
                   <TableCell>
                     <OrderStatusBadge status={order.status} />
                   </TableCell>
                   <TableCell>
-                    {formatCurrency(total)}
+                    {formatCurrency(order.total || 0)}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
