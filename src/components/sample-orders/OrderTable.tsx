@@ -3,12 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Package, Truck, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import OrderStatusBadge from "./OrderStatusBadge";
 import OrderExpandedDetails from "./OrderExpandedDetails";
 import { formatCurrency } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { calculateOrderTotal } from "@/lib/orderCalculations";
 
 interface OrderTableProps {
   orders: any[];
@@ -16,24 +15,8 @@ interface OrderTableProps {
 }
 
 const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
-  const { toast } = useToast();
-  const [isDeleting, setIsDeleting] = useState(false);
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
-  const [updatingStatus, setUpdatingStatus] = useState(false);
-
-  const calculateOrderTotal = (order: any) => {
-    const products = order.products || [];
-    const subtotal = products.reduce((total: number, product: any) => {
-      return total + (product.from_price * (product.quantity || 1));
-    }, 0);
-    
-    const totalItems = products.reduce((sum: number, product: any) => 
-      sum + (product.quantity || 1), 0);
-    const shippingCost = 4.50 + Math.max(0, totalItems - 1) * 2;
-    
-    return subtotal + shippingCost;
-  };
 
   const toggleOrderExpansion = (orderId: string) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
@@ -102,7 +85,7 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
                     <OrderStatusBadge status={order.status} />
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
-                    {formatCurrency(calculateOrderTotal(order))}
+                    {formatCurrency(calculateOrderTotal(order.products || []))}
                   </TableCell>
                 </TableRow>
                 <AnimatePresence>

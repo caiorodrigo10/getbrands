@@ -10,6 +10,7 @@ import OrderStatusBadge from "@/components/sample-orders/OrderStatusBadge";
 import AdminOrderExpandedDetails from "./AdminOrderExpandedDetails";
 import { formatCurrency } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { calculateOrderTotal } from "@/lib/orderCalculations";
 
 interface AdminOrdersTableProps {
   orders: any[];
@@ -22,7 +23,7 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
-    if (updatingOrderId) return; // Prevent multiple simultaneous updates
+    if (updatingOrderId) return;
 
     try {
       setUpdatingOrderId(orderId);
@@ -37,7 +38,6 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
 
       if (error) throw error;
 
-      // Force a refetch of the orders data
       await queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
 
       toast({
@@ -124,8 +124,7 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
                   <OrderStatusBadge status={order.status} />
                 </TableCell>
                 <TableCell>
-                  {formatCurrency(order.products?.reduce((total: number, item: any) => 
-                    total + (item.product.from_price || 0), 0) || 0)}
+                  {formatCurrency(calculateOrderTotal(order.products || []))}
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>
