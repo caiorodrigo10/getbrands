@@ -110,7 +110,7 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
                         SKU: {product.id.slice(0, 8)}
                       </p>
                       <p className="text-sm font-medium mt-1">
-                        {quantity}x {formatCurrency(unit_price)}
+                        {quantity || 1}x {formatCurrency(unit_price || 0)}
                       </p>
                     </div>
                   </div>
