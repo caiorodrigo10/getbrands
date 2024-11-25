@@ -24,8 +24,14 @@ export const useDeleteOrders = () => {
 
       if (ordersError) throw ordersError;
 
-      queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+      // Invalidate queries to refresh the orders list
+      await queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
       
+      toast({
+        title: "Success",
+        description: `Successfully deleted ${selectedOrders.length} order(s)`,
+      });
+
       return true;
     } catch (error) {
       console.error('Delete error:', error);
