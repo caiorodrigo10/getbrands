@@ -82,6 +82,8 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
       setShowDeleteDialog(false);
       // Clear selection after successful deletion
       handleSelectAll(false, []);
+      // Refetch orders to update the list
+      queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
     }
   };
 
@@ -110,118 +112,22 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
 
       <div className="rounded-md border">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50px]">
-                <Checkbox
-                  checked={orders.every(order => isOrderSelected(order.id))}
-                  onCheckedChange={(checked) => handleSelectAll(checked as boolean, orders)}
-                />
-              </TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Order Number</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Items</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead className="w-12"></TableHead>
-            </TableRow>
-          </TableHeader>
+          <OrderTableHeader 
+            onSelectAll={handleSelectAll} 
+            allSelected={orders.every(order => isOrderSelected(order.id))}
+          />
           <TableBody>
             {orders.map((order) => (
               <React.Fragment key={order.id}>
-                <TableRow>
-                  <TableCell>
-                    <Checkbox
-                      checked={isOrderSelected(order.id)}
-                      onCheckedChange={(checked) => handleSelectOrder(order.id, checked as boolean)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-medium">
-                        {order.customer?.first_name} {order.customer?.last_name}
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        {order.customer?.email}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>SPL{order.id.slice(0, 6)}</TableCell>
-                  <TableCell>
-                    {new Date(order.created_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </TableCell>
-                  <TableCell>{order.products?.length || 0} items</TableCell>
-                  <TableCell>
-                    <OrderStatusBadge status={order.status} />
-                  </TableCell>
-                  <TableCell>
-                    {formatCurrency(order.total || 0)}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => toggleOrderExpansion(order.id)}
-                      >
-                        {expandedOrderId === order.id ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="icon"
-                            disabled={updatingOrderId === order.id}
-                          >
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-white">
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusChange(order.id, 'pending')}
-                            disabled={updatingOrderId === order.id}
-                          >
-                            Mark as Pending
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusChange(order.id, 'processing')}
-                            disabled={updatingOrderId === order.id}
-                          >
-                            Mark as Processing
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusChange(order.id, 'shipped')}
-                            disabled={updatingOrderId === order.id}
-                          >
-                            Mark as Shipped
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusChange(order.id, 'completed')}
-                            disabled={updatingOrderId === order.id}
-                          >
-                            Mark as Completed
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusChange(order.id, 'canceled')}
-                            disabled={updatingOrderId === order.id}
-                          >
-                            Mark as Canceled
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <OrderTableRow
+                  order={order}
+                  isSelected={isOrderSelected(order.id)}
+                  onSelect={(checked) => handleSelectOrder(order.id, checked)}
+                  isExpanded={expandedOrderId === order.id}
+                  onToggleExpand={() => toggleOrderExpansion(order.id)}
+                  onStatusChange={handleStatusChange}
+                  isUpdating={updatingOrderId === order.id}
+                />
                 <AnimatePresence>
                   {expandedOrderId === order.id && (
                     <TableRow key={`${order.id}-expanded`}>
