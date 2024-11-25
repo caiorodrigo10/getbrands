@@ -47,11 +47,15 @@ export const trackCheckoutCompleted = (
   shippingCost: number,
   customerEmail?: string
 ) => {
+  // Calculate the correct revenue from items
+  const subtotal = items.reduce((sum, item) => sum + (item.from_price * item.quantity), 0);
+  const totalRevenue = subtotal + shippingCost;
+
   const orderData: OrderData = {
     order_id: orderId,
-    revenue: total,
+    revenue: totalRevenue, // Use the correct total including shipping
     currency: "USD",
-    payment_method: "credit_card", // Always set to credit_card as requested
+    payment_method: "credit_card",
     products: items.map(item => ({
       product_id: item.id,
       sku: item.id,
@@ -59,6 +63,7 @@ export const trackCheckoutCompleted = (
       price: item.from_price,
       quantity: item.quantity,
       category: item.category,
+      revenue: item.from_price * item.quantity // Add individual product revenue
     })),
     customer: {
       email: customerEmail,
