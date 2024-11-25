@@ -5,8 +5,16 @@ import { Input } from "@/components/ui/input";
 import AdminOrdersTable from "@/components/admin/orders/AdminOrdersTable";
 import { Skeleton } from "@/components/ui/skeleton";
 import OrderStatusFilters from "@/components/sample-orders/OrderStatusFilters";
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from "@/components/ui/pagination";
 
-const ITEMS_PER_PAGE = 15;
+const ITEMS_PER_PAGE = 10; // Changed from 15 to 10
 
 const AdminOrders = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -116,6 +124,40 @@ const AdminOrders = () => {
         orders={filteredOrders || []} 
         totalOrders={ordersData?.totalCount}
       />
+
+      {ordersData?.totalPages && ordersData.totalPages > 1 && (
+        <div className="flex justify-center mt-6">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+              
+              {Array.from({ length: ordersData.totalPages }, (_, i) => i + 1).map((page) => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(page)}
+                    isActive={currentPage === page}
+                    className="cursor-pointer"
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => setCurrentPage(Math.min(ordersData.totalPages, currentPage + 1))}
+                  className={currentPage === ordersData.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 };
