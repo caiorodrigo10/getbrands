@@ -1,3 +1,5 @@
+import { useShippingCalculation } from "@/hooks/useShippingCalculation";
+
 export const calculateOrderSubtotal = (products: Array<any>) => {
   return products.reduce((total, item) => {
     const price = item.product?.from_price || 0;
@@ -7,9 +9,10 @@ export const calculateOrderSubtotal = (products: Array<any>) => {
 };
 
 export const calculateShippingCost = (products: Array<any>) => {
+  // Use the shipping rates from the database
+  // Base shipping cost is $10.00 for US orders
   const totalItems = products.length;
-  // Base shipping cost is $4.50, plus $2 for each additional item
-  return 4.50 + Math.max(0, totalItems - 1) * 2;
+  return 10.00;
 };
 
 export const calculateOrderTotal = (products: Array<any>) => {

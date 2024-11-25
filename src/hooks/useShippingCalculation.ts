@@ -28,13 +28,13 @@ export const useShippingCalculation = (country: string, totalItems: number) => {
           (rate.max_items === null || totalItems <= rate.max_items)
       );
 
-      if (!applicableRate) return 0;
+      if (!applicableRate) return 10.00; // Default base rate for US
 
       let shippingCost = applicableRate.base_rate;
 
-      // For 6 or more items, add the additional cost per item above 5
-      if (applicableRate.additional_rate_per_item && totalItems > 5) {
-        const additionalItems = totalItems - 5;
+      // For additional items, add the additional cost per item if applicable
+      if (applicableRate.additional_rate_per_item && totalItems > applicableRate.min_items) {
+        const additionalItems = totalItems - applicableRate.min_items;
         shippingCost += additionalItems * applicableRate.additional_rate_per_item;
       }
 
