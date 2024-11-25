@@ -27,7 +27,7 @@ export const useDeleteOrders = () => {
       // Immediately invalidate and refetch queries to refresh the orders list
       await queryClient.invalidateQueries({ 
         queryKey: ["admin-orders"],
-        refetchType: 'all'
+        exact: true
       });
       
       toast({

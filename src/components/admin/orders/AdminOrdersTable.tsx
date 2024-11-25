@@ -80,6 +80,8 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
     const success = await deleteOrders(selectedIds);
     if (success) {
       setShowDeleteDialog(false);
+      // Clear selection after successful deletion
+      handleSelectAll(false, []);
     }
   };
 
