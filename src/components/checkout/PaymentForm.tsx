@@ -39,6 +39,8 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
     const lastName = localStorage.getItem('lastName') || '';
     const phone = localStorage.getItem('phone') || '';
 
+    const subtotal = items.reduce((sum, item) => sum + (item.from_price * (item.quantity || 1)), 0);
+
     const { data: sampleRequest, error: sampleRequestError } = await supabase
       .from('sample_requests')
       .insert({
@@ -50,7 +52,10 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         shipping_zip: shippingZip,
         first_name: firstName,
         last_name: lastName,
-        payment_method: 'credit_card'
+        payment_method: 'credit_card',
+        shipping_cost: shippingCost,
+        subtotal: subtotal,
+        total: total
       })
       .select()
       .single();
@@ -60,6 +65,8 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
     const sampleRequestProducts = items.map(item => ({
       sample_request_id: sampleRequest.id,
       product_id: item.id,
+      quantity: item.quantity || 1,
+      unit_price: item.from_price
     }));
 
     const { error: productsError } = await supabase

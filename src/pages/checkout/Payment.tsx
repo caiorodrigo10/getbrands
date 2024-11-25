@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useShippingCalculation } from "@/hooks/useShippingCalculation";
 import PaymentForm from "@/components/checkout/PaymentForm";
 import PaymentSummary from "@/components/checkout/PaymentSummary";
-import { calculateOrderSubtotal, calculateShippingCost } from "@/lib/orderCalculations";
+import { calculateOrderSubtotal } from "@/lib/orderCalculations";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
 
@@ -18,14 +18,14 @@ const Payment = () => {
   const { toast } = useToast();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [selectedCountry] = useState("USA");
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
   
   const { data: shippingCost = 0, isLoading: isLoadingShipping } = useShippingCalculation(
     selectedCountry,
     totalItems
   );
 
-  const subtotal = calculateOrderSubtotal(items);
+  const subtotal = items.reduce((sum, item) => sum + (item.from_price * (item.quantity || 1)), 0);
   const total = subtotal + (shippingCost || 0);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const Payment = () => {
             shipping_amount: Math.round(shippingCost * 100),
             items: items.map(item => ({
               product_id: item.id,
-              quantity: item.quantity,
+              quantity: item.quantity || 1,
               unit_price: item.from_price
             })),
             subtotal: subtotal,
@@ -63,7 +63,7 @@ const Payment = () => {
     if (items.length > 0 && !isLoadingShipping) {
       createPaymentIntent();
     }
-  }, [items, toast, isLoadingShipping]);
+  }, [items, toast, isLoadingShipping, total, shippingCost, subtotal]);
 
   if (!clientSecret || isLoadingShipping) {
     return (
