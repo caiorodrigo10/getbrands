@@ -32,6 +32,7 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
     handleSelectAllPages,
     getSelectedCount,
     isOrderSelected,
+    selectedOrders
   } = useOrderSelection(totalOrders);
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
@@ -75,7 +76,7 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
     if (success) {
       setShowDeleteDialog(false);
       handleSelectAll(false, []);
-      queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+      await queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
     }
   };
 
