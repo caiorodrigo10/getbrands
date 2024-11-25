@@ -54,6 +54,7 @@ const AdminOrders = () => {
       return {
         data,
         totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE),
+        totalCount: count || 0,
         currentPage
       };
     },
@@ -111,7 +112,10 @@ const AdminOrders = () => {
         </div>
       </div>
 
-      <AdminOrdersTable orders={filteredOrders || []} />
+      <AdminOrdersTable 
+        orders={filteredOrders || []} 
+        totalOrders={ordersData?.totalCount}
+      />
     </div>
   );
 };
