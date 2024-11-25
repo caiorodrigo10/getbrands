@@ -1007,6 +1007,7 @@ export type Database = {
           product_id: string | null
           shipping_address: string | null
           shipping_city: string | null
+          shipping_cost: number | null
           shipping_state: string | null
           shipping_zip: string | null
           status: string | null
@@ -1027,6 +1028,7 @@ export type Database = {
           product_id?: string | null
           shipping_address?: string | null
           shipping_city?: string | null
+          shipping_cost?: number | null
           shipping_state?: string | null
           shipping_zip?: string | null
           status?: string | null
@@ -1047,6 +1049,7 @@ export type Database = {
           product_id?: string | null
           shipping_address?: string | null
           shipping_city?: string | null
+          shipping_cost?: number | null
           shipping_state?: string | null
           shipping_zip?: string | null
           status?: string | null

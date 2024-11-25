@@ -86,7 +86,6 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
         <TableBody>
           {orders.map((order) => {
             const subtotal = calculateOrderSubtotal(order.products || []);
-            // Usar o shipping_cost armazenado ou calcular baseado nas regras antigas se não existir
             const total = subtotal + (order.shipping_cost || 0);
             
             return (
