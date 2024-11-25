@@ -13,7 +13,7 @@ interface OrderTableRowProps {
   onSelect: (checked: boolean) => void;
   isExpanded: boolean;
   onToggleExpand: () => void;
-  onStatusChange: (orderId: string, status: string) => void;
+  onStatusChange: (status: string) => void;
   isUpdating: boolean;
 }
 
@@ -85,31 +85,31 @@ export const OrderTableRow = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-white">
               <DropdownMenuItem 
-                onClick={() => onStatusChange(order.id, 'pending')}
+                onClick={() => onStatusChange('pending')}
                 disabled={isUpdating}
               >
                 Mark as Pending
               </DropdownMenuItem>
               <DropdownMenuItem 
-                onClick={() => onStatusChange(order.id, 'processing')}
+                onClick={() => onStatusChange('processing')}
                 disabled={isUpdating}
               >
                 Mark as Processing
               </DropdownMenuItem>
               <DropdownMenuItem 
-                onClick={() => onStatusChange(order.id, 'shipped')}
+                onClick={() => onStatusChange('shipped')}
                 disabled={isUpdating}
               >
                 Mark as Shipped
               </DropdownMenuItem>
               <DropdownMenuItem 
-                onClick={() => onStatusChange(order.id, 'completed')}
+                onClick={() => onStatusChange('completed')}
                 disabled={isUpdating}
               >
                 Mark as Completed
               </DropdownMenuItem>
               <DropdownMenuItem 
-                onClick={() => onStatusChange(order.id, 'canceled')}
+                onClick={() => onStatusChange('canceled')}
                 disabled={isUpdating}
               >
                 Mark as Canceled

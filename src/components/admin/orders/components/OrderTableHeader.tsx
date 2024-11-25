@@ -3,7 +3,7 @@ import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface OrderTableHeaderProps {
-  onSelectAll: (checked: boolean, currentPageOrders: any[]) => void;
+  onSelectAll: (checked: boolean) => void;
   allSelected: boolean;
   orders: any[];
 }
@@ -15,7 +15,7 @@ export const OrderTableHeader = ({ onSelectAll, allSelected, orders }: OrderTabl
         <TableHead className="w-[50px]">
           <Checkbox
             checked={allSelected}
-            onCheckedChange={(checked) => onSelectAll(checked as boolean, orders)}
+            onCheckedChange={(checked) => onSelectAll(checked as boolean)}
           />
         </TableHead>
         <TableHead>Customer</TableHead>

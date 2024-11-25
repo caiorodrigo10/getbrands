@@ -105,7 +105,7 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
       <div className="rounded-md border">
         <Table>
           <OrderTableHeader 
-            onSelectAll={handleSelectAll}
+            onSelectAll={(checked) => handleSelectAll(checked, orders)}
             allSelected={orders.every(order => isOrderSelected(order.id))}
             orders={orders}
           />
@@ -118,7 +118,7 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
                   onSelect={(checked) => handleSelectOrder(order.id, checked)}
                   isExpanded={expandedOrderId === order.id}
                   onToggleExpand={() => toggleOrderExpansion(order.id)}
-                  onStatusChange={handleStatusChange}
+                  onStatusChange={(status) => handleStatusChange(order.id, status)}
                   isUpdating={updatingOrderId === order.id}
                 />
                 <AnimatePresence>
