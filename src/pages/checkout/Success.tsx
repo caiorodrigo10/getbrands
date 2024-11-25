@@ -14,25 +14,37 @@ const Success = () => {
   const [orderDetails, setOrderDetails] = useState<any>(null);
   const [showConfetti, setShowConfetti] = useState(true);
   const { toast } = useToast();
-  const sessionId = searchParams.get("session_id");
+  const orderId = searchParams.get("order_id");
+  const paymentIntentId = searchParams.get("payment_intent");
 
   useEffect(() => {
     const getOrderDetails = async () => {
-      if (!sessionId) {
+      if (!orderId) {
         setIsLoading(false);
         return;
       }
 
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        const { data, error } = await supabase.functions.invoke('get-order-details', {
-          body: { sessionId }
-        });
+        const { data, error } = await supabase
+          .from('sample_requests')
+          .select(`
+            *,
+            products:sample_request_products(
+              product:products(*)
+            )
+          `)
+          .eq('id', orderId)
+          .single();
 
         if (error) throw error;
 
-        setOrderDetails(data);
+        setOrderDetails({
+          orderId: data.id,
+          amount: data.total || 0,
+          status: data.status,
+          products: data.products,
+          paymentIntentId
+        });
       } catch (error: any) {
         console.error('Error fetching order details:', error);
         toast({
@@ -50,7 +62,7 @@ const Success = () => {
     // Cleanup confetti after 5 seconds
     const timer = setTimeout(() => setShowConfetti(false), 5000);
     return () => clearTimeout(timer);
-  }, [sessionId, toast]);
+  }, [orderId, paymentIntentId, toast]);
 
   if (isLoading) {
     return (
@@ -67,7 +79,7 @@ const Success = () => {
     );
   }
 
-  if (!sessionId || !orderDetails) {
+  if (!orderId || !orderDetails) {
     return (
       <div className="min-h-screen bg-background">
         <NavigationMenu />
@@ -110,7 +122,9 @@ const Success = () => {
               <div className="space-y-4">
                 <div className="text-sm text-green-600">
                   <p>Order ID: {orderDetails.orderId}</p>
-                  <p>Amount Paid: ${(orderDetails.amount / 100).toFixed(2)}</p>
+                  {orderDetails.products && (
+                    <p>Items: {orderDetails.products.length}</p>
+                  )}
                 </div>
               </div>
             </CardContent>

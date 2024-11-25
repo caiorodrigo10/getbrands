@@ -50,7 +50,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         shipping_zip: shippingZip,
         first_name: firstName,
         last_name: lastName,
-        payment_method: 'credit_card' // Adding payment method
+        payment_method: 'credit_card'
       })
       .select()
       .single();
@@ -83,7 +83,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
     try {
       const orderId = await createSampleRequest();
 
-      const { error: paymentError } = await stripe.confirmPayment({
+      const { error: paymentError, paymentIntent } = await stripe.confirmPayment({
         elements,
         redirect: 'if_required',
         confirmParams: {
@@ -101,6 +101,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
               },
             },
           },
+          return_url: `${window.location.origin}/checkout/success`,
         },
       });
 
@@ -127,7 +128,9 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
       );
 
       clearCart();
-      navigate('/checkout/success');
+      
+      // Navigate with both orderId and payment intent ID
+      navigate(`/checkout/success?order_id=${orderId}&payment_intent=${paymentIntent?.id}`);
 
     } catch (error) {
       console.error("Payment error:", error);
