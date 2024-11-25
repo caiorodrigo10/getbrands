@@ -8,7 +8,7 @@ interface FunnelData {
   percentage: number;
 }
 
-export const SalesFunnel = () => {
+const SalesFunnel = () => {
   const { data: funnelData, isLoading } = useQuery({
     queryKey: ["sales-funnel"],
     queryFn: async () => {
@@ -130,3 +130,5 @@ export const SalesFunnel = () => {
     </Card>
   );
 };
+
+export default SalesFunnel;
