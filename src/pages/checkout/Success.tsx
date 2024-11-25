@@ -38,9 +38,17 @@ const Success = () => {
 
         if (error) throw error;
 
+        // Calculate total from products
+        const total = data.products.reduce((sum: number, item: any) => {
+          return sum + (item.product.from_price || 0);
+        }, 0);
+
+        // Calculate shipping based on number of items
+        const shippingCost = 4.50 + Math.max(0, data.products.length - 1) * 2;
+
         setOrderDetails({
           orderId: data.id,
-          amount: data.total || 0,
+          amount: total + shippingCost,
           status: data.status,
           products: data.products,
           paymentIntentId
