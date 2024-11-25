@@ -7,7 +7,7 @@ import OrderStatusBadge from "./OrderStatusBadge";
 import OrderExpandedDetails from "./OrderExpandedDetails";
 import { formatCurrency } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { calculateOrderTotal } from "@/lib/orderCalculations";
+import { calculateOrderSubtotal, calculateShippingCost } from "@/lib/orderCalculations";
 
 interface OrderTableProps {
   orders: any[];
@@ -20,6 +20,12 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
 
   const toggleOrderExpansion = (orderId: string) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
+  };
+
+  const calculateTotal = (order: any) => {
+    const subtotal = calculateOrderSubtotal(order.products || []);
+    const shipping = calculateShippingCost(order.products || []);
+    return subtotal + shipping;
   };
 
   return (
@@ -85,7 +91,7 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
                     <OrderStatusBadge status={order.status} />
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
-                    {formatCurrency(calculateOrderTotal(order.products || []))}
+                    {formatCurrency(calculateTotal(order))}
                   </TableCell>
                 </TableRow>
                 <AnimatePresence>
