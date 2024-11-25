@@ -97,20 +97,20 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
             <h4 className="font-semibold text-lg mb-4">Order Details</h4>
             <Card className="p-4">
               <div className="space-y-4">
-                {order.products.map(({ product, quantity, unit_price }) => (
-                  <div key={product.id} className="flex items-start gap-3">
+                {order.products.map((item) => (
+                  <div key={item.product.id} className="flex items-start gap-3">
                     <img
-                      src={product.image_url || "/placeholder.svg"}
-                      alt={product.name}
+                      src={item.product.image_url || "/placeholder.svg"}
+                      alt={item.product.name}
                       className="w-16 h-16 object-cover rounded-md"
                     />
                     <div>
-                      <h5 className="font-medium">{product.name}</h5>
+                      <h5 className="font-medium">{item.product.name}</h5>
                       <p className="text-sm text-muted-foreground">
-                        SKU: {product.id.slice(0, 8)}
+                        SKU: {item.product.id.slice(0, 8)}
                       </p>
                       <p className="text-sm font-medium mt-1">
-                        {quantity || 1}x {formatCurrency(unit_price || 0)}
+                        {item.quantity}x {formatCurrency(item.unit_price)}
                       </p>
                     </div>
                   </div>
