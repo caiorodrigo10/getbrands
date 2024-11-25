@@ -3,10 +3,11 @@ import { useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu } from "@/components/NavigationMenu";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Package, Truck } from "lucide-react";
 import Confetti from "react-confetti";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { formatCurrency } from "@/lib/utils";
 
 const Success = () => {
   const [searchParams] = useSearchParams();
@@ -51,7 +52,19 @@ const Success = () => {
           amount: total + shippingCost,
           status: data.status,
           products: data.products,
-          paymentIntentId
+          shippingAddress: {
+            address: data.shipping_address,
+            city: data.shipping_city,
+            state: data.shipping_state,
+            zip: data.shipping_zip
+          },
+          customer: {
+            firstName: data.first_name,
+            lastName: data.last_name
+          },
+          paymentIntentId,
+          shippingCost,
+          subtotal: total
         });
       } catch (error: any) {
         console.error('Error fetching order details:', error);
@@ -117,8 +130,8 @@ const Success = () => {
       {showConfetti && <Confetti />}
       <NavigationMenu />
       <main className="md:pl-64 w-full">
-        <div className="max-w-3xl mx-auto px-4 py-8">
-          <Card className="mb-8 border-green-200 bg-green-50">
+        <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+          <Card className="border-green-200 bg-green-50">
             <CardHeader className="text-center pb-6">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
               <CardTitle className="text-2xl text-green-700">Order Confirmed!</CardTitle>
@@ -126,14 +139,81 @@ const Success = () => {
                 Thank you for your order. We've received your payment and will process your order shortly.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="text-sm text-green-600">
-                  <p>Order ID: {orderDetails.orderId}</p>
-                  {orderDetails.products && (
-                    <p>Items: {orderDetails.products.length}</p>
-                  )}
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Order Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <h4 className="font-medium mb-2">Customer Information</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {orderDetails.customer.firstName} {orderDetails.customer.lastName}
+                  </p>
                 </div>
+                <div>
+                  <h4 className="font-medium mb-2">Shipping Address</h4>
+                  <div className="text-sm text-muted-foreground">
+                    <p>{orderDetails.shippingAddress.address}</p>
+                    <p>
+                      {orderDetails.shippingAddress.city}, {orderDetails.shippingAddress.state}{" "}
+                      {orderDetails.shippingAddress.zip}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-medium mb-4">Order Summary</h4>
+                <div className="space-y-4">
+                  {orderDetails.products.map((item: any) => (
+                    <div key={item.product.id} className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg">
+                      <div className="h-16 w-16 rounded-md overflow-hidden flex-shrink-0">
+                        <img
+                          src={item.product.image_url || "/placeholder.svg"}
+                          alt={item.product.name}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <h5 className="font-medium">{item.product.name}</h5>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {formatCurrency(item.product.from_price)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>{formatCurrency(orderDetails.subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Shipping</span>
+                    <span>{formatCurrency(orderDetails.shippingCost)}</span>
+                  </div>
+                  <div className="flex justify-between font-medium pt-4 border-t">
+                    <span>Total</span>
+                    <span>{formatCurrency(orderDetails.amount)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center pt-6 border-t">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Package className="h-4 w-4" />
+                  <span>Order #{orderDetails.orderId.slice(0, 8)}</span>
+                </div>
+                {orderDetails.status === 'shipped' && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Truck className="h-4 w-4" />
+                    <span>Tracking: {orderDetails.trackingNumber}</span>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
