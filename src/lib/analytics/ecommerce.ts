@@ -19,7 +19,10 @@ export const trackCheckoutStep = (
   items: CartItem[],
   additionalData?: Record<string, any>
 ) => {
-  const total = items.reduce((sum, item) => sum + (item.from_price * item.quantity), 0);
+  const subtotal = items.reduce((sum, item) => sum + (item.from_price * item.quantity), 0);
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const shippingCost = 4.50 + Math.max(0, totalItems - 1) * 2;
+  const total = subtotal + shippingCost;
   
   trackEvent("Checkout Step Viewed", {
     step_number: step,
@@ -32,7 +35,9 @@ export const trackCheckoutStep = (
       quantity: item.quantity,
     })),
     total_items: items.length,
-    total_quantity: items.reduce((sum, item) => sum + item.quantity, 0),
+    total_quantity: totalItems,
+    subtotal: subtotal,
+    shipping_cost: shippingCost,
     revenue: total,
     currency: "USD",
     ...additionalData
@@ -78,6 +83,7 @@ export const trackCheckoutCompleted = (
     total_items: items.length,
     total_quantity: items.reduce((sum, item) => sum + item.quantity, 0),
     shipping_cost: shippingCost,
+    subtotal: subtotal,
     shipping_address: {
       address: shippingAddress.address1,
       address2: shippingAddress.address2,
