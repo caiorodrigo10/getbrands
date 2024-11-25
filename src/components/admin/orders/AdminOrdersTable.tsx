@@ -1,22 +1,16 @@
 import React, { useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreVertical, ChevronDown, ChevronUp } from "lucide-react";
-import { AnimatePresence } from "framer-motion";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import OrderStatusBadge from "@/components/sample-orders/OrderStatusBadge";
-import AdminOrderExpandedDetails from "./AdminOrderExpandedDetails";
-import { formatCurrency } from "@/lib/utils";
+import { AnimatePresence } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
-import { Checkbox } from "@/components/ui/checkbox";
 import { OrderSelectionBar } from "./OrderSelectionBar";
 import { DeleteConfirmationDialog } from "../catalog/DeleteConfirmationDialog";
 import { useDeleteOrders } from "./hooks/useDeleteOrders";
 import { useOrderSelection } from "./hooks/useOrderSelection";
 import { OrderTableHeader } from "./components/OrderTableHeader";
 import { OrderTableRow } from "./components/OrderTableRow";
+import AdminOrderExpandedDetails from "./AdminOrderExpandedDetails";
 
 interface AdminOrdersTableProps {
   orders: any[];
@@ -80,9 +74,7 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
     const success = await deleteOrders(selectedIds);
     if (success) {
       setShowDeleteDialog(false);
-      // Clear selection after successful deletion
       handleSelectAll(false, []);
-      // Refetch orders to update the list
       queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
     }
   };
@@ -113,8 +105,9 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
       <div className="rounded-md border">
         <Table>
           <OrderTableHeader 
-            onSelectAll={handleSelectAll} 
+            onSelectAll={handleSelectAll}
             allSelected={orders.every(order => isOrderSelected(order.id))}
+            orders={orders}
           />
           <TableBody>
             {orders.map((order) => (
