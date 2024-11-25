@@ -17,10 +17,10 @@ import { useDeleteOrders } from "./hooks/useDeleteOrders";
 
 interface AdminOrdersTableProps {
   orders: any[];
-  totalOrders?: number;
+  totalOrders: number;
 }
 
-const AdminOrdersTable = ({ orders, totalOrders = 0 }: AdminOrdersTableProps) => {
+const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
