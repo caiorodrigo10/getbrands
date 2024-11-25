@@ -7,7 +7,7 @@ import OrderStatusBadge from "./OrderStatusBadge";
 import OrderExpandedDetails from "./OrderExpandedDetails";
 import { formatCurrency } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { calculateOrderSubtotal, calculateShippingCost, calculateOrderTotal } from "@/lib/orderCalculations";
+import { calculateOrderSubtotal } from "@/lib/orderCalculations";
 
 interface OrderTableProps {
   orders: any[];
@@ -39,66 +39,71 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders?.map((order) => (
-              <>
-                <TableRow key={order.id}>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => toggleOrderExpansion(order.id)}
-                    >
-                      {expandedOrderId === order.id ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2 whitespace-nowrap">
-                      <Package className="h-4 w-4 flex-shrink-0" />
-                      <span>SAMPLE ORDER</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">SPL{order.id.slice(0, 6)}</TableCell>
-                  <TableCell className="whitespace-nowrap">
-                    {new Date(order.created_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">{order.products?.length || 0} items</TableCell>
-                  <TableCell>
-                    {order.tracking_number ? (
+            {orders?.map((order) => {
+              const subtotal = calculateOrderSubtotal(order.products || []);
+              const total = subtotal + (order.shipping_cost || 0);
+
+              return (
+                <>
+                  <TableRow key={order.id}>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => toggleOrderExpansion(order.id)}
+                      >
+                        {expandedOrderId === order.id ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </TableCell>
+                    <TableCell>
                       <div className="flex items-center gap-2 whitespace-nowrap">
-                        <Truck className="h-4 w-4 flex-shrink-0" />
-                        <span>{order.tracking_number}</span>
+                        <Package className="h-4 w-4 flex-shrink-0" />
+                        <span>SAMPLE ORDER</span>
                       </div>
-                    ) : (
-                      "-"
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">SPL{order.id.slice(0, 6)}</TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      {new Date(order.created_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">{order.products?.length || 0} items</TableCell>
+                    <TableCell>
+                      {order.tracking_number ? (
+                        <div className="flex items-center gap-2 whitespace-nowrap">
+                          <Truck className="h-4 w-4 flex-shrink-0" />
+                          <span>{order.tracking_number}</span>
+                        </div>
+                      ) : (
+                        "-"
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <OrderStatusBadge status={order.status} />
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      {formatCurrency(total)}
+                    </TableCell>
+                  </TableRow>
+                  <AnimatePresence>
+                    {expandedOrderId === order.id && (
+                      <TableRow>
+                        <TableCell colSpan={8}>
+                          <OrderExpandedDetails order={order} />
+                        </TableCell>
+                      </TableRow>
                     )}
-                  </TableCell>
-                  <TableCell>
-                    <OrderStatusBadge status={order.status} />
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">
-                    {formatCurrency(calculateOrderTotal(order.products || []))}
-                  </TableCell>
-                </TableRow>
-                <AnimatePresence>
-                  {expandedOrderId === order.id && (
-                    <TableRow>
-                      <TableCell colSpan={8}>
-                        <OrderExpandedDetails order={order} />
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </AnimatePresence>
-              </>
-            ))}
+                  </AnimatePresence>
+                </>
+              );
+            })}
           </TableBody>
         </Table>
       </div>

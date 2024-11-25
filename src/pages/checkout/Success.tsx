@@ -40,17 +40,14 @@ const Success = () => {
 
         if (error) throw error;
 
-        // Calculate total from products
+        // Calculate subtotal from products
         const subtotal = data.products.reduce((sum: number, item: any) => {
           return sum + (item.product.from_price || 0);
         }, 0);
 
-        // Calculate shipping based on number of items
-        const shippingCost = 4.50 + Math.max(0, data.products.length - 1) * 2;
-
         setOrderDetails({
           orderId: data.id,
-          amount: subtotal + shippingCost,
+          amount: subtotal + (data.shipping_cost || 0),
           status: data.status,
           products: data.products,
           shippingAddress: {
@@ -64,7 +61,7 @@ const Success = () => {
             lastName: data.last_name
           },
           paymentIntentId,
-          shippingCost,
+          shippingCost: data.shipping_cost || 0,
           subtotal
         });
       } catch (error: any) {

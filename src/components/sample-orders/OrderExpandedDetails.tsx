@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
+import { calculateOrderSubtotal } from "@/lib/orderCalculations";
 
 interface OrderProduct {
   id: string;
@@ -21,23 +22,13 @@ interface OrderExpandedDetailsProps {
     tracking_number?: string | null;
     first_name?: string;
     last_name?: string;
+    shipping_cost?: number;
   };
 }
 
 const OrderExpandedDetails = ({ order }: OrderExpandedDetailsProps) => {
-  const calculateSubtotal = (products: OrderProduct[]) => {
-    return products.reduce((total, product) => {
-      return total + (product.from_price * (product.quantity || 1));
-    }, 0);
-  };
-
-  const calculateShippingCost = (products: OrderProduct[]) => {
-    const totalItems = products.reduce((sum, product) => sum + (product.quantity || 1), 0);
-    return 4.50 + Math.max(0, totalItems - 1) * 2;
-  };
-
-  const subtotal = calculateSubtotal(order.products);
-  const shippingCost = calculateShippingCost(order.products);
+  const subtotal = calculateOrderSubtotal(order.products);
+  const shippingCost = order.shipping_cost || 0;
   const total = subtotal + shippingCost;
 
   return (
