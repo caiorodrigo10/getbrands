@@ -7,7 +7,8 @@ export const calculateOrderSubtotal = (products: Array<any>) => {
 };
 
 export const calculateShippingCost = (products: Array<any>) => {
-  const totalItems = products.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  const totalItems = products.length;
+  // Base shipping cost is $4.50, plus $2 for each additional item
   return 4.50 + Math.max(0, totalItems - 1) * 2;
 };
 
