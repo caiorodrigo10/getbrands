@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { calculateOrderSubtotal } from "@/lib/orderCalculations";
 
 interface AdminOrderExpandedDetailsProps {
   order: {
@@ -30,6 +31,7 @@ interface AdminOrderExpandedDetailsProps {
       last_name: string;
       email: string;
     };
+    shipping_cost?: number;
   };
 }
 
@@ -60,17 +62,8 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
     }
   };
 
-  const calculateSubtotal = () => {
-    return order.products.reduce((total, item) => total + item.product.from_price, 0);
-  };
-
-  const calculateShippingCost = () => {
-    const totalItems = order.products.length;
-    return 4.50 + Math.max(0, totalItems - 1) * 2;
-  };
-
-  const subtotal = calculateSubtotal();
-  const shippingCost = calculateShippingCost();
+  const subtotal = calculateOrderSubtotal(order.products);
+  const shippingCost = order.shipping_cost || 0;
   const total = subtotal + shippingCost;
 
   return (
