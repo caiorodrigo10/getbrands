@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { OrderSelectionBar } from "./OrderSelectionBar";
 import { DeleteConfirmationDialog } from "../catalog/DeleteConfirmationDialog";
 import { useDeleteOrders } from "./hooks/useDeleteOrders";
+import { useOrderSelection } from "./hooks/useOrderSelection";
 
 interface AdminOrdersTableProps {
   orders: any[];
@@ -25,23 +26,24 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
   const queryClient = useQueryClient();
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
-  const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [selectAllPages, setSelectAllPages] = useState(false);
   const { deleteOrders } = useDeleteOrders();
+  
+  const {
+    selectAllPages,
+    handleSelectOrder,
+    handleSelectAll,
+    handleSelectAllPages,
+    getSelectedCount,
+    isOrderSelected,
+  } = useOrderSelection(totalOrders);
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
-    if (updatingOrderId) return;
-
     try {
       setUpdatingOrderId(orderId);
-
       const { error } = await supabase
         .from('sample_requests')
-        .update({ 
-          status: newStatus,
-          updated_at: new Date().toISOString()
-        })
+        .update({ status: newStatus })
         .eq('id', orderId);
 
       if (error) throw error;
@@ -68,39 +70,14 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
   };
 
-  const handleSelectOrder = (orderId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedOrders([...selectedOrders, orderId]);
-    } else {
-      setSelectedOrders(selectedOrders.filter(id => id !== orderId));
-      setSelectAllPages(false);
-    }
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedOrders(orders.map(order => order.id));
-    } else {
-      setSelectedOrders([]);
-      setSelectAllPages(false);
-    }
-  };
-
-  const handleSelectAllPages = (checked: boolean) => {
-    setSelectAllPages(checked);
-    if (checked) {
-      setSelectedOrders(orders.map(order => order.id));
-    } else {
-      setSelectedOrders([]);
-    }
-  };
-
   const handleDeleteSelected = async () => {
-    const success = await deleteOrders(selectedOrders);
+    const selectedIds = orders
+      .filter(order => isOrderSelected(order.id))
+      .map(order => order.id);
+
+    const success = await deleteOrders(selectedIds);
     if (success) {
-      setSelectedOrders([]);
       setShowDeleteDialog(false);
-      setSelectAllPages(false);
     }
   };
 
@@ -112,11 +89,13 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
     );
   }
 
+  const selectedCount = getSelectedCount(orders);
+
   return (
     <div className="space-y-4">
-      {selectedOrders.length > 0 && (
+      {selectedCount > 0 && (
         <OrderSelectionBar
-          selectedCount={selectAllPages ? totalOrders : selectedOrders.length}
+          selectedCount={selectedCount}
           totalCount={totalOrders}
           selectAllPages={selectAllPages}
           onSelectAllPages={handleSelectAllPages}
@@ -131,7 +110,7 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
             <TableRow>
               <TableHead className="w-[50px]">
                 <Checkbox
-                  checked={selectedOrders.length === orders.length || selectAllPages}
+                  checked={orders.every(order => isOrderSelected(order.id))}
                   onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
                 />
               </TableHead>
@@ -153,7 +132,7 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
                   <TableRow>
                     <TableCell>
                       <Checkbox
-                        checked={selectedOrders.includes(order.id) || selectAllPages}
+                        checked={isOrderSelected(order.id)}
                         onCheckedChange={(checked) => handleSelectOrder(order.id, checked as boolean)}
                       />
                     </TableCell>
