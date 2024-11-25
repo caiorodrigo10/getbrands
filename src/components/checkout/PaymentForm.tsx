@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { formatCurrency } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { trackCheckoutStep, trackCheckoutCompleted } from "@/lib/analytics/ecommerce";
-import { useEffect } from "react";
 
 interface PaymentFormProps {
   clientSecret: string;
@@ -108,7 +107,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         throw paymentError;
       }
 
-      // Track successful checkout
+      // Track successful checkout with email
       trackCheckoutCompleted(
         orderId,
         items,
@@ -122,7 +121,8 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
           zipCode: localStorage.getItem('shipping_zip'),
         },
         total,
-        shippingCost
+        shippingCost,
+        user.email // Pass the user's email to the tracking function
       );
 
       clearCart();

@@ -1,5 +1,6 @@
 import { CartItem } from "@/types/cart";
 import { trackEvent } from "./core";
+import type { OrderData } from "./types";
 
 export const trackAddToCart = (product: CartItem) => {
   trackEvent("Product Added to Cart", {
@@ -43,23 +44,35 @@ export const trackCheckoutCompleted = (
   items: CartItem[],
   shippingAddress: any,
   total: number,
-  shippingCost: number
+  shippingCost: number,
+  customerEmail?: string
 ) => {
-  trackEvent("Order Completed", {
+  const orderData: OrderData = {
     order_id: orderId,
+    revenue: total,
+    currency: "USD",
+    payment_method: "credit_card", // Always set to credit_card as requested
     products: items.map(item => ({
       product_id: item.id,
-      product_name: item.name,
-      category: item.category,
+      sku: item.id,
+      name: item.name,
       price: item.from_price,
       quantity: item.quantity,
-      revenue: item.from_price * item.quantity
+      category: item.category,
     })),
+    customer: {
+      email: customerEmail,
+      first_name: shippingAddress.firstName,
+      last_name: shippingAddress.lastName,
+      phone: shippingAddress.phone,
+    }
+  };
+
+  trackEvent("Order Completed", {
+    ...orderData,
     total_items: items.length,
     total_quantity: items.reduce((sum, item) => sum + item.quantity, 0),
-    revenue: total,
     shipping_cost: shippingCost,
-    currency: "USD",
     shipping_address: {
       address: shippingAddress.address1,
       address2: shippingAddress.address2,
@@ -67,11 +80,6 @@ export const trackCheckoutCompleted = (
       state: shippingAddress.state,
       zip: shippingAddress.zipCode,
       country: "USA"
-    },
-    customer: {
-      first_name: shippingAddress.firstName,
-      last_name: shippingAddress.lastName,
-      phone: shippingAddress.phone
     }
   });
 };
