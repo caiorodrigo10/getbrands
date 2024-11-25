@@ -23,9 +23,16 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
   };
 
   const calculateTotal = (order: any) => {
-    const subtotal = calculateOrderSubtotal(order.products || []);
-    const shipping = calculateShippingCost(order.products || []);
-    return subtotal + shipping;
+    // Calculate subtotal based on product prices
+    const subtotal = order.products?.reduce((sum: number, item: any) => {
+      return sum + (item.product?.from_price || 0);
+    }, 0) || 0;
+
+    // Calculate shipping based on number of items
+    const totalItems = order.products?.length || 0;
+    const shippingCost = 4.50 + Math.max(0, totalItems - 1) * 2;
+
+    return subtotal + shippingCost;
   };
 
   return (
