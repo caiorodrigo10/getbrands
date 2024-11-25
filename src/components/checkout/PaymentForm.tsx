@@ -49,7 +49,8 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         shipping_state: shippingState,
         shipping_zip: shippingZip,
         first_name: firstName,
-        last_name: lastName
+        last_name: lastName,
+        payment_method: 'credit_card' // Adding payment method
       })
       .select()
       .single();
@@ -122,7 +123,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         },
         total,
         shippingCost,
-        user.email // Pass the user's email to the tracking function
+        user.email
       );
 
       clearCart();

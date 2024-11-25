@@ -1003,6 +1003,7 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          payment_method: string | null
           product_id: string | null
           shipping_address: string | null
           shipping_city: string | null
@@ -1022,6 +1023,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          payment_method?: string | null
           product_id?: string | null
           shipping_address?: string | null
           shipping_city?: string | null
@@ -1041,6 +1043,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          payment_method?: string | null
           product_id?: string | null
           shipping_address?: string | null
           shipping_city?: string | null
