@@ -1,7 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createHmac } from "https://deno.land/std@0.168.0/crypto/mod.ts";
 import { handleProductUpdate, handleProductDelete } from './productHandlers.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const shopifyApiSecret = "88c1261b203ad4d97aefa71f1d7a3680dee240926b275f56fdbe1862343ba257";
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -10,6 +8,34 @@ const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+async function generateHmacSha256(message: string, key: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(key);
+  const messageData = encoder.encode(message);
+
+  // Import the key
+  const cryptoKey = await crypto.subtle.importKey(
+    "raw",
+    keyData,
+    {
+      name: "HMAC",
+      hash: { name: "SHA-256" }
+    },
+    false,
+    ["sign"]
+  );
+
+  // Sign the message
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    cryptoKey,
+    messageData
+  );
+
+  // Convert to Base64
+  return btoa(String.fromCharCode(...new Uint8Array(signature)));
 }
 
 serve(async (req) => {
@@ -40,10 +66,8 @@ serve(async (req) => {
     const rawBody = await req.clone().text();
     console.log('Body do webhook recebido:', rawBody);
     
-    // Validação HMAC mais detalhada
-    const generatedHash = createHmac("sha256", shopifyApiSecret)
-      .update(rawBody)
-      .toString("base64");
+    // Validação HMAC usando crypto.subtle
+    const generatedHash = await generateHmacSha256(rawBody, shopifyApiSecret);
 
     console.log('Validação HMAC:', {
       received: hmac,
