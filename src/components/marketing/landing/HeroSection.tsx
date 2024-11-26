@@ -13,7 +13,7 @@ export const HeroSection = () => {
             <Button 
               variant="ghost" 
               size="sm"
-              className="text-gray-700 hover:bg-gray-100 text-sm font-medium px-4"
+              className="text-gray-700 hover:bg-[#f0562e] hover:text-white text-sm font-medium px-4"
             >
               Login
             </Button>
