@@ -12,6 +12,8 @@ const corsHeaders = {
 const topics = ['PRODUCTS_CREATE', 'PRODUCTS_UPDATE', 'PRODUCTS_DELETE'];
 
 async function registerWebhook(topic: string) {
+  console.log(`Attempting to register webhook for topic: ${topic}`);
+  
   const mutation = `
     mutation {
       webhookSubscriptionCreate(
@@ -32,32 +34,48 @@ async function registerWebhook(topic: string) {
     }
   `;
 
-  const response = await fetch(SHOPIFY_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN,
-    },
-    body: JSON.stringify({ query: mutation }),
-  });
+  try {
+    const response = await fetch(SHOPIFY_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN,
+      },
+      body: JSON.stringify({ query: mutation }),
+    });
 
-  return await response.json();
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(`Webhook registration response for ${topic}:`, data);
+    return data;
+  } catch (error) {
+    console.error(`Error registering webhook for ${topic}:`, error);
+    throw error;
+  }
 }
 
 serve(async (req) => {
   console.log('Starting webhook registration');
 
+  // Handle CORS
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Verify required environment variables
+    if (!SHOPIFY_ACCESS_TOKEN) {
+      throw new Error('SHOPIFY_ACCESS_TOKEN is not configured');
+    }
+
     const results = [];
     for (const topic of topics) {
       console.log(`Registering webhook for ${topic}`);
       const result = await registerWebhook(topic);
       results.push({ topic, result });
-      console.log(`Registration result for ${topic}:`, result);
     }
 
     return new Response(
@@ -70,7 +88,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error registering webhooks:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error instanceof Error ? error.stack : undefined 
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500 

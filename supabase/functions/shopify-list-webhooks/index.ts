@@ -11,11 +11,17 @@ const corsHeaders = {
 serve(async (req) => {
   console.log('Starting webhook listing');
 
+  // Handle CORS
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Verify required environment variables
+    if (!SHOPIFY_ACCESS_TOKEN) {
+      throw new Error('SHOPIFY_ACCESS_TOKEN is not configured');
+    }
+
     const query = `
       query {
         webhookSubscriptions(first: 10) {
@@ -41,11 +47,22 @@ serve(async (req) => {
       body: JSON.stringify({ query }),
     });
 
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const data = await response.json();
     console.log('Webhooks retrieved:', data);
 
+    if (data.errors) {
+      throw new Error(data.errors[0].message);
+    }
+
     return new Response(
-      JSON.stringify({ success: true, webhooks: data.data.webhookSubscriptions.edges }),
+      JSON.stringify({ 
+        success: true, 
+        webhooks: data.data?.webhookSubscriptions?.edges || [] 
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 
@@ -54,7 +71,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error listing webhooks:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error instanceof Error ? error.stack : undefined 
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500 
