@@ -3,7 +3,7 @@ import { createHmac } from "https://deno.land/std@0.168.0/crypto/mod.ts";
 import { handleProductUpdate, handleProductDelete } from './productHandlers.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const shopifyApiSecret = Deno.env.get('SHOPIFY_API_SECRET')!;
+const shopifyApiSecret = "88c1261b203ad4d97aefa71f1d7a3680dee240926b275f56fdbe1862343ba257";
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
@@ -13,7 +13,7 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  console.log('Webhook recebido');
+  console.log('Webhook recebido - Iniciando processamento');
   
   if (req.method === 'OPTIONS') {
     console.log('Tratando requisição CORS preflight');
@@ -23,10 +23,12 @@ serve(async (req) => {
   try {
     const hmac = req.headers.get('x-shopify-hmac-sha256');
     const topic = req.headers.get('x-shopify-topic');
+    const shopDomain = req.headers.get('x-shopify-shop-domain');
     
     console.log('Headers do webhook:', {
       hmac,
       topic,
+      shopDomain,
       allHeaders: Object.fromEntries(req.headers.entries())
     });
     
@@ -38,6 +40,7 @@ serve(async (req) => {
     const rawBody = await req.clone().text();
     console.log('Body do webhook recebido:', rawBody);
     
+    // Validação HMAC mais detalhada
     const generatedHash = createHmac("sha256", shopifyApiSecret)
       .update(rawBody)
       .toString("base64");
@@ -45,16 +48,24 @@ serve(async (req) => {
     console.log('Validação HMAC:', {
       received: hmac,
       generated: generatedHash,
-      matches: generatedHash === hmac
+      matches: generatedHash === hmac,
+      secretUsed: shopifyApiSecret.substring(0, 10) + '...' // Log parcial do secret para debug
     });
 
     if (generatedHash !== hmac) {
-      console.error('Assinatura do webhook inválida');
+      console.error('Assinatura do webhook inválida', {
+        receivedHmac: hmac,
+        generatedHmac: generatedHash
+      });
       throw new Error('Assinatura do webhook inválida');
     }
 
     const body = JSON.parse(rawBody);
-    console.log('Processando webhook:', { topic, productId: body.id });
+    console.log('Processando webhook:', { 
+      topic, 
+      productId: body.id,
+      productTitle: body.title 
+    });
 
     // Initialize Supabase client
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -71,27 +82,40 @@ serve(async (req) => {
       console.error('Erro ao registrar webhook:', logError);
     }
 
+    let result;
     switch (topic) {
       case 'products/create':
       case 'products/update':
-        await handleProductUpdate(body);
+        console.log('Iniciando atualização do produto:', body.title);
+        result = await handleProductUpdate(body);
+        console.log('Produto atualizado com sucesso:', result);
         break;
       case 'products/delete':
-        await handleProductDelete(body);
+        console.log('Iniciando exclusão do produto:', body.id);
+        result = await handleProductDelete(body);
+        console.log('Produto excluído com sucesso');
         break;
       default:
         console.log('Tópico de webhook não tratado:', topic);
     }
 
     console.log('Webhook processado com sucesso');
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({ 
+      success: true,
+      topic,
+      productId: body.id,
+      result 
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
   } catch (error) {
     console.error('Erro processando webhook:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        stack: error.stack
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400 
