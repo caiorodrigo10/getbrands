@@ -1,15 +1,12 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { logger } from './logger.ts';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-export async function handleProductUpdate(shopifyProduct: any) {
-  console.log('Processando atualização do produto:', { 
-    productId: shopifyProduct.id,
-    title: shopifyProduct.title,
-    variants: shopifyProduct.variants?.length
-  });
+export const handleProductUpdate = async (shopifyProduct: any) => {
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+  logger.info('Processing product update', { productId: shopifyProduct.id });
 
   try {
     const variant = shopifyProduct.variants[0];
@@ -19,17 +16,11 @@ export async function handleProductUpdate(shopifyProduct: any) {
       is_primary: img.position === 1
     })) || [];
 
-    console.log('Detalhes do produto:', {
-      variant,
-      imagesCount: images.length,
-      price: variant?.price
-    });
-
     if (!variant) {
-      throw new Error('Produto sem variante principal');
+      throw new Error('Product has no primary variant');
     }
 
-    // Primeiro procura se o produto já existe
+    // Check if product exists
     const { data: existingProduct } = await supabase
       .from('shopify_products')
       .select('product_id')
@@ -38,9 +29,8 @@ export async function handleProductUpdate(shopifyProduct: any) {
 
     let productId = existingProduct?.product_id;
 
-    // Se não existe, cria um novo produto
     if (!productId) {
-      console.log('Criando novo produto...');
+      // Create new product
       const { data: newProduct, error: productError } = await supabase
         .from('products')
         .insert({
@@ -55,16 +45,10 @@ export async function handleProductUpdate(shopifyProduct: any) {
         .select()
         .single();
 
-      if (productError) {
-        console.error('Erro ao criar produto:', productError);
-        throw productError;
-      }
-
+      if (productError) throw productError;
       productId = newProduct.id;
-      console.log('Novo produto criado:', { productId });
     } else {
-      console.log('Atualizando produto existente:', { productId });
-      // Atualiza o produto existente
+      // Update existing product
       const { error: updateError } = await supabase
         .from('products')
         .update({
@@ -78,14 +62,11 @@ export async function handleProductUpdate(shopifyProduct: any) {
         })
         .eq('id', productId);
 
-      if (updateError) {
-        console.error('Erro ao atualizar produto:', updateError);
-        throw updateError;
-      }
+      if (updateError) throw updateError;
     }
 
-    // Atualiza ou cria o mapeamento Shopify
-    const { error: mappingError } = await supabase
+    // Update Shopify mapping
+    await supabase
       .from('shopify_products')
       .upsert({
         product_id: productId,
@@ -94,25 +75,14 @@ export async function handleProductUpdate(shopifyProduct: any) {
         last_synced_at: new Date().toISOString()
       });
 
-    if (mappingError) {
-      console.error('Erro ao atualizar mapeamento:', mappingError);
-      throw mappingError;
-    }
-
-    // Atualiza as imagens
+    // Update images
     if (images.length > 0) {
-      console.log('Atualizando imagens do produto...');
-      const { error: deleteImagesError } = await supabase
+      await supabase
         .from('product_images')
         .delete()
         .eq('product_id', productId);
 
-      if (deleteImagesError) {
-        console.error('Erro ao deletar imagens antigas:', deleteImagesError);
-        throw deleteImagesError;
-      }
-
-      const { error: imagesError } = await supabase
+      await supabase
         .from('product_images')
         .insert(
           images.map(img => ({
@@ -120,82 +90,43 @@ export async function handleProductUpdate(shopifyProduct: any) {
             ...img
           }))
         );
-
-      if (imagesError) {
-        console.error('Erro ao inserir novas imagens:', imagesError);
-        throw imagesError;
-      }
-      console.log('Imagens atualizadas com sucesso');
     }
 
+    logger.webhook('products/update', 'processed', { productId });
     return { productId, status: 'success' };
   } catch (error) {
-    console.error('Erro em handleProductUpdate:', error);
+    logger.error('Failed to process product update', error);
     throw error;
   }
-}
+};
 
-export async function handleProductDelete(shopifyProduct: any) {
-  console.log('Processando exclusão do produto:', { productId: shopifyProduct.id });
+export const handleProductDelete = async (shopifyProduct: any) => {
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+  logger.info('Processing product deletion', { productId: shopifyProduct.id });
 
   try {
-    const { data: mapping, error: fetchError } = await supabase
+    const { data: mapping } = await supabase
       .from('shopify_products')
       .select('product_id')
       .eq('shopify_id', shopifyProduct.id.toString())
       .single();
 
-    if (fetchError) {
-      console.error('Erro ao buscar mapeamento:', fetchError);
-      throw fetchError;
-    }
-
     if (mapping) {
-      await deleteProductData(mapping.product_id);
-      console.log('Produto excluído com sucesso');
+      await deleteProductData(supabase, mapping.product_id);
+      logger.webhook('products/delete', 'processed', { productId: mapping.product_id });
       return { status: 'success', deletedProductId: mapping.product_id };
-    } else {
-      console.log('Produto não encontrado para exclusão');
-      return { status: 'not_found' };
     }
+    
+    logger.info('Product not found for deletion');
+    return { status: 'not_found' };
   } catch (error) {
-    console.error('Erro em handleProductDelete:', error);
+    logger.error('Failed to process product deletion', error);
     throw error;
   }
-}
+};
 
-async function deleteProductData(productId: string) {
-  console.log('Iniciando exclusão de dados do produto:', productId);
-
-  const { error: imagesError } = await supabase
-    .from('product_images')
-    .delete()
-    .eq('product_id', productId);
-
-  if (imagesError) {
-    console.error('Erro ao deletar imagens:', imagesError);
-    throw imagesError;
-  }
-
-  const { error: productError } = await supabase
-    .from('products')
-    .delete()
-    .eq('id', productId);
-
-  if (productError) {
-    console.error('Erro ao deletar produto:', productError);
-    throw productError;
-  }
-
-  const { error: mappingError } = await supabase
-    .from('shopify_products')
-    .delete()
-    .eq('product_id', productId);
-
-  if (mappingError) {
-    console.error('Erro ao deletar mapeamento:', mappingError);
-    throw mappingError;
-  }
-
-  console.log('Dados do produto excluídos com sucesso');
-}
+const deleteProductData = async (supabase: any, productId: string) => {
+  await supabase.from('product_images').delete().eq('product_id', productId);
+  await supabase.from('products').delete().eq('id', productId);
+  await supabase.from('shopify_products').delete().eq('product_id', productId);
+};
