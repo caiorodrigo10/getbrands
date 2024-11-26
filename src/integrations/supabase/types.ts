@@ -959,21 +959,27 @@ export type Database = {
           created_at: string
           id: string
           product_id: string
+          quantity: number
           sample_request_id: string
+          unit_price: number
           updated_at: string
         }
         Insert: {
           created_at?: string
           id?: string
           product_id: string
+          quantity?: number
           sample_request_id: string
+          unit_price?: number
           updated_at?: string
         }
         Update: {
           created_at?: string
           id?: string
           product_id?: string
+          quantity?: number
           sample_request_id?: string
+          unit_price?: number
           updated_at?: string
         }
         Relationships: [
@@ -1003,12 +1009,16 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          payment_method: string | null
           product_id: string | null
           shipping_address: string | null
           shipping_city: string | null
+          shipping_cost: number | null
           shipping_state: string | null
           shipping_zip: string | null
           status: string | null
+          subtotal: number
+          total: number
           tracking_number: string | null
           updated_at: string
           user_id: string | null
@@ -1022,12 +1032,16 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          payment_method?: string | null
           product_id?: string | null
           shipping_address?: string | null
           shipping_city?: string | null
+          shipping_cost?: number | null
           shipping_state?: string | null
           shipping_zip?: string | null
           status?: string | null
+          subtotal?: number
+          total?: number
           tracking_number?: string | null
           updated_at?: string
           user_id?: string | null
@@ -1041,12 +1055,16 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          payment_method?: string | null
           product_id?: string | null
           shipping_address?: string | null
           shipping_city?: string | null
+          shipping_cost?: number | null
           shipping_state?: string | null
           shipping_zip?: string | null
           status?: string | null
+          subtotal?: number
+          total?: number
           tracking_number?: string | null
           updated_at?: string
           user_id?: string | null

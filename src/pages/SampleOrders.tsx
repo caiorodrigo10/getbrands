@@ -33,12 +33,13 @@ const SampleOrders = () => {
         .from("sample_requests")
         .select(`
           *,
-          products: sample_request_products (
+          products:sample_request_products (
+            quantity,
+            unit_price,
             product:products (
               id,
               name,
-              image_url,
-              from_price
+              image_url
             )
           )
         `, { count: 'exact' })
@@ -64,17 +65,8 @@ const SampleOrders = () => {
         throw error;
       }
 
-      // Transform the data to flatten the products array
-      const transformedData = data?.map(order => ({
-        ...order,
-        products: order.products.map((p: any) => ({
-          ...p.product,
-          quantity: 1
-        }))
-      }));
-
       return {
-        data: transformedData,
+        data,
         totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE),
         currentPage
       };

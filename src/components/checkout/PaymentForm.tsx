@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { formatCurrency } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { trackCheckoutStep, trackCheckoutCompleted } from "@/lib/analytics/ecommerce";
-import { useEffect } from "react";
 
 interface PaymentFormProps {
   clientSecret: string;
@@ -40,6 +39,8 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
     const lastName = localStorage.getItem('lastName') || '';
     const phone = localStorage.getItem('phone') || '';
 
+    const subtotal = items.reduce((sum, item) => sum + (item.from_price * (item.quantity || 1)), 0);
+
     const { data: sampleRequest, error: sampleRequestError } = await supabase
       .from('sample_requests')
       .insert({
@@ -50,7 +51,11 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         shipping_state: shippingState,
         shipping_zip: shippingZip,
         first_name: firstName,
-        last_name: lastName
+        last_name: lastName,
+        payment_method: 'credit_card',
+        shipping_cost: shippingCost,
+        subtotal: subtotal,
+        total: total
       })
       .select()
       .single();
@@ -60,6 +65,8 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
     const sampleRequestProducts = items.map(item => ({
       sample_request_id: sampleRequest.id,
       product_id: item.id,
+      quantity: item.quantity || 1,
+      unit_price: item.from_price
     }));
 
     const { error: productsError } = await supabase
@@ -83,7 +90,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
     try {
       const orderId = await createSampleRequest();
 
-      const { error: paymentError } = await stripe.confirmPayment({
+      const { error: paymentError, paymentIntent } = await stripe.confirmPayment({
         elements,
         redirect: 'if_required',
         confirmParams: {
@@ -101,6 +108,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
               },
             },
           },
+          return_url: `${window.location.origin}/checkout/success`,
         },
       });
 
@@ -108,7 +116,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         throw paymentError;
       }
 
-      // Track successful checkout
+      // Track successful checkout with email
       trackCheckoutCompleted(
         orderId,
         items,
@@ -122,11 +130,14 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
           zipCode: localStorage.getItem('shipping_zip'),
         },
         total,
-        shippingCost
+        shippingCost,
+        user.email
       );
 
       clearCart();
-      navigate('/checkout/success');
+      
+      // Navigate with both orderId and payment intent ID
+      navigate(`/checkout/success?order_id=${orderId}&payment_intent=${paymentIntent?.id}`);
 
     } catch (error) {
       console.error("Payment error:", error);

@@ -1,43 +1,50 @@
 import React, { useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreVertical, ChevronDown, ChevronUp } from "lucide-react";
-import { AnimatePresence } from "framer-motion";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import OrderStatusBadge from "@/components/sample-orders/OrderStatusBadge";
-import AdminOrderExpandedDetails from "./AdminOrderExpandedDetails";
-import { formatCurrency } from "@/lib/utils";
+import { AnimatePresence } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
+import { OrderSelectionBar } from "./OrderSelectionBar";
+import { DeleteConfirmationDialog } from "../catalog/DeleteConfirmationDialog";
+import { useDeleteOrders } from "./hooks/useDeleteOrders";
+import { useOrderSelection } from "./hooks/useOrderSelection";
+import { OrderTableHeader } from "./components/OrderTableHeader";
+import { OrderTableRow } from "./components/OrderTableRow";
+import AdminOrderExpandedDetails from "./AdminOrderExpandedDetails";
 
 interface AdminOrdersTableProps {
   orders: any[];
+  totalOrders: number;
 }
 
-const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
+const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { deleteOrders } = useDeleteOrders();
+  
+  const {
+    selectAllPages,
+    handleSelectOrder,
+    handleSelectAll,
+    handleSelectAllPages,
+    getSelectedCount,
+    isOrderSelected,
+    selectedOrders
+  } = useOrderSelection(totalOrders);
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
-    if (updatingOrderId) return; // Prevent multiple simultaneous updates
-
     try {
       setUpdatingOrderId(orderId);
-
       const { error } = await supabase
         .from('sample_requests')
-        .update({ 
-          status: newStatus,
-          updated_at: new Date().toISOString()
-        })
+        .update({ status: newStatus })
         .eq('id', orderId);
 
       if (error) throw error;
 
-      // Force a refetch of the orders data
       await queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
 
       toast({
@@ -60,6 +67,19 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
   };
 
+  const handleDeleteSelected = async () => {
+    const selectedIds = orders
+      .filter(order => isOrderSelected(order.id))
+      .map(order => order.id);
+
+    const success = await deleteOrders(selectedIds);
+    if (success) {
+      setShowDeleteDialog(false);
+      handleSelectAll(false, []);
+      await queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+    }
+  };
+
   if (!orders || orders.length === 0) {
     return (
       <div className="text-center py-12 border rounded-md">
@@ -68,124 +88,61 @@ const AdminOrdersTable = ({ orders }: AdminOrdersTableProps) => {
     );
   }
 
+  const selectedCount = getSelectedCount();
+
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-12"></TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Order Number</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Items</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Total</TableHead>
-            <TableHead className="w-12"></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {orders.map((order) => (
-            <React.Fragment key={order.id}>
-              <TableRow>
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => toggleOrderExpansion(order.id)}
-                  >
-                    {expandedOrderId === order.id ? (
-                      <ChevronUp className="h-4 w-4" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4" />
-                    )}
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-col">
-                    <span className="font-medium">
-                      {order.customer?.first_name} {order.customer?.last_name}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      {order.customer?.email}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>SPL{order.id.slice(0, 6)}</TableCell>
-                <TableCell>
-                  {new Date(order.created_at).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </TableCell>
-                <TableCell>{order.products?.length || 0} items</TableCell>
-                <TableCell>
-                  <OrderStatusBadge status={order.status} />
-                </TableCell>
-                <TableCell>
-                  {formatCurrency(order.products?.reduce((total: number, item: any) => 
-                    total + (item.product.from_price || 0), 0) || 0)}
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        disabled={updatingOrderId === order.id}
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-white">
-                      <DropdownMenuItem 
-                        onClick={() => handleStatusChange(order.id, 'pending')}
-                        disabled={updatingOrderId === order.id}
-                      >
-                        Mark as Pending
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleStatusChange(order.id, 'processing')}
-                        disabled={updatingOrderId === order.id}
-                      >
-                        Mark as Processing
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleStatusChange(order.id, 'shipped')}
-                        disabled={updatingOrderId === order.id}
-                      >
-                        Mark as Shipped
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleStatusChange(order.id, 'completed')}
-                        disabled={updatingOrderId === order.id}
-                      >
-                        Mark as Completed
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleStatusChange(order.id, 'canceled')}
-                        disabled={updatingOrderId === order.id}
-                      >
-                        Mark as Canceled
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-              <AnimatePresence>
-                {expandedOrderId === order.id && (
-                  <TableRow key={`${order.id}-expanded`}>
-                    <TableCell colSpan={8}>
-                      <AdminOrderExpandedDetails order={order} />
-                    </TableCell>
-                  </TableRow>
-                )}
-              </AnimatePresence>
-            </React.Fragment>
-          ))}
-        </TableBody>
-      </Table>
+    <div className="space-y-4">
+      {selectedCount > 0 && (
+        <OrderSelectionBar
+          selectedCount={selectedCount}
+          totalCount={totalOrders}
+          selectAllPages={selectAllPages}
+          onSelectAllPages={handleSelectAllPages}
+          onDeleteClick={() => setShowDeleteDialog(true)}
+          ordersInPage={orders.length}
+        />
+      )}
+
+      <div className="rounded-md border">
+        <Table>
+          <OrderTableHeader 
+            onSelectAll={(checked) => handleSelectAll(checked, orders)}
+            allSelected={orders.every(order => isOrderSelected(order.id))}
+            orders={orders}
+          />
+          <TableBody>
+            {orders.map((order) => (
+              <React.Fragment key={order.id}>
+                <OrderTableRow
+                  order={order}
+                  isSelected={isOrderSelected(order.id)}
+                  onSelect={(checked) => handleSelectOrder(order.id, checked)}
+                  isExpanded={expandedOrderId === order.id}
+                  onToggleExpand={() => toggleOrderExpansion(order.id)}
+                  onStatusChange={(status) => handleStatusChange(order.id, status)}
+                  isUpdating={updatingOrderId === order.id}
+                />
+                <AnimatePresence>
+                  {expandedOrderId === order.id && (
+                    <TableRow key={`${order.id}-expanded`}>
+                      <TableCell colSpan={8}>
+                        <AdminOrderExpandedDetails order={order} />
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </AnimatePresence>
+              </React.Fragment>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <DeleteConfirmationDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={handleDeleteSelected}
+        selectAllPages={selectAllPages}
+      />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { CartItem } from "@/types/cart";
 import { trackEvent } from "./core";
+import type { OrderData } from "./types";
 
 export const trackAddToCart = (product: CartItem) => {
   trackEvent("Product Added to Cart", {
@@ -18,7 +19,10 @@ export const trackCheckoutStep = (
   items: CartItem[],
   additionalData?: Record<string, any>
 ) => {
-  const total = items.reduce((sum, item) => sum + (item.from_price * item.quantity), 0);
+  const subtotal = items.reduce((sum, item) => sum + (item.from_price * item.quantity), 0);
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const shippingCost = 4.50 + Math.max(0, totalItems - 1) * 2;
+  const total = subtotal + shippingCost;
   
   trackEvent("Checkout Step Viewed", {
     step_number: step,
@@ -31,7 +35,9 @@ export const trackCheckoutStep = (
       quantity: item.quantity,
     })),
     total_items: items.length,
-    total_quantity: items.reduce((sum, item) => sum + item.quantity, 0),
+    total_quantity: totalItems,
+    subtotal: subtotal,
+    shipping_cost: shippingCost,
     revenue: total,
     currency: "USD",
     ...additionalData
@@ -43,23 +49,41 @@ export const trackCheckoutCompleted = (
   items: CartItem[],
   shippingAddress: any,
   total: number,
-  shippingCost: number
+  shippingCost: number,
+  customerEmail?: string
 ) => {
-  trackEvent("Order Completed", {
+  // Calculate the correct revenue from items
+  const subtotal = items.reduce((sum, item) => sum + (item.from_price * item.quantity), 0);
+  const totalRevenue = subtotal + shippingCost;
+
+  const orderData: OrderData = {
     order_id: orderId,
+    revenue: totalRevenue, // Use the correct total including shipping
+    currency: "USD",
+    payment_method: "credit_card",
     products: items.map(item => ({
       product_id: item.id,
-      product_name: item.name,
-      category: item.category,
+      sku: item.id,
+      name: item.name,
       price: item.from_price,
       quantity: item.quantity,
-      revenue: item.from_price * item.quantity
+      category: item.category,
+      revenue: item.from_price * item.quantity // Add individual product revenue
     })),
+    customer: {
+      email: customerEmail,
+      first_name: shippingAddress.firstName,
+      last_name: shippingAddress.lastName,
+      phone: shippingAddress.phone,
+    }
+  };
+
+  trackEvent("Order Completed", {
+    ...orderData,
     total_items: items.length,
     total_quantity: items.reduce((sum, item) => sum + item.quantity, 0),
-    revenue: total,
     shipping_cost: shippingCost,
-    currency: "USD",
+    subtotal: subtotal,
     shipping_address: {
       address: shippingAddress.address1,
       address2: shippingAddress.address2,
@@ -67,11 +91,6 @@ export const trackCheckoutCompleted = (
       state: shippingAddress.state,
       zip: shippingAddress.zipCode,
       country: "USA"
-    },
-    customer: {
-      first_name: shippingAddress.firstName,
-      last_name: shippingAddress.lastName,
-      phone: shippingAddress.phone
     }
   });
 };

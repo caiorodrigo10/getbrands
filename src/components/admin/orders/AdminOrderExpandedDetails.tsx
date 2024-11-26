@@ -15,10 +15,11 @@ interface AdminOrderExpandedDetailsProps {
     shipping_state: string;
     shipping_zip: string;
     products: Array<{
+      quantity: number;
+      unit_price: number;
       product: {
         name: string;
         id: string;
-        from_price: number;
         image_url: string | null;
       };
     }>;
@@ -30,6 +31,9 @@ interface AdminOrderExpandedDetailsProps {
       last_name: string;
       email: string;
     };
+    shipping_cost?: number;
+    subtotal: number;
+    total: number;
   };
 }
 
@@ -59,19 +63,6 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
       });
     }
   };
-
-  const calculateSubtotal = () => {
-    return order.products.reduce((total, item) => total + item.product.from_price, 0);
-  };
-
-  const calculateShippingCost = () => {
-    const totalItems = order.products.length;
-    return 4.50 + Math.max(0, totalItems - 1) * 2;
-  };
-
-  const subtotal = calculateSubtotal();
-  const shippingCost = calculateShippingCost();
-  const total = subtotal + shippingCost;
 
   return (
     <motion.div
@@ -106,20 +97,20 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
             <h4 className="font-semibold text-lg mb-4">Order Details</h4>
             <Card className="p-4">
               <div className="space-y-4">
-                {order.products.map(({ product }) => (
-                  <div key={product.id} className="flex items-start gap-3">
+                {order.products.map((item) => (
+                  <div key={item.product.id} className="flex items-start gap-3">
                     <img
-                      src={product.image_url || "/placeholder.svg"}
-                      alt={product.name}
+                      src={item.product.image_url || "/placeholder.svg"}
+                      alt={item.product.name}
                       className="w-16 h-16 object-cover rounded-md"
                     />
                     <div>
-                      <h5 className="font-medium">{product.name}</h5>
+                      <h5 className="font-medium">{item.product.name}</h5>
                       <p className="text-sm text-muted-foreground">
-                        SKU: {product.id.slice(0, 8)}
+                        SKU: {item.product.id.slice(0, 8)}
                       </p>
                       <p className="text-sm font-medium mt-1">
-                        {formatCurrency(product.from_price)}
+                        {item.quantity}x {formatCurrency(item.unit_price)}
                       </p>
                     </div>
                   </div>
@@ -128,15 +119,15 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
                 <div className="pt-4 border-t space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Subtotal:</span>
-                    <span>{formatCurrency(subtotal)}</span>
+                    <span>{formatCurrency(order.subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Shipping:</span>
-                    <span>{formatCurrency(shippingCost)}</span>
+                    <span>{formatCurrency(order.shipping_cost || 0)}</span>
                   </div>
                   <div className="flex justify-between font-medium pt-2 border-t">
                     <span>Total:</span>
-                    <span>{formatCurrency(total)}</span>
+                    <span>{formatCurrency(order.total)}</span>
                   </div>
                 </div>
               </div>

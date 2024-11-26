@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu } from "@/components/NavigationMenu";
-import { CheckCircle } from "lucide-react";
 import Confetti from "react-confetti";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { OrderConfirmationCard } from "@/components/checkout/success/OrderConfirmationCard";
+import { CustomerInformation } from "@/components/checkout/success/CustomerInformation";
+import { OrderSummaryDetails } from "@/components/checkout/success/OrderSummaryDetails";
 
 const Success = () => {
   const [searchParams] = useSearchParams();
@@ -14,25 +16,51 @@ const Success = () => {
   const [orderDetails, setOrderDetails] = useState<any>(null);
   const [showConfetti, setShowConfetti] = useState(true);
   const { toast } = useToast();
-  const sessionId = searchParams.get("session_id");
+  const orderId = searchParams.get("order_id");
+  const paymentIntentId = searchParams.get("payment_intent");
 
   useEffect(() => {
     const getOrderDetails = async () => {
-      if (!sessionId) {
+      if (!orderId) {
         setIsLoading(false);
         return;
       }
 
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        const { data, error } = await supabase.functions.invoke('get-order-details', {
-          body: { sessionId }
-        });
+        const { data, error } = await supabase
+          .from('sample_requests')
+          .select(`
+            *,
+            products:sample_request_products(
+              quantity,
+              unit_price,
+              product:products(*)
+            )
+          `)
+          .eq('id', orderId)
+          .single();
 
         if (error) throw error;
 
-        setOrderDetails(data);
+        setOrderDetails({
+          orderId: data.id,
+          amount: data.total,
+          status: data.status,
+          products: data.products,
+          shippingAddress: {
+            address: data.shipping_address,
+            city: data.shipping_city,
+            state: data.shipping_state,
+            zip: data.shipping_zip
+          },
+          customer: {
+            firstName: data.first_name,
+            lastName: data.last_name
+          },
+          paymentIntentId,
+          shippingCost: data.shipping_cost || 0,
+          subtotal: data.subtotal
+        });
       } catch (error: any) {
         console.error('Error fetching order details:', error);
         toast({
@@ -50,7 +78,7 @@ const Success = () => {
     // Cleanup confetti after 5 seconds
     const timer = setTimeout(() => setShowConfetti(false), 5000);
     return () => clearTimeout(timer);
-  }, [sessionId, toast]);
+  }, [orderId, paymentIntentId, toast]);
 
   if (isLoading) {
     return (
@@ -67,7 +95,7 @@ const Success = () => {
     );
   }
 
-  if (!sessionId || !orderDetails) {
+  if (!orderId || !orderDetails) {
     return (
       <div className="min-h-screen bg-background">
         <NavigationMenu />
@@ -76,9 +104,9 @@ const Success = () => {
             <Card className="text-center">
               <CardHeader>
                 <CardTitle>No Order Found</CardTitle>
-                <CardDescription>
+                <CardContent>
                   We couldn't find any order details. Please check your order history or contact support.
-                </CardDescription>
+                </CardContent>
               </CardHeader>
               <CardContent>
                 <Button variant="outline" onClick={() => window.location.href = "/dashboard"}>
@@ -97,22 +125,16 @@ const Success = () => {
       {showConfetti && <Confetti />}
       <NavigationMenu />
       <main className="md:pl-64 w-full">
-        <div className="max-w-3xl mx-auto px-4 py-8">
-          <Card className="mb-8 border-green-200 bg-green-50">
-            <CardHeader className="text-center pb-6">
-              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <CardTitle className="text-2xl text-green-700">Order Confirmed!</CardTitle>
-              <CardDescription className="text-green-600">
-                Thank you for your order. We've received your payment and will process your order shortly.
-              </CardDescription>
+        <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+          <OrderConfirmationCard />
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Order Details</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="text-sm text-green-600">
-                  <p>Order ID: {orderDetails.orderId}</p>
-                  <p>Amount Paid: ${(orderDetails.amount / 100).toFixed(2)}</p>
-                </div>
-              </div>
+            <CardContent className="space-y-6">
+              <CustomerInformation orderDetails={orderDetails} />
+              <OrderSummaryDetails orderDetails={orderDetails} />
             </CardContent>
           </Card>
 
