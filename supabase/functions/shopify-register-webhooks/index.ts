@@ -11,8 +11,50 @@ const corsHeaders = {
 
 const topics = ['PRODUCTS_CREATE', 'PRODUCTS_UPDATE', 'PRODUCTS_DELETE'];
 
-async function registerWebhook(topic: string) {
+async function getExistingWebhooks() {
+  const query = `
+    query {
+      webhookSubscriptions(first: 10) {
+        edges {
+          node {
+            id
+            topic
+            callbackUrl
+          }
+        }
+      }
+    }
+  `;
+
+  const response = await fetch(SHOPIFY_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN,
+    },
+    body: JSON.stringify({ query }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.data?.webhookSubscriptions?.edges || [];
+}
+
+async function registerWebhook(topic: string, existingWebhooks: any[]) {
   console.log(`Tentando registrar webhook para o tópico: ${topic}`);
+  
+  // Check if webhook already exists
+  const exists = existingWebhooks.some(webhook => 
+    webhook.node.topic === topic && webhook.node.callbackUrl === WEBHOOK_URL
+  );
+
+  if (exists) {
+    console.log(`Webhook já existe para o tópico: ${topic}`);
+    return { topic, status: 'already_exists' };
+  }
   
   const mutation = `
     mutation {
@@ -45,7 +87,7 @@ async function registerWebhook(topic: string) {
     });
 
     if (!response.ok) {
-      throw new Error(`Erro HTTP! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
@@ -59,7 +101,7 @@ async function registerWebhook(topic: string) {
       throw new Error(data.data.webhookSubscriptionCreate.userErrors[0].message);
     }
 
-    return data;
+    return { topic, status: 'created', data };
   } catch (error) {
     console.error(`Erro ao registrar webhook para ${topic}:`, error);
     throw error;
@@ -80,11 +122,15 @@ serve(async (req) => {
       throw new Error('SHOPIFY_ACCESS_TOKEN não está configurado');
     }
 
+    // Get existing webhooks first
+    const existingWebhooks = await getExistingWebhooks();
+    console.log('Webhooks existentes:', existingWebhooks);
+
     const results = [];
     for (const topic of topics) {
       console.log(`Registrando webhook para ${topic}`);
-      const result = await registerWebhook(topic);
-      results.push({ topic, result });
+      const result = await registerWebhook(topic, existingWebhooks);
+      results.push(result);
     }
 
     return new Response(
