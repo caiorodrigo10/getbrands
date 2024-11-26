@@ -88,7 +88,7 @@ const OrderExpandedDetails = ({ order }: OrderExpandedDetailsProps) => {
                           SKU: {item.product.id.slice(0, 8)}
                         </p>
                         <p className="text-sm font-medium mt-1">
-                          x {formatCurrency(item.unit_price)}
+                          {item.quantity} x {formatCurrency(item.unit_price)}
                         </p>
                       </div>
                     </div>
