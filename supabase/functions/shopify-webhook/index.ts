@@ -14,14 +14,23 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  console.log('Received webhook request');
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('Handling CORS preflight request');
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const hmac = req.headers.get('x-shopify-hmac-sha256');
     const topic = req.headers.get('x-shopify-topic');
+    
+    console.log('Webhook headers:', {
+      hmac,
+      topic,
+      allHeaders: Object.fromEntries(req.headers.entries())
+    });
     
     if (!hmac || !topic) {
       console.error('Missing required Shopify headers:', { hmac, topic });
@@ -30,11 +39,18 @@ serve(async (req) => {
 
     // Get raw body for HMAC validation
     const rawBody = await req.clone().text();
+    console.log('Received webhook body:', rawBody);
     
     // Validate webhook signature
     const generatedHash = createHmac("sha256", shopifyApiSecret)
       .update(rawBody)
       .toString("base64");
+
+    console.log('HMAC validation:', {
+      received: hmac,
+      generated: generatedHash,
+      matches: generatedHash === hmac
+    });
 
     if (generatedHash !== hmac) {
       console.error('Invalid webhook signature');
@@ -43,7 +59,7 @@ serve(async (req) => {
 
     // Parse body as JSON after validation
     const body = JSON.parse(rawBody);
-    console.log('Received Shopify webhook:', { topic, productId: body.id });
+    console.log('Processing webhook:', { topic, productId: body.id });
 
     switch (topic) {
       case 'products/create':
@@ -57,6 +73,7 @@ serve(async (req) => {
         console.log('Unhandled webhook topic:', topic);
     }
 
+    console.log('Webhook processed successfully');
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
@@ -77,7 +94,8 @@ async function handleProductUpdate(shopifyProduct: any) {
   try {
     console.log('Processing product update:', { 
       productId: shopifyProduct.id,
-      title: shopifyProduct.title 
+      title: shopifyProduct.title,
+      fullProduct: shopifyProduct
     });
 
     const variant = shopifyProduct.variants[0]; // Get first variant
@@ -86,6 +104,13 @@ async function handleProductUpdate(shopifyProduct: any) {
       position: img.position,
       is_primary: img.position === 1
     }));
+
+    console.log('Product details:', {
+      variant,
+      images,
+      price: variant.price,
+      compareAtPrice: variant.compare_at_price
+    });
 
     // First, create or update the product
     const { data: product, error: productError } = await supabase
@@ -125,8 +150,12 @@ async function handleProductUpdate(shopifyProduct: any) {
       throw mappingError;
     }
 
+    console.log('Product mapping updated successfully');
+
     // Finally, update product images
     if (images.length > 0) {
+      console.log('Updating product images:', images);
+      
       const { error: imagesError } = await supabase
         .from('product_images')
         .upsert(
@@ -168,6 +197,8 @@ async function handleProductDelete(shopifyProduct: any) {
       throw fetchError;
     }
 
+    console.log('Found product mapping:', mapping);
+
     if (mapping) {
       // Delete product images
       const { error: imagesError } = await supabase
@@ -180,6 +211,8 @@ async function handleProductDelete(shopifyProduct: any) {
         throw imagesError;
       }
 
+      console.log('Product images deleted successfully');
+
       // Delete the product
       const { error: productError } = await supabase
         .from('products')
@@ -190,6 +223,8 @@ async function handleProductDelete(shopifyProduct: any) {
         console.error('Error deleting product:', productError);
         throw productError;
       }
+
+      console.log('Product deleted successfully');
 
       // Delete the mapping
       const { error: mappingError } = await supabase
@@ -202,10 +237,7 @@ async function handleProductDelete(shopifyProduct: any) {
         throw mappingError;
       }
 
-      console.log('Product and related data deleted successfully:', { 
-        shopifyId: shopifyProduct.id,
-        productId: mapping.product_id 
-      });
+      console.log('Product mapping deleted successfully');
     }
   } catch (error) {
     console.error('Error in handleProductDelete:', error);
