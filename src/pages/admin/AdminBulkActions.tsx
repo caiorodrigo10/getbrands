@@ -2,6 +2,8 @@ import { ImportProductsDialog } from "@/components/admin/bulk-actions/ImportProd
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ShopifyWebhookTester } from "@/components/admin/shopify/ShopifyWebhookTester";
+import { ShopifyWebhookTest } from "@/components/admin/bulk-actions/ShopifyWebhookTest";
+import { Separator } from "@/components/ui/separator";
 
 const AdminBulkActions = () => {
   const [showImportDialog, setShowImportDialog] = useState(false);
@@ -26,9 +28,14 @@ const AdminBulkActions = () => {
         />
       </div>
 
-      <div className="border-t pt-8">
+      <Separator />
+
+      <div>
         <h2 className="text-xl font-semibold mb-4">Webhooks do Shopify</h2>
-        <ShopifyWebhookTester />
+        <div className="space-y-8">
+          <ShopifyWebhookTest />
+          <ShopifyWebhookTester />
+        </div>
       </div>
     </div>
   );
