@@ -1016,6 +1016,7 @@ export type Database = {
           shipping_cost: number | null
           shipping_state: string | null
           shipping_zip: string | null
+          shopify_order_id: string | null
           status: string | null
           subtotal: number
           total: number
@@ -1039,6 +1040,7 @@ export type Database = {
           shipping_cost?: number | null
           shipping_state?: string | null
           shipping_zip?: string | null
+          shopify_order_id?: string | null
           status?: string | null
           subtotal?: number
           total?: number
@@ -1062,6 +1064,7 @@ export type Database = {
           shipping_cost?: number | null
           shipping_state?: string | null
           shipping_zip?: string | null
+          shopify_order_id?: string | null
           status?: string | null
           subtotal?: number
           total?: number

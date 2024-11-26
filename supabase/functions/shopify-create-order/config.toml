@@ -1,4 +1,4 @@
 project_id = "skrvprmnncxpkojraoem"
-
-[functions.shopify-create-order]
-verify_jwt = true
+[secrets]
+SHOPIFY_ACCESS_TOKEN = "SHOPIFY_ACCESS_TOKEN"
+SHOPIFY_SHOP_DOMAIN = "SHOPIFY_SHOP_DOMAIN"
