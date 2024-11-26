@@ -9,6 +9,7 @@ import { formatCurrency } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { trackCheckoutStep, trackCheckoutCompleted } from "@/lib/analytics/ecommerce";
 import { createShopifyOrder } from "@/lib/shopify/createOrder";
+import { formatPhoneForShopify } from "@/lib/utils/phoneFormatter";
 
 interface PaymentFormProps {
   clientSecret: string;
@@ -130,6 +131,9 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         shopifyProducts?.map(sp => [sp.product_id, sp.shopify_variant_id]) || []
       );
 
+      const phone = localStorage.getItem('phone') || '';
+      const formattedPhone = formatPhoneForShopify(phone);
+
       // Create order in Shopify with the correct variant IDs
       await createShopifyOrder({
         orderId,
@@ -137,7 +141,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
           first_name: localStorage.getItem('firstName') || '',
           last_name: localStorage.getItem('lastName') || '',
           email: user.email,
-          phone: localStorage.getItem('phone') || undefined,
+          phone: formattedPhone,
         },
         shippingAddress: {
           address1: localStorage.getItem('shipping_address') || '',
@@ -145,7 +149,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
           city: localStorage.getItem('shipping_city') || '',
           province: localStorage.getItem('shipping_state') || '',
           zip: localStorage.getItem('shipping_zip') || '',
-          phone: localStorage.getItem('phone') || '',
+          phone: formattedPhone,
         },
         lineItems: items.map(item => ({
           variant_id: variantMap.get(item.id) || '',
@@ -161,7 +165,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         {
           firstName: localStorage.getItem('firstName'),
           lastName: localStorage.getItem('lastName'),
-          phone: localStorage.getItem('phone'),
+          phone: formattedPhone,
           address1: localStorage.getItem('shipping_address'),
           city: localStorage.getItem('shipping_city'),
           state: localStorage.getItem('shipping_state'),
