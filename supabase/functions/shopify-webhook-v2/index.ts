@@ -19,27 +19,37 @@ serve(async (req) => {
     const hmac = req.headers.get('x-shopify-hmac-sha256');
     const topic = req.headers.get('x-shopify-topic');
     
-    logger.info('V2: Received webhook request', { 
+    logger.debug('Webhook request received', { 
       topic,
       hmacPresent: !!hmac,
-      headers: Object.fromEntries(req.headers.entries())
+      headers: Object.fromEntries(req.headers.entries()),
+      timestamp: new Date().toISOString()
     });
 
     if (!hmac || !topic) {
-      logger.error('V2: Missing required headers', { hmac, topic });
+      logger.error('Missing required headers', { hmac, topic });
       throw new Error('Required Shopify headers missing');
     }
 
     const rawBody = await req.clone().text();
     
-    logger.info('V2: Webhook payload received', {
+    logger.debug('Webhook payload details', {
       payloadLength: rawBody.length,
-      payloadSample: rawBody.substring(0, 100)
+      payloadSample: rawBody.substring(0, 100),
+      contentType: req.headers.get('content-type'),
+      payloadHash: await crypto.subtle.digest('SHA-256', new TextEncoder().encode(rawBody)).then(hash => 
+        Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('')
+      )
     });
 
     const isValid = await validateShopifyHmac(hmac, rawBody, shopifyApiSecret);
     
     if (!isValid) {
+      logger.error('Invalid webhook signature', {
+        topic,
+        receivedHmac: hmac,
+        payloadLength: rawBody.length
+      });
       throw new Error('Invalid webhook signature');
     }
 
@@ -56,17 +66,26 @@ serve(async (req) => {
         result = await handleProductDelete(body);
         break;
       default:
-        logger.info('V2: Unhandled webhook topic', { topic });
+        logger.info('Unhandled webhook topic', { topic });
     }
+
+    logger.debug('Webhook processing completed', {
+      topic,
+      result,
+      timestamp: new Date().toISOString()
+    });
 
     return new Response(
       JSON.stringify({ success: true, topic, productId: body.id, result }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    logger.error('V2: Webhook processing failed', error);
+    logger.error('Webhook processing failed', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        timestamp: new Date().toISOString()
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400 
