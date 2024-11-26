@@ -70,11 +70,9 @@ const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) 
 
   const handleDuplicateSelected = async () => {
     try {
-      // Get the selected products with their images
       const selectedProductsData = products.filter(p => selectedProducts.includes(p.id));
       
       for (const product of selectedProductsData) {
-        // Create a new product
         const { data: newProduct, error: productError } = await supabase
           .from('products')
           .insert({
@@ -92,13 +90,11 @@ const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) 
 
         if (productError) throw productError;
 
-        // Get all images for the original product
         const { data: productImages } = await supabase
           .from('product_images')
           .select('*')
           .eq('product_id', product.id);
 
-        // Duplicate all images for the new product
         if (productImages) {
           for (const image of productImages) {
             await supabase
@@ -113,7 +109,6 @@ const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) 
         }
       }
 
-      // Clear selection and refresh the product list
       setSelectedProducts([]);
       queryClient.invalidateQueries({ queryKey: ['admin-catalog'] });
 
@@ -151,7 +146,20 @@ const AdminCatalogTable = ({ products, totalProducts }: AdminCatalogTableProps) 
     // First try to get the primary image from product_images
     const primaryImage = productImages?.find(img => img.product_id === product.id)?.image_url;
     // If no primary image found, fall back to the product's main image_url
-    return primaryImage || product.image_url || "/placeholder.svg";
+    const imageUrl = primaryImage || product.image_url || "/placeholder.svg";
+    
+    // Ensure the URL is properly formatted
+    if (imageUrl.startsWith('http')) {
+      return imageUrl;
+    } else if (imageUrl.startsWith('/')) {
+      return imageUrl; // Local asset
+    } else {
+      // If it's a Supabase storage URL, ensure it's properly formatted
+      const { data: { publicUrl } } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(imageUrl);
+      return publicUrl;
+    }
   };
 
   if (products.length === 0) {
