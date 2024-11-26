@@ -19,8 +19,9 @@ serve(async (req) => {
     const hmac = req.headers.get('x-shopify-hmac-sha256');
     const topic = req.headers.get('x-shopify-topic');
     
-    logger.info('Received webhook', { 
+    logger.info('Received webhook request', { 
       topic,
+      hmacPresent: !!hmac,
       headers: Object.fromEntries(req.headers.entries())
     });
 
@@ -29,7 +30,14 @@ serve(async (req) => {
       throw new Error('Required Shopify headers missing');
     }
 
+    // Importante: Clonar a request antes de ler o body
     const rawBody = await req.clone().text();
+    
+    logger.info('Webhook payload received', {
+      payloadLength: rawBody.length,
+      payloadSample: rawBody.substring(0, 100)
+    });
+
     const isValid = await validateShopifyHmac(hmac, rawBody, shopifyApiSecret);
     
     if (!isValid) {
