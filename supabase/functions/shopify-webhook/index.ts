@@ -19,6 +19,11 @@ serve(async (req) => {
     const hmac = req.headers.get('x-shopify-hmac-sha256');
     const topic = req.headers.get('x-shopify-topic');
     
+    logger.info('Received webhook', { 
+      topic,
+      headers: Object.fromEntries(req.headers.entries())
+    });
+
     if (!hmac || !topic) {
       logger.error('Missing required headers', { hmac, topic });
       throw new Error('Required Shopify headers missing');
@@ -28,7 +33,6 @@ serve(async (req) => {
     const isValid = await validateShopifyHmac(hmac, rawBody, shopifyApiSecret);
     
     if (!isValid) {
-      logger.error('Invalid HMAC signature', { hmac });
       throw new Error('Invalid webhook signature');
     }
 
