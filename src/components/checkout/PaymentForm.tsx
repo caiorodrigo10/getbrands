@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { formatCurrency } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { trackCheckoutStep, trackCheckoutCompleted } from "@/lib/analytics/ecommerce";
+import { createShopifyOrder } from "@/lib/shopify/createOrder";
 
 interface PaymentFormProps {
   clientSecret: string;
@@ -115,6 +116,30 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
       if (paymentError) {
         throw paymentError;
       }
+
+      // Create order in Shopify
+      await createShopifyOrder({
+        orderId,
+        customer: {
+          first_name: localStorage.getItem('firstName') || '',
+          last_name: localStorage.getItem('lastName') || '',
+          email: user.email,
+          phone: localStorage.getItem('phone') || undefined,
+        },
+        shippingAddress: {
+          address1: localStorage.getItem('shipping_address') || '',
+          address2: localStorage.getItem('shipping_address2') || undefined,
+          city: localStorage.getItem('shipping_city') || '',
+          province: localStorage.getItem('shipping_state') || '',
+          zip: localStorage.getItem('shipping_zip') || '',
+          phone: localStorage.getItem('phone') || '',
+        },
+        lineItems: items.map(item => ({
+          variant_id: item.id,
+          quantity: item.quantity || 1,
+          price: item.from_price
+        }))
+      });
 
       // Track successful checkout with email
       trackCheckoutCompleted(

@@ -1,14 +1,12 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
-const shopifyAccessToken = Deno.env.get('SHOPIFY_ACCESS_TOKEN')!;
-const shopifyApiVersion = '2023-10';
-const shopifyShopDomain = Deno.env.get('SHOPIFY_SHOP_DOMAIN')!;
+const SHOPIFY_ACCESS_TOKEN = Deno.env.get('SHOPIFY_ACCESS_TOKEN')!;
+const SHOPIFY_SHOP_DOMAIN = Deno.env.get('SHOPIFY_SHOP_DOMAIN')!;
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+}
 
 interface OrderLineItem {
   variant_id: string;
@@ -24,11 +22,12 @@ interface ShippingAddress {
   city: string;
   province: string;
   zip: string;
-  country: "US";
+  country: string;
   phone: string;
 }
 
 interface OrderData {
+  orderId: string;
   customer: {
     first_name: string;
     last_name: string;
@@ -41,15 +40,22 @@ interface OrderData {
   financial_status: "paid" | "pending" | "refunded";
 }
 
-async function createShopifyOrder(orderData: OrderData) {
-  const url = `https://${shopifyShopDomain}/admin/api/${shopifyApiVersion}/orders.json`;
-  
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
   try {
-    const response = await fetch(url, {
+    const { orderData } = await req.json();
+
+    console.log('Creating Shopify order with data:', orderData);
+
+    const response = await fetch(`https://${SHOPIFY_SHOP_DOMAIN}/admin/api/2024-01/orders.json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Shopify-Access-Token': shopifyAccessToken,
+        'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN,
       },
       body: JSON.stringify({
         order: {
@@ -69,71 +75,25 @@ async function createShopifyOrder(orderData: OrderData) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('Shopify API error:', errorData);
       throw new Error(`Shopify API error: ${JSON.stringify(errorData)}`);
     }
 
-    return await response.json();
-  } catch (error) {
-    console.error('Error creating Shopify order:', error);
-    throw error;
-  }
-}
-
-serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  try {
-    const { orderData } = await req.json();
-
-    // Create order in Shopify
-    const shopifyResponse = await createShopifyOrder(orderData);
-
-    // Get Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Update our order with Shopify order ID
-    if (orderData.orderId) {
-      await supabase
-        .from('sample_requests')
-        .update({ 
-          shopify_order_id: shopifyResponse.order.id,
-          status: 'processing'
-        })
-        .eq('id', orderData.orderId);
-    }
+    const data = await response.json();
+    console.log('Shopify order created:', data);
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        shopifyOrder: shopifyResponse.order 
-      }),
-      { 
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        } 
-      }
+      JSON.stringify({ success: true, shopifyOrder: data.order }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
-    console.error('Error in shopify-create-order function:', error);
-    
+    console.error('Error creating Shopify order:', error);
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: error.message
-      }),
+      JSON.stringify({ error: error.message }),
       { 
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        },
-        status: 400
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400 
       }
     );
   }
