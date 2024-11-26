@@ -1126,6 +1126,44 @@ export type Database = {
         }
         Relationships: []
       }
+      shopify_products: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_synced_at: string | null
+          product_id: string | null
+          shopify_id: string
+          shopify_variant_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_synced_at?: string | null
+          product_id?: string | null
+          shopify_id: string
+          shopify_variant_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_synced_at?: string | null
+          product_id?: string | null
+          shopify_id?: string
+          shopify_variant_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopify_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       crm_view: {
