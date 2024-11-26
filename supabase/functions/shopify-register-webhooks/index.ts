@@ -12,7 +12,7 @@ const corsHeaders = {
 const topics = ['PRODUCTS_CREATE', 'PRODUCTS_UPDATE', 'PRODUCTS_DELETE'];
 
 async function registerWebhook(topic: string) {
-  console.log(`Attempting to register webhook for topic: ${topic}`);
+  console.log(`Tentando registrar webhook para o tópico: ${topic}`);
   
   const mutation = `
     mutation {
@@ -45,20 +45,29 @@ async function registerWebhook(topic: string) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`Erro HTTP! status: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log(`Webhook registration response for ${topic}:`, data);
+    console.log(`Resposta do registro de webhook para ${topic}:`, data);
+
+    if (data.errors) {
+      throw new Error(data.errors[0].message);
+    }
+
+    if (data.data?.webhookSubscriptionCreate?.userErrors?.length > 0) {
+      throw new Error(data.data.webhookSubscriptionCreate.userErrors[0].message);
+    }
+
     return data;
   } catch (error) {
-    console.error(`Error registering webhook for ${topic}:`, error);
+    console.error(`Erro ao registrar webhook para ${topic}:`, error);
     throw error;
   }
 }
 
 serve(async (req) => {
-  console.log('Starting webhook registration');
+  console.log('Iniciando registro de webhooks');
 
   // Handle CORS
   if (req.method === 'OPTIONS') {
@@ -68,12 +77,12 @@ serve(async (req) => {
   try {
     // Verify required environment variables
     if (!SHOPIFY_ACCESS_TOKEN) {
-      throw new Error('SHOPIFY_ACCESS_TOKEN is not configured');
+      throw new Error('SHOPIFY_ACCESS_TOKEN não está configurado');
     }
 
     const results = [];
     for (const topic of topics) {
-      console.log(`Registering webhook for ${topic}`);
+      console.log(`Registrando webhook para ${topic}`);
       const result = await registerWebhook(topic);
       results.push({ topic, result });
     }
@@ -86,7 +95,7 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error registering webhooks:', error);
+    console.error('Erro ao registrar webhooks:', error);
     return new Response(
       JSON.stringify({ 
         error: error.message,

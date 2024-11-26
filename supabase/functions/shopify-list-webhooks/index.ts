@@ -9,7 +9,7 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  console.log('Starting webhook listing');
+  console.log('Iniciando listagem de webhooks');
 
   // Handle CORS
   if (req.method === 'OPTIONS') {
@@ -19,7 +19,7 @@ serve(async (req) => {
   try {
     // Verify required environment variables
     if (!SHOPIFY_ACCESS_TOKEN) {
-      throw new Error('SHOPIFY_ACCESS_TOKEN is not configured');
+      throw new Error('SHOPIFY_ACCESS_TOKEN não está configurado');
     }
 
     const query = `
@@ -37,7 +37,7 @@ serve(async (req) => {
       }
     `;
 
-    console.log('Fetching webhooks from Shopify');
+    console.log('Buscando webhooks do Shopify');
     const response = await fetch(SHOPIFY_API_URL, {
       method: 'POST',
       headers: {
@@ -48,11 +48,11 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`Erro HTTP! status: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('Webhooks retrieved:', data);
+    console.log('Webhooks recuperados:', data);
 
     if (data.errors) {
       throw new Error(data.errors[0].message);
@@ -69,7 +69,7 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error listing webhooks:', error);
+    console.error('Erro ao listar webhooks:', error);
     return new Response(
       JSON.stringify({ 
         error: error.message,
