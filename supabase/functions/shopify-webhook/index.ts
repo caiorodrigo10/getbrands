@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { handleProductUpdate, handleProductDelete } from './productHandlers.ts'
 
 const shopifyApiSecret = "88c1261b203ad4d97aefa71f1d7a3680dee240926b275f56fdbe1862343ba257";
