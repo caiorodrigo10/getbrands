@@ -1,8 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createHmac } from "https://deno.land/std@0.168.0/crypto/mod.ts";
 import { handleProductUpdate, handleProductDelete } from './productHandlers.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const shopifyApiSecret = Deno.env.get('SHOPIFY_API_SECRET')!;
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -52,6 +55,21 @@ serve(async (req) => {
 
     const body = JSON.parse(rawBody);
     console.log('Processando webhook:', { topic, productId: body.id });
+
+    // Initialize Supabase client
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Log the webhook
+    const { error: logError } = await supabase
+      .from('webhook_logs')
+      .insert({
+        topic,
+        payload: body
+      });
+
+    if (logError) {
+      console.error('Erro ao registrar webhook:', logError);
+    }
 
     switch (topic) {
       case 'products/create':

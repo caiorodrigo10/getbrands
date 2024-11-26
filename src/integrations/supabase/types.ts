@@ -1164,6 +1164,27 @@ export type Database = {
           },
         ]
       }
+      webhook_logs: {
+        Row: {
+          created_at: string
+          id: string
+          payload: Json
+          topic: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payload: Json
+          topic: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          topic?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       crm_view: {
