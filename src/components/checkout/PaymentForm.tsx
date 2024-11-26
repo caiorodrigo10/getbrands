@@ -117,7 +117,20 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         throw paymentError;
       }
 
-      // Create order in Shopify
+      // Get Shopify variant IDs for the products
+      const { data: shopifyProducts, error: shopifyError } = await supabase
+        .from('shopify_products')
+        .select('shopify_variant_id, product_id')
+        .in('product_id', items.map(item => item.id));
+
+      if (shopifyError) throw shopifyError;
+
+      // Create a map of our product IDs to Shopify variant IDs
+      const variantMap = new Map(
+        shopifyProducts?.map(sp => [sp.product_id, sp.shopify_variant_id]) || []
+      );
+
+      // Create order in Shopify with the correct variant IDs
       await createShopifyOrder({
         orderId,
         customer: {
@@ -135,7 +148,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
           phone: localStorage.getItem('phone') || '',
         },
         lineItems: items.map(item => ({
-          variant_id: item.id,
+          variant_id: variantMap.get(item.id) || '',
           quantity: item.quantity || 1,
           price: item.from_price
         }))

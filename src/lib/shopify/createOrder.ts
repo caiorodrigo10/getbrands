@@ -31,6 +31,13 @@ export async function createShopifyOrder({
   lineItems
 }: CreateOrderParams) {
   try {
+    // Filter out any line items that don't have a valid Shopify variant ID
+    const validLineItems = lineItems.filter(item => item.variant_id);
+
+    if (validLineItems.length === 0) {
+      throw new Error("No valid Shopify variants found for the products in the order");
+    }
+
     const { data, error } = await supabase.functions.invoke('shopify-create-order', {
       body: {
         orderData: {
@@ -48,13 +55,21 @@ export async function createShopifyOrder({
             last_name: customer.last_name,
             country: "US"
           },
-          line_items: lineItems,
+          line_items: validLineItems,
           financial_status: "paid"
         }
       }
     });
 
     if (error) throw error;
+
+    // Update the sample request with the Shopify order ID
+    if (data?.shopifyOrder?.id) {
+      await supabase
+        .from('sample_requests')
+        .update({ shopify_order_id: data.shopifyOrder.id })
+        .eq('id', orderId);
+    }
 
     toast({
       title: "Order created in Shopify",
