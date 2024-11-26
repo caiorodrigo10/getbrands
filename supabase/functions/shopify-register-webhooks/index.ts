@@ -9,7 +9,16 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const topics = ['PRODUCTS_CREATE', 'PRODUCTS_UPDATE', 'PRODUCTS_DELETE'];
+const topics = [
+  'ORDERS_CREATE',
+  'ORDERS_UPDATED',
+  'ORDERS_CANCELLED',
+  'ORDERS_FULFILLED',
+  'ORDERS_PAID',
+  'PRODUCTS_CREATE',
+  'PRODUCTS_UPDATE',
+  'PRODUCTS_DELETE'
+];
 
 async function getExistingWebhooks() {
   const query = `
