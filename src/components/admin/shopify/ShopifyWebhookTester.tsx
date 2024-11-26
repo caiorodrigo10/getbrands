@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -55,6 +55,11 @@ export const ShopifyWebhookTester = () => {
     }
   };
 
+  // Fetch webhooks when component mounts
+  useEffect(() => {
+    handleListWebhooks();
+  }, []);
+
   return (
     <div className="space-y-6">
       <div className="flex gap-4">
@@ -70,7 +75,7 @@ export const ShopifyWebhookTester = () => {
           onClick={handleListWebhooks}
           disabled={isLoading}
         >
-          {isLoading ? "Carregando..." : "Listar Webhooks"}
+          {isLoading ? "Carregando..." : "Atualizar Lista"}
         </Button>
       </div>
 
