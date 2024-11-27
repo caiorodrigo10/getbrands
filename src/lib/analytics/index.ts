@@ -20,6 +20,8 @@ export const identifyUser = async (userId: string, traits?: Record<string, any>)
     window.analytics.identify(userId, {
       ...traits,
       lastIdentified: new Date().toISOString(),
+      environment: process.env.NODE_ENV,
+      source: 'web_app'
     });
 
     console.log('Identify call successful:', { userId, traits });
@@ -37,6 +39,7 @@ export const trackEvent = async (eventName: string, properties?: Record<string, 
       ...properties,
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV,
+      source: 'web_app'
     });
 
     console.log('Track event:', { eventName, properties });
@@ -50,16 +53,23 @@ export const trackPage = async (properties?: Record<string, any>) => {
   try {
     await waitForAnalytics();
     
-    window.analytics.page("Page Viewed", {
-      ...properties,
+    const defaultProperties = {
       url: window.location.href,
       path: window.location.pathname,
       referrer: document.referrer,
       title: document.title,
+      search: window.location.search,
       timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV,
+      source: 'web_app'
+    };
+
+    window.analytics.page("Page Viewed", {
+      ...defaultProperties,
+      ...properties
     });
 
-    console.log('Page view:', { properties });
+    console.log('Page view:', { ...defaultProperties, ...properties });
   } catch (error) {
     console.error('Error tracking page view:', error);
     toast.error('Analytics Error: Failed to track page view');

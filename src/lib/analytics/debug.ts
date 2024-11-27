@@ -30,7 +30,8 @@ export const debugAnalytics = () => {
         url: window.location.href,
         path: window.location.pathname,
         referrer: document.referrer,
-        debug: true
+        debug: true,
+        source: 'web_app'
       });
       console.log('✅ Page tracking test successful');
     } catch (error) {
@@ -41,7 +42,8 @@ export const debugAnalytics = () => {
     try {
       window.analytics.track("Debug Event", {
         timestamp: new Date().toISOString(),
-        debug: true
+        debug: true,
+        source: 'web_app'
       });
       console.log('✅ Event tracking test successful');
     } catch (error) {
@@ -64,7 +66,8 @@ export const validateSegmentCall = (eventName: string, properties?: Record<strin
     window.analytics.track(eventName, {
       ...properties,
       validated: true,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      source: 'web_app'
     });
     return true;
   } catch (error) {
