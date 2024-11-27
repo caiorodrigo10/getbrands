@@ -17,8 +17,8 @@ interface ProductsResponse {
 }
 
 export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProductsOptions = {}) => {
-  const fetchProducts = async (context: { pageParam?: number }) => {
-    const pageParam = context.pageParam || 1;
+  const fetchProducts = async (context: { pageParam?: unknown }) => {
+    const pageParam = Number(context.pageParam) || page;
     const from = (pageParam - 1) * limit;
     const to = from + limit - 1;
 
