@@ -1,12 +1,18 @@
-// Placeholder analytics functions until we reimplement Segment
+// Segment Analytics Implementation
 export const identifyUser = async (userId: string, traits?: Record<string, any>) => {
-  console.log('Analytics identify:', { userId, traits });
+  if (window.analytics) {
+    window.analytics.identify(userId, traits);
+  }
 };
 
 export const trackEvent = (eventName: string, properties?: Record<string, any>) => {
-  console.log('Analytics track:', { eventName, properties });
+  if (window.analytics) {
+    window.analytics.track(eventName, properties);
+  }
 };
 
 export const trackPage = (properties?: Record<string, any>) => {
-  console.log('Analytics page:', { properties });
+  if (window.analytics) {
+    window.analytics.page(properties);
+  }
 };
