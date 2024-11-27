@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { AuthContextType } from "@/lib/auth/types";
 import { handleUserSession } from "@/lib/auth/session";
+import { useToast } from "@/hooks/use-toast";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -25,6 +26,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -74,14 +76,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
+      // First clear local state
       setUser(null);
+      
+      // Then attempt to sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        // If we get a 403 or session_not_found, we can ignore it since the user is already signed out
+        if (error.message.includes('403') || error.message.includes('session_not_found')) {
+          console.log('User was already signed out');
+        } else {
+          // For other errors, we should show them to the user
+          toast({
+            variant: "destructive",
+            title: "Error signing out",
+            description: "Please try again",
+          });
+          throw error;
+        }
+      }
+
+      // Always navigate to login page
       navigate('/login');
     } catch (error) {
       console.error('Error in logout:', error);
-      throw error;
+      // Don't rethrow the error here, as we want the logout to complete regardless
     }
   };
 
