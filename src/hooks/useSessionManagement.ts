@@ -13,10 +13,17 @@ export const useSessionManagement = () => {
     try {
       setIsLoggingOut(true);
       
-      // First clear any stored auth data
-      localStorage.removeItem('supabase.auth.token');
+      // Get current session first
+      const { data: { session } } = await supabase.auth.getSession();
       
-      // Then attempt to sign out without scope parameter
+      if (!session) {
+        // If no session exists, just clear local storage and redirect
+        localStorage.clear();
+        navigate('/login');
+        return;
+      }
+
+      // Attempt to sign out
       const { error } = await supabase.auth.signOut();
       
       if (error && !error.message?.includes('session_not_found')) {
@@ -29,6 +36,7 @@ export const useSessionManagement = () => {
       toast.error("Network error during logout");
     } finally {
       setIsLoggingOut(false);
+      localStorage.clear();
       // Always navigate to login page, even if there was an error
       navigate('/login');
     }
