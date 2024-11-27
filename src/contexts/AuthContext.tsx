@@ -44,8 +44,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   const handleUserIdentification = async (user: User, profile: ProfileType) => {
-    // Identify user in analytics with all relevant traits
-    identifyUser(user.id, {
+    // Enhanced user identification with all relevant traits
+    await identifyUser(user.id, {
       email: user.email,
       first_name: profile.first_name,
       last_name: profile.last_name,
@@ -54,14 +54,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       created_at: user.created_at,
       last_sign_in: user.last_sign_in_at,
       onboarding_completed: profile.onboarding_completed,
+      auth_provider: user.app_metadata.provider,
+      email_confirmed: user.email_confirmed_at ? true : false
     });
 
-    // Track login event with user properties
-    trackEvent("User Logged In", {
+    // Track login event with enhanced properties
+    await trackEvent("User Logged In", {
       user_id: user.id,
       email: user.email,
-      login_method: "email",
+      login_method: user.app_metadata.provider || 'email',
       role: profile.role,
+      is_new_user: (new Date().getTime() - new Date(user.created_at).getTime()) < 300000 // 5 minutes
     });
     
     // Identify user in Gleap
@@ -129,18 +132,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) {
+        trackEvent("Login Failed", {
+          error: error.message,
+          email: email // Don't include password in tracking
+        });
+        throw error;
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   };
 
   const logout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    // Clear Gleap identification on logout
-    Gleap.clearIdentity();
+    try {
+      if (user) {
+        await trackEvent("User Logged Out", {
+          user_id: user.id,
+          email: user.email
+        });
+      }
+      
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      // Clear Gleap identification on logout
+      Gleap.clearIdentity();
+    } catch (error) {
+      console.error('Logout error:', error);
+      throw error;
+    }
   };
 
   return (

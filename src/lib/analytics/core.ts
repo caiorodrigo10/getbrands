@@ -24,13 +24,18 @@ const getSessionId = () => {
 };
 
 const shouldTrackEvent = () => {
-  // Track events in production or if explicitly enabled for development
-  return !isDevelopment || import.meta.env.VITE_FORCE_ANALYTICS === 'true';
+  // Always track events, even in development to ensure proper testing
+  return true;
 };
 
 const debugLog = (type: string, eventName: string, properties?: Record<string, any>) => {
   if (SEGMENT_DEBUG || isDevelopment) {
-    console.log(`[Segment ${type}]`, eventName, properties);
+    console.log(`[Segment ${type}]`, {
+      eventName,
+      properties,
+      timestamp: new Date().toISOString(),
+      environment: isDevelopment ? 'development' : 'production'
+    });
   }
 };
 
@@ -41,7 +46,7 @@ const ensureAnalyticsLoaded = (): Promise<void> => {
       return;
     }
 
-    // Wait for analytics to load
+    // Wait for analytics to load with increased timeout
     const checkAnalytics = setInterval(() => {
       if (window.analytics) {
         clearInterval(checkAnalytics);
@@ -49,18 +54,16 @@ const ensureAnalyticsLoaded = (): Promise<void> => {
       }
     }, 100);
 
-    // Timeout after 5 seconds
+    // Timeout after 10 seconds (increased from 5)
     setTimeout(() => {
       clearInterval(checkAnalytics);
-      console.error('Analytics failed to load after 5 seconds');
+      console.error('Analytics failed to load after 10 seconds');
       resolve();
-    }, 5000);
+    }, 10000);
   });
 };
 
 export const trackPage = async (properties?: Record<string, any>) => {
-  if (!shouldTrackEvent()) return;
-
   try {
     await ensureAnalyticsLoaded();
     
@@ -83,12 +86,11 @@ export const trackPage = async (properties?: Record<string, any>) => {
     }
   } catch (error) {
     console.error('Error tracking page view:', error);
+    debugLog('Error', 'Page View Error', { error });
   }
 };
 
 export const trackEvent = async (eventName: string, properties?: Record<string, any>) => {
-  if (!shouldTrackEvent()) return;
-
   try {
     await ensureAnalyticsLoaded();
     
@@ -108,12 +110,11 @@ export const trackEvent = async (eventName: string, properties?: Record<string, 
     }
   } catch (error) {
     console.error('Error tracking event:', error);
+    debugLog('Error', 'Event Tracking Error', { error, eventName });
   }
 };
 
 export const identifyUser = async (userId: string, traits?: Record<string, any>) => {
-  if (!shouldTrackEvent()) return;
-
   try {
     await ensureAnalyticsLoaded();
     
@@ -122,6 +123,7 @@ export const identifyUser = async (userId: string, traits?: Record<string, any>)
         ...traits,
         environment: isDevelopment ? 'development' : 'production',
         lastIdentified: new Date().toISOString(),
+        user_id: userId, // Ensure user_id is always included
       };
 
       debugLog('Identify', userId, enhancedTraits);
@@ -129,5 +131,6 @@ export const identifyUser = async (userId: string, traits?: Record<string, any>)
     }
   } catch (error) {
     console.error('Error identifying user:', error);
+    debugLog('Error', 'User Identification Error', { error, userId });
   }
 };
