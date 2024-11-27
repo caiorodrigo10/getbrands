@@ -4,8 +4,6 @@ import { ProfileType } from "./types";
 import Gleap from "gleap";
 
 export const handleAnalytics = async (user: User, profile: ProfileType) => {
-  if (!window.analytics) return;
-
   try {
     await identifyUser(user.id, {
       email: user.email,
