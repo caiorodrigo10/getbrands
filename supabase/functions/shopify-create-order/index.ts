@@ -38,10 +38,7 @@ interface OrderData {
   shipping_address: ShippingAddress;
   billing_address?: ShippingAddress;
   financial_status: "paid" | "pending" | "refunded";
-  shipping_lines?: {
-    price: number;
-    title: string;
-  }[];
+  shipping_cost?: number;
 }
 
 serve(async (req) => {
@@ -55,11 +52,15 @@ serve(async (req) => {
 
     console.log('Creating Shopify order with data:', orderData);
 
-    // Format shipping lines for Shopify
+    // Format shipping lines for Shopify with additional details
     const shippingLines = orderData.shipping_cost ? [{
+      title: "Standard Shipping",
       price: orderData.shipping_cost.toFixed(2),
-      title: "Standard Shipping"
+      code: "CALCULATED_BY_SYSTEM",
+      source: "Lovable System"
     }] : undefined;
+
+    console.log('Shipping lines configuration:', shippingLines);
 
     const response = await fetch(`https://${SHOPIFY_SHOP_DOMAIN}/admin/api/2024-01/orders.json`, {
       method: 'POST',
