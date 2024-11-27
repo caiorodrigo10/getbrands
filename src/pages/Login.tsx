@@ -5,7 +5,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "react-router-dom";
-import { trackEvent } from "@/lib/analytics";
 
 const Login = () => {
   const { toast } = useToast();
@@ -16,7 +15,6 @@ const Login = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/dashboard');
@@ -25,41 +23,12 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please fill in all fields",
-      });
-      return;
-    }
-
     setIsLoading(true);
 
     try {
-      await trackEvent("Login Attempt", {
-        method: "email",
-        email: email
-      });
-
       await login(email, password);
-      
-      await trackEvent("Login Success", {
-        method: "email",
-        email: email
-      });
-
-      // Navigate will happen automatically through the auth context effect
-
     } catch (error: any) {
       console.error("Login error:", error);
-      
-      await trackEvent("Login Failed", {
-        method: "email",
-        email: email,
-        error: error.message
-      });
-
       toast({
         variant: "destructive",
         title: "Error",
@@ -73,11 +42,6 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     try {
       setIsGoogleLoading(true);
-      
-      await trackEvent("Login Attempt", {
-        method: "google"
-      });
-
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -91,19 +55,8 @@ const Login = () => {
       });
       
       if (error) throw error;
-
-      await trackEvent("Login Success", {
-        method: "google"
-      });
-
     } catch (error: any) {
       console.error('Error logging in with Google:', error);
-      
-      await trackEvent("Login Failed", {
-        method: "google",
-        error: error.message
-      });
-
       toast({
         variant: "destructive",
         title: "Error",

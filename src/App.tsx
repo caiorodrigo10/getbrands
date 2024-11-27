@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import { AppRoutes } from "./routes/AppRoutes";
@@ -23,33 +23,12 @@ const queryClient = new QueryClient({
   },
 });
 
-// Separate component to handle route changes
-const RouteTracker = () => {
-  const location = useLocation();
-  
-  useEffect(() => {
-    // Track page view with enhanced debugging
-    const trackPageView = async () => {
-      console.log('Tracking page view:', {
-        path: location.pathname,
-        key: location.key,
-        timestamp: new Date().toISOString()
-      });
-      
-      await trackPage({
-        initial_load: location.key === 'default',
-        route_change: location.key !== 'default',
-        timestamp: new Date().toISOString()
-      });
-    };
-
-    trackPageView();
-  }, [location]);
-
-  return null;
-};
-
 const App = () => {
+  useEffect(() => {
+    // Track initial page view
+    trackPage();
+  }, []);
+
   return (
     <SessionContextProvider supabaseClient={supabase}>
       <QueryClientProvider client={queryClient}>
@@ -57,7 +36,6 @@ const App = () => {
           <AuthProvider>
             <CartProvider>
               <TooltipProvider>
-                <RouteTracker />
                 <AppRoutes />
                 <Toaster />
                 <Sonner />
