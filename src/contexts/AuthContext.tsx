@@ -72,10 +72,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const handleUserSession = async (user: User | null, isInitialLogin = false) => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+    if (!user) return;
 
     try {
       const { data: profile, error } = await supabase
@@ -88,8 +85,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       const typedProfile = profile as ProfileType;
 
+      // Identify user with all available information
       await handleUserIdentification(user, typedProfile);
 
+      // Only redirect if it's the initial login
       if (isInitialLogin) {
         if (!typedProfile?.onboarding_completed) {
           navigate('/onboarding');
@@ -101,31 +100,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch (error) {
       console.error('Error checking user profile:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      const isInitialLogin = event === 'SIGNED_IN';
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        await handleUserSession(session.user, isInitialLogin);
-      } else {
-        setLoading(false);
-      }
-    });
-
-    // Initial session check
+    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         handleUserSession(session.user, false);
-      } else {
-        setLoading(false);
       }
+      setLoading(false);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const isInitialLogin = _event === 'SIGNED_IN';
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        handleUserSession(session.user, isInitialLogin);
+      }
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();

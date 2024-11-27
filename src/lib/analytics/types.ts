@@ -1,15 +1,29 @@
-// Type definitions to maintain type compatibility
-export type AnalyticsEvent = {
-  name: string;
-  properties?: Record<string, any>;
-};
+export interface CustomerData {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
+}
 
-export type AnalyticsUser = {
-  id: string;
-  traits?: Record<string, any>;
-};
+export interface OrderData {
+  order_id: string;
+  revenue: number;
+  currency: string;
+  payment_method: string;
+  products: Array<{
+    product_id: string;
+    sku: string;
+    name: string;
+    price: number;
+    quantity: number;
+    category?: string;
+  }>;
+  customer?: CustomerData;
+}
 
-export type AnalyticsPage = {
-  name: string;
-  properties?: Record<string, any>;
-};
+export interface TrackingData {
+  url?: string;
+  path?: string;
+  timestamp?: string;
+  [key: string]: any;
+}
