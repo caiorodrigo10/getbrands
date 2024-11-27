@@ -54,9 +54,9 @@ serve(async (req) => {
 
     // Format shipping lines for Shopify with additional details
     const shippingLines = orderData.shipping_cost ? [{
-      title: "Frete Expresso",
+      title: "Express Shipping",
       price: orderData.shipping_cost.toFixed(2),
-      code: "EXPRESSO",
+      code: "EXPRESS",
       source: "Lovable System"
     }] : [];
 
