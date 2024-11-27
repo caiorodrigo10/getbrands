@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, ShoppingBag, LayoutDashboard, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { UserInfo } from "./user-menu/UserInfo";
 import { MobileMenu } from "./user-menu/MobileMenu";
+import { MenuItems } from "./user-menu/MenuItems";
+import { useSessionManagement } from "@/hooks/useSessionManagement";
 import { toast } from "sonner";
 
 interface UserMenuProps {
@@ -21,11 +21,12 @@ interface UserMenuProps {
 }
 
 const UserMenu = ({ isMobile }: UserMenuProps) => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const { handleLogout } = useSessionManagement();
   const isInAdminPanel = location.pathname.startsWith('/admin');
 
   useEffect(() => {
@@ -99,31 +100,6 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) {
-        console.error('Session error:', sessionError);
-        navigate('/login');
-        return;
-      }
-
-      if (!session) {
-        navigate('/login');
-        return;
-      }
-
-      await logout();
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-      toast.error("Error during logout. Please try again.");
-      // Still navigate to login page even if there's an error
-      navigate('/login');
-    }
-  };
-
   if (isMobile) {
     return (
       <MobileMenu
@@ -171,36 +147,12 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-gray-100" />
-        <div className="p-1">
-          <Link to="/profile">
-            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#fff4fc] hover:text-black rounded-md">
-              <User className="h-4 w-4 text-black" />
-              <span className="text-black">My Profile</span>
-            </DropdownMenuItem>
-          </Link>
-          <Link to="/sample-orders">
-            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#fff4fc] hover:text-black rounded-md">
-              <ShoppingBag className="h-4 w-4 text-black" />
-              <span className="text-black">Orders</span>
-            </DropdownMenuItem>
-          </Link>
-          {isAdmin && (
-            <DropdownMenuItem 
-              onClick={handleAdminNavigation}
-              className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#fff4fc] hover:text-black rounded-md"
-            >
-              <LayoutDashboard className="h-4 w-4 text-black" />
-              <span className="text-black">{isInAdminPanel ? 'User View' : 'Admin Panel'}</span>
-            </DropdownMenuItem>
-          )}
-          <DropdownMenuItem 
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#fff4fc] hover:text-red-600 rounded-md text-red-600"
-          >
-            <LogOut className="h-4 w-4" />
-            <span>Sign Out</span>
-          </DropdownMenuItem>
-        </div>
+        <MenuItems
+          isAdmin={isAdmin}
+          isInAdminPanel={isInAdminPanel}
+          handleAdminNavigation={handleAdminNavigation}
+          handleLogout={handleLogout}
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   );
