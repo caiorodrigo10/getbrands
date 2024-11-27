@@ -20,7 +20,7 @@ type Step = {
   component: React.ComponentType<any>;
   props: Record<string, any>;
   autoAdvance?: boolean;
-  name: string;
+  name: string; // Added name for analytics
 };
 
 export function OnboardingQuiz() {
@@ -37,17 +37,17 @@ export function OnboardingQuiz() {
   // Track onboarding start when component mounts
   useState(() => {
     if (user?.id) {
-      trackOnboardingStarted({ user_id: user.id });
+      trackOnboardingStarted(user.id);
     }
   });
 
   const handleNext = () => {
     // Track step completion
-    trackOnboardingStepCompleted({
-      step: currentStep,
-      step_name: steps[currentStep].name,
-      data: { ...quizData }
-    });
+    trackOnboardingStepCompleted(
+      currentStep,
+      steps[currentStep].name,
+      { ...quizData }
+    );
     setCurrentStep((prev) => prev + 1);
   };
 
@@ -58,11 +58,7 @@ export function OnboardingQuiz() {
   const handleComplete = async () => {
     try {
       if (!user?.id) {
-        trackError({
-          error_type: "Onboarding Error",
-          error_message: "User not found",
-          component: "OnboardingQuiz"
-        });
+        trackError("Onboarding Error", "User not found", "OnboardingQuiz");
         toast.error("User not found");
         return;
       }
@@ -93,11 +89,7 @@ export function OnboardingQuiz() {
       navigate("/start-here");
     } catch (error: any) {
       console.error("Error updating profile:", error);
-      trackError({
-        error_type: "Profile Update Error",
-        error_message: error.message,
-        component: "OnboardingQuiz"
-      });
+      trackError("Profile Update Error", error.message, "OnboardingQuiz");
       toast.error(error.message || "Failed to update profile");
     }
   };
@@ -105,7 +97,7 @@ export function OnboardingQuiz() {
   // Track abandonment when user leaves the page
   window.onbeforeunload = () => {
     if (currentStep > 0 && currentStep < steps.length - 1) {
-      trackOnboardingAbandoned({ step: currentStep });
+      trackOnboardingAbandoned(currentStep);
     }
   };
 
