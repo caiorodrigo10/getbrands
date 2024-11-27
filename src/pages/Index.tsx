@@ -3,11 +3,8 @@ import { trackPage } from "@/lib/analytics";
 
 const Index = () => {
   useEffect(() => {
-    // Track home page visit
-    trackPage({
-      page_name: "Home",
-      path: "/",
-    });
+    // Track home page visit with correct parameter type
+    trackPage("Home");
   }, []);
 
   return (
