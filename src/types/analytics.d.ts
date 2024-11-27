@@ -6,6 +6,7 @@ export interface AnalyticsBrowserAPI {
   group(groupId: string, traits?: object): void;
   alias(userId: string, previousId?: string): void;
   debug(): void;
+  _writeKey?: string;
 }
 
 declare global {

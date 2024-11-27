@@ -7,10 +7,15 @@ declare global {
 }
 
 export const debugAnalytics = () => {
+  console.log('Initializing Segment Analytics debugging...');
+  
   if (!window.analytics) {
-    console.error('Segment analytics not found! Check installation.');
+    console.error('❌ Segment analytics not initialized! Check installation.');
     return false;
   }
+
+  console.log('✅ Segment analytics object found');
+  console.log(`Write Key: ${window.analytics._writeKey}`);
 
   // Test page tracking
   try {
