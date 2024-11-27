@@ -1,9 +1,8 @@
 import { trackEvent } from "./core";
 
-export const trackOnboardingStarted = (userId: string) => {
+export const trackOnboardingStarted = (userType: string) => {
   trackEvent("Onboarding Started", {
-    user_id: userId,
-    timestamp: new Date().toISOString()
+    user_type: userType,
   });
 };
 
@@ -16,13 +15,21 @@ export const trackOnboardingStepCompleted = (
     step_number: stepNumber,
     step_name: stepName,
     ...stepData,
-    timestamp: new Date().toISOString()
   });
 };
 
-export const trackOnboardingAbandoned = (lastCompletedStep: number) => {
+export const trackOnboardingCompleted = (userData: Record<string, any>) => {
+  trackEvent("Onboarding Completed", {
+    ...userData,
+  });
+};
+
+export const trackOnboardingAbandoned = (
+  lastCompletedStep: number,
+  reason?: string
+) => {
   trackEvent("Onboarding Abandoned", {
     last_completed_step: lastCompletedStep,
-    timestamp: new Date().toISOString()
+    reason: reason,
   });
 };

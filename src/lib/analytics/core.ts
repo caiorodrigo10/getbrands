@@ -1,74 +1,40 @@
-import { SegmentAnalytics } from './types/segment';
-import { SEGMENT_WRITE_KEY, shouldTrackEvent, debugLog } from './config';
-import { getSessionId } from './session';
-
 declare global {
   interface Window {
-    analytics: SegmentAnalytics;
+    analytics: {
+      track: (event: string, properties?: Record<string, any>) => void;
+      page: (properties?: Record<string, any>) => void;
+      identify: (userId: string, traits?: Record<string, any>) => void;
+      group: (groupId: string, traits?: Record<string, any>) => void;
+      screen: (screenName: string, properties?: Record<string, any>) => void;
+    };
   }
 }
 
-const loadSegment = async () => {
-  if (!SEGMENT_WRITE_KEY) {
-    console.error('Segment write key is not configured');
-    return;
-  }
+const isDevelopment = import.meta.env.DEV;
+const SEGMENT_DEBUG = import.meta.env.VITE_SEGMENT_DEBUG === 'true';
 
-  // Initialize Segment
-  const analytics = window.analytics = window.analytics || {} as SegmentAnalytics;
-  
-  if (!analytics.initialize) {
-    analytics.methods = [
-      'trackSubmit',
-      'trackClick',
-      'trackLink',
-      'trackForm',
-      'pageview',
-      'identify',
-      'reset',
-      'group',
-      'track',
-      'ready',
-      'alias',
-      'debug',
-      'page',
-      'screen',
-      'once',
-      'off',
-      'on',
-      'addSourceMiddleware',
-      'addIntegrationMiddleware',
-      'setAnonymousId',
-      'addDestinationMiddleware'
-    ];
-    analytics.factory = function(method: string) {
-      return function() {
-        const args = Array.prototype.slice.call(arguments);
-        args.unshift(method);
-        (analytics as any).push(args);
-        return analytics;
-      };
-    };
-    for (const method of analytics.methods) {
-      (analytics as any)[method] = analytics.factory(method);
-    }
-  }
+// Track unique sessions to prevent duplicate page views
+let currentSessionId: string | null = null;
 
-  // Load Segment script
-  const script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.async = true;
-  script.src = `https://cdn.segment.com/analytics.js/v1/${SEGMENT_WRITE_KEY}/analytics.min.js`;
-  
-  const firstScript = document.getElementsByTagName('script')[0];
-  firstScript.parentNode?.insertBefore(script, firstScript);
+const getSessionId = () => {
+  if (!currentSessionId) {
+    currentSessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+  return currentSessionId;
 };
 
-const ensureAnalyticsLoaded = async (): Promise<void> => {
-  if (!window.analytics) {
-    await loadSegment();
-  }
+const shouldTrackEvent = () => {
+  // Track events in production or if explicitly enabled for development
+  return !isDevelopment || import.meta.env.VITE_FORCE_ANALYTICS === 'true';
+};
 
+const debugLog = (type: string, eventName: string, properties?: Record<string, any>) => {
+  if (SEGMENT_DEBUG || isDevelopment) {
+    console.log(`[Segment ${type}]`, eventName, properties);
+  }
+};
+
+const ensureAnalyticsLoaded = (): Promise<void> => {
   return new Promise((resolve) => {
     if (window.analytics) {
       resolve();
@@ -107,7 +73,7 @@ export const trackPage = async (properties?: Record<string, any>) => {
         title: document.title,
         search: window.location.search,
         session_id: sessionId,
-        environment: import.meta.env.DEV ? 'development' : 'production',
+        environment: isDevelopment ? 'development' : 'production',
         ...properties,
         timestamp: new Date().toISOString(),
       };
@@ -132,7 +98,7 @@ export const trackEvent = async (eventName: string, properties?: Record<string, 
         url: window.location.href,
         path: window.location.pathname,
         session_id: sessionId,
-        environment: import.meta.env.DEV ? 'development' : 'production',
+        environment: isDevelopment ? 'development' : 'production',
         ...properties,
         timestamp: new Date().toISOString(),
       };
@@ -154,7 +120,7 @@ export const identifyUser = async (userId: string, traits?: Record<string, any>)
     if (window.analytics) {
       const enhancedTraits = {
         ...traits,
-        environment: import.meta.env.DEV ? 'development' : 'production',
+        environment: isDevelopment ? 'development' : 'production',
         lastIdentified: new Date().toISOString(),
       };
 
