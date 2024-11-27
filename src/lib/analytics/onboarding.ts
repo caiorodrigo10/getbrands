@@ -1,35 +1,16 @@
-import { trackEvent } from "./core";
+import { trackEvent } from './core';
+import type { OnboardingProperties } from './types';
 
-export const trackOnboardingStarted = (userType: string) => {
-  trackEvent("Onboarding Started", {
-    user_type: userType,
-  });
+export const trackOnboardingProgress = (properties: OnboardingProperties) => {
+  trackEvent('Onboarding Progress', properties);
 };
 
-export const trackOnboardingStepCompleted = (
-  stepNumber: number, 
-  stepName: string, 
-  stepData: Record<string, any>
+export const trackOnboardingDropoff = (
+  abandonmentPoint: string,
+  abandonmentReason?: string
 ) => {
-  trackEvent("Onboarding Step Completed", {
-    step_number: stepNumber,
-    step_name: stepName,
-    ...stepData,
-  });
-};
-
-export const trackOnboardingCompleted = (userData: Record<string, any>) => {
-  trackEvent("Onboarding Completed", {
-    ...userData,
-  });
-};
-
-export const trackOnboardingAbandoned = (
-  lastCompletedStep: number,
-  reason?: string
-) => {
-  trackEvent("Onboarding Abandoned", {
-    last_completed_step: lastCompletedStep,
-    reason: reason,
+  trackEvent('Onboarding Funnel Dropoff', {
+    abandonment_point: abandonmentPoint,
+    abandonment_reason: abandonmentReason,
   });
 };
