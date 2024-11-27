@@ -1,3 +1,5 @@
+import { toast } from "sonner";
+
 const SEGMENT_DEBUG = process.env.NODE_ENV === 'development';
 
 export const identifyUser = async (userId: string, traits?: Record<string, any>) => {
@@ -54,7 +56,7 @@ export const trackPage = (properties?: Record<string, any>) => {
   }
 
   try {
-    window.analytics.page({
+    window.analytics.page("Page View", {
       ...properties,
       url: window.location.href,
       path: window.location.pathname,

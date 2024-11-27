@@ -14,7 +14,7 @@ export const debugAnalytics = () => {
 
   // Test page tracking
   try {
-    window.analytics.page({
+    window.analytics.page("Debug Page", {
       title: document.title,
       url: window.location.href,
       path: window.location.pathname,
