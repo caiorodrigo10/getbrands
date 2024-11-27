@@ -15,7 +15,21 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      const checkUserRole = async () => {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user?.id)
+          .single();
+          
+        if (profile?.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
+      };
+      
+      checkUserRole();
     }
   }, [isAuthenticated, navigate]);
 
@@ -25,7 +39,6 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate('/dashboard');
     } catch (error: any) {
       console.error("Login error:", error);
       toast({
@@ -43,7 +56,7 @@ const Login = () => {
       <div className="w-full max-w-md space-y-8 p-8 bg-white rounded-2xl shadow-lg">
         <div className="flex flex-col items-center space-y-2">
           <img
-            src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
+            src="/lovable-uploads/f0fa9ff6-43ca-42bb-80f0-379ac7a30a31.png"
             alt="Logo"
             className="w-[180px] h-auto"
           />

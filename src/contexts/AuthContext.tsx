@@ -3,7 +3,7 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { AuthContextType } from "@/lib/auth/types";
-import { handleUserSession } from "@/lib/auth/session";
+import { useToast } from "@/hooks/use-toast";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -32,9 +33,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           setUser(session.user);
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+            
+          if (profile?.role === 'admin') {
+            navigate('/admin');
+          } else {
+            navigate('/dashboard');
+          }
         }
       } catch (error) {
         console.error('Error in initializeAuth:', error);
+        toast({
+          variant: "destructive",
+          title: "Erro na autenticação",
+          description: "Houve um problema ao inicializar a autenticação.",
+        });
       } finally {
         setLoading(false);
       }
@@ -45,6 +62,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         setUser(session.user);
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+          
+        if (profile?.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         setUser(null);
       }
@@ -52,7 +80,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, toast]);
 
   const login = async (email: string, password: string) => {
     try {
@@ -65,9 +93,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (data.user) {
         setUser(data.user);
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+          
+        if (profile?.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in login:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro no login",
+        description: error.message || "Houve um problema ao fazer login.",
+      });
       throw error;
     }
   };
@@ -79,8 +123,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       setUser(null);
       navigate('/login');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in logout:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao sair",
+        description: error.message || "Houve um problema ao fazer logout.",
+      });
       throw error;
     }
   };
