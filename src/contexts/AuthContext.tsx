@@ -3,7 +3,6 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { AuthContextType } from "@/lib/auth/types";
-import { handleUserSession } from "@/lib/auth/session";
 import { toast } from "sonner";
 
 const AuthContext = createContext<AuthContextType>({
