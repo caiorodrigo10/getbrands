@@ -16,10 +16,8 @@ export const useSessionManagement = () => {
       // First clear any stored auth data
       localStorage.removeItem('supabase.auth.token');
       
-      // Then attempt to sign out
-      const { error } = await supabase.auth.signOut({
-        scope: 'local'  // Changed from 'global' to 'local' to avoid session validation
-      });
+      // Then attempt to sign out without scope parameter
+      const { error } = await supabase.auth.signOut();
       
       if (error && !error.message?.includes('session_not_found')) {
         console.error('Logout error:', error);
