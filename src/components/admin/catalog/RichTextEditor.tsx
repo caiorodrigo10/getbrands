@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Bold, Italic, Link, List, MoreHorizontal, Underline } from "lucide-react";
 import { useRef, useState } from "react";
 import ReactMarkdown from 'react-markdown';
+import parse from 'html-react-parser';
 
 interface RichTextEditorProps {
   value: string;
@@ -22,32 +23,46 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
     const selectedText = value || textarea.value.substring(start, end);
 
     let formattedText = '';
-    let surroundText = '';
+    let prefix = '';
+    let suffix = '';
+    
     switch (command) {
       case 'bold':
-        surroundText = '**';
+        prefix = '<strong>';
+        suffix = '</strong>';
         break;
       case 'italic':
-        surroundText = '*';
+        prefix = '<em>';
+        suffix = '</em>';
         break;
       case 'underline':
-        surroundText = '__';
+        prefix = '<u>';
+        suffix = '</u>';
         break;
       case 'link':
         const url = prompt('Enter URL:');
         if (url) {
-          formattedText = `[${selectedText}](${url})`;
+          prefix = `<a href="${url}">`;
+          suffix = '</a>';
         }
         break;
       case 'list':
-        formattedText = selectedText.split('\n').map(line => `- ${line}`).join('\n');
+        formattedText = selectedText
+          .split('\n')
+          .map(line => `<li>${line}</li>`)
+          .join('\n');
+        formattedText = `<ul>\n${formattedText}\n</ul>`;
+        break;
+      case 'paragraph':
+        prefix = '<p>';
+        suffix = '</p>';
         break;
       default:
         return;
     }
 
     if (!formattedText) {
-      formattedText = `${surroundText}${selectedText}${surroundText}`;
+      formattedText = `${prefix}${selectedText}${suffix}`;
     }
 
     const newValue = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
@@ -57,10 +72,15 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
     setTimeout(() => {
       textarea.focus();
       textarea.setSelectionRange(
-        start + surroundText.length,
-        start + formattedText.length - surroundText.length
+        start + prefix.length,
+        start + formattedText.length - suffix.length
       );
     }, 0);
+  };
+
+  const isHTML = (str: string) => {
+    const doc = new DOMParser().parseFromString(str, 'text/html');
+    return Array.from(doc.body.childNodes).some(node => node.nodeType === 1);
   };
 
   return (
@@ -143,7 +163,7 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
       
       {isPreview ? (
         <div className="min-h-[200px] p-4 border rounded-md prose prose-sm max-w-none">
-          <ReactMarkdown>{value}</ReactMarkdown>
+          {isHTML(value) ? parse(value) : <ReactMarkdown>{value}</ReactMarkdown>}
         </div>
       ) : (
         <Textarea 
