@@ -5,6 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { clearGleapIdentity } from "@/lib/auth/analytics";
 
 const Login = () => {
   const { toast } = useToast();
@@ -15,8 +16,21 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const clearSession = async () => {
+      // Clear Gleap identity when accessing login page
+      clearGleapIdentity();
+      
+      // Sign out from Supabase to ensure clean state
+      await supabase.auth.signOut();
+    };
+
+    clearSession();
+  }, []); // Run only once when component mounts
+
+  useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      
       if (session?.user) {
         const { data: profile } = await supabase
           .from('profiles')

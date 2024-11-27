@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { SignUpFormFields } from "@/components/auth/signup/SignUpFormFields";
 import { trackEvent } from "@/lib/analytics";
+import { clearGleapIdentity } from "@/lib/auth/analytics";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -20,6 +21,18 @@ const SignUp = () => {
     password: "",
     phone: "",
   });
+
+  useEffect(() => {
+    const clearSession = async () => {
+      // Clear Gleap identity when accessing signup page
+      clearGleapIdentity();
+      
+      // Sign out from Supabase to ensure clean state
+      await supabase.auth.signOut();
+    };
+
+    clearSession();
+  }, []); // Run only once when component mounts
 
   const validateForm = () => {
     const newErrors = {
@@ -104,6 +117,7 @@ const SignUp = () => {
         });
 
         navigate("/login");
+        toast.success("Account created successfully! Please log in.");
       }
     } catch (error: any) {
       console.error("Error signing up:", error);
