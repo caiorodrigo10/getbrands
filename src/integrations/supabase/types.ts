@@ -1129,6 +1129,33 @@ export type Database = {
         }
         Relationships: []
       }
+      shopify_logs: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          payload: Json
+          status: string
+          topic: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          payload: Json
+          status: string
+          topic: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          payload?: Json
+          status?: string
+          topic?: string
+        }
+        Relationships: []
+      }
       shopify_products: {
         Row: {
           created_at: string | null

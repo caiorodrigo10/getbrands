@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export const ShopifyWebhookTester = () => {
   const [webhooks, setWebhooks] = useState<any[]>([]);
   const [webhookLogs, setWebhookLogs] = useState<any[]>([]);
+  const [shopifyLogs, setShopifyLogs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -56,22 +57,33 @@ export const ShopifyWebhookTester = () => {
     }
   };
 
-  const fetchWebhookLogs = async () => {
+  const fetchLogs = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch webhook logs
+      const { data: webhookData, error: webhookError } = await supabase
         .from('webhook_logs')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(50);
 
-      if (error) throw error;
-      setWebhookLogs(data || []);
+      if (webhookError) throw webhookError;
+      setWebhookLogs(webhookData || []);
+
+      // Fetch Shopify logs
+      const { data: shopifyData, error: shopifyError } = await supabase
+        .from('shopify_logs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (shopifyError) throw shopifyError;
+      setShopifyLogs(shopifyData || []);
     } catch (error) {
       console.error('Erro ao buscar logs:', error);
       toast({
         variant: "destructive",
         title: "Erro",
-        description: "Falha ao carregar logs dos webhooks",
+        description: "Falha ao carregar logs",
       });
     }
   };
@@ -79,10 +91,10 @@ export const ShopifyWebhookTester = () => {
   // Fetch webhooks and logs when component mounts
   useEffect(() => {
     handleListWebhooks();
-    fetchWebhookLogs();
+    fetchLogs();
     
     // Set up real-time subscription for webhook logs
-    const subscription = supabase
+    const webhookSubscription = supabase
       .channel('webhook_logs_changes')
       .on('postgres_changes', 
         { 
@@ -96,8 +108,24 @@ export const ShopifyWebhookTester = () => {
       )
       .subscribe();
 
+    // Set up real-time subscription for Shopify logs
+    const shopifySubscription = supabase
+      .channel('shopify_logs_changes')
+      .on('postgres_changes', 
+        { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'shopify_logs' 
+        }, 
+        (payload) => {
+          setShopifyLogs(current => [payload.new, ...current].slice(0, 50));
+        }
+      )
+      .subscribe();
+
     return () => {
-      subscription.unsubscribe();
+      webhookSubscription.unsubscribe();
+      shopifySubscription.unsubscribe();
     };
   }, []);
 
@@ -123,7 +151,8 @@ export const ShopifyWebhookTester = () => {
       <Tabs defaultValue="webhooks" className="w-full">
         <TabsList>
           <TabsTrigger value="webhooks">Webhooks Registrados</TabsTrigger>
-          <TabsTrigger value="logs">Logs</TabsTrigger>
+          <TabsTrigger value="webhook-logs">Logs de Webhook</TabsTrigger>
+          <TabsTrigger value="shopify-logs">Logs do Shopify</TabsTrigger>
         </TabsList>
 
         <TabsContent value="webhooks">
@@ -145,7 +174,7 @@ export const ShopifyWebhookTester = () => {
           )}
         </TabsContent>
 
-        <TabsContent value="logs">
+        <TabsContent value="webhook-logs">
           <div className="border rounded-lg p-4">
             <ScrollArea className="h-[300px]">
               {webhookLogs.map((log) => (
@@ -155,6 +184,34 @@ export const ShopifyWebhookTester = () => {
                 >
                   <p><strong>Tópico:</strong> {log.topic}</p>
                   <p><strong>Data:</strong> {new Date(log.created_at).toLocaleString()}</p>
+                  <details className="mt-2">
+                    <summary className="cursor-pointer text-sm text-muted-foreground">
+                      Ver payload
+                    </summary>
+                    <pre className="mt-2 p-2 bg-muted rounded-md text-xs overflow-auto">
+                      {JSON.stringify(log.payload, null, 2)}
+                    </pre>
+                  </details>
+                </div>
+              ))}
+            </ScrollArea>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="shopify-logs">
+          <div className="border rounded-lg p-4">
+            <ScrollArea className="h-[300px]">
+              {shopifyLogs.map((log) => (
+                <div 
+                  key={log.id} 
+                  className="p-4 border-b last:border-b-0"
+                >
+                  <p><strong>Tópico:</strong> {log.topic}</p>
+                  <p><strong>Status:</strong> {log.status}</p>
+                  <p><strong>Data:</strong> {new Date(log.created_at).toLocaleString()}</p>
+                  {log.error && (
+                    <p className="text-destructive"><strong>Erro:</strong> {log.error}</p>
+                  )}
                   <details className="mt-2">
                     <summary className="cursor-pointer text-sm text-muted-foreground">
                       Ver payload
