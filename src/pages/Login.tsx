@@ -16,6 +16,17 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate('/dashboard');
+      }
+    };
+    
+    checkSession();
+  }, [navigate]);
+
+  useEffect(() => {
     if (isAuthenticated) {
       navigate('/dashboard');
     }
