@@ -2,14 +2,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import { AppRoutes } from "./routes/AppRoutes";
-import { useEffect } from "react";
-import { trackPage } from "@/lib/analytics";
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
+import { debugAnalytics } from "./lib/analytics/debug";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,8 +25,9 @@ const queryClient = new QueryClient({
 
 const App = () => {
   useEffect(() => {
-    // Track initial page view
-    trackPage();
+    if (process.env.NODE_ENV === 'development') {
+      debugAnalytics();
+    }
   }, []);
 
   return (

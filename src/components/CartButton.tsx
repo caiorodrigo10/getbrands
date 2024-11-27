@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
+import { trackEvent } from "@/lib/analytics";
 import {
   Tooltip,
   TooltipContent,
@@ -13,6 +14,19 @@ export function CartButton() {
   const { items } = useCart();
   const navigate = useNavigate();
 
+  const handleCartClick = () => {
+    trackEvent("Cart Viewed", {
+      items_count: items.length,
+      items: items.map(item => ({
+        product_id: item.id,
+        product_name: item.name,
+        quantity: item.quantity,
+        price: item.from_price
+      }))
+    });
+    navigate("/checkout/confirmation");
+  };
+
   return (
     <TooltipProvider>
       <Tooltip>
@@ -21,7 +35,7 @@ export function CartButton() {
             variant="outline"
             size="icon"
             className="relative"
-            onClick={() => navigate("/checkout/confirmation")}
+            onClick={handleCartClick}
           >
             <ShoppingCart className="h-5 w-5" />
             {items.length > 0 && (
