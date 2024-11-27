@@ -31,6 +31,15 @@ export async function createShopifyOrder({
   lineItems
 }: CreateOrderParams) {
   try {
+    // Get the sample request to access the saved shipping cost
+    const { data: sampleRequest, error: sampleRequestError } = await supabase
+      .from('sample_requests')
+      .select('shipping_cost')
+      .eq('id', orderId)
+      .single();
+
+    if (sampleRequestError) throw sampleRequestError;
+
     // Filter out any line items that don't have a valid Shopify variant ID
     const validLineItems = lineItems.filter(item => item.variant_id);
 
@@ -56,7 +65,13 @@ export async function createShopifyOrder({
             country: "US"
           },
           line_items: validLineItems,
-          financial_status: "paid"
+          financial_status: "paid",
+          shipping_lines: [{
+            title: "Standard Shipping",
+            price: sampleRequest.shipping_cost.toFixed(2),
+            code: "STANDARD",
+            source: "Lovable System"
+          }]
         }
       }
     });
