@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const { toast } = useToast();
@@ -19,7 +20,7 @@ const Login = () => {
         const { data: profile } = await supabase
           .from('profiles')
           .select('role')
-          .eq('id', user?.id)
+          .eq('id', auth.user()?.id)
           .single();
           
         if (profile?.role === 'admin') {
@@ -43,8 +44,8 @@ const Login = () => {
       console.error("Login error:", error);
       toast({
         variant: "destructive",
-        title: "Erro no login",
-        description: "Email ou senha incorretos. Por favor, tente novamente.",
+        title: "Login Error",
+        description: "Incorrect email or password. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -56,8 +57,8 @@ const Login = () => {
       <div className="w-full max-w-md space-y-8 p-8 bg-white rounded-2xl shadow-lg">
         <div className="flex flex-col items-center space-y-2">
           <img
-            src="/lovable-uploads/f0fa9ff6-43ca-42bb-80f0-379ac7a30a31.png"
-            alt="Logo"
+            src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
+            alt="GetBrands Logo"
             className="w-[180px] h-auto"
           />
           <p className="text-gray-600">
@@ -101,21 +102,21 @@ const Login = () => {
             {isLoading ? (
               <div className="flex items-center justify-center">
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                <span>Entrando...</span>
+                <span>Signing in...</span>
               </div>
             ) : (
-              "Entrar"
+              "Sign in"
             )}
           </Button>
         </form>
 
         <div className="mt-4 text-center text-sm">
           <a href="/forgot-password" className="text-[#f0562e] hover:text-[#f0562e]/90">
-            Esqueceu a senha?
+            Forgot password?
           </a>
           <span className="mx-2 text-gray-400">•</span>
           <a href="/signup" className="text-[#f0562e] hover:text-[#f0562e]/90">
-            Criar uma conta
+            Create an account
           </a>
         </div>
       </div>
