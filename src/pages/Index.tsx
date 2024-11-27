@@ -3,8 +3,15 @@ import { trackPage } from "@/lib/analytics";
 
 const Index = () => {
   useEffect(() => {
-    // Track home page visit with correct parameter type
-    trackPage("Home");
+    trackPage({
+      initial_load: true,
+      route_change: false,
+      url: window.location.href,
+      referrer: document.referrer,
+      session_id: "session-1", // You should implement proper session ID generation
+      user_role: "member",
+      page_type: "home"
+    });
   }, []);
 
   return (
