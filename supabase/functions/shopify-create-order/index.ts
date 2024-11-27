@@ -50,15 +50,25 @@ serve(async (req) => {
   try {
     const { orderData } = await req.json();
 
-    console.log('Creating Shopify order with data:', orderData);
-    console.log('Shipping cost received:', orderData.shipping_cost);
+    console.log('Creating Shopify order with data:', {
+      ...orderData,
+      customer: {
+        ...orderData.customer,
+        email: '***@***.com' // Mask email for security
+      }
+    });
+
+    // Validate required data
+    if (!orderData.customer?.email || !orderData.line_items?.length) {
+      throw new Error('Missing required order data');
+    }
 
     // Validate shipping cost
-    if (orderData.shipping_cost === undefined || orderData.shipping_cost === null) {
+    if (typeof orderData.shipping_cost === 'undefined') {
       console.warn('Warning: No shipping cost provided in order data');
     }
 
-    // Format shipping lines for Shopify with additional details
+    // Format shipping lines for Shopify
     const shippingLines = orderData.shipping_cost ? [{
       title: "Express Shipping",
       price: orderData.shipping_cost.toFixed(2),
@@ -68,51 +78,85 @@ serve(async (req) => {
 
     console.log('Shipping lines configuration:', shippingLines);
 
+    // Prepare order payload with timeout
     const orderPayload = {
       order: {
-        ...orderData,
+        email: orderData.customer.email,
         send_receipt: true,
         inventory_behaviour: 'decrement_ignoring_policy',
-        email: orderData.customer.email,
         customer: {
           first_name: orderData.customer.first_name,
           last_name: orderData.customer.last_name,
           email: orderData.customer.email,
           phone: orderData.customer.phone,
         },
+        shipping_address: orderData.shipping_address,
+        billing_address: orderData.billing_address || orderData.shipping_address,
+        line_items: orderData.line_items,
         shipping_lines: shippingLines,
+        financial_status: orderData.financial_status,
       },
     };
 
-    console.log('Final order payload:', JSON.stringify(orderPayload, null, 2));
-
-    const response = await fetch(`https://${SHOPIFY_SHOP_DOMAIN}/admin/api/2024-01/orders.json`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN,
-      },
-      body: JSON.stringify(orderPayload),
+    console.log('Sending order payload to Shopify:', {
+      ...orderPayload,
+      order: {
+        ...orderPayload.order,
+        email: '***@***.com',
+        customer: {
+          ...orderPayload.order.customer,
+          email: '***@***.com'
+        }
+      }
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Shopify API error:', errorData);
-      throw new Error(`Shopify API error: ${JSON.stringify(errorData)}`);
+    // Create order with timeout
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 25000); // 25 second timeout
+
+    try {
+      const response = await fetch(
+        `https://${SHOPIFY_SHOP_DOMAIN}/admin/api/2024-01/orders.json`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN,
+          },
+          body: JSON.stringify(orderPayload),
+          signal: controller.signal,
+        }
+      );
+
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Shopify API error:', errorData);
+        throw new Error(`Shopify API error: ${JSON.stringify(errorData)}`);
+      }
+
+      const data = await response.json();
+      console.log('Shopify order created successfully:', {
+        order_id: data.order.id,
+        order_number: data.order.order_number
+      });
+
+      return new Response(
+        JSON.stringify({ success: true, shopifyOrder: data.order }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    } catch (error) {
+      clearTimeout(timeout);
+      throw error;
     }
-
-    const data = await response.json();
-    console.log('Shopify order created:', data);
-
-    return new Response(
-      JSON.stringify({ success: true, shopifyOrder: data.order }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-
   } catch (error) {
     console.error('Error creating Shopify order:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error instanceof Error ? error.stack : undefined 
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400 
