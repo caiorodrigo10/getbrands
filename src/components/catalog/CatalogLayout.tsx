@@ -4,22 +4,58 @@ import CatalogFilters from "@/components/CatalogFilters";
 import ProductGrid from "@/components/ProductGrid";
 import CatalogPagination from "./CatalogPagination";
 import { CartButton } from "@/components/CartButton";
-import { useState } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { useProducts } from "@/hooks/useProducts";
+import { useWindowSize } from "@/hooks/useWindowSize";
 
 const CatalogLayout = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
+  const { width } = useWindowSize();
+  const isMobile = width < 768;
+  const loadMoreRef = useRef(null);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   
   const { 
     data: productsData, 
     isLoading,
-    error 
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
   } = useProducts({ 
     page: currentPage,
+    limit: isMobile ? 7 : 9,
+    infinite: isMobile
   });
+
+  useEffect(() => {
+    if (productsData?.pages) {
+      const products = productsData.pages.flatMap(page => page.data);
+      setAllProducts(products);
+    }
+  }, [productsData]);
+
+  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+    const [target] = entries;
+    if (target.isIntersecting && hasNextPage && !isFetchingNextPage && isMobile) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, isMobile]);
+
+  useEffect(() => {
+    const element = loadMoreRef.current;
+    if (!element || !isMobile) return;
+
+    const observer = new IntersectionObserver(handleObserver, {
+      threshold: 0.1,
+    });
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [handleObserver, isMobile]);
 
   if (error) {
     toast({
@@ -49,7 +85,7 @@ const CatalogLayout = () => {
 
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {Array.from({ length: 9 }).map((_, i) => (
+            {Array.from({ length: isMobile ? 7 : 9 }).map((_, i) => (
               <div key={i} className="space-y-4">
                 <Skeleton className="h-[200px] w-full" />
                 <Skeleton className="h-4 w-[250px]" />
@@ -57,19 +93,34 @@ const CatalogLayout = () => {
               </div>
             ))}
           </div>
-        ) : productsData?.data && productsData.data.length > 0 ? (
-          <ProductGrid products={productsData.data} />
+        ) : allProducts && allProducts.length > 0 ? (
+          <>
+            <ProductGrid products={allProducts} />
+            {isMobile && (
+              <div 
+                ref={loadMoreRef} 
+                className="w-full py-8 flex justify-center"
+              >
+                {isFetchingNextPage && (
+                  <div className="space-y-4">
+                    <Skeleton className="h-[200px] w-full" />
+                    <Skeleton className="h-4 w-[250px]" />
+                  </div>
+                )}
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-12">
             <p className="text-lg text-muted-foreground">No products found.</p>
           </div>
         )}
         
-        {productsData?.totalPages && productsData.totalPages > 1 && (
+        {!isMobile && productsData?.pages?.[0]?.totalPages && productsData.pages[0].totalPages > 1 && (
           <div className="mt-section flex justify-center">
             <CatalogPagination
               currentPage={currentPage}
-              totalPages={productsData.totalPages}
+              totalPages={productsData.pages[0].totalPages}
               onPageChange={setCurrentPage}
             />
           </div>
