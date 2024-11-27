@@ -1,56 +1,6 @@
-declare global {
-  interface Window {
-    analytics: SegmentAnalytics.AnalyticsJS & any[];
-  }
-}
-
-interface SegmentAnalytics {
-  initialize(): void;
-  invoked: boolean;
-  methods: string[];
-  factory(method: string): Function;
-  push(...args: any[]): void;
-}
-
-namespace SegmentAnalytics {
-  export interface AnalyticsJS {
-    track(event: string, properties?: Record<string, any>): void;
-    page(properties?: Record<string, any>): void;
-    identify(userId: string, traits?: Record<string, any>): void;
-    group(groupId: string, traits?: Record<string, any>): void;
-    screen(screenName: string, properties?: Record<string, any>): void;
-    initialize(): void;
-    invoked: boolean;
-    methods: string[];
-    factory(method: string): Function;
-    push(...args: any[]): void;
-  }
-}
-
-const isDevelopment = import.meta.env.DEV;
-const SEGMENT_DEBUG = import.meta.env.VITE_SEGMENT_DEBUG === 'true';
-const SEGMENT_WRITE_KEY = import.meta.env.VITE_SEGMENT_WRITE_KEY;
-
-// Track unique sessions to prevent duplicate page views
-let currentSessionId: string | null = null;
-
-const getSessionId = () => {
-  if (!currentSessionId) {
-    currentSessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-  return currentSessionId;
-};
-
-const shouldTrackEvent = () => {
-  // Track events in production or if explicitly enabled for development
-  return !isDevelopment || import.meta.env.VITE_FORCE_ANALYTICS === 'true';
-};
-
-const debugLog = (type: string, eventName: string, properties?: Record<string, any>) => {
-  if (SEGMENT_DEBUG || isDevelopment) {
-    console.log(`[Segment ${type}]`, eventName, properties);
-  }
-};
+import { SegmentAnalyticsJS } from './types/segment';
+import { SEGMENT_WRITE_KEY, shouldTrackEvent, debugLog } from './config';
+import { getSessionId } from './session';
 
 const loadSegment = async () => {
   if (!SEGMENT_WRITE_KEY) {
@@ -59,7 +9,8 @@ const loadSegment = async () => {
   }
 
   // Initialize Segment
-  const analytics = window.analytics = window.analytics || [];
+  const analytics = window.analytics = window.analytics || [] as SegmentAnalyticsJS;
+  
   if (!analytics.initialize) {
     if (analytics.invoked) {
       console.error('Segment snippet included twice.');
@@ -89,7 +40,7 @@ const loadSegment = async () => {
       'setAnonymousId',
       'addDestinationMiddleware'
     ];
-    analytics.factory = (method: string) => {
+    analytics.factory = function(method: string) {
       return function() {
         const args = Array.prototype.slice.call(arguments);
         args.unshift(method);
@@ -155,7 +106,7 @@ export const trackPage = async (properties?: Record<string, any>) => {
         title: document.title,
         search: window.location.search,
         session_id: sessionId,
-        environment: isDevelopment ? 'development' : 'production',
+        environment: import.meta.env.DEV ? 'development' : 'production',
         ...properties,
         timestamp: new Date().toISOString(),
       };
@@ -180,7 +131,7 @@ export const trackEvent = async (eventName: string, properties?: Record<string, 
         url: window.location.href,
         path: window.location.pathname,
         session_id: sessionId,
-        environment: isDevelopment ? 'development' : 'production',
+        environment: import.meta.env.DEV ? 'development' : 'production',
         ...properties,
         timestamp: new Date().toISOString(),
       };
@@ -202,7 +153,7 @@ export const identifyUser = async (userId: string, traits?: Record<string, any>)
     if (window.analytics) {
       const enhancedTraits = {
         ...traits,
-        environment: isDevelopment ? 'development' : 'production',
+        environment: import.meta.env.DEV ? 'development' : 'production',
         lastIdentified: new Date().toISOString(),
       };
 
