@@ -8,6 +8,14 @@ interface UseProductsOptions {
   infinite?: boolean;
 }
 
+interface ProductsResponse {
+  data: Product[];
+  totalPages: number;
+  totalCount: number;
+  nextPage: number;
+  hasMore: boolean;
+}
+
 export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProductsOptions = {}) => {
   const fetchProducts = async ({ pageParam = 1 }) => {
     const from = (pageParam - 1) * limit;
@@ -57,7 +65,5 @@ export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProduc
         pageParams: [page],
       };
     },
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    gcTime: 1000 * 60 * 5,
   });
 };

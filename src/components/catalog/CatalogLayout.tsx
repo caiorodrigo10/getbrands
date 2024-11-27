@@ -22,8 +22,8 @@ const CatalogLayout = () => {
     data: productsData, 
     isLoading,
     error,
-    fetchNextPage,
     hasNextPage,
+    fetchNextPage,
     isFetchingNextPage
   } = useProducts({ 
     page: currentPage,
