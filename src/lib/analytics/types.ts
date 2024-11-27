@@ -4,8 +4,12 @@ export type AnalyticsEvent = {
   properties?: Record<string, any>;
 };
 
-export type UserTraits = {
-  email?: string;
-  name?: string;
-  [key: string]: any;
+export type AnalyticsUser = {
+  id: string;
+  traits?: Record<string, any>;
+};
+
+export type AnalyticsPage = {
+  name: string;
+  properties?: Record<string, any>;
 };

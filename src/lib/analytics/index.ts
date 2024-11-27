@@ -1,6 +1,7 @@
+// Re-export all analytics functions
 export * from './core';
 export * from './ecommerce';
-export * from './engagement';
-export * from './user';
+export { trackButtonClick, trackFormSubmitted, trackFeatureUsed } from './engagement';
 export * from './onboarding';
-export type * from './types';
+export * from './user';
+export * from './types';

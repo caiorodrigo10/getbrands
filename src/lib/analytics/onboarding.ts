@@ -1,7 +1,7 @@
 // Empty implementations to maintain API compatibility
 export const trackOnboardingStarted = (userId: string) => {};
 export const trackOnboardingStepCompleted = (
-  step: number,
+  step: number, 
   stepName: string,
   data?: Record<string, any>
 ) => {};
