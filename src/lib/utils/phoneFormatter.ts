@@ -13,7 +13,10 @@ export const formatPhoneForShopify = (phone: string): string => {
     return `+${digits}`;
   } else if (digits.length === 10) {
     return `+1${digits}`;
-  } else {
+  } else if (digits.length > 10) {
+    // For international numbers, just add the plus
     return `+${digits}`;
   }
+  
+  return '';
 };
