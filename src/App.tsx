@@ -25,8 +25,32 @@ const queryClient = new QueryClient({
 
 const App = () => {
   useEffect(() => {
+    // Ensure Segment is loaded
+    if (!window.analytics) {
+      console.error('Segment analytics not found. Please check the script installation.');
+      return;
+    }
+
     // Track initial page view
-    trackPage();
+    trackPage({
+      initial_load: true,
+      timestamp: new Date().toISOString()
+    });
+
+    // Set up route change tracking
+    const handleRouteChange = () => {
+      trackPage({
+        route_change: true,
+        timestamp: new Date().toISOString()
+      });
+    };
+
+    // Listen for route changes
+    window.addEventListener('popstate', handleRouteChange);
+
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange);
+    };
   }, []);
 
   return (
