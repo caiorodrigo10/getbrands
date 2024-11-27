@@ -32,9 +32,15 @@ const CatalogLayout = () => {
   });
 
   useEffect(() => {
-    if (productsData?.pages) {
-      const products = productsData.pages.flatMap(page => page.data);
-      setAllProducts(products);
+    if (productsData) {
+      if ('pages' in productsData) {
+        // Handle infinite query data
+        const products = productsData.pages.flatMap(page => page.data);
+        setAllProducts(products);
+      } else {
+        // Handle regular query data
+        setAllProducts(productsData.data);
+      }
     }
   }, [productsData]);
 
@@ -64,6 +70,8 @@ const CatalogLayout = () => {
       description: "Failed to load products. Please try again.",
     });
   }
+
+  const totalPages = productsData && !('pages' in productsData) ? productsData.totalPages : 1;
 
   return (
     <div className="space-y-page">
@@ -116,11 +124,11 @@ const CatalogLayout = () => {
           </div>
         )}
         
-        {!isMobile && productsData?.pages?.[0]?.totalPages && productsData.pages[0].totalPages > 1 && (
+        {!isMobile && totalPages > 1 && (
           <div className="mt-section flex justify-center">
             <CatalogPagination
               currentPage={currentPage}
-              totalPages={productsData.pages[0].totalPages}
+              totalPages={totalPages}
               onPageChange={setCurrentPage}
             />
           </div>
