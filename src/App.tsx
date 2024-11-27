@@ -41,8 +41,11 @@ const RouteTracker = () => {
 
 const App = () => {
   useEffect(() => {
-    // Always initialize debug in all environments
+    // Initialize debug mode
     debugAnalytics();
+
+    // Track initial page view
+    trackPage();
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -54,16 +57,21 @@ const App = () => {
           .eq('id', session.user.id)
           .single();
 
-        // Identify user in Segment
-        await identifyUser(session.user.id, {
-          email: session.user.email,
-          first_name: profile?.first_name,
-          last_name: profile?.last_name,
-          phone: profile?.phone,
-          role: profile?.role,
-          auth_provider: session.user.app_metadata.provider,
-          last_sign_in: session.user.last_sign_in_at
-        });
+        if (profile) {
+          // Identify user in Segment with complete profile data
+          await identifyUser(session.user.id, {
+            email: session.user.email,
+            first_name: profile.first_name,
+            last_name: profile.last_name,
+            phone: profile.phone,
+            role: profile.role,
+            auth_provider: session.user.app_metadata.provider,
+            last_sign_in: session.user.last_sign_in_at,
+            onboarding_completed: profile.onboarding_completed,
+            profile_type: profile.profile_type,
+            brand_status: profile.brand_status
+          });
+        }
       }
     });
 
