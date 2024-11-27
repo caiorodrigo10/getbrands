@@ -38,7 +38,7 @@ export const AddressFormSection = ({
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Please fill in all required fields for both shipping and billing addresses.",
+        description: "Please fill in all required fields for shipping address.",
       });
       return;
     }
@@ -57,6 +57,25 @@ export const AddressFormSection = ({
         });
         return;
       }
+    }
+
+    // Store billing preference in localStorage
+    localStorage.setItem('useSameForBilling', useSameForBilling.toString());
+
+    // If using same address for billing, copy shipping address values
+    if (useSameForBilling) {
+      localStorage.setItem('billing_address', values.address1);
+      localStorage.setItem('billing_address2', values.address2 || '');
+      localStorage.setItem('billing_city', values.city);
+      localStorage.setItem('billing_state', values.state);
+      localStorage.setItem('billing_zip', values.zipCode);
+    } else {
+      // Store separate billing address
+      localStorage.setItem('billing_address', values.billingAddress1 || '');
+      localStorage.setItem('billing_address2', values.billingAddress2 || '');
+      localStorage.setItem('billing_city', values.billingCity || '');
+      localStorage.setItem('billing_state', values.billingState || '');
+      localStorage.setItem('billing_zip', values.billingZipCode || '');
     }
 
     await onSubmit(values);

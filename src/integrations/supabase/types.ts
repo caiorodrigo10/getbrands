@@ -1016,6 +1016,7 @@ export type Database = {
           shipping_cost: number | null
           shipping_state: string | null
           shipping_zip: string | null
+          shopify_order_id: string | null
           status: string | null
           subtotal: number
           total: number
@@ -1039,6 +1040,7 @@ export type Database = {
           shipping_cost?: number | null
           shipping_state?: string | null
           shipping_zip?: string | null
+          shopify_order_id?: string | null
           status?: string | null
           subtotal?: number
           total?: number
@@ -1062,6 +1064,7 @@ export type Database = {
           shipping_cost?: number | null
           shipping_state?: string | null
           shipping_zip?: string | null
+          shopify_order_id?: string | null
           status?: string | null
           subtotal?: number
           total?: number
@@ -1123,6 +1126,92 @@ export type Database = {
           max_items?: number | null
           min_items?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      shopify_logs: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          payload: Json
+          status: string
+          topic: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          payload: Json
+          status: string
+          topic: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          payload?: Json
+          status?: string
+          topic?: string
+        }
+        Relationships: []
+      }
+      shopify_products: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_synced_at: string | null
+          product_id: string | null
+          shopify_id: string
+          shopify_variant_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_synced_at?: string | null
+          product_id?: string | null
+          shopify_id: string
+          shopify_variant_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_synced_at?: string | null
+          product_id?: string | null
+          shopify_id?: string
+          shopify_variant_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopify_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhook_logs: {
+        Row: {
+          created_at: string
+          id: string
+          payload: Json
+          topic: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payload: Json
+          topic: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          topic?: string
         }
         Relationships: []
       }
