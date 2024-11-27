@@ -75,7 +75,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const handleUserSession = async (user: User | null, isInitialLogin = false) => {
-    if (!user) return;
+    if (!user) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
 
     try {
       const { data: profile, error } = await supabase
@@ -91,6 +95,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Identify user with all available information
       await handleUserIdentification(user, typedProfile);
 
+      setUser(user);
+
       // Only redirect if it's the initial login
       if (isInitialLogin) {
         if (!typedProfile?.onboarding_completed) {
@@ -103,29 +109,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch (error) {
       console.error('Error checking user profile:', error);
+      setUser(null);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
       if (session?.user) {
         handleUserSession(session.user, false);
+      } else {
+        setUser(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const isInitialLogin = _event === 'SIGNED_IN';
-      setUser(session?.user ?? null);
       if (session?.user) {
-        handleUserSession(session.user, isInitialLogin);
+        await handleUserSession(session.user, isInitialLogin);
+      } else {
+        setUser(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -133,17 +144,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      if (error) {
-        trackEvent("Login Failed", {
-          error: error.message,
-          email: email // Don't include password in tracking
-        });
-        throw error;
+      
+      if (error) throw error;
+      
+      if (!data.user) {
+        throw new Error("No user returned from login");
       }
+      
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -164,6 +175,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       // Clear Gleap identification on logout
       Gleap.clearIdentity();
+      
+      // Navigate to login after logout
+      navigate('/login');
     } catch (error) {
       console.error('Logout error:', error);
       throw error;

@@ -16,6 +16,7 @@ const Login = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/dashboard');
@@ -24,12 +25,21 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please fill in all fields",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       await trackEvent("Login Attempt", {
         method: "email",
-        email: email // Don't include password in tracking
+        email: email
       });
 
       await login(email, password);
@@ -38,6 +48,8 @@ const Login = () => {
         method: "email",
         email: email
       });
+
+      // Navigate will happen automatically through the auth context effect
 
     } catch (error: any) {
       console.error("Login error:", error);
