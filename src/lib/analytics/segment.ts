@@ -1,19 +1,10 @@
-declare global {
-  interface Window {
-    analytics: any;
-  }
-}
+import { initializeAnalytics, identifyUser, trackEvent } from './initialize';
 
 export const initializeSegment = (user: any) => {
-  if (!window.analytics) {
-    console.warn('Segment analytics not initialized');
-    return;
-  }
-
+  initializeAnalytics();
+  
   if (user?.id) {
-    window.analytics.identify(user.id, {
-      email: user.email,
-      created_at: user.created_at,
+    identifyUser(user, {
       first_name: user?.first_name,
       last_name: user?.last_name,
       role: user?.role,
@@ -25,22 +16,22 @@ export const initializeSegment = (user: any) => {
 export const trackPageView = (properties: Record<string, any> = {}) => {
   if (!window.analytics) return;
   
-  window.analytics.page({
-    ...properties,
-    timestamp: new Date().toISOString(),
-  });
-};
-
-export const trackEvent = (eventName: string, properties: Record<string, any> = {}) => {
-  if (!window.analytics) return;
-
-  window.analytics.track(eventName, {
-    ...properties,
-    timestamp: new Date().toISOString(),
+  window.analytics.ready(() => {
+    window.analytics.page({
+      ...properties,
+      timestamp: new Date().toISOString(),
+    });
   });
 };
 
 export const resetAnalytics = () => {
   if (!window.analytics) return;
-  window.analytics.reset();
+  
+  window.analytics.ready(() => {
+    window.analytics.reset();
+    console.log('Analytics reset completed');
+  });
 };
+
+// Re-export core tracking functions
+export { trackEvent };
