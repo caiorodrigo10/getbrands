@@ -1,12 +1,22 @@
 import { toast } from "sonner";
 
-export const identifyUser = async (userId: string, traits?: Record<string, any>) => {
-  if (!window.analytics) {
-    console.error('Segment analytics not initialized');
-    return;
-  }
+const waitForAnalytics = () => {
+  return new Promise<void>((resolve) => {
+    const check = () => {
+      if (window.analytics) {
+        resolve();
+      } else {
+        setTimeout(check, 100);
+      }
+    };
+    check();
+  });
+};
 
+export const identifyUser = async (userId: string, traits?: Record<string, any>) => {
   try {
+    await waitForAnalytics();
+    
     window.analytics.identify(userId, {
       ...traits,
       lastIdentified: new Date().toISOString(),
@@ -19,13 +29,10 @@ export const identifyUser = async (userId: string, traits?: Record<string, any>)
   }
 };
 
-export const trackEvent = (eventName: string, properties?: Record<string, any>) => {
-  if (!window.analytics) {
-    console.error('Segment analytics not initialized');
-    return;
-  }
-
+export const trackEvent = async (eventName: string, properties?: Record<string, any>) => {
   try {
+    await waitForAnalytics();
+    
     window.analytics.track(eventName, {
       ...properties,
       timestamp: new Date().toISOString(),
@@ -39,14 +46,11 @@ export const trackEvent = (eventName: string, properties?: Record<string, any>) 
   }
 };
 
-export const trackPage = (properties?: Record<string, any>) => {
-  if (!window.analytics) {
-    console.error('Segment analytics not initialized');
-    return;
-  }
-
+export const trackPage = async (properties?: Record<string, any>) => {
   try {
-    window.analytics.page("Page View", {
+    await waitForAnalytics();
+    
+    window.analytics.page({
       ...properties,
       url: window.location.href,
       path: window.location.pathname,
@@ -63,12 +67,13 @@ export const trackPage = (properties?: Record<string, any>) => {
 };
 
 // Initialize debug mode immediately
-window.addEventListener('load', () => {
-  if (!window.analytics) {
-    console.error('⚠️ Segment analytics not initialized on page load');
-    toast.error('Analytics not initialized properly');
-  } else {
+window.addEventListener('load', async () => {
+  try {
+    await waitForAnalytics();
     console.log('✅ Segment analytics initialized successfully');
     window.analytics.debug();
+  } catch (error) {
+    console.error('⚠️ Segment analytics not initialized on page load');
+    toast.error('Analytics not initialized properly');
   }
 });

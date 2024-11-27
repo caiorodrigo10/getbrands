@@ -10,6 +10,7 @@ import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { debugAnalytics } from "./lib/analytics/debug";
+import { trackPage } from "./lib/analytics";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,9 +26,16 @@ const queryClient = new QueryClient({
 
 const App = () => {
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      debugAnalytics();
-    }
+    // Always initialize debug in all environments
+    debugAnalytics();
+
+    // Track initial page view
+    trackPage({
+      url: window.location.href,
+      path: window.location.pathname,
+      title: document.title,
+      referrer: document.referrer
+    });
   }, []);
 
   return (

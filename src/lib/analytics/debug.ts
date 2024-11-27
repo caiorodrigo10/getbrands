@@ -9,40 +9,49 @@ declare global {
 export const debugAnalytics = () => {
   console.log('Initializing Segment Analytics debugging...');
   
-  if (!window.analytics) {
-    console.error('❌ Segment analytics not initialized! Check installation.');
-    return false;
-  }
+  // Wait for analytics to be available
+  const checkAnalytics = () => {
+    if (!window.analytics) {
+      console.error('❌ Segment analytics not initialized! Retrying in 1s...');
+      setTimeout(checkAnalytics, 1000);
+      return false;
+    }
 
-  console.log('✅ Segment analytics object found');
-  console.log(`Write Key: ${window.analytics._writeKey}`);
+    console.log('✅ Segment analytics object found');
+    console.log(`Write Key: ${window.analytics._writeKey}`);
 
-  // Test page tracking
-  try {
-    window.analytics.page("Debug Page", {
-      title: document.title,
-      url: window.location.href,
-      path: window.location.pathname,
-      referrer: document.referrer,
-      debug: true
-    });
-    console.log('✅ Page tracking test successful');
-  } catch (error) {
-    console.error('❌ Page tracking test failed:', error);
-  }
+    // Enable debug mode
+    window.analytics.debug();
 
-  // Test event tracking
-  try {
-    window.analytics.track("Debug Event", {
-      timestamp: new Date().toISOString(),
-      debug: true
-    });
-    console.log('✅ Event tracking test successful');
-  } catch (error) {
-    console.error('❌ Event tracking test failed:', error);
-  }
+    // Test page tracking
+    try {
+      window.analytics.page("Debug Page", {
+        title: document.title,
+        url: window.location.href,
+        path: window.location.pathname,
+        referrer: document.referrer,
+        debug: true
+      });
+      console.log('✅ Page tracking test successful');
+    } catch (error) {
+      console.error('❌ Page tracking test failed:', error);
+    }
 
-  return true;
+    // Test event tracking
+    try {
+      window.analytics.track("Debug Event", {
+        timestamp: new Date().toISOString(),
+        debug: true
+      });
+      console.log('✅ Event tracking test successful');
+    } catch (error) {
+      console.error('❌ Event tracking test failed:', error);
+    }
+
+    return true;
+  };
+
+  return checkAnalytics();
 };
 
 export const validateSegmentCall = (eventName: string, properties?: Record<string, any>) => {
