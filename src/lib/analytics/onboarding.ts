@@ -26,12 +26,3 @@ export const trackOnboardingAbandoned = (lastCompletedStep: number) => {
     timestamp: new Date().toISOString()
   });
 };
-
-export const trackError = (errorType: string, errorMessage: string, location: string) => {
-  trackEvent("Error Encountered", {
-    error_type: errorType,
-    error_message: errorMessage,
-    location: location,
-    timestamp: new Date().toISOString()
-  });
-};
