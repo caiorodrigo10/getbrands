@@ -1,9 +1,16 @@
-// Empty implementations to maintain API compatibility
-export const trackOnboardingStarted = (userId: string) => {};
-export const trackOnboardingStepCompleted = (
-  step: number, 
-  stepName: string,
-  data?: Record<string, any>
-) => {};
-export const trackOnboardingCompleted = (userId: string) => {};
-export const trackOnboardingAbandoned = (step: number) => {};
+import { trackEvent } from './core';
+import type { OnboardingProperties } from './types';
+
+export const trackOnboardingProgress = (properties: OnboardingProperties) => {
+  trackEvent('Onboarding Progress', properties);
+};
+
+export const trackOnboardingDropoff = (
+  abandonmentPoint: string,
+  abandonmentReason?: string
+) => {
+  trackEvent('Onboarding Funnel Dropoff', {
+    abandonment_point: abandonmentPoint,
+    abandonment_reason: abandonmentReason,
+  });
+};

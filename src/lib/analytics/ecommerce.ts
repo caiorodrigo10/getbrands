@@ -1,12 +1,14 @@
-// Empty implementations to maintain API compatibility
-export const trackAddToCart = (item: any) => {};
-export const trackCheckoutStep = (step: number, items: any[], data?: any) => {};
-export const trackOrderCompleted = (orderId: string, items: any[]) => {};
-export const trackCheckoutCompleted = (
-  orderId: string,
-  items: any[],
-  shippingInfo: any,
-  total: number,
-  shippingCost: number,
-  email: string
-) => {};
+import { trackEvent } from './core';
+import type { EcommerceProperties } from './types';
+
+export const trackAddToWishlist = (properties: EcommerceProperties) => {
+  trackEvent('Product Added to Wishlist', properties);
+};
+
+export const trackCartEngagement = (properties: EcommerceProperties) => {
+  trackEvent('Cart Engagement', properties);
+};
+
+export const trackAbandonedCart = (properties: EcommerceProperties) => {
+  trackEvent('Abandoned Cart', properties);
+};

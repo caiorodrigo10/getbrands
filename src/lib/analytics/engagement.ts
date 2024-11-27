@@ -1,4 +1,14 @@
-// Empty implementations to maintain API compatibility
-export const trackButtonClick = (buttonName: string, properties?: Record<string, any>) => {};
-export const trackFormSubmitted = (formName: string, properties?: Record<string, any>) => {};
-export const trackFeatureUsed = (featureName: string, properties?: Record<string, any>) => {};
+import { trackEvent } from './core';
+import type { EngagementProperties } from './types';
+
+export const trackMouseHover = (properties: EngagementProperties) => {
+  trackEvent('Mouse Hover', properties);
+};
+
+export const trackVideoWatched = (properties: EngagementProperties) => {
+  trackEvent('Video Watched', properties);
+};
+
+export const trackFeatureDropoff = (properties: EngagementProperties) => {
+  trackEvent('Feature Dropped Off', properties);
+};
