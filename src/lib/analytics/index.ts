@@ -1,5 +1,3 @@
-import { toast } from "sonner";
-
 const SEGMENT_DEBUG = process.env.NODE_ENV === 'development';
 
 export const identifyUser = async (userId: string, traits?: Record<string, any>) => {
