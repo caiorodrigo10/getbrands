@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const { toast } = useToast();
@@ -155,13 +155,13 @@ const Login = () => {
         </form>
 
         <div className="mt-4 text-center text-sm">
-          <Link to="/forgot-password" className="text-[#f0562e] hover:text-[#f0562e]/90">
+          <a href="/forgot-password" className="text-[#f0562e] hover:text-[#f0562e]/90">
             Forgot password?
-          </Link>
+          </a>
           <span className="mx-2 text-gray-400">•</span>
-          <Link to="/signup" className="text-[#f0562e] hover:text-[#f0562e]/90">
+          <a href="/signup" className="text-[#f0562e] hover:text-[#f0562e]/90">
             Create an account
-          </Link>
+          </a>
         </div>
       </div>
     </div>

@@ -44,38 +44,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   const handleUserIdentification = async (user: User, profile: ProfileType) => {
-    identifyUser(user.id, {
-      email: user.email,
-      first_name: profile.first_name,
-      last_name: profile.last_name,
-      full_name: `${profile.first_name} ${profile.last_name}`.trim(),
-      role: profile.role,
-      created_at: user.created_at,
-      last_sign_in: user.last_sign_in_at,
-      onboarding_completed: profile.onboarding_completed,
-    });
+    try {
+      await identifyUser(user.id, {
+        email: user.email,
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        full_name: `${profile.first_name} ${profile.last_name}`.trim(),
+        role: profile.role,
+        created_at: user.created_at,
+        last_sign_in: user.last_sign_in_at,
+        onboarding_completed: profile.onboarding_completed,
+      });
 
-    trackEvent("User Logged In", {
-      user_id: user.id,
-      email: user.email,
-      login_method: "email",
-      role: profile.role,
-    });
-    
-    Gleap.identify(user.id, {
-      email: user.email,
-      name: profile.first_name ? `${profile.first_name} ${profile.last_name}` : user.email,
-    });
+      await trackEvent("User Logged In", {
+        user_id: user.id,
+        email: user.email,
+        login_method: "email",
+        role: profile.role,
+      });
+      
+      Gleap.identify(user.id, {
+        email: user.email,
+        name: profile.first_name ? `${profile.first_name} ${profile.last_name}` : user.email,
+      });
+    } catch (error) {
+      console.error('Error in handleUserIdentification:', error);
+    }
   };
 
   const handleUserSession = async (user: User | null, isInitialLogin = false) => {
-    if (!user) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
-
     try {
+      if (!user) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('onboarding_completed, role, first_name, last_name')
@@ -98,7 +102,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       }
     } catch (error) {
-      console.error('Error checking user profile:', error);
+      console.error('Error in handleUserSession:', error);
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -130,18 +135,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
+      
+      if (data.user) {
+        await handleUserSession(data.user, true);
+      }
+    } catch (error) {
+      console.error('Error in login:', error);
+      throw error;
+    }
   };
 
   const logout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    Gleap.clearIdentity();
-    navigate('/login');
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      Gleap.clearIdentity();
+      setUser(null);
+      navigate('/login');
+    } catch (error) {
+      console.error('Error in logout:', error);
+      throw error;
+    }
   };
 
   return (
