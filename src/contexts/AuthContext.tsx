@@ -30,46 +30,37 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user ?? null);
-        setIsAuthenticated(!!session?.user);
-      } catch (error) {
-        console.error('Error getting session:', error);
-        toast.error('Error initializing session');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initializeAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setIsAuthenticated(!!session?.user);
+      setIsLoading(false);
+    });
 
-      if (event === 'SIGNED_OUT') {
-        navigate('/login');
-        toast.success('Logged out successfully');
-      }
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setIsAuthenticated(!!session?.user);
+      setIsLoading(false);
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, []);
 
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
       setUser(null);
       setIsAuthenticated(false);
+      navigate('/login');
+      toast.success('Logged out successfully');
     } catch (error) {
       console.error('Error signing out:', error);
       toast.error('Error signing out');
@@ -89,8 +80,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(data.user);
       setIsAuthenticated(true);
       navigate('/dashboard');
-    } catch (error) {
+      toast.success('Logged in successfully');
+    } catch (error: any) {
       console.error('Login error:', error);
+      toast.error(error.message || 'Error logging in');
       throw error;
     } finally {
       setIsLoading(false);
