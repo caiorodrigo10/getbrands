@@ -63,18 +63,20 @@ serve(async (req) => {
       throw new Error('Missing required order data');
     }
 
-    // Validate shipping cost
-    if (typeof orderData.shipping_cost === 'undefined') {
-      console.warn('Warning: No shipping cost provided in order data');
-    }
+    // Ensure shipping cost is a valid number
+    const shippingCost = typeof orderData.shipping_cost === 'number' ? 
+      orderData.shipping_cost : 
+      0;
+
+    console.log('Shipping cost:', shippingCost);
 
     // Format shipping lines for Shopify
-    const shippingLines = orderData.shipping_cost ? [{
-      title: "Express Shipping",
-      price: orderData.shipping_cost.toFixed(2),
-      code: "EXPRESS",
+    const shippingLines = [{
+      title: "Standard Shipping",
+      price: shippingCost.toFixed(2),
+      code: "STANDARD",
       source: "Lovable System"
-    }] : [];
+    }];
 
     console.log('Shipping lines configuration:', shippingLines);
 
