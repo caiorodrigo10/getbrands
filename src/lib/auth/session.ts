@@ -18,7 +18,29 @@ export const handleUserSession = async (
 
     const { data: profile, error } = await supabase
       .from('profiles')
-      .select('onboarding_completed, role, first_name, last_name')
+      .select(`
+        onboarding_completed,
+        role,
+        first_name,
+        last_name,
+        phone,
+        avatar_url,
+        shipping_address_street,
+        shipping_address_street2,
+        shipping_address_city,
+        shipping_address_state,
+        shipping_address_zip,
+        billing_address_street,
+        billing_address_street2,
+        billing_city,
+        billing_state,
+        billing_zip,
+        instagram_handle,
+        product_interest,
+        profile_type,
+        brand_status,
+        launch_urgency
+      `)
       .eq('id', user.id)
       .single();
 
