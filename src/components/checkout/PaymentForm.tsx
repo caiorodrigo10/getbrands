@@ -29,6 +29,14 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
     trackCheckoutStep(3, items, { total, shipping_cost: shippingCost });
   }, [items, total, shippingCost]);
 
+  const validateZipCode = (zip: string | null) => {
+    if (!zip) return false;
+    // Basic ZIP code validation for Brazil (CEP) and US formats
+    const brZipRegex = /^\d{5}-?\d{3}$/;
+    const usZipRegex = /^\d{5}(-\d{4})?$/;
+    return brZipRegex.test(zip) || usZipRegex.test(zip);
+  };
+
   const createSampleRequest = async () => {
     if (!user?.id || !user?.email) throw new Error("User not authenticated");
 
@@ -40,6 +48,11 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
     const lastName = localStorage.getItem('lastName') || '';
     const phone = localStorage.getItem('phone') || '';
     const useSameForBilling = localStorage.getItem('useSameForBilling') === 'true';
+
+    // Validate ZIP code
+    if (!validateZipCode(shippingZip)) {
+      throw new Error("Invalid shipping ZIP code format");
+    }
 
     const billingAddress = useSameForBilling 
       ? shippingAddress 
@@ -53,6 +66,11 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
     const billingZip = useSameForBilling 
       ? shippingZip 
       : localStorage.getItem('billing_zip') || '';
+
+    // Validate billing ZIP if different
+    if (!useSameForBilling && !validateZipCode(billingZip)) {
+      throw new Error("Invalid billing ZIP code format");
+    }
 
     const subtotal = items.reduce((sum, item) => sum + (item.from_price * (item.quantity || 1)), 0);
 
@@ -132,6 +150,9 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
       });
 
       if (paymentError) {
+        if (paymentError.type === 'validation_error' && paymentError.code === 'invalid_zip') {
+          throw new Error("Por favor, verifique se o CEP está no formato correto (ex: 12345-678)");
+        }
         throw paymentError;
       }
 
@@ -154,8 +175,8 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
       console.error("Payment error:", error);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "An unexpected error occurred. Please try again.",
+        title: "Erro no pagamento",
+        description: error instanceof Error ? error.message : "Ocorreu um erro inesperado. Por favor, tente novamente.",
       });
     } finally {
       setIsProcessing(false);
@@ -172,7 +193,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         disabled={!stripe || isProcessing}
         className="w-full bg-primary hover:bg-primary-dark"
       >
-        {isProcessing ? "Processing..." : `Pay ${formatCurrency(total)}`}
+        {isProcessing ? "Processando..." : `Pagar ${formatCurrency(total)}`}
       </Button>
     </form>
   );
