@@ -29,6 +29,8 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   const isInAdminPanel = location.pathname.startsWith('/admin');
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchProfile = async () => {
       if (!user) {
         setIsLoading(false);
@@ -36,11 +38,16 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
       }
       
       try {
-        setIsLoading(true);
-        const { data: session } = await supabase.auth.getSession();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (!session.session) {
-          // If no session exists, redirect to login
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          toast.error("Session error. Please try logging in again.");
+          navigate('/login');
+          return;
+        }
+
+        if (!session) {
           navigate('/login');
           return;
         }
@@ -53,22 +60,28 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           
         if (error) {
           console.error('Error fetching profile:', error);
-          toast.error("Failed to load profile data");
+          toast.error("Failed to load profile data. Please refresh the page.");
           return;
         }
 
-        if (data) {
+        if (data && isMounted) {
           setProfile(data);
         }
       } catch (error) {
         console.error('Error in profile fetch:', error);
-        toast.error("Failed to load profile data");
+        toast.error("Network error. Please check your connection.");
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchProfile();
+
+    return () => {
+      isMounted = false;
+    };
   }, [user, navigate]);
 
   if (!user) return null;
@@ -88,10 +101,15 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
 
   const handleLogout = async () => {
     try {
-      const { data: session } = await supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      if (!session.session) {
-        // If no session exists, just navigate to login
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+        navigate('/login');
+        return;
+      }
+
+      if (!session) {
         navigate('/login');
         return;
       }
