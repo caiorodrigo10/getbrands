@@ -1,11 +1,25 @@
 import { CartItem } from "@/types/cart";
 
 export const trackAddToCart = (item: CartItem) => {
-  console.log('Analytics ecommerce - Add to Cart:', item);
+  trackEvent("Product Added to Cart", {
+    product_id: item.id,
+    product_name: item.name,
+    category: item.category,
+    price: item.from_price,
+    quantity: item.quantity
+  });
 };
 
 export const trackCheckoutStep = (step: number, items: CartItem[]) => {
-  console.log('Analytics ecommerce - Checkout Step:', { step, items });
+  trackEvent("Checkout Step Viewed", {
+    step_number: step,
+    items: items.map(item => ({
+      product_id: item.id,
+      product_name: item.name,
+      quantity: item.quantity,
+      price: item.from_price
+    }))
+  });
 };
 
 export const trackCheckoutCompleted = (
@@ -16,12 +30,17 @@ export const trackCheckoutCompleted = (
   shippingCost: number,
   customerEmail: string
 ) => {
-  console.log('Analytics ecommerce - Checkout Completed:', {
-    orderId,
-    items,
-    shippingInfo,
-    total,
-    shippingCost,
-    customerEmail
+  trackEvent("Order Completed", {
+    order_id: orderId,
+    total_amount: total,
+    shipping_cost: shippingCost,
+    customer_email: customerEmail,
+    shipping_address: shippingInfo,
+    products: items.map(item => ({
+      product_id: item.id,
+      product_name: item.name,
+      quantity: item.quantity,
+      price: item.from_price
+    }))
   });
 };
