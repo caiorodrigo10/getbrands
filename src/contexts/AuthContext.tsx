@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const handleUserIdentification = async (user: User, profile: ProfileType) => {
     // Identify user in analytics with all relevant traits
-    identifyUser(user.id, {
+    await identifyUser(user.id, {
       email: user.email,
       first_name: profile.first_name,
       last_name: profile.last_name,
