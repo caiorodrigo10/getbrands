@@ -42,8 +42,8 @@ const Login = () => {
       console.error("Login error:", error);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to login. Please try again.",
+        title: "Erro",
+        description: error.message || "Falha no login. Por favor, tente novamente.",
       });
     } finally {
       setIsLoading(false);
@@ -67,11 +67,11 @@ const Login = () => {
       
       if (error) throw error;
     } catch (error: any) {
-      console.error('Error logging in with Google:', error);
+      console.error('Erro ao fazer login com Google:', error);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to login with Google. Please try again.",
+        title: "Erro",
+        description: error.message || "Falha no login com Google. Por favor, tente novamente.",
       });
       setIsGoogleLoading(false);
     }
