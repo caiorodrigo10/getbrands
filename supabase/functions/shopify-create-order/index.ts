@@ -51,6 +51,12 @@ serve(async (req) => {
     const { orderData } = await req.json();
 
     console.log('Creating Shopify order with data:', orderData);
+    console.log('Shipping cost received:', orderData.shipping_cost);
+
+    // Validate shipping cost
+    if (orderData.shipping_cost === undefined || orderData.shipping_cost === null) {
+      console.warn('Warning: No shipping cost provided in order data');
+    }
 
     // Format shipping lines for Shopify with additional details
     const shippingLines = orderData.shipping_cost ? [{
