@@ -28,12 +28,22 @@ const RouteTracker = () => {
   const location = useLocation();
   
   useEffect(() => {
-    // Track initial page view
-    trackPage({
-      initial_load: location.key === 'default',
-      route_change: location.key !== 'default',
-      timestamp: new Date().toISOString()
-    });
+    // Track page view with enhanced debugging
+    const trackPageView = async () => {
+      console.log('Tracking page view:', {
+        path: location.pathname,
+        key: location.key,
+        timestamp: new Date().toISOString()
+      });
+      
+      await trackPage({
+        initial_load: location.key === 'default',
+        route_change: location.key !== 'default',
+        timestamp: new Date().toISOString()
+      });
+    };
+
+    trackPageView();
   }, [location]);
 
   return null;

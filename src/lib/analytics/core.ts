@@ -24,7 +24,7 @@ const getSessionId = () => {
 };
 
 const shouldTrackEvent = () => {
-  // Only track events in production or if explicitly enabled for development
+  // Track events in production or if explicitly enabled for development
   return !isDevelopment || import.meta.env.VITE_FORCE_ANALYTICS === 'true';
 };
 
@@ -34,10 +34,36 @@ const debugLog = (type: string, eventName: string, properties?: Record<string, a
   }
 };
 
-export const trackPage = (properties?: Record<string, any>) => {
+const ensureAnalyticsLoaded = (): Promise<void> => {
+  return new Promise((resolve) => {
+    if (window.analytics) {
+      resolve();
+      return;
+    }
+
+    // Wait for analytics to load
+    const checkAnalytics = setInterval(() => {
+      if (window.analytics) {
+        clearInterval(checkAnalytics);
+        resolve();
+      }
+    }, 100);
+
+    // Timeout after 5 seconds
+    setTimeout(() => {
+      clearInterval(checkAnalytics);
+      console.error('Analytics failed to load after 5 seconds');
+      resolve();
+    }, 5000);
+  });
+};
+
+export const trackPage = async (properties?: Record<string, any>) => {
   if (!shouldTrackEvent()) return;
 
   try {
+    await ensureAnalyticsLoaded();
+    
     if (window.analytics) {
       const sessionId = getSessionId();
       const enhancedProperties = {
@@ -60,10 +86,12 @@ export const trackPage = (properties?: Record<string, any>) => {
   }
 };
 
-export const trackEvent = (eventName: string, properties?: Record<string, any>) => {
+export const trackEvent = async (eventName: string, properties?: Record<string, any>) => {
   if (!shouldTrackEvent()) return;
 
   try {
+    await ensureAnalyticsLoaded();
+    
     if (window.analytics) {
       const sessionId = getSessionId();
       const enhancedProperties = {
@@ -83,10 +111,12 @@ export const trackEvent = (eventName: string, properties?: Record<string, any>) 
   }
 };
 
-export const identifyUser = (userId: string, traits?: Record<string, any>) => {
+export const identifyUser = async (userId: string, traits?: Record<string, any>) => {
   if (!shouldTrackEvent()) return;
 
   try {
+    await ensureAnalyticsLoaded();
+    
     if (window.analytics) {
       const enhancedTraits = {
         ...traits,
