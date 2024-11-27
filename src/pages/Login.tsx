@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
@@ -15,18 +15,13 @@ const Login = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, navigate]);
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
       await login(email, password);
+      // Navigation is handled in AuthContext after successful login
     } catch (error: any) {
       console.error("Login error:", error);
       toast({
@@ -34,7 +29,6 @@ const Login = () => {
         title: "Error",
         description: error.message || "Failed to login. Please try again.",
       });
-    } finally {
       setIsLoading(false);
     }
   };
