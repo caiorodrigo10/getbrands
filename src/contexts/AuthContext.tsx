@@ -77,14 +77,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       // Clear local state first for immediate UI feedback
       setUser(null);
+
+      // Get current session
+      const { data: { session } } = await supabase.auth.getSession();
       
-      try {
-        // Attempt to sign out from Supabase
-        await supabase.auth.signOut();
-      } catch (error: any) {
-        // Only log specific errors that aren't related to session not found
-        if (!error.message?.includes('session_not_found') && 
-            !error.message?.includes('Failed to fetch')) {
+      if (session) {
+        // Only attempt to sign out if there's an active session
+        const { error } = await supabase.auth.signOut();
+        if (error && !error.message?.includes('session_not_found')) {
           console.error('Sign out error:', error);
           toast.error("There was an issue signing out, but you've been logged out successfully");
         }
