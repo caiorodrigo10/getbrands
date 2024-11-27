@@ -1,6 +1,12 @@
-import { SegmentAnalyticsJS } from './types/segment';
+import { SegmentAnalytics } from './types/segment';
 import { SEGMENT_WRITE_KEY, shouldTrackEvent, debugLog } from './config';
 import { getSessionId } from './session';
+
+declare global {
+  interface Window {
+    analytics: SegmentAnalytics;
+  }
+}
 
 const loadSegment = async () => {
   if (!SEGMENT_WRITE_KEY) {
@@ -9,14 +15,9 @@ const loadSegment = async () => {
   }
 
   // Initialize Segment
-  const analytics = window.analytics = window.analytics || [] as SegmentAnalyticsJS;
+  const analytics = window.analytics = window.analytics || {} as SegmentAnalytics;
   
   if (!analytics.initialize) {
-    if (analytics.invoked) {
-      console.error('Segment snippet included twice.');
-      return;
-    }
-    analytics.invoked = true;
     analytics.methods = [
       'trackSubmit',
       'trackClick',
@@ -44,12 +45,12 @@ const loadSegment = async () => {
       return function() {
         const args = Array.prototype.slice.call(arguments);
         args.unshift(method);
-        analytics.push(args);
+        (analytics as any).push(args);
         return analytics;
       };
     };
     for (const method of analytics.methods) {
-      analytics[method] = analytics.factory(method);
+      (analytics as any)[method] = analytics.factory(method);
     }
   }
 
