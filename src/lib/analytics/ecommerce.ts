@@ -2,3 +2,4 @@
 export const trackAddToCart = () => {};
 export const trackCheckoutStep = () => {};
 export const trackOrderCompleted = () => {};
+export const trackCheckoutCompleted = () => {};
