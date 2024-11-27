@@ -75,22 +75,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      // First clear all session data
-      await supabase.auth.clearSession();
-      
-      // Clear local state
+      // Clear local state first
       setUser(null);
       
       // Attempt to sign out from Supabase
       try {
-        await supabase.auth.signOut();
-      } catch (signOutError: any) {
-        // Ignore specific errors that indicate the user is already signed out
-        if (!signOutError.message?.includes('session_not_found') && 
-            !signOutError.message?.includes('403')) {
-          console.error('Sign out error:', signOutError);
-          toast.error("There was an issue signing out, but you've been logged out successfully");
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          // Ignore specific errors that indicate the user is already signed out
+          if (!error.message?.includes('session_not_found') && 
+              !error.message?.includes('403')) {
+            console.error('Sign out error:', error);
+            toast.error("There was an issue signing out, but you've been logged out successfully");
+          }
         }
+      } catch (signOutError: any) {
+        console.error('Sign out error:', signOutError);
       }
 
       // Clear any stored auth data
