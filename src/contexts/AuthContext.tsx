@@ -119,13 +119,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      setUser(null);
+      // First, reset analytics
       if (window.analytics) {
         window.analytics.reset();
       }
-      await supabase.auth.signOut();
+
+      // Then sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+
+      // Clear user state and storage
+      setUser(null);
       localStorage.clear();
       sessionStorage.clear();
+
+      // Finally, navigate to login
       navigate('/login');
     } catch (error) {
       console.error('Error in logout:', error);
