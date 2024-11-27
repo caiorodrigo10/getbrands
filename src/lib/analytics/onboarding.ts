@@ -1,3 +1,5 @@
+import { trackEvent } from "@/lib/analytics";
+
 export const trackOnboardingStarted = (userId: string) => {
   trackEvent("Onboarding Started", { user_id: userId });
 };

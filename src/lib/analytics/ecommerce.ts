@@ -1,4 +1,5 @@
 import { CartItem } from "@/types/cart";
+import { trackEvent } from "@/lib/analytics";
 
 export const trackAddToCart = (item: CartItem) => {
   trackEvent("Product Added to Cart", {
