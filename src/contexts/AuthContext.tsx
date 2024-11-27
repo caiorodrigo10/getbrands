@@ -1,10 +1,25 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
-import { AuthContextType } from "@/lib/auth/types";
-import { useToast } from "@/hooks/use-toast";
-import { handleUserSession } from "@/lib/auth/session";
+import { identifyUser, trackEvent } from "@/lib/analytics";
+import { useNavigate, useLocation } from "react-router-dom";
+import { getRoleBasedRedirectPath } from "@/lib/roleRedirection";
+import Gleap from "gleap";
+
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  isAuthenticated: boolean;
+}
+
+interface ProfileType {
+  onboarding_completed: boolean;
+  role: string;
+  first_name: string | null;
+  last_name: string | null;
+}
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -26,102 +41,109 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const location = useLocation();
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        console.log("Initializing auth...");
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error("Session error:", sessionError);
-          throw sessionError;
-        }
-
-        if (session?.user) {
-          console.log("Found existing session for user:", session.user.email);
-          await handleUserSession(session.user, true, setUser, navigate);
-        } else {
-          console.log("No existing session found");
-        }
-      } catch (error: any) {
-        console.error('Error in initializeAuth:', error);
-        toast({
-          variant: "destructive",
-          title: "Authentication Error",
-          description: `Error initializing auth: ${error.message}`,
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initializeAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session?.user?.email);
-      
-      if (event === 'SIGNED_IN' && session?.user) {
-        console.log("User signed in:", session.user.email);
-        await handleUserSession(session.user, true, setUser, navigate);
-      } else if (event === 'SIGNED_OUT') {
-        console.log("User signed out");
-        setUser(null);
-        navigate('/login');
-      }
-      setLoading(false);
+  const handleUserIdentification = async (user: User, profile: ProfileType) => {
+    // Identify user in analytics with all relevant traits
+    identifyUser(user.id, {
+      email: user.email,
+      first_name: profile.first_name,
+      last_name: profile.last_name,
+      full_name: `${profile.first_name} ${profile.last_name}`.trim(),
+      role: profile.role,
+      created_at: user.created_at,
+      last_sign_in: user.last_sign_in_at,
+      onboarding_completed: profile.onboarding_completed,
     });
 
-    return () => subscription.unsubscribe();
-  }, [navigate, toast]);
+    // Track login event with user properties
+    trackEvent("User Logged In", {
+      user_id: user.id,
+      email: user.email,
+      login_method: "email",
+      role: profile.role,
+    });
+    
+    // Identify user in Gleap
+    Gleap.identify(user.id, {
+      email: user.email,
+      name: profile.first_name ? `${profile.first_name} ${profile.last_name}` : user.email,
+    });
+  };
 
-  const login = async (email: string, password: string) => {
-    console.log("Attempting login for email:", email);
+  const handleUserSession = async (user: User | null, isInitialLogin = false) => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (error) {
-        console.error("Login error:", error);
-        throw error;
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('onboarding_completed, role, first_name, last_name')
+        .eq('id', user.id)
+        .single();
+
+      if (error) throw error;
+
+      const typedProfile = profile as ProfileType;
+
+      await handleUserIdentification(user, typedProfile);
+
+      if (isInitialLogin) {
+        if (!typedProfile?.onboarding_completed) {
+          navigate('/onboarding');
+          return;
+        }
+
+        const redirectPath = getRoleBasedRedirectPath(typedProfile?.role);
+        navigate(redirectPath);
       }
-      
-      if (data.user) {
-        console.log("Login successful for user:", data.user.email);
-        await handleUserSession(data.user, true, setUser, navigate);
-      }
-    } catch (error: any) {
-      console.error('Error in login:', error);
-      toast({
-        variant: "destructive",
-        title: "Login Error",
-        description: error.message || "Invalid email or password. Please try again.",
-      });
-      throw error;
+    } catch (error) {
+      console.error('Error checking user profile:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const logout = async () => {
-    try {
-      console.log("Attempting logout...");
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const isInitialLogin = event === 'SIGNED_IN';
+      setUser(session?.user ?? null);
       
-      console.log("Logout successful");
-      setUser(null);
-      navigate('/login');
-    } catch (error: any) {
-      console.error('Error in logout:', error);
-      toast({
-        variant: "destructive",
-        title: "Logout Error",
-        description: error.message || "There was a problem signing out.",
-      });
-      throw error;
-    }
+      if (session?.user) {
+        await handleUserSession(session.user, isInitialLogin);
+      } else {
+        setLoading(false);
+      }
+    });
+
+    // Initial session check
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        handleUserSession(session.user, false);
+      } else {
+        setLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw error;
+  };
+
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    // Clear Gleap identification on logout
+    Gleap.clearIdentity();
   };
 
   return (
