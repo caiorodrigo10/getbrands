@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { AuthContextType } from "@/lib/auth/types";
 import { toast } from "sonner";
+import { initializeSegment } from "@/lib/analytics/segment";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -32,6 +33,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           setUser(session.user);
+          // Initialize Segment with user data
+          initializeSegment(session.user);
         }
       } catch (error) {
         console.error('Error in initializeAuth:', error);
@@ -46,6 +49,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         setUser(session.user);
+        // Initialize Segment on auth state change
+        initializeSegment(session.user);
       } else {
         setUser(null);
       }
@@ -66,6 +71,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (data.user) {
         setUser(data.user);
+        // Initialize Segment after successful login
+        initializeSegment(data.user);
       }
     } catch (error) {
       console.error('Error in login:', error);
@@ -96,6 +103,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       // Clear any stored auth data
       localStorage.removeItem('supabase.auth.token');
+      
+      // Reset Segment analytics
+      if (window.analytics) {
+        window.analytics.reset();
+      }
       
     } catch (error) {
       console.error('Error in logout:', error);
