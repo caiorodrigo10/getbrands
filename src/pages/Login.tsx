@@ -62,7 +62,6 @@ const Login = () => {
         title: "Error",
         description: error.message || "Failed to login with Google. Please try again.",
       });
-    } finally {
       setIsGoogleLoading(false);
     }
   };
@@ -92,6 +91,7 @@ const Login = () => {
                 required
                 className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0562e]/20"
                 placeholder="your@email.com"
+                disabled={isLoading}
               />
             </div>
             <div>
@@ -103,6 +103,7 @@ const Login = () => {
                 required
                 className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0562e]/20"
                 placeholder="••••••••"
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -113,7 +114,14 @@ const Login = () => {
               className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
               disabled={isLoading}
             >
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                  <span>Signing in...</span>
+                </div>
+              ) : (
+                "Sign in"
+              )}
             </Button>
 
             <div className="relative">
@@ -129,7 +137,7 @@ const Login = () => {
               type="button"
               variant="outline"
               onClick={handleGoogleLogin}
-              disabled={isGoogleLoading}
+              disabled={isGoogleLoading || isLoading}
               className="w-full border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-2.5 rounded-lg flex items-center justify-center space-x-2"
             >
               {isGoogleLoading ? (
