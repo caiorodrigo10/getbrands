@@ -50,7 +50,7 @@ export const trackPage = async (properties?: Record<string, any>) => {
   try {
     await waitForAnalytics();
     
-    window.analytics.page({
+    window.analytics.page("Page Viewed", {
       ...properties,
       url: window.location.href,
       path: window.location.pathname,
