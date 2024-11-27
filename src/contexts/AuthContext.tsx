@@ -130,6 +130,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (_event === 'SIGNED_OUT') {
+        setUser(null);
+        setLoading(false);
+        navigate('/login', { replace: true });
+        return;
+      }
+
       const isInitialLogin = _event === 'SIGNED_IN';
       if (session?.user) {
         await handleUserSession(session.user, isInitialLogin);
@@ -163,6 +170,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
+      setLoading(true);
+      
       if (user) {
         await trackEvent("User Logged Out", {
           user_id: user.id,
@@ -170,17 +179,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
       }
       
+      // Clear user state before signing out
+      setUser(null);
+      
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
       // Clear Gleap identification on logout
       Gleap.clearIdentity();
       
-      // Navigate to login after logout
-      navigate('/login');
+      // Immediate navigation
+      navigate('/login', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
