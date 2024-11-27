@@ -13,32 +13,23 @@ export const useSessionManagement = () => {
     try {
       setIsLoggingOut(true);
       
-      // Get current session first
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        // If no session exists, just clear local storage and redirect
-        localStorage.clear();
-        navigate('/login');
-        return;
-      }
+      // Directly sign out without any session checks
+      await supabase.auth.signOut({
+        scope: 'local'
+      });
 
-      // Attempt to sign out
-      const { error } = await supabase.auth.signOut();
+      // Clear any remaining data
+      sessionStorage.clear();
+      localStorage.clear();
       
-      if (error && !error.message?.includes('session_not_found')) {
-        console.error('Logout error:', error);
-        toast.error("Error during logout. Please try again.");
-      }
+      // Redirect immediately
+      navigate('/login');
       
     } catch (error) {
       console.error('Error during logout:', error);
-      toast.error("Network error during logout");
+      toast.error("Erro ao fazer logout. Por favor, tente novamente.");
     } finally {
       setIsLoggingOut(false);
-      localStorage.clear();
-      // Always navigate to login page, even if there was an error
-      navigate('/login');
     }
   };
 
