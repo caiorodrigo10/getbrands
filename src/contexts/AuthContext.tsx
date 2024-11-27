@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { AuthContextType } from "@/lib/auth/types";
 import { toast } from "sonner";
+import Gleap from "gleap";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -26,12 +27,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const identifyUserInGleap = (user: User | null) => {
+    if (user) {
+      Gleap.identify(user.id, {
+        email: user.email,
+        name: user.email // We'll update this with profile data when available
+      });
+    } else {
+      Gleap.clearIdentity();
+    }
+  };
+
   useEffect(() => {
     const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           setUser(session.user);
+          identifyUserInGleap(session.user);
         }
       } catch (error) {
         console.error('Error in initializeAuth:', error);
@@ -46,8 +59,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         setUser(session.user);
+        identifyUserInGleap(session.user);
       } else {
         setUser(null);
+        Gleap.clearIdentity();
       }
       setLoading(false);
     });
@@ -66,6 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (data.user) {
         setUser(data.user);
+        identifyUserInGleap(data.user);
       }
     } catch (error) {
       console.error('Error in login:', error);
@@ -75,8 +91,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      // Clear local state first for immediate UI feedback
       setUser(null);
+      Gleap.clearIdentity();
 
       const { error } = await supabase.auth.signOut();
       if (error) {
@@ -85,7 +101,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
 
-      // Clear any stored auth data
       localStorage.removeItem('supabase.auth.token');
       
     } catch (error) {
