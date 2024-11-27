@@ -14,7 +14,10 @@ export const initializeSegment = (user: any) => {
     window.analytics.identify(user.id, {
       email: user.email,
       created_at: user.created_at,
-      // Add any other user traits you want to track
+      first_name: user?.first_name,
+      last_name: user?.last_name,
+      role: user?.role,
+      onboarding_completed: user?.onboarding_completed
     });
   }
 };
@@ -35,4 +38,9 @@ export const trackEvent = (eventName: string, properties: Record<string, any> = 
     ...properties,
     timestamp: new Date().toISOString(),
   });
+};
+
+export const resetAnalytics = () => {
+  if (!window.analytics) return;
+  window.analytics.reset();
 };

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { AuthContextType } from "@/lib/auth/types";
 import { toast } from "sonner";
-import { initializeSegment } from "@/lib/analytics/segment";
+import { initializeSegment, resetAnalytics } from "@/lib/analytics/segment";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -82,32 +82,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
+      // Reset analytics before clearing local state
+      resetAnalytics();
+      
       // Clear local state first for immediate UI feedback
       setUser(null);
 
-      // Get current session
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) {
-        console.error('Session error:', sessionError);
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Sign out error:', error);
+        toast.error("There was an issue signing out");
         return;
-      }
-      
-      if (session) {
-        const { error } = await supabase.auth.signOut();
-        if (error && !error.message?.includes('session_not_found')) {
-          console.error('Sign out error:', error);
-          toast.error("There was an issue signing out");
-        }
       }
 
       // Clear any stored auth data
       localStorage.removeItem('supabase.auth.token');
-      
-      // Reset Segment analytics
-      if (window.analytics) {
-        window.analytics.reset();
-      }
       
     } catch (error) {
       console.error('Error in logout:', error);
