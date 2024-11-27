@@ -18,7 +18,7 @@ export const handleUserSession = async (
 
     const { data: profile, error } = await supabase
       .from('profiles')
-      .select('onboarding_completed, role, first_name, last_name')
+      .select('*')
       .eq('id', user.id)
       .single();
 
@@ -26,6 +26,7 @@ export const handleUserSession = async (
 
     setUser(user);
     
+    // Handle third-party integrations
     handleGleapIdentification(user, profile as ProfileType);
     handleAnalytics(user, profile as ProfileType);
 

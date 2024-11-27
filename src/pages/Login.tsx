@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { clearGleapIdentity } from "@/lib/auth/analytics";
+import { trackEvent } from "@/lib/analytics";
+import Gleap from "gleap";
 
 const Login = () => {
   const { toast } = useToast();
@@ -17,7 +19,10 @@ const Login = () => {
 
   useEffect(() => {
     const clearSession = async () => {
+      // Clear all existing sessions and identifications
       clearGleapIdentity();
+      Gleap.clearIdentity();
+      window.analytics?.reset();
       await supabase.auth.signOut();
     };
 
@@ -30,6 +35,13 @@ const Login = () => {
 
     try {
       await login(email, password);
+      
+      // Track successful login event
+      trackEvent("User Logged In", {
+        email: email,
+        login_method: "email",
+      });
+
     } catch (error: any) {
       console.error("Login error:", error);
       toast({
@@ -51,33 +63,42 @@ const Login = () => {
             alt="GetBrands Logo"
             className="w-[180px] h-auto"
           />
+          <h2 className="mt-6 text-2xl font-semibold text-gray-900">
+            Welcome back
+          </h2>
           <p className="text-gray-600">
-            Transform your ideas into amazing products
+            Sign in to your account to continue
           </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           <div className="space-y-4">
             <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email address
+              </label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0562e]/20"
+                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
                 placeholder="your@email.com"
                 disabled={isLoading}
               />
             </div>
             <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0562e]/20"
+                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
                 placeholder="••••••••"
                 disabled={isLoading}
               />
@@ -86,7 +107,7 @@ const Login = () => {
 
           <Button
             type="submit"
-            className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
+            className="w-full bg-primary hover:bg-primary/90 text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
             disabled={isLoading}
           >
             {isLoading ? (
@@ -101,11 +122,11 @@ const Login = () => {
         </form>
 
         <div className="mt-4 text-center text-sm">
-          <a href="/forgot-password" className="text-[#f0562e] hover:text-[#f0562e]/90">
+          <a href="/forgot-password" className="text-primary hover:text-primary/90">
             Forgot password?
           </a>
           <span className="mx-2 text-gray-400">•</span>
-          <a href="/signup" className="text-[#f0562e] hover:text-[#f0562e]/90">
+          <a href="/signup" className="text-primary hover:text-primary/90">
             Create an account
           </a>
         </div>
