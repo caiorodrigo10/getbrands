@@ -39,8 +39,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error('Error in initializeAuth:', error);
         toast({
           variant: "destructive",
-          title: "Erro na autenticação",
-          description: "Houve um problema ao inicializar a autenticação.",
+          title: "Authentication Error",
+          description: "There was a problem initializing authentication.",
         });
       } finally {
         setLoading(false);
@@ -78,8 +78,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Error in login:', error);
       toast({
         variant: "destructive",
-        title: "Erro no login",
-        description: error.message || "Houve um problema ao fazer login.",
+        title: "Login Error",
+        description: error.message || "There was a problem signing in.",
       });
       throw error;
     }
@@ -96,8 +96,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Error in logout:', error);
       toast({
         variant: "destructive",
-        title: "Erro ao sair",
-        description: error.message || "Houve um problema ao fazer logout.",
+        title: "Logout Error",
+        description: error.message || "There was a problem signing out.",
       });
       throw error;
     }

@@ -18,6 +18,12 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
     const clearSession = async () => {
       // Clear all existing sessions and identifications
       clearGleapIdentity();
@@ -32,6 +38,16 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
+    if (!email || !password) {
+      toast({
+        variant: "destructive",
+        title: "Required Fields",
+        description: "Please fill in all fields.",
+      });
+      setIsLoading(false);
+      return;
+    }
 
     try {
       await login(email, password);
@@ -107,7 +123,7 @@ const Login = () => {
 
           <Button
             type="submit"
-            className="w-full bg-primary hover:bg-primary/90 text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
+            className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
             disabled={isLoading}
           >
             {isLoading ? (
@@ -122,11 +138,11 @@ const Login = () => {
         </form>
 
         <div className="mt-4 text-center text-sm">
-          <a href="/forgot-password" className="text-primary hover:text-primary/90">
+          <a href="/forgot-password" className="text-[#f0562e] hover:text-[#f0562e]/90">
             Forgot password?
           </a>
           <span className="mx-2 text-gray-400">•</span>
-          <a href="/signup" className="text-primary hover:text-primary/90">
+          <a href="/signup" className="text-[#f0562e] hover:text-[#f0562e]/90">
             Create an account
           </a>
         </div>

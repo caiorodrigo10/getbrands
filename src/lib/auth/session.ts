@@ -22,7 +22,10 @@ export const handleUserSession = async (
       .eq('id', user.id)
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching profile:', error);
+      throw error;
+    }
 
     setUser(user);
     
@@ -37,5 +40,6 @@ export const handleUserSession = async (
   } catch (error) {
     console.error('Error in handleUserSession:', error);
     setUser(null);
+    throw error;
   }
 };
