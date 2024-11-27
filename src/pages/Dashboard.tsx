@@ -9,7 +9,6 @@ import ProjectsOverview from "@/components/dashboard/ProjectsOverview";
 import ProjectDetails from "@/components/dashboard/ProjectDetails";
 import UpcomingMeetings from "@/components/dashboard/UpcomingMeetings";
 import { useDashboardData } from "@/hooks/useDashboardData";
-import { Product } from "@/types/product";
 import {
   Carousel,
   CarouselContent,
@@ -45,16 +44,19 @@ const Dashboard = () => {
       <DashboardHeader userName={userName} />
 
       <div className="grid grid-cols-12 gap-6">
+        {/* Left Column */}
         <div className="col-span-12 lg:col-span-7 space-y-6">
           <ProjectsOverview projects={projects || []} />
           <UpcomingMeetings meetings={meetings || []} />
         </div>
         
+        {/* Right Column */}
         <div className="col-span-12 lg:col-span-5">
           <ProjectDetails />
         </div>
       </div>
 
+      {/* Your Products */}
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold">Your Products</h2>
@@ -65,11 +67,11 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products?.slice(0, 3).map((item) => {
             const specificProduct = item.specific?.[0];
-            const displayProduct: Product = {
+            const displayProduct = {
               ...item.product,
-              name: specificProduct?.name || item.product.name,
-              image_url: specificProduct?.main_image_url || item.product.image_url,
-              id: item.product.id,
+              name: specificProduct?.name || item.product?.name,
+              image_url: specificProduct?.image_url || item.product?.image_url,
+              id: item.product?.id,
             };
             return (
               <SimpleProductCard 
@@ -82,6 +84,7 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* Catalog Carousel */}
       <div className="overflow-hidden">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold">Featured Products</h2>
@@ -108,6 +111,7 @@ const Dashboard = () => {
         </Carousel>
       </div>
 
+      {/* Sample Requests */}
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold">Sample Requests</h2>

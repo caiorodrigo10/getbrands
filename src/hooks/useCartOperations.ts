@@ -41,7 +41,7 @@ export const useCartOperations = (user: User | null) => {
 
       if (error) throw error;
 
-      const formattedItems: CartItem[] = cartItems?.map((item) => ({
+      const formattedItems = cartItems?.map((item) => ({
         ...item.products,
         quantity: 1
       })) || [];

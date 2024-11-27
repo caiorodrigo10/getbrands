@@ -27,7 +27,7 @@ export interface ProjectSpecificProduct {
   name: string | null;
   description: string | null;
   main_image_url: string | null;
-  images: any[] | null;
+  images: string[] | null;
   selling_price: number | null;
 }
 
