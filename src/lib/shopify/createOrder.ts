@@ -1,5 +1,4 @@
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/use-toast";
 
 interface CreateOrderParams {
   orderId: string;
@@ -86,20 +85,10 @@ export async function createShopifyOrder({
         .eq('id', orderId);
     }
 
-    toast({
-      title: "Order created in Shopify",
-      description: `Order #${data.shopifyOrder.order_number} was created successfully.`
-    });
-
     return data.shopifyOrder;
 
   } catch (error) {
     console.error('Error creating Shopify order:', error);
-    toast({
-      variant: "destructive",
-      title: "Error creating order",
-      description: "There was a problem creating your order in Shopify. Please try again."
-    });
     throw error;
   }
 }
