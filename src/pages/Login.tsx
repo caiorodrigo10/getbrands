@@ -17,10 +17,11 @@ const Login = () => {
   useEffect(() => {
     if (isAuthenticated) {
       const checkUserRole = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
         const { data: profile } = await supabase
           .from('profiles')
           .select('role')
-          .eq('id', auth.user()?.id)
+          .eq('id', user?.id)
           .single();
           
         if (profile?.role === 'admin') {
