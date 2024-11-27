@@ -29,33 +29,47 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   const isInAdminPanel = location.pathname.startsWith('/admin');
 
   useEffect(() => {
-    if (user) {
-      fetchProfile();
-    }
-  }, [user]);
-
-  const fetchProfile = async () => {
-    if (!user) return;
-    
-    try {
-      setIsLoading(true);
-      const { data, error } = await supabase
-        .from("profiles")
-        .select()
-        .eq("id", user.id)
-        .single();
-        
-      if (error) throw error;
-      if (data) {
-        setProfile(data);
+    const fetchProfile = async () => {
+      if (!user) {
+        setIsLoading(false);
+        return;
       }
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-      toast.error("Failed to load profile data");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      
+      try {
+        setIsLoading(true);
+        const { data: session } = await supabase.auth.getSession();
+        
+        if (!session.session) {
+          // If no session exists, redirect to login
+          navigate('/login');
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from("profiles")
+          .select()
+          .eq("id", user.id)
+          .single();
+          
+        if (error) {
+          console.error('Error fetching profile:', error);
+          toast.error("Failed to load profile data");
+          return;
+        }
+
+        if (data) {
+          setProfile(data);
+        }
+      } catch (error) {
+        console.error('Error in profile fetch:', error);
+        toast.error("Failed to load profile data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [user, navigate]);
 
   if (!user) return null;
 
@@ -74,9 +88,10 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
 
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.getSession();
-      if (error) {
-        console.error('Session error:', error);
+      const { data: session } = await supabase.auth.getSession();
+      
+      if (!session.session) {
+        // If no session exists, just navigate to login
         navigate('/login');
         return;
       }
