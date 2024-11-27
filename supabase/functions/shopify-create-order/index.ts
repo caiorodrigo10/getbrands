@@ -58,9 +58,27 @@ serve(async (req) => {
       price: orderData.shipping_cost.toFixed(2),
       code: "CALCULATED_BY_SYSTEM",
       source: "Lovable System"
-    }] : undefined;
+    }] : [];
 
     console.log('Shipping lines configuration:', shippingLines);
+
+    const orderPayload = {
+      order: {
+        ...orderData,
+        send_receipt: true,
+        inventory_behaviour: 'decrement_ignoring_policy',
+        email: orderData.customer.email,
+        customer: {
+          first_name: orderData.customer.first_name,
+          last_name: orderData.customer.last_name,
+          email: orderData.customer.email,
+          phone: orderData.customer.phone,
+        },
+        shipping_lines: shippingLines,
+      },
+    };
+
+    console.log('Final order payload:', JSON.stringify(orderPayload, null, 2));
 
     const response = await fetch(`https://${SHOPIFY_SHOP_DOMAIN}/admin/api/2024-01/orders.json`, {
       method: 'POST',
@@ -68,21 +86,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
         'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN,
       },
-      body: JSON.stringify({
-        order: {
-          ...orderData,
-          send_receipt: true,
-          inventory_behaviour: 'decrement_ignoring_policy',
-          email: orderData.customer.email,
-          customer: {
-            first_name: orderData.customer.first_name,
-            last_name: orderData.customer.last_name,
-            email: orderData.customer.email,
-            phone: orderData.customer.phone,
-          },
-          shipping_lines: shippingLines,
-        },
-      }),
+      body: JSON.stringify(orderPayload),
     });
 
     if (!response.ok) {
