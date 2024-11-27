@@ -35,6 +35,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } catch (error) {
         console.error('Error in initializeAuth:', error);
+        toast.error("Authentication error. Please try logging in again.");
       } finally {
         setLoading(false);
       }
@@ -78,28 +79,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(null);
 
       // Get current session
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+        return;
+      }
       
       if (session) {
-        // Only attempt to sign out if there's an active session
         const { error } = await supabase.auth.signOut();
         if (error && !error.message?.includes('session_not_found')) {
           console.error('Sign out error:', error);
-          toast.error("There was an issue signing out, but you've been logged out successfully");
+          toast.error("There was an issue signing out");
         }
       }
 
       // Clear any stored auth data
       localStorage.removeItem('supabase.auth.token');
       
-      // Always navigate to login page
-      navigate('/login');
     } catch (error) {
       console.error('Error in logout:', error);
-      // Show error to user but don't prevent logout
-      toast.error("There was an issue during logout, please try again");
-      // Still navigate to login page
-      navigate('/login');
+      toast.error("Error during logout");
     }
   };
 
