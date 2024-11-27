@@ -31,16 +31,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          await handleUserSession(session.user, true, setUser, navigate);
+        console.log("Initializing auth...");
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Session error:", sessionError);
+          throw sessionError;
         }
-      } catch (error) {
+
+        if (session?.user) {
+          console.log("Found existing session for user:", session.user.email);
+          await handleUserSession(session.user, true, setUser, navigate);
+        } else {
+          console.log("No existing session found");
+        }
+      } catch (error: any) {
         console.error('Error in initializeAuth:', error);
         toast({
           variant: "destructive",
           title: "Authentication Error",
-          description: "There was a problem initializing authentication.",
+          description: `Error initializing auth: ${error.message}`,
         });
       } finally {
         setLoading(false);
@@ -50,9 +60,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     initializeAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session?.user?.email);
+      
       if (event === 'SIGNED_IN' && session?.user) {
+        console.log("User signed in:", session.user.email);
         await handleUserSession(session.user, true, setUser, navigate);
       } else if (event === 'SIGNED_OUT') {
+        console.log("User signed out");
         setUser(null);
         navigate('/login');
       }
@@ -63,15 +77,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [navigate, toast]);
 
   const login = async (email: string, password: string) => {
+    console.log("Attempting login for email:", email);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Login error:", error);
+        throw error;
+      }
       
       if (data.user) {
+        console.log("Login successful for user:", data.user.email);
         await handleUserSession(data.user, true, setUser, navigate);
       }
     } catch (error: any) {
@@ -79,7 +98,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       toast({
         variant: "destructive",
         title: "Login Error",
-        description: error.message || "There was a problem signing in.",
+        description: error.message || "Invalid email or password. Please try again.",
       });
       throw error;
     }
@@ -87,9 +106,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
+      console.log("Attempting logout...");
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
+      console.log("Logout successful");
       setUser(null);
       navigate('/login');
     } catch (error: any) {

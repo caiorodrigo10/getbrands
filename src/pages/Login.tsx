@@ -19,17 +19,23 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
+      console.log("User is authenticated, redirecting to dashboard");
       navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     const clearSession = async () => {
-      // Clear all existing sessions and identifications
-      clearGleapIdentity();
-      Gleap.clearIdentity();
-      window.analytics?.reset();
-      await supabase.auth.signOut();
+      console.log("Clearing existing sessions...");
+      try {
+        clearGleapIdentity();
+        Gleap.clearIdentity();
+        window.analytics?.reset();
+        await supabase.auth.signOut();
+        console.log("Sessions cleared successfully");
+      } catch (error) {
+        console.error("Error clearing sessions:", error);
+      }
     };
 
     clearSession();
@@ -37,9 +43,11 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Login attempt started for email:", email);
     setIsLoading(true);
 
     if (!email || !password) {
+      console.log("Missing required fields");
       toast({
         variant: "destructive",
         title: "Required Fields",
@@ -51,8 +59,8 @@ const Login = () => {
 
     try {
       await login(email, password);
+      console.log("Login successful");
       
-      // Track successful login event
       trackEvent("User Logged In", {
         email: email,
         login_method: "email",
@@ -62,8 +70,8 @@ const Login = () => {
       console.error("Login error:", error);
       toast({
         variant: "destructive",
-        title: "Login Error",
-        description: "Incorrect email or password. Please try again.",
+        title: "Login Failed",
+        description: error.message || "Invalid email or password. Please try again.",
       });
     } finally {
       setIsLoading(false);
