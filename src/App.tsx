@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate } from "react-router-dom";
+import { BrowserRouter, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import { AppRoutes } from "./routes/AppRoutes";
@@ -23,36 +23,23 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => {
+// Separate component to handle route changes
+const RouteTracker = () => {
+  const location = useLocation();
+  
   useEffect(() => {
-    // Ensure Segment is loaded
-    if (!window.analytics) {
-      console.error('Segment analytics not found. Please check the script installation.');
-      return;
-    }
-
     // Track initial page view
     trackPage({
-      initial_load: true,
+      initial_load: location.key === 'default',
+      route_change: location.key !== 'default',
       timestamp: new Date().toISOString()
     });
+  }, [location]);
 
-    // Set up route change tracking
-    const handleRouteChange = () => {
-      trackPage({
-        route_change: true,
-        timestamp: new Date().toISOString()
-      });
-    };
+  return null;
+};
 
-    // Listen for route changes
-    window.addEventListener('popstate', handleRouteChange);
-
-    return () => {
-      window.removeEventListener('popstate', handleRouteChange);
-    };
-  }, []);
-
+const App = () => {
   return (
     <SessionContextProvider supabaseClient={supabase}>
       <QueryClientProvider client={queryClient}>
@@ -60,6 +47,7 @@ const App = () => {
           <AuthProvider>
             <CartProvider>
               <TooltipProvider>
+                <RouteTracker />
                 <AppRoutes />
                 <Toaster />
                 <Sonner />

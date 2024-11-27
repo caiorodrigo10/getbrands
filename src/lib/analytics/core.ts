@@ -10,26 +10,50 @@ declare global {
   }
 }
 
+const isDevelopment = import.meta.env.DEV;
+const SEGMENT_DEBUG = import.meta.env.VITE_SEGMENT_DEBUG === 'true';
+
+// Track unique sessions to prevent duplicate page views
+let currentSessionId: string | null = null;
+
+const getSessionId = () => {
+  if (!currentSessionId) {
+    currentSessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+  return currentSessionId;
+};
+
+const shouldTrackEvent = () => {
+  // Only track events in production or if explicitly enabled for development
+  return !isDevelopment || import.meta.env.VITE_FORCE_ANALYTICS === 'true';
+};
+
+const debugLog = (type: string, eventName: string, properties?: Record<string, any>) => {
+  if (SEGMENT_DEBUG || isDevelopment) {
+    console.log(`[Segment ${type}]`, eventName, properties);
+  }
+};
+
 export const trackPage = (properties?: Record<string, any>) => {
+  if (!shouldTrackEvent()) return;
+
   try {
     if (window.analytics) {
-      console.log('Tracking page view:', {
-        url: window.location.href,
-        path: window.location.pathname,
-        ...properties
-      });
-      
-      window.analytics.page({
+      const sessionId = getSessionId();
+      const enhancedProperties = {
         url: window.location.href,
         path: window.location.pathname,
         referrer: document.referrer,
         title: document.title,
         search: window.location.search,
+        session_id: sessionId,
+        environment: isDevelopment ? 'development' : 'production',
         ...properties,
         timestamp: new Date().toISOString(),
-      });
-    } else {
-      console.warn('Segment analytics not initialized');
+      };
+
+      debugLog('Page', 'Page View', enhancedProperties);
+      window.analytics.page(enhancedProperties);
     }
   } catch (error) {
     console.error('Error tracking page view:', error);
@@ -37,22 +61,22 @@ export const trackPage = (properties?: Record<string, any>) => {
 };
 
 export const trackEvent = (eventName: string, properties?: Record<string, any>) => {
+  if (!shouldTrackEvent()) return;
+
   try {
     if (window.analytics) {
-      console.log('Tracking event:', eventName, {
+      const sessionId = getSessionId();
+      const enhancedProperties = {
         url: window.location.href,
         path: window.location.pathname,
-        ...properties
-      });
-      
-      window.analytics.track(eventName, {
-        url: window.location.href,
-        path: window.location.pathname,
+        session_id: sessionId,
+        environment: isDevelopment ? 'development' : 'production',
         ...properties,
         timestamp: new Date().toISOString(),
-      });
-    } else {
-      console.warn('Segment analytics not initialized');
+      };
+
+      debugLog('Event', eventName, enhancedProperties);
+      window.analytics.track(eventName, enhancedProperties);
     }
   } catch (error) {
     console.error('Error tracking event:', error);
@@ -60,16 +84,18 @@ export const trackEvent = (eventName: string, properties?: Record<string, any>) 
 };
 
 export const identifyUser = (userId: string, traits?: Record<string, any>) => {
+  if (!shouldTrackEvent()) return;
+
   try {
     if (window.analytics) {
-      console.log('Identifying user:', userId, traits);
-      
-      window.analytics.identify(userId, {
+      const enhancedTraits = {
         ...traits,
+        environment: isDevelopment ? 'development' : 'production',
         lastIdentified: new Date().toISOString(),
-      });
-    } else {
-      console.warn('Segment analytics not initialized');
+      };
+
+      debugLog('Identify', userId, enhancedTraits);
+      window.analytics.identify(userId, enhancedTraits);
     }
   } catch (error) {
     console.error('Error identifying user:', error);
