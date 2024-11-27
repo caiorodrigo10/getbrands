@@ -30,7 +30,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
   }, [items, total, shippingCost]);
 
   const createSampleRequest = async () => {
-    if (!user) throw new Error("User not authenticated");
+    if (!user?.id || !user?.email) throw new Error("User not authenticated");
 
     const shippingAddress = localStorage.getItem('shipping_address') || '';
     const shippingCity = localStorage.getItem('shipping_city') || '';
@@ -39,6 +39,20 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
     const firstName = localStorage.getItem('firstName') || '';
     const lastName = localStorage.getItem('lastName') || '';
     const phone = localStorage.getItem('phone') || '';
+    const useSameForBilling = localStorage.getItem('useSameForBilling') === 'true';
+
+    const billingAddress = useSameForBilling 
+      ? shippingAddress 
+      : localStorage.getItem('billing_address') || '';
+    const billingCity = useSameForBilling 
+      ? shippingCity 
+      : localStorage.getItem('billing_city') || '';
+    const billingState = useSameForBilling 
+      ? shippingState 
+      : localStorage.getItem('billing_state') || '';
+    const billingZip = useSameForBilling 
+      ? shippingZip 
+      : localStorage.getItem('billing_zip') || '';
 
     const subtotal = items.reduce((sum, item) => sum + (item.from_price * (item.quantity || 1)), 0);
 
@@ -51,6 +65,10 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         shipping_city: shippingCity,
         shipping_state: shippingState,
         shipping_zip: shippingZip,
+        billing_address: billingAddress,
+        billing_city: billingCity,
+        billing_state: billingState,
+        billing_zip: billingZip,
         first_name: firstName,
         last_name: lastName,
         payment_method: 'credit_card',
@@ -82,7 +100,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!stripe || !elements || !user) {
+    if (!stripe || !elements || !user?.id || !user?.email) {
       return;
     }
 
@@ -118,7 +136,10 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
       }
 
       await createOrder({
-        user,
+        user: {
+          id: user.id,
+          email: user.email
+        },
         items,
         total,
         shippingCost,
@@ -127,7 +148,6 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
 
       clearCart();
       
-      // Navigate with both orderId and payment intent ID
       navigate(`/checkout/success?order_id=${orderId}&payment_intent=${paymentIntent?.id}`);
 
     } catch (error) {
