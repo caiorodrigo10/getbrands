@@ -12,21 +12,27 @@ export const useSessionManagement = () => {
     
     try {
       setIsLoggingOut(true);
-      const { error } = await supabase.auth.signOut();
+      
+      // First clear any stored auth data
+      localStorage.removeItem('supabase.auth.token');
+      
+      // Then attempt to sign out
+      const { error } = await supabase.auth.signOut({
+        scope: 'local'  // Changed from 'global' to 'local' to avoid session validation
+      });
       
       if (error && !error.message?.includes('session_not_found')) {
         console.error('Logout error:', error);
         toast.error("Error during logout. Please try again.");
       }
       
-      // Always navigate to login page
-      navigate('/login');
     } catch (error) {
       console.error('Error during logout:', error);
       toast.error("Network error during logout");
-      navigate('/login');
     } finally {
       setIsLoggingOut(false);
+      // Always navigate to login page, even if there was an error
+      navigate('/login');
     }
   };
 
