@@ -15,13 +15,13 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      const checkUserRole = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
         const { data: profile } = await supabase
           .from('profiles')
           .select('role')
-          .eq('id', user?.id)
+          .eq('id', session.user.id)
           .single();
           
         if (profile?.role === 'admin') {
@@ -29,9 +29,11 @@ const Login = () => {
         } else {
           navigate('/dashboard');
         }
-      };
-      
-      checkUserRole();
+      }
+    };
+
+    if (isAuthenticated) {
+      checkAuth();
     }
   }, [isAuthenticated, navigate]);
 
