@@ -20,7 +20,7 @@ export const debugAnalytics = () => {
     console.log('✅ Segment analytics object found');
     console.log(`Write Key: ${window.analytics._writeKey}`);
 
-    // Enable debug mode
+    // Enable debug mode in all environments
     window.analytics.debug();
 
     // Test page tracking
