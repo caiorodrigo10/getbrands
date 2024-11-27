@@ -8,6 +8,8 @@ import { CartProvider } from "./contexts/CartContext";
 import { AppRoutes } from "./routes/AppRoutes";
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
+import { debugAnalytics } from "./lib/analytics/debug";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,6 +24,12 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      debugAnalytics();
+    }
+  }, []);
+
   return (
     <SessionContextProvider supabaseClient={supabase}>
       <QueryClientProvider client={queryClient}>
