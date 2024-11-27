@@ -30,8 +30,8 @@ const Login = () => {
       console.error("Login error:", error);
       toast({
         variant: "destructive",
-        title: "Erro no login",
-        description: "Email ou senha incorretos. Por favor, tente novamente.",
+        title: "Login Error",
+        description: "Incorrect email or password. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -88,21 +88,21 @@ const Login = () => {
             {isLoading ? (
               <div className="flex items-center justify-center">
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                <span>Entrando...</span>
+                <span>Signing in...</span>
               </div>
             ) : (
-              "Entrar"
+              "Sign in"
             )}
           </Button>
         </form>
 
         <div className="mt-4 text-center text-sm">
           <a href="/forgot-password" className="text-[#f0562e] hover:text-[#f0562e]/90">
-            Esqueceu a senha?
+            Forgot password?
           </a>
           <span className="mx-2 text-gray-400">•</span>
           <a href="/signup" className="text-[#f0562e] hover:text-[#f0562e]/90">
-            Criar uma conta
+            Create an account
           </a>
         </div>
       </div>
