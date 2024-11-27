@@ -4,7 +4,6 @@ import { Label } from "@/components/ui/label";
 import { QuizNavigation } from "./QuizNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { trackEvent } from "@/lib/analytics";
 import { toast } from "sonner";
 
 interface LaunchUrgencyStepProps {
@@ -49,12 +48,6 @@ export const LaunchUrgencyStep = ({
         console.error('Supabase error:', error);
         throw error;
       }
-
-      // Track the event in analytics
-      trackEvent('launch_urgency_selected', {
-        userId: user.id,
-        launch_urgency: value
-      });
 
       toast.success("Launch timeline preference saved!");
     } catch (error: any) {

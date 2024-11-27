@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { trackCheckoutStep } from "@/lib/analytics/ecommerce";
 import { createOrder } from "@/lib/utils/paymentUtils";
 import { PaymentFormButton } from "./payment/PaymentFormButton";
 import { useCreateSampleRequest } from "./payment/useCreateSampleRequest";
@@ -24,10 +23,6 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const { createRequest } = useCreateSampleRequest();
-
-  useEffect(() => {
-    trackCheckoutStep(3, items, { total, shipping_cost: shippingCost });
-  }, [items, total, shippingCost]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

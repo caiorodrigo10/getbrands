@@ -8,13 +8,6 @@ import { ProfileTypeStep } from "./steps/ProfileTypeStep";
 import { BrandStatusStep } from "./steps/BrandStatusStep";
 import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { useAuth } from "@/contexts/AuthContext";
-import { 
-  trackOnboardingStarted,
-  trackOnboardingStepCompleted,
-  trackOnboardingAbandoned,
-  trackEvent,
-  trackError
-} from "@/lib/analytics";
 
 type Step = {
   component: React.ComponentType<any>;
@@ -34,20 +27,7 @@ export function OnboardingQuiz() {
     launchUrgency: "",
   });
 
-  // Track onboarding start when component mounts
-  useState(() => {
-    if (user?.id) {
-      trackOnboardingStarted({ user_id: user.id });
-    }
-  });
-
   const handleNext = () => {
-    // Track step completion
-    trackOnboardingStepCompleted({
-      step: currentStep,
-      step_name: steps[currentStep].name,
-      data: { ...quizData }
-    });
     setCurrentStep((prev) => prev + 1);
   };
 
@@ -58,11 +38,6 @@ export function OnboardingQuiz() {
   const handleComplete = async () => {
     try {
       if (!user?.id) {
-        trackError({
-          error_type: "Onboarding Error",
-          error_message: "User not found",
-          component: "OnboardingQuiz"
-        });
         toast.error("User not found");
         return;
       }
@@ -80,32 +55,11 @@ export function OnboardingQuiz() {
 
       if (error) throw error;
 
-      // Track onboarding completion
-      trackEvent("Onboarding Completed", {
-        product_categories: quizData.productCategories,
-        profile_type: quizData.profileType,
-        brand_status: quizData.brandStatus,
-        launch_urgency: quizData.launchUrgency,
-        steps_completed: currentStep + 1,
-      });
-
       toast.success("Profile updated successfully!");
       navigate("/start-here");
     } catch (error: any) {
       console.error("Error updating profile:", error);
-      trackError({
-        error_type: "Profile Update Error",
-        error_message: error.message,
-        component: "OnboardingQuiz"
-      });
       toast.error(error.message || "Failed to update profile");
-    }
-  };
-
-  // Track abandonment when user leaves the page
-  window.onbeforeunload = () => {
-    if (currentStep > 0 && currentStep < steps.length - 1) {
-      trackOnboardingAbandoned({ step: currentStep });
     }
   };
 
