@@ -36,13 +36,11 @@ export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSea
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const products = productsData && 'pages' in productsData 
-    ? productsData.pages[0]?.data 
-    : productsData?.data || [];
+  const products = productsData?.data || [];
 
-  const filteredProducts = products?.filter(product =>
+  const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(query.toLowerCase())
-  ) || [];
+  );
 
   const handleSelect = async (product: Product) => {
     if (addToCart) {

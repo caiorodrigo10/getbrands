@@ -17,7 +17,8 @@ interface ProductsResponse {
 }
 
 export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProductsOptions = {}) => {
-  const fetchProducts = async ({ pageParam = 1 }: { pageParam: number }) => {
+  const fetchProducts = async (context: { pageParam?: number }) => {
+    const pageParam = context.pageParam || 1;
     const from = (pageParam - 1) * limit;
     const to = from + limit - 1;
 
@@ -55,7 +56,7 @@ export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProduc
     });
   }
 
-  return useQuery({
+  return useQuery<ProductsResponse>({
     queryKey: ["products", { page, limit }],
     queryFn: () => fetchProducts({ pageParam: page }),
   });

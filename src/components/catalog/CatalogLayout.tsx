@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { useProducts } from "@/hooks/useProducts";
 import { useWindowSize } from "@/hooks/useWindowSize";
+import { UseInfiniteQueryResult, UseQueryResult } from "@tanstack/react-query";
 
 const CatalogLayout = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -18,18 +19,20 @@ const CatalogLayout = () => {
   const loadMoreRef = useRef(null);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   
+  const productsQuery = useProducts({ 
+    page: currentPage,
+    limit: isMobile ? 7 : 9,
+    infinite: isMobile
+  });
+
   const { 
-    data: productsData, 
+    data: productsData,
     isLoading,
     error,
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage
-  } = useProducts({ 
-    page: currentPage,
-    limit: isMobile ? 7 : 9,
-    infinite: isMobile
-  });
+  } = productsQuery as UseInfiniteQueryResult<any>;
 
   useEffect(() => {
     if (productsData) {
