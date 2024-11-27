@@ -19,11 +19,12 @@ export const debugAnalytics = () => {
 
   // Test page tracking
   try {
+    const url = new URL(window.location.href);
     window.analytics.page("Debug Page", {
       title: document.title,
-      url: window.location.href,
-      path: window.location.pathname,
-      referrer: document.referrer,
+      url: url.toString(),
+      path: url.pathname,
+      referrer: document.referrer || '',
       debug: true
     });
     console.log('✅ Page tracking test successful');

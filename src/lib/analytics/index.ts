@@ -46,11 +46,12 @@ export const trackPage = (properties?: Record<string, any>) => {
   }
 
   try {
-    window.analytics.page("Page View", {
+    const url = new URL(window.location.href);
+    window.analytics.page({
       ...properties,
-      url: window.location.href,
-      path: window.location.pathname,
-      referrer: document.referrer,
+      url: url.toString(),
+      path: url.pathname,
+      referrer: document.referrer || '',
       title: document.title,
       timestamp: new Date().toISOString(),
     });
