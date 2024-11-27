@@ -14,11 +14,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const { data: productImages } = useQuery({
     queryKey: ['product-images', product.id],
     queryFn: async () => {
-      // Only fetch if we have a valid product ID
       if (!product.id) return [];
       
       const { data, error } = await supabase
@@ -30,7 +30,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       if (error) throw error;
       return data || [];
     },
-    enabled: Boolean(product.id), // Only run query if product.id exists
+    enabled: Boolean(product.id),
   });
 
   const handleCardClick = () => {
@@ -42,10 +42,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
     setImageLoaded(true);
   };
 
-  // Get the primary image or fall back to the first image in the gallery, then product's main image
-  const displayImage = productImages?.length 
-    ? (productImages.find(img => img.is_primary)?.image_url || productImages[0]?.image_url)
-    : (product.image_url || '/placeholder.svg');
+  // Get the primary image and secondary image for hover effect
+  const primaryImage = productImages?.find(img => img.is_primary)?.image_url || 
+                      productImages?.[0]?.image_url ||
+                      product.image_url || 
+                      '/placeholder.svg';
+                      
+  const secondaryImage = productImages?.[1]?.image_url || primaryImage;
 
   // Ensure we have valid numbers for calculations
   const fromPrice = typeof product.from_price === 'number' ? product.from_price : 0;
@@ -57,7 +60,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
       className="bg-white border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer relative"
       onClick={handleCardClick}
     >
-      <div className="relative aspect-square bg-gray-50">
+      <div 
+        className="relative aspect-square bg-gray-50"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         {!imageLoaded && (
           <div className="absolute inset-0 bg-gray-100 animate-pulse" />
         )}
@@ -77,16 +84,27 @@ const ProductCard = ({ product }: ProductCardProps) => {
         >
           1000 points
         </Badge>
-        <img
-          src={imageError ? '/placeholder.svg' : displayImage}
-          alt={product.name}
-          className={`w-full h-full object-cover p-4 transition-opacity duration-200 ${
-            imageLoaded ? "opacity-100" : "opacity-0"
-          }`}
-          onLoad={() => setImageLoaded(true)}
-          onError={handleImageError}
-          loading="lazy"
-        />
+        <div className="relative w-full h-full">
+          <img
+            src={imageError ? '/placeholder.svg' : primaryImage}
+            alt={`${product.name} - Primary`}
+            className={`absolute inset-0 w-full h-full object-cover p-4 transition-opacity duration-300 ${
+              isHovered ? 'opacity-0' : 'opacity-100'
+            }`}
+            onLoad={() => setImageLoaded(true)}
+            onError={handleImageError}
+            loading="lazy"
+          />
+          <img
+            src={imageError ? '/placeholder.svg' : secondaryImage}
+            alt={`${product.name} - Secondary`}
+            className={`absolute inset-0 w-full h-full object-cover p-4 transition-opacity duration-300 ${
+              isHovered ? 'opacity-100' : 'opacity-0'
+            }`}
+            onError={handleImageError}
+            loading="lazy"
+          />
+        </div>
       </div>
       <div className="p-4">
         <div className="text-sm text-gray-600 mb-2">{product.category}</div>
