@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -12,19 +11,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate('/dashboard');
-      }
-    };
-    
-    checkSession();
-  }, [navigate]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -38,42 +25,16 @@ const Login = () => {
 
     try {
       await login(email, password);
+      navigate('/dashboard');
     } catch (error: any) {
       console.error("Login error:", error);
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: error.message || "Falha no login. Por favor, tente novamente.",
+        title: "Erro no login",
+        description: "Email ou senha incorretos. Por favor, tente novamente.",
       });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    try {
-      setIsGoogleLoading(true);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-          scopes: 'email profile'
-        }
-      });
-      
-      if (error) throw error;
-    } catch (error: any) {
-      console.error('Erro ao fazer login com Google:', error);
-      toast({
-        variant: "destructive",
-        title: "Erro",
-        description: error.message || "Falha no login com Google. Por favor, tente novamente.",
-      });
-      setIsGoogleLoading(false);
     }
   };
 
@@ -119,59 +80,29 @@ const Login = () => {
             </div>
           </div>
 
-          <div className="space-y-4">
-            <Button
-              type="submit"
-              className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <div className="flex items-center justify-center">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                  <span>Signing in...</span>
-                </div>
-              ) : (
-                "Sign in"
-              )}
-            </Button>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
+          <Button
+            type="submit"
+            className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                <span>Entrando...</span>
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">or continue with</span>
-              </div>
-            </div>
-
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleGoogleLogin}
-              disabled={isGoogleLoading || isLoading}
-              className="w-full border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-2.5 rounded-lg flex items-center justify-center space-x-2"
-            >
-              {isGoogleLoading ? (
-                <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
-              ) : (
-                <img 
-                  src="https://www.svgrepo.com/show/475656/google-color.svg"
-                  alt="Google Logo"
-                  className="w-5 h-5"
-                />
-              )}
-              <span>{isGoogleLoading ? "Connecting..." : "Google"}</span>
-            </Button>
-          </div>
+            ) : (
+              "Entrar"
+            )}
+          </Button>
         </form>
 
         <div className="mt-4 text-center text-sm">
           <a href="/forgot-password" className="text-[#f0562e] hover:text-[#f0562e]/90">
-            Forgot password?
+            Esqueceu a senha?
           </a>
           <span className="mx-2 text-gray-400">•</span>
           <a href="/signup" className="text-[#f0562e] hover:text-[#f0562e]/90">
-            Create an account
+            Criar uma conta
           </a>
         </div>
       </div>

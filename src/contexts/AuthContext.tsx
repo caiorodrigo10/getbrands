@@ -4,8 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { AuthContextType } from "@/lib/auth/types";
 import { handleUserSession } from "@/lib/auth/session";
-import { trackEvent } from "@/lib/analytics";
-import { clearGleapIdentity } from "@/lib/auth/analytics";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -33,7 +31,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
-          await handleUserSession(session.user, false, setUser, navigate);
+          setUser(session.user);
         }
       } catch (error) {
         console.error('Error in initializeAuth:', error);
@@ -45,9 +43,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     initializeAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      const isInitialLogin = event === 'SIGNED_IN';
       if (session?.user) {
-        await handleUserSession(session.user, isInitialLogin, setUser, navigate);
+        setUser(session.user);
       } else {
         setUser(null);
       }
@@ -67,7 +64,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (error) throw error;
       
       if (data.user) {
-        await handleUserSession(data.user, true, setUser, navigate);
+        setUser(data.user);
       }
     } catch (error) {
       console.error('Error in login:', error);
@@ -77,17 +74,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      if (window.analytics) {
-        await trackEvent("User Logged Out", {
-          user_id: user?.id,
-          email: user?.email,
-        });
-      }
-
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      clearGleapIdentity();
       setUser(null);
       navigate('/login');
     } catch (error) {
