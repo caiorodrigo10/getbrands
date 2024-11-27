@@ -45,23 +45,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const handleUserIdentification = async (user: User, profile: ProfileType) => {
     try {
-      await identifyUser(user.id, {
-        email: user.email,
-        first_name: profile.first_name,
-        last_name: profile.last_name,
-        full_name: `${profile.first_name} ${profile.last_name}`.trim(),
-        role: profile.role,
-        created_at: user.created_at,
-        last_sign_in: user.last_sign_in_at,
-        onboarding_completed: profile.onboarding_completed,
-      });
+      if (window.analytics) {
+        await identifyUser(user.id, {
+          email: user.email,
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          full_name: `${profile.first_name} ${profile.last_name}`.trim(),
+          role: profile.role,
+          created_at: user.created_at,
+          last_sign_in: user.last_sign_in_at,
+          onboarding_completed: profile.onboarding_completed,
+        });
 
-      await trackEvent("User Logged In", {
-        user_id: user.id,
-        email: user.email,
-        login_method: "email",
-        role: profile.role,
-      });
+        await trackEvent("User Logged In", {
+          user_id: user.id,
+          email: user.email,
+          login_method: "email",
+          role: profile.role,
+        });
+      }
       
       Gleap.identify(user.id, {
         email: user.email,
@@ -156,6 +158,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      
+      if (window.analytics) {
+        await trackEvent("User Logged Out", {
+          user_id: user?.id,
+          email: user?.email,
+        });
+      }
+      
       Gleap.clearIdentity();
       setUser(null);
       navigate('/login');
