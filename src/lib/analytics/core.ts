@@ -12,6 +12,7 @@ declare global {
 
 const isDevelopment = import.meta.env.DEV;
 const SEGMENT_DEBUG = import.meta.env.VITE_SEGMENT_DEBUG === 'true';
+const SEGMENT_WRITE_KEY = import.meta.env.VITE_SEGMENT_WRITE_KEY;
 
 // Track unique sessions to prevent duplicate page views
 let currentSessionId: string | null = null;
@@ -34,7 +35,71 @@ const debugLog = (type: string, eventName: string, properties?: Record<string, a
   }
 };
 
-const ensureAnalyticsLoaded = (): Promise<void> => {
+const loadSegment = async () => {
+  if (!SEGMENT_WRITE_KEY) {
+    console.error('Segment write key is not configured');
+    return;
+  }
+
+  // Initialize Segment
+  const analytics = window.analytics = window.analytics || [];
+  if (!analytics.initialize) {
+    if (analytics.invoked) {
+      console.error('Segment snippet included twice.');
+      return;
+    }
+    analytics.invoked = true;
+    analytics.methods = [
+      'trackSubmit',
+      'trackClick',
+      'trackLink',
+      'trackForm',
+      'pageview',
+      'identify',
+      'reset',
+      'group',
+      'track',
+      'ready',
+      'alias',
+      'debug',
+      'page',
+      'screen',
+      'once',
+      'off',
+      'on',
+      'addSourceMiddleware',
+      'addIntegrationMiddleware',
+      'setAnonymousId',
+      'addDestinationMiddleware'
+    ];
+    analytics.factory = (method: string) => {
+      return function() {
+        const args = Array.prototype.slice.call(arguments);
+        args.unshift(method);
+        analytics.push(args);
+        return analytics;
+      };
+    };
+    for (const method of analytics.methods) {
+      analytics[method] = analytics.factory(method);
+    }
+  }
+
+  // Load Segment script
+  const script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.async = true;
+  script.src = `https://cdn.segment.com/analytics.js/v1/${SEGMENT_WRITE_KEY}/analytics.min.js`;
+  
+  const firstScript = document.getElementsByTagName('script')[0];
+  firstScript.parentNode?.insertBefore(script, firstScript);
+};
+
+const ensureAnalyticsLoaded = async (): Promise<void> => {
+  if (!window.analytics) {
+    await loadSegment();
+  }
+
   return new Promise((resolve) => {
     if (window.analytics) {
       resolve();
