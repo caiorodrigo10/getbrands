@@ -1,29 +1,11 @@
-export interface CustomerData {
-  first_name?: string;
-  last_name?: string;
+// Empty type definitions to maintain type compatibility
+export type AnalyticsEvent = {
+  name: string;
+  properties?: Record<string, any>;
+};
+
+export type UserTraits = {
   email?: string;
-  phone?: string;
-}
-
-export interface OrderData {
-  order_id: string;
-  revenue: number;
-  currency: string;
-  payment_method: string;
-  products: Array<{
-    product_id: string;
-    sku: string;
-    name: string;
-    price: number;
-    quantity: number;
-    category?: string;
-  }>;
-  customer?: CustomerData;
-}
-
-export interface TrackingData {
-  url?: string;
-  path?: string;
-  timestamp?: string;
+  name?: string;
   [key: string]: any;
-}
+};
