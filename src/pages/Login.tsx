@@ -17,39 +17,12 @@ const Login = () => {
 
   useEffect(() => {
     const clearSession = async () => {
-      // Clear Gleap identity when accessing login page
       clearGleapIdentity();
-      
-      // Sign out from Supabase to ensure clean state
       await supabase.auth.signOut();
     };
 
     clearSession();
-  }, []); // Run only once when component mounts
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-          
-        if (profile?.role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/dashboard');
-        }
-      }
-    };
-
-    if (isAuthenticated) {
-      checkAuth();
-    }
-  }, [isAuthenticated, navigate]);
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

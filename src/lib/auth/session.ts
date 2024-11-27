@@ -30,12 +30,8 @@ export const handleUserSession = async (
     handleAnalytics(user, profile as ProfileType);
 
     if (isInitialLogin) {
-      if (!profile?.onboarding_completed) {
-        navigate('/onboarding');
-      } else {
-        const redirectPath = getRoleBasedRedirectPath(profile?.role);
-        navigate(redirectPath);
-      }
+      const redirectPath = getRoleBasedRedirectPath(profile?.role);
+      navigate(redirectPath);
     }
   } catch (error) {
     console.error('Error in handleUserSession:', error);

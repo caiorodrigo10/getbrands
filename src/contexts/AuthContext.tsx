@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { AuthContextType } from "@/lib/auth/types";
 import { useToast } from "@/hooks/use-toast";
+import { handleUserSession } from "@/lib/auth/session";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -32,18 +33,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
-          setUser(session.user);
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
-            
-          if (profile?.role === 'admin') {
-            navigate('/admin');
-          } else {
-            navigate('/dashboard');
-          }
+          await handleUserSession(session.user, true, setUser, navigate);
         }
       } catch (error) {
         console.error('Error in initializeAuth:', error);
@@ -60,21 +50,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     initializeAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        setUser(session.user);
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-          
-        if (profile?.role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/dashboard');
-        }
-      } else {
+      if (event === 'SIGNED_IN' && session?.user) {
+        await handleUserSession(session.user, true, setUser, navigate);
+      } else if (event === 'SIGNED_OUT') {
         setUser(null);
+        navigate('/login');
       }
       setLoading(false);
     });
@@ -92,18 +72,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (error) throw error;
       
       if (data.user) {
-        setUser(data.user);
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
-          
-        if (profile?.role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/dashboard');
-        }
+        await handleUserSession(data.user, true, setUser, navigate);
       }
     } catch (error: any) {
       console.error('Error in login:', error);
