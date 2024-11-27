@@ -62,7 +62,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
                 city: localStorage.getItem('shipping_city') || undefined,
                 state: localStorage.getItem('shipping_state') || undefined,
                 postal_code: localStorage.getItem('shipping_zip') || undefined,
-                country: 'BR',
+                country: 'US',
               },
             },
           },
@@ -72,7 +72,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
 
       if (paymentError) {
         if (paymentError.type === 'validation_error' && paymentError.code === 'invalid_zip') {
-          throw new Error("Por favor, verifique se o CEP está no formato correto (ex: 12345-678)");
+          throw new Error("Please verify that the ZIP code is in the correct format (e.g., 12345 or 12345-678)");
         }
         throw paymentError;
       }
@@ -96,8 +96,8 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
       console.error("Payment error:", error);
       toast({
         variant: "destructive",
-        title: "Erro no pagamento",
-        description: error instanceof Error ? error.message : "Ocorreu um erro inesperado. Por favor, tente novamente.",
+        title: "Payment Error",
+        description: error instanceof Error ? error.message : "An unexpected error occurred. Please try again.",
       });
     } finally {
       setIsProcessing(false);

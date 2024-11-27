@@ -14,7 +14,7 @@ export const PaymentFormButton = ({ isProcessing, isDisabled, total }: PaymentFo
       disabled={isDisabled}
       className="w-full bg-primary hover:bg-primary-dark"
     >
-      {isProcessing ? "Processando..." : `Pagar ${formatCurrency(total)}`}
+      {isProcessing ? "Processing..." : `Pay ${formatCurrency(total)}`}
     </Button>
   );
 };
