@@ -1,12 +1,29 @@
 declare global {
   interface Window {
-    analytics: {
-      track: (event: string, properties?: Record<string, any>) => void;
-      page: (properties?: Record<string, any>) => void;
-      identify: (userId: string, traits?: Record<string, any>) => void;
-      group: (groupId: string, traits?: Record<string, any>) => void;
-      screen: (screenName: string, properties?: Record<string, any>) => void;
-    };
+    analytics: SegmentAnalytics.AnalyticsJS & any[];
+  }
+}
+
+interface SegmentAnalytics {
+  initialize(): void;
+  invoked: boolean;
+  methods: string[];
+  factory(method: string): Function;
+  push(...args: any[]): void;
+}
+
+namespace SegmentAnalytics {
+  export interface AnalyticsJS {
+    track(event: string, properties?: Record<string, any>): void;
+    page(properties?: Record<string, any>): void;
+    identify(userId: string, traits?: Record<string, any>): void;
+    group(groupId: string, traits?: Record<string, any>): void;
+    screen(screenName: string, properties?: Record<string, any>): void;
+    initialize(): void;
+    invoked: boolean;
+    methods: string[];
+    factory(method: string): Function;
+    push(...args: any[]): void;
   }
 }
 
