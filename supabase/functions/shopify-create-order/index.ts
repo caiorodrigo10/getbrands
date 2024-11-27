@@ -38,6 +38,10 @@ interface OrderData {
   shipping_address: ShippingAddress;
   billing_address?: ShippingAddress;
   financial_status: "paid" | "pending" | "refunded";
+  shipping_lines?: {
+    price: number;
+    title: string;
+  }[];
 }
 
 serve(async (req) => {
@@ -50,6 +54,12 @@ serve(async (req) => {
     const { orderData } = await req.json();
 
     console.log('Creating Shopify order with data:', orderData);
+
+    // Format shipping lines for Shopify
+    const shippingLines = orderData.shipping_cost ? [{
+      price: orderData.shipping_cost.toFixed(2),
+      title: "Standard Shipping"
+    }] : undefined;
 
     const response = await fetch(`https://${SHOPIFY_SHOP_DOMAIN}/admin/api/2024-01/orders.json`, {
       method: 'POST',
@@ -69,6 +79,7 @@ serve(async (req) => {
             email: orderData.customer.email,
             phone: orderData.customer.phone,
           },
+          shipping_lines: shippingLines,
         },
       }),
     });
