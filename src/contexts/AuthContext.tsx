@@ -5,6 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { AuthContextType } from "@/lib/auth/types";
 import { toast } from "sonner";
 
+declare global {
+  interface Window {
+    analytics: any;
+  }
+}
+
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
@@ -26,12 +32,45 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const identifyUser = async (user: User) => {
+    try {
+      // Get user profile data
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (window.analytics) {
+        // Identify user in Segment
+        window.analytics.identify(user.id, {
+          email: user.email,
+          first_name: profile?.first_name,
+          last_name: profile?.last_name,
+          role: profile?.role,
+          created_at: user.created_at,
+          last_sign_in: user.last_sign_in_at
+        });
+
+        // Track login event
+        window.analytics.track('User Logged In', {
+          userId: user.id,
+          email: user.email,
+          provider: 'email'
+        });
+      }
+    } catch (error) {
+      console.error('Error identifying user:', error);
+    }
+  };
+
   useEffect(() => {
     const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           setUser(session.user);
+          await identifyUser(session.user);
         }
       } catch (error) {
         console.error('Error in initializeAuth:', error);
@@ -46,8 +85,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         setUser(session.user);
+        await identifyUser(session.user);
       } else {
         setUser(null);
+        if (window.analytics) {
+          window.analytics.reset();
+        }
       }
       setLoading(false);
     });
@@ -66,6 +109,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (data.user) {
         setUser(data.user);
+        await identifyUser(data.user);
       }
     } catch (error) {
       console.error('Error in login:', error);
@@ -75,28 +119,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      // Clear local state first for immediate UI feedback
       setUser(null);
-
-      // Get current session
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) {
-        console.error('Session error:', sessionError);
-        return;
+      if (window.analytics) {
+        window.analytics.reset();
       }
-      
-      if (session) {
-        const { error } = await supabase.auth.signOut();
-        if (error && !error.message?.includes('session_not_found')) {
-          console.error('Sign out error:', error);
-          toast.error("There was an issue signing out");
-        }
-      }
-
-      // Clear any stored auth data
-      localStorage.removeItem('supabase.auth.token');
-      
+      await supabase.auth.signOut();
+      localStorage.clear();
+      sessionStorage.clear();
+      navigate('/login');
     } catch (error) {
       console.error('Error in logout:', error);
       toast.error("Error during logout");
