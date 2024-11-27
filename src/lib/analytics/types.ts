@@ -1,4 +1,4 @@
-// Empty type definitions to maintain type compatibility
+// Type definitions to maintain type compatibility
 export type AnalyticsEvent = {
   name: string;
   properties?: Record<string, any>;
