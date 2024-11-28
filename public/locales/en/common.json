@@ -22,5 +22,18 @@
     "error": "An error occurred",
     "success": "Success!",
     "noData": "No data available"
+  },
+  "dashboard": {
+    "welcome": "Welcome!",
+    "overview": "Overview",
+    "recentActivity": "Recent Activity",
+    "upcomingTasks": "Upcoming Tasks"
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password"
   }
 }

@@ -22,5 +22,18 @@
     "error": "Ocorreu um erro",
     "success": "Sucesso!",
     "noData": "Nenhum dado disponível"
+  },
+  "dashboard": {
+    "welcome": "Bem-vindo!",
+    "overview": "Visão Geral",
+    "recentActivity": "Atividade Recente",
+    "upcomingTasks": "Tarefas Pendentes"
+  },
+  "auth": {
+    "login": "Entrar",
+    "signup": "Cadastrar",
+    "logout": "Sair",
+    "email": "Email",
+    "password": "Senha"
   }
 }
