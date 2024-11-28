@@ -19,7 +19,7 @@ export const NavigationMenu = () => {
       label: "Dashboard", 
       path: "/dashboard", 
       icon: LayoutDashboard,
-      restricted: true
+      restricted: false
     },
     { 
       label: "Projects", 
@@ -28,29 +28,15 @@ export const NavigationMenu = () => {
       restricted: true
     },
     { 
-      label: "My Products", 
+      label: "Products", 
       path: "/products", 
-      icon: Palette,
+      icon: Grid3X3,
       restricted: true
     },
-    ...(showStartHere ? [
-      { 
-        label: "Start Here", 
-        path: "/start-here", 
-        icon: PlayCircle,
-        restricted: false
-      }
-    ] : []),
     { 
       label: "Catalog", 
       path: "/catalog", 
-      icon: Grid3X3,
-      restricted: false
-    },
-    { 
-      label: "Orders", 
-      path: "/sample-orders", 
-      icon: Package2,
+      icon: Palette,
       restricted: false
     },
     { 
@@ -59,6 +45,20 @@ export const NavigationMenu = () => {
       icon: Calculator,
       restricted: false
     },
+    { 
+      label: "Sample Orders", 
+      path: "/sample-orders", 
+      icon: Package2,
+      restricted: false
+    },
+    ...(showStartHere ? [
+      { 
+        label: "Get Started", 
+        path: "/start-here", 
+        icon: PlayCircle,
+        restricted: false
+      }
+    ] : []),
   ];
 
   const handleRestrictedNavigation = (path: string) => {

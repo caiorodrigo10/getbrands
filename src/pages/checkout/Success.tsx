@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu } from "@/components/NavigationMenu";
@@ -12,6 +12,7 @@ import { OrderSummaryDetails } from "@/components/checkout/success/OrderSummaryD
 
 const Success = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [orderDetails, setOrderDetails] = useState<any>(null);
   const [showConfetti, setShowConfetti] = useState(true);
@@ -109,8 +110,12 @@ const Success = () => {
                 </CardContent>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" onClick={() => window.location.href = "/dashboard"}>
-                  Return to Dashboard
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => navigate('/')}
+                >
+                  Return to Home
                 </Button>
               </CardContent>
             </Card>
@@ -139,8 +144,12 @@ const Success = () => {
           </Card>
 
           <div className="text-center">
-            <Button variant="outline" onClick={() => window.location.href = "/dashboard"}>
-              Return to Dashboard
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => navigate('/')}
+            >
+              Return to Home
             </Button>
           </div>
         </div>

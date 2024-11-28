@@ -1,69 +1,74 @@
-import { Link } from "react-router-dom";
-import { User, ShoppingBag, LayoutDashboard, LogOut } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { User, ShoppingBag, LogOut, Settings } from "lucide-react";
 import { UserInfo } from "./UserInfo";
+import { Button } from "@/components/ui/button";
 
 interface MobileMenuProps {
-  userName: string;
-  userEmail: string;
-  userAvatar?: string;
-  isLoading: boolean;
   isAdmin: boolean;
   isInAdminPanel: boolean;
   handleAdminNavigation: () => void;
   handleLogout: () => void;
+  handleClose: () => void;
 }
 
 export const MobileMenu = ({
-  userName,
-  userEmail,
-  userAvatar,
-  isLoading,
   isAdmin,
   isInAdminPanel,
   handleAdminNavigation,
   handleLogout,
+  handleClose,
 }: MobileMenuProps) => {
+  const navigate = useNavigate();
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    handleClose();
+  };
+
   return (
-    <div className="flex flex-col">
-      <div className="flex items-center gap-3 mb-4">
-        <UserInfo
-          isLoading={isLoading}
-          userName={userName}
-          userEmail={userEmail}
-          userAvatar={userAvatar}
-        />
+    <div className="fixed inset-0 z-50 bg-white p-6">
+      <div className="mb-8">
+        <UserInfo />
       </div>
-      <div className="flex flex-col space-y-1">
-        <Link 
-          to="/profile" 
-          className="flex items-center gap-2 px-3 py-2 text-sm text-black hover:bg-[#fff4fc] hover:text-black rounded-md"
+
+      <div className="space-y-4">
+        <Button
+          variant="ghost"
+          className="w-full justify-start"
+          onClick={() => handleNavigation('/profile')}
         >
           <User className="h-4 w-4" />
-          <span>My Profile</span>
-        </Link>
-        <Link 
-          to="/sample-orders" 
-          className="flex items-center gap-2 px-3 py-2 text-sm text-black hover:bg-[#fff4fc] hover:text-black rounded-md"
+          <span className="ml-2">My Profile</span>
+        </Button>
+
+        <Button
+          variant="ghost"
+          className="w-full justify-start"
+          onClick={() => handleNavigation('/sample-orders')}
         >
           <ShoppingBag className="h-4 w-4" />
-          <span>Orders</span>
-        </Link>
+          <span className="ml-2">Orders</span>
+        </Button>
+
         {isAdmin && (
-          <button
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-purple-600 hover:text-purple-700"
             onClick={handleAdminNavigation}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-black hover:bg-[#fff4fc] hover:text-black rounded-md w-full text-left"
           >
-            <LayoutDashboard className="h-4 w-4" />
-            <span>{isInAdminPanel ? 'User View' : 'Admin Panel'}</span>
-          </button>
+            <Settings className="h-4 w-4" />
+            <span className="ml-2">{isInAdminPanel ? "View as User" : "View as Admin"}</span>
+          </Button>
         )}
-        <button
+
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-red-500 hover:text-red-600"
           onClick={handleLogout}
-          className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-[#fff4fc] hover:text-red-500 rounded-md w-full text-left"
         >
           <LogOut className="h-4 w-4" />
-          <span>Sign Out</span>
-        </button>
+          <span className="ml-2">Logout</span>
+        </Button>
       </div>
     </div>
   );

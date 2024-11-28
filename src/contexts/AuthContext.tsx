@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 
 interface AuthContextType {
@@ -33,40 +33,58 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleAuthChange = (session: any) => {
-    setUser(session?.user ?? null);
-    setIsAuthenticated(!!session?.user);
+  const handleAuthChange = async (session: any) => {
+    console.log('[DEBUG] handleAuthChange - Session:', session?.user?.id, 'Path:', location.pathname);
+    
+    if (session?.user) {
+      setUser(session.user);
+      setIsAuthenticated(true);
+    } else {
+      setUser(null);
+      setIsAuthenticated(false);
+    }
     setIsLoading(false);
   };
 
   useEffect(() => {
-    // Get initial session
+    let mounted = true;
+    console.log('[DEBUG] AuthContext useEffect - User:', user?.id, 'Path:', location.pathname);
+    
     const initSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) throw error;
-        handleAuthChange(session);
+        
+        if (mounted) {
+          await handleAuthChange(session);
+        }
       } catch (error) {
         console.error('Session error:', error);
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     initSession();
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      handleAuthChange(session);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (mounted) {
+        await handleAuthChange(session);
+      }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
 
   const signOut = async () => {
     try {
+      setIsLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
@@ -77,10 +95,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error('Error signing out:', error);
       toast.error('Error signing out');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const login = async (email: string, password: string) => {
+    console.log('[DEBUG] login attempt - Path:', location.pathname);
     try {
       setIsLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -92,7 +113,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       setUser(data.user);
       setIsAuthenticated(true);
-      navigate('/dashboard');
+      
+      // Redirecionar para /catalog após login bem-sucedido
+      navigate('/catalog', { replace: true });
       toast.success('Logged in successfully');
     } catch (error: any) {
       console.error('Login error:', error);

@@ -2,7 +2,6 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileType } from "./types";
 import { handleAnalytics, handleGleapIdentification } from "./analytics";
-import { getRoleBasedRedirectPath } from "@/lib/roleRedirection";
 
 export const handleUserSession = async (
   user: User | null,
@@ -51,13 +50,9 @@ export const handleUserSession = async (
     handleGleapIdentification(user, profile as ProfileType);
     handleAnalytics(user, profile as ProfileType);
 
-    if (isInitialLogin) {
-      if (!profile?.onboarding_completed) {
-        navigate('/onboarding');
-      } else {
-        const redirectPath = getRoleBasedRedirectPath(profile?.role);
-        navigate(redirectPath);
-      }
+    // Só redireciona se for login inicial E se houver perfil E não completou onboarding
+    if (isInitialLogin && profile && !profile.onboarding_completed) {
+      navigate('/onboarding');
     }
   } catch (error) {
     console.error('Error in handleUserSession:', error);

@@ -2,12 +2,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export type UserRole = 'admin' | 'member' | 'sampler';
+export const useAuthWithPermissions = () => {
+  const { user, isAuthenticated, isLoading: isLoadingAuth } = useAuth();
 
-export const useUserPermissions = () => {
-  const { user } = useAuth();
-
-  const { data: profile } = useQuery({
+  const { 
+    data: profile, 
+    isLoading: isLoadingProfile 
+  } = useQuery({
     queryKey: ["user-profile", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
@@ -19,6 +20,8 @@ export const useUserPermissions = () => {
       return data;
     },
     enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5, // Cache por 5 minutos
+    cacheTime: 1000 * 60 * 30, // Manter no cache por 30 minutos
   });
 
   const isAdmin = profile?.role === 'admin';
@@ -28,20 +31,17 @@ export const useUserPermissions = () => {
   const hasFullAccess = isAdmin;
   const hasLimitedAccess = isMember || isSampler;
 
+  const isLoading = isLoadingAuth || (isAuthenticated && isLoadingProfile);
+
   return {
+    user,
+    isAuthenticated,
+    isLoading,
+    profile,
     isAdmin,
     isMember,
     isSampler,
     hasFullAccess,
     hasLimitedAccess,
   };
-};
-
-export const RESTRICTED_ROUTES = [
-  '/projects',
-  '/products',
-];
-
-export const isRestrictedRoute = (pathname: string) => {
-  return RESTRICTED_ROUTES.some(route => pathname.startsWith(route));
 };

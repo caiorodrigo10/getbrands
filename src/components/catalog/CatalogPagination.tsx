@@ -14,6 +14,45 @@ interface CatalogPaginationProps {
 }
 
 const CatalogPagination = ({ currentPage, totalPages, onPageChange }: CatalogPaginationProps) => {
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    
+    if (totalPages <= 5) {
+      // Se tiver 5 páginas ou menos, mostra todas
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    // Sempre adiciona página 1
+    pages.push(1);
+
+    if (currentPage <= 4) {
+      // Se estiver nas primeiras 4 páginas
+      pages.push(2, 3, 4, 5, "...", totalPages);
+    } else if (currentPage >= totalPages - 3) {
+      // Se estiver nas últimas 4 páginas
+      pages.push(
+        "...",
+        totalPages - 4,
+        totalPages - 3,
+        totalPages - 2,
+        totalPages - 1,
+        totalPages
+      );
+    } else {
+      // No meio
+      pages.push(
+        "...",
+        currentPage - 1,
+        currentPage,
+        currentPage + 1,
+        "...",
+        totalPages
+      );
+    }
+
+    return pages;
+  };
+
   return (
     <Pagination>
       <PaginationContent className="text-gray-900">
@@ -24,15 +63,21 @@ const CatalogPagination = ({ currentPage, totalPages, onPageChange }: CatalogPag
           />
         </PaginationItem>
 
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-          <PaginationItem key={page} className="hidden md:block">
-            <PaginationLink
-              onClick={() => onPageChange(page)}
-              isActive={currentPage === page}
-              className="cursor-pointer text-gray-900"
-            >
-              {page}
-            </PaginationLink>
+        {getPageNumbers().map((page, index) => (
+          <PaginationItem key={index} className="hidden md:block">
+            {page === "..." ? (
+              <span className="px-4 py-2">...</span>
+            ) : (
+              <PaginationLink
+                onClick={() => onPageChange(page as number)}
+                isActive={currentPage === page}
+                className={`cursor-pointer text-gray-900 ${
+                  currentPage === page ? "bg-primary text-white hover:bg-primary/90" : ""
+                }`}
+              >
+                {page}
+              </PaginationLink>
+            )}
           </PaginationItem>
         ))}
 
