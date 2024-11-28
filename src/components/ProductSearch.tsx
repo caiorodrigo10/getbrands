@@ -125,3 +125,4 @@ export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSea
       )}
     </div>
   );
+};
