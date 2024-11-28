@@ -516,6 +516,7 @@ export type Database = {
           first_name: string | null
           id: string
           instagram_handle: string | null
+          language: string | null
           last_name: string | null
           launch_urgency: string | null
           name: string | null
@@ -544,6 +545,7 @@ export type Database = {
           first_name?: string | null
           id: string
           instagram_handle?: string | null
+          language?: string | null
           last_name?: string | null
           launch_urgency?: string | null
           name?: string | null
@@ -572,6 +574,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           instagram_handle?: string | null
+          language?: string | null
           last_name?: string | null
           launch_urgency?: string | null
           name?: string | null

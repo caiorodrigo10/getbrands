@@ -36,13 +36,13 @@ const getUserLanguage = async () => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (user?.id) {
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('language')
         .eq('id', user.id)
         .single();
       
-      if (profile?.language) {
+      if (!error && profile?.language) {
         i18n.changeLanguage(profile.language);
       }
     }
