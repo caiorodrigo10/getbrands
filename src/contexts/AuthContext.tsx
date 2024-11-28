@@ -3,6 +3,7 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
+import i18n from 'i18next';
 
 interface AuthContextType {
   user: User | null;
@@ -41,6 +42,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (session?.user) {
       setUser(session.user);
       setIsAuthenticated(true);
+      
+      // Fetch and set user language preference
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('language')
+        .eq('id', session.user.id)
+        .single();
+        
+      if (profile?.language) {
+        i18n.changeLanguage(profile.language);
+      }
     } else {
       setUser(null);
       setIsAuthenticated(false);
