@@ -25,6 +25,7 @@ import PackageQuizPage from "@/pages/PackageQuizPage";
 import OnboardingQuizPage from "@/pages/OnboardingQuiz";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
+import LandingPage from "@/pages/marketing/LandingPage";
 
 // Language redirect component with updated logic
 const LanguageRedirect = () => {
@@ -81,7 +82,8 @@ export const AppRoutes = () => {
   const createLocalizedRoutes = (language: string) => (
     <Route path={`/${language}`} element={<AppLayout />}>
       {/* Public index route - no authentication required */}
-      <Route index element={<MarketingRoutes />} />
+      <Route index element={<LandingPage />} />
+      <MarketingRoutes />
       
       <Route path="dashboard" element={
         <ProtectedRoute>
