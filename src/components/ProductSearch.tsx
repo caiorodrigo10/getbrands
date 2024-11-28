@@ -4,7 +4,7 @@ import { useProducts } from "@/hooks/useProducts";
 import { Product } from "@/types/product";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface ProductSearchProps {
   onSelectProduct?: (product: Product) => void;
@@ -20,6 +20,13 @@ export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSea
   const { addItem } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get current language prefix
+  const getLanguagePrefix = () => {
+    const match = location.pathname.match(/^\/(en|pt|es)/);
+    return match ? match[0] : '/en';
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

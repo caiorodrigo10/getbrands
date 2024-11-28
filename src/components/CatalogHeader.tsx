@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useEffect, useState } from "react";
 
@@ -8,6 +8,7 @@ const CatalogHeader = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
   const debouncedSearch = useDebounce(searchTerm, 300);
+  const location = useLocation();
 
   useEffect(() => {
     const newSearchParams = new URLSearchParams(searchParams);
@@ -16,8 +17,15 @@ const CatalogHeader = () => {
     } else {
       newSearchParams.delete("search");
     }
-    setSearchParams(newSearchParams);
-  }, [debouncedSearch, setSearchParams]);
+    
+    // Preserve the language prefix when updating search params
+    const currentPath = location.pathname;
+    setSearchParams(newSearchParams, { 
+      replace: true,
+      // Preserve the current path to maintain language prefix
+      state: { path: currentPath }
+    });
+  }, [debouncedSearch, setSearchParams, location.pathname]);
 
   return (
     <div className="relative flex-1">

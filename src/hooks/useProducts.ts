@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 
 interface UseProductsOptions {
   page?: number;
@@ -19,7 +19,11 @@ interface ProductsResponse {
 
 export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProductsOptions = {}) => {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const searchTerm = searchParams.get("search");
+
+  // Remove language prefix from path for consistency
+  const cleanPath = location.pathname.replace(/^\/(en|pt|es)/, '');
 
   const fetchProducts = async (context: { pageParam?: unknown }) => {
     const currentPage = (context.pageParam as number) ?? page;
@@ -61,7 +65,7 @@ export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProduc
 
   if (infinite) {
     return useInfiniteQuery({
-      queryKey: ["products", "infinite", { limit, search: searchTerm }],
+      queryKey: ["products", "infinite", { limit, search: searchTerm, path: cleanPath }],
       queryFn: fetchProducts,
       getNextPageParam: (lastPage) => lastPage.hasMore ? lastPage.nextPage : undefined,
       initialPageParam: 1,
@@ -69,7 +73,7 @@ export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProduc
   }
 
   return useQuery({
-    queryKey: ["products", { page, limit, search: searchTerm }],
+    queryKey: ["products", { page, limit, search: searchTerm, path: cleanPath }],
     queryFn: () => fetchProducts({ pageParam: page }),
   });
 };
