@@ -24,6 +24,34 @@ import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
 import OnboardingQuizPage from "@/pages/OnboardingQuiz";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/contexts/AuthContext";
+
+// Language redirect component
+const LanguageRedirect = () => {
+  const { i18n } = useTranslation();
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
+  
+  // Get browser language or default to 'en'
+  const getBrowserLanguage = () => {
+    const browserLang = navigator.language.split('-')[0];
+    return ['en', 'pt', 'es'].includes(browserLang) ? browserLang : 'en';
+  };
+
+  // If at root, redirect to appropriate language path
+  if (location.pathname === '/') {
+    const targetLang = i18n.language || getBrowserLanguage();
+    return <Navigate to={`/${targetLang}`} replace />;
+  }
+
+  // If at /login, redirect to language-specific login
+  if (location.pathname === '/login') {
+    const targetLang = i18n.language || getBrowserLanguage();
+    return <Navigate to={`/${targetLang}/login`} replace />;
+  }
+
+  return null;
+};
 
 export const AppRoutes = () => {
   const location = useLocation();
@@ -125,28 +153,26 @@ export const AppRoutes = () => {
           <ProfitCalculator />
         </ProtectedRoute>
       } />
-
+      
       <Route path="*" element={<Error404 />} />
     </Route>
   );
 
   return (
     <Routes>
-      {/* Redirect root to default language */}
-      <Route path="/" element={<Navigate to={`/${i18n.language}`} replace />} />
+      {/* Language redirect handler */}
+      <Route path="/" element={<LanguageRedirect />} />
+      <Route path="/login" element={<LanguageRedirect />} />
       
       {/* Create routes for each supported language */}
       {createLocalizedRoutes('en')}
       {createLocalizedRoutes('pt')}
       {createLocalizedRoutes('es')}
 
-      {/* Marketing Routes */}
-      {MarketingRoutes}
-      
-      {/* Public Routes */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/onboarding" element={<OnboardingQuizPage />} />
+      {/* Public Routes with language support */}
+      <Route path="/:lang/login" element={<Login />} />
+      <Route path="/:lang/signup" element={<SignUp />} />
+      <Route path="/:lang/onboarding" element={<OnboardingQuizPage />} />
       
       {/* Admin Routes */}
       <Route path="/admin/*" element={

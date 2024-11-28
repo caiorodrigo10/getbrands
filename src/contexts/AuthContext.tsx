@@ -37,8 +37,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   const handleAuthChange = async (session: any) => {
-    console.log('[DEBUG] handleAuthChange - Session:', session?.user?.id, 'Path:', location.pathname);
-    
     if (session?.user) {
       setUser(session.user);
       setIsAuthenticated(true);
@@ -62,7 +60,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     let mounted = true;
-    console.log('[DEBUG] AuthContext useEffect - User:', user?.id, 'Path:', location.pathname);
     
     const initSession = async () => {
       try {
@@ -102,6 +99,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       setUser(null);
       setIsAuthenticated(false);
+      
+      // Redirect to login without language prefix
       navigate('/login');
       toast.success('Logged out successfully');
     } catch (error) {
@@ -113,7 +112,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const login = async (email: string, password: string) => {
-    console.log('[DEBUG] login attempt - Path:', location.pathname);
     try {
       setIsLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -126,8 +124,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(data.user);
       setIsAuthenticated(true);
       
-      // Redirecionar para /catalog após login bem-sucedido
-      navigate('/catalog', { replace: true });
+      // Get user's language preference or use current language
+      const lang = i18n.language || 'en';
+      navigate(`/${lang}/catalog`, { replace: true });
       toast.success('Logged in successfully');
     } catch (error: any) {
       console.error('Login error:', error);

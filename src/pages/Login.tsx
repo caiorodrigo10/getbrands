@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const Login = () => {
   const { toast } = useToast();
@@ -12,12 +13,19 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
+  const { lang } = useParams();
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      navigate(`/${lang || i18n.language}/dashboard`);
     }
-  }, [isAuthenticated, navigate]);
+    
+    // Update language if URL param differs from current
+    if (lang && lang !== i18n.language) {
+      i18n.changeLanguage(lang);
+    }
+  }, [isAuthenticated, navigate, lang, i18n]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,8 +33,7 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate('/catalog');
-      setIsLoading(false);
+      navigate(`/${lang || i18n.language}/catalog`);
     } catch (error: any) {
       console.error("Login error:", error);
       toast({
