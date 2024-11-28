@@ -20,7 +20,7 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    fallbackLng: 'en',
+    fallbackLng: ['en'],
     supportedLngs: ['en', 'pt', 'es'],
     debug: import.meta.env.DEV,
     
@@ -32,7 +32,6 @@ i18n
       order: ['path', 'localStorage', 'navigator'],
       lookupFromPathIndex: 0,
       caches: ['localStorage'],
-      checkWhitelist: true,
     },
 
     interpolation: {
