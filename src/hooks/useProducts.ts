@@ -21,8 +21,8 @@ export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProduc
   const [searchParams] = useSearchParams();
   const searchTerm = searchParams.get("search");
 
-  const fetchProducts = async (context: { pageParam?: number }) => {
-    const currentPage = context.pageParam ?? page;
+  const fetchProducts = async (context: { pageParam?: unknown }) => {
+    const currentPage = (context.pageParam as number) ?? page;
     const from = (currentPage - 1) * limit;
     const to = from + limit - 1;
 
