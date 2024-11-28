@@ -34,6 +34,15 @@
     "signup": "Cadastrar",
     "logout": "Sair",
     "email": "Email",
-    "password": "Senha"
+    "password": "Senha",
+    "createAccount": "Criar sua conta",
+    "joinUs": "Junte-se a nós e comece a construir sua marca",
+    "firstName": "Nome",
+    "lastName": "Sobrenome",
+    "passwordPlaceholder": "••••••••",
+    "emailPlaceholder": "seu@email.com",
+    "alreadyHaveAccount": "Já tem uma conta?",
+    "signIn": "Entrar",
+    "creatingAccount": "Criando conta..."
   }
 }
