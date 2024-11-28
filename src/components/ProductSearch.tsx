@@ -37,7 +37,7 @@ export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSea
   }, []);
 
   // Handle both infinite and regular query results
-  const products = ('pages' in productsData 
+  const products = ('pages' in productsData && productsData.pages?.length > 0
     ? productsData.pages[0]?.data 
     : productsData?.data) || [];
 

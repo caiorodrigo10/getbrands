@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { handleProductUpdate, handleProductDelete } from './productHandlers.ts';
+import { handleProductUpdate, handleProductDelete, syncAllProductsCost } from './productHandlers.ts';
 import { validateShopifyHmac } from './hmacValidation.ts';
 import { logger } from './logger.ts';
 
@@ -16,6 +16,46 @@ serve(async (req) => {
   }
 
   try {
+    // Handle sync costs action
+    if (req.method === 'POST') {
+      try {
+        const body = await req.json();
+        logger.info('Received POST request:', { body });
+        
+        if (body.action === 'sync-costs') {
+          logger.info('Starting cost sync');
+          const result = await syncAllProductsCost();
+          logger.info('Cost sync completed:', result);
+          return new Response(
+            JSON.stringify(result),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        } else {
+          logger.info('Unknown action:', body.action);
+        }
+      } catch (error) {
+        logger.error('Error processing POST request:', error);
+        return new Response(
+          JSON.stringify({ error: error.message }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 400
+          }
+        );
+      }
+    }
+
+    const url = new URL(req.url);
+    
+    // Handle sync all products cost endpoint
+    if (url.pathname === '/sync-costs') {
+      const result = await syncAllProductsCost();
+      return new Response(
+        JSON.stringify(result),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const hmac = req.headers.get('x-shopify-hmac-sha256');
     const topic = req.headers.get('x-shopify-topic');
     

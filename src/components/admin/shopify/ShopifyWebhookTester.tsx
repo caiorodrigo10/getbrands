@@ -57,6 +57,42 @@ export const ShopifyWebhookTester = () => {
     }
   };
 
+  const handleSyncCosts = async () => {
+    setIsLoading(true);
+    try {
+      console.log('Iniciando sincronização de custos...');
+      const { data, error } = await supabase.functions.invoke('shopify-webhook-v2', {
+        method: 'POST',
+        body: { action: 'sync-costs' }
+      });
+      
+      console.log('Resposta da função:', { data, error });
+      
+      if (error) {
+        console.error('Erro detalhado:', error);
+        throw error;
+      }
+      
+      toast({
+        title: "Sucesso",
+        description: "Sincronização de custos iniciada com sucesso",
+      });
+      
+      // Refresh logs after sync
+      await fetchLogs();
+      
+    } catch (error) {
+      console.error('Erro completo ao sincronizar custos:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: error.message || "Falha ao sincronizar custos",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const fetchLogs = async () => {
     try {
       // Fetch webhook logs
@@ -130,22 +166,29 @@ export const ShopifyWebhookTester = () => {
   }, []);
 
   return (
-    <div className="space-y-6">
-      <div className="flex gap-4">
-        <Button 
-          onClick={handleRegisterWebhooks} 
-          disabled={isLoading}
-        >
-          {isLoading ? "Processando..." : "Registrar Webhooks"}
-        </Button>
-        
-        <Button 
-          variant="outline" 
-          onClick={handleListWebhooks}
-          disabled={isLoading}
-        >
-          {isLoading ? "Carregando..." : "Atualizar Lista"}
-        </Button>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-medium">Webhooks do Shopify</h3>
+          <p className="text-sm text-muted-foreground">
+            Gerencie webhooks e sincronização
+          </p>
+        </div>
+        <div className="space-x-2">
+          <Button 
+            onClick={handleRegisterWebhooks}
+            disabled={isLoading}
+          >
+            {isLoading ? "Registrando..." : "Registrar Webhooks"}
+          </Button>
+          <Button 
+            onClick={handleSyncCosts}
+            disabled={isLoading}
+            variant="secondary"
+          >
+            {isLoading ? "Sincronizando..." : "Sincronizar Custos"}
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="webhooks" className="w-full">

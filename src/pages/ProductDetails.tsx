@@ -10,6 +10,8 @@ import ProjectSelectionDialog from "@/components/dialogs/ProjectSelectionDialog"
 import { ProductHeader } from "@/components/products/ProductHeader";
 import { ProductBenefits } from "@/components/products/ProductBenefits";
 import { ProductCalculator } from "@/components/products/ProductCalculator";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -205,6 +207,14 @@ const ProductDetails = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <Button
+        onClick={() => navigate('/catalog')}
+        variant="ghost"
+        className="mb-6 hover:text-white hover:bg-orange-500 transition-colors"
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Back to Catalog
+      </Button>
       <ProductHeader 
         product={product} 
         onSelectProduct={handleSelectProduct}

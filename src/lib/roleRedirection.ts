@@ -1,9 +1,7 @@
 export const getRoleBasedRedirectPath = (role: string | null, hasProjects: boolean = false): string => {
+  // Se não tiver role, vai para login
   if (!role) return '/login';
   
-  if (role === 'admin') return '/admin';
-  if (hasProjects) return '/dashboard';
-  if (['member', 'sampler'].includes(role)) return '/start-here';
-  
-  return '/dashboard';
+  // Mantém o usuário na página atual
+  return window.location.pathname;
 };

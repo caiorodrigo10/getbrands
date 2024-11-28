@@ -1194,6 +1194,48 @@ export type Database = {
           },
         ]
       }
+      user_permissions: {
+        Row: {
+          can_manage_bulk_actions: boolean | null
+          can_manage_catalog: boolean | null
+          can_manage_crm: boolean | null
+          can_manage_orders: boolean | null
+          can_manage_projects: boolean | null
+          can_manage_users: boolean | null
+          can_view_reports: boolean | null
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          can_manage_bulk_actions?: boolean | null
+          can_manage_catalog?: boolean | null
+          can_manage_crm?: boolean | null
+          can_manage_orders?: boolean | null
+          can_manage_projects?: boolean | null
+          can_manage_users?: boolean | null
+          can_view_reports?: boolean | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          can_manage_bulk_actions?: boolean | null
+          can_manage_catalog?: boolean | null
+          can_manage_crm?: boolean | null
+          can_manage_orders?: boolean | null
+          can_manage_projects?: boolean | null
+          can_manage_users?: boolean | null
+          can_view_reports?: boolean | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       webhook_logs: {
         Row: {
           created_at: string
@@ -1237,7 +1279,15 @@ export type Database = {
     Enums: {
       bulk_action_status: "pending" | "processing" | "completed" | "failed"
       bulk_action_type: "import" | "delete" | "contacts"
+      profile_type: "general" | "design" | "backend"
       project_pack_type: "start" | "pro" | "ultra"
+      user_role:
+        | "admin"
+        | "member"
+        | "sampler"
+        | "team_member"
+        | "designer_partner"
+        | "customer"
     }
     CompositeTypes: {
       [_ in never]: never

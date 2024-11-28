@@ -25,7 +25,8 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate('/dashboard');
+      navigate('/catalog');
+      setIsLoading(false);
     } catch (error: any) {
       console.error("Login error:", error);
       toast({

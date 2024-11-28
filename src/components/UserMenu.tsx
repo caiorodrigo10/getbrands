@@ -27,7 +27,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { handleLogout } = useSessionManagement();
-  const isInAdminPanel = location.pathname.startsWith('/admin');
+  const [isInAdminPanel, setIsInAdminPanel] = useState(location.pathname.startsWith('/admin'));
 
   useEffect(() => {
     let isMounted = true;
@@ -44,12 +44,12 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
         if (sessionError) {
           console.error('Session error:', sessionError);
           toast.error("Session error. Please try logging in again.");
-          navigate('/login');
+          navigate('/');
           return;
         }
 
         if (!session) {
-          navigate('/login');
+          navigate('/');
           return;
         }
 
@@ -98,6 +98,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
     } else {
       navigate('/admin');
     }
+    setIsInAdminPanel(!isInAdminPanel);
   };
 
   if (isMobile) {

@@ -26,13 +26,7 @@ const StartHere = () => {
     enabled: !!user?.id,
   });
 
-  useEffect(() => {
-    if (profile && !["member", "sampler"].includes(profile.role)) {
-      navigate("/dashboard");
-    }
-  }, [profile, navigate]);
-
-  // Add script for video player
+  // Apenas o useEffect do vídeo
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://scripts.converteai.net/lib/js/smartplayer/v1/sdk.min.js";
@@ -99,53 +93,6 @@ const StartHere = () => {
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </Link>
-        
-        <Button 
-          className="w-full"
-          size="lg"
-          variant="outline"
-        >
-          Schedule a Demo
-          <ArrowRight className="ml-2 h-5 w-5" />
-        </Button>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6 mt-8">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold mb-4">Next Steps</h3>
-          <ul className="space-y-3">
-            <li className="flex items-center text-gray-600">
-              <span className="mr-2">1.</span>
-              Complete your profile information
-            </li>
-            <li className="flex items-center text-gray-600">
-              <span className="mr-2">2.</span>
-              Browse our product catalog
-            </li>
-            <li className="flex items-center text-gray-600">
-              <span className="mr-2">3.</span>
-              Request product samples
-            </li>
-          </ul>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold mb-4">Resources</h3>
-          <ul className="space-y-3">
-            <li className="flex items-center text-gray-600">
-              <span className="mr-2">•</span>
-              Platform Guide
-            </li>
-            <li className="flex items-center text-gray-600">
-              <span className="mr-2">•</span>
-              FAQ
-            </li>
-            <li className="flex items-center text-gray-600">
-              <span className="mr-2">•</span>
-              Support Contact
-            </li>
-          </ul>
-        </div>
       </div>
     </div>
   );

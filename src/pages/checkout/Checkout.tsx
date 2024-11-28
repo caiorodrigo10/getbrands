@@ -20,7 +20,7 @@ const Checkout = () => {
 
   // Only render checkout if we're in a checkout route
   if (!location.pathname.startsWith('/checkout')) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/" replace />;
   }
 
   const getCurrentStepIndex = () => {

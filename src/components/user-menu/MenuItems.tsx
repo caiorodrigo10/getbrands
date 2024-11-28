@@ -1,6 +1,5 @@
+import { User, ShoppingBag, LogOut, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
-import { User, ShoppingBag, LayoutDashboard, LogOut } from "lucide-react";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 interface MenuItemsProps {
   isAdmin: boolean;
@@ -13,38 +12,40 @@ export const MenuItems = ({
   isAdmin,
   isInAdminPanel,
   handleAdminNavigation,
-  handleLogout
+  handleLogout,
 }: MenuItemsProps) => {
   return (
-    <div className="p-1">
-      <Link to="/profile">
-        <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#fff4fc] hover:text-black rounded-md">
-          <User className="h-4 w-4 text-black" />
-          <span className="text-black">My Profile</span>
-        </DropdownMenuItem>
+    <div className="flex flex-col space-y-1">
+      <Link
+        to="/profile"
+        className="flex items-center gap-2 px-3 py-2 text-sm text-black hover:bg-[#fff4fc] hover:text-black rounded-md"
+      >
+        <User className="h-4 w-4 text-black" />
+        <span>My Profile</span>
       </Link>
-      <Link to="/sample-orders">
-        <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#fff4fc] hover:text-black rounded-md">
-          <ShoppingBag className="h-4 w-4 text-black" />
-          <span className="text-black">Orders</span>
-        </DropdownMenuItem>
+      <Link
+        to="/sample-orders"
+        className="flex items-center gap-2 px-3 py-2 text-sm text-black hover:bg-[#fff4fc] hover:text-black rounded-md"
+      >
+        <ShoppingBag className="h-4 w-4 text-black" />
+        <span>Orders</span>
       </Link>
       {isAdmin && (
-        <DropdownMenuItem 
+        <button
           onClick={handleAdminNavigation}
-          className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#fff4fc] hover:text-black rounded-md"
+          className="flex items-center gap-2 px-3 py-2 text-sm text-purple-600 hover:bg-[#fff4fc] hover:text-purple-700 rounded-md w-full text-left"
         >
-          <LayoutDashboard className="h-4 w-4 text-black" />
-          <span className="text-black">{isInAdminPanel ? 'User View' : 'Admin Panel'}</span>
-        </DropdownMenuItem>
+          <Settings className="h-4 w-4" />
+          <span>{isInAdminPanel ? "View as User" : "View as Admin"}</span>
+        </button>
       )}
-      <DropdownMenuItem 
+      <button
         onClick={handleLogout}
-        className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#fff4fc] hover:text-red-600 rounded-md text-red-600"
+        className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-[#fff4fc] hover:text-red-500 rounded-md w-full text-left"
       >
         <LogOut className="h-4 w-4" />
-        <span>Sign Out</span>
-      </DropdownMenuItem>
+        <span>Logout</span>
+      </button>
     </div>
   );
 };
