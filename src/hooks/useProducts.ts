@@ -32,7 +32,7 @@ export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProduc
       query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
     }
 
-    const { count } = await query.select("*", { count: "exact", head: true });
+    const { count } = await query;
 
     let dataQuery = supabase
       .from("products")
@@ -60,7 +60,7 @@ export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProduc
   };
 
   if (infinite) {
-    return useInfiniteQuery<ProductsResponse>({
+    return useInfiniteQuery({
       queryKey: ["products", "infinite", { limit, search: searchTerm }],
       queryFn: fetchProducts,
       getNextPageParam: (lastPage) => lastPage.hasMore ? lastPage.nextPage : undefined,
@@ -68,7 +68,7 @@ export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProduc
     });
   }
 
-  return useQuery<ProductsResponse>({
+  return useQuery({
     queryKey: ["products", { page, limit, search: searchTerm }],
     queryFn: () => fetchProducts({ pageParam: page }),
   });
