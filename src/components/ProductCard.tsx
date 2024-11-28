@@ -114,7 +114,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         
         <div className="grid grid-cols-3 gap-2 mb-4">
           <div className="flex flex-col justify-between h-full">
-            <p className="text-sm text-gray-600">Cost</p>
+            <p className="text-sm text-gray-600">From</p>
             <p className="font-semibold text-gray-900 text-lg">${fromPrice.toFixed(2)}</p>
           </div>
           <div className="flex flex-col justify-between h-full">
