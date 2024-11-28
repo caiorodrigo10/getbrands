@@ -6,7 +6,7 @@ import { BrandLogosSection } from "./BrandLogosSection";
 export const HeroSection = () => {
   return (
     <>
-      <section className="relative bg-white pt-20 pb-16 lg:pt-32">
+      <section className="relative bg-white pt-20 pb-16 lg:pt-32 w-full">
         {/* Login Button */}
         <div className="absolute top-4 right-4 z-20">
           <Link to="/login">
@@ -20,7 +20,7 @@ export const HeroSection = () => {
           </Link>
         </div>
 
-        <div className="container mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <img
               src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"

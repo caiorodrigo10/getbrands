@@ -21,8 +21,8 @@ export const BrandLogosSection = () => {
   }, []);
 
   return (
-    <section className="bg-[#fef5fe] py-12">
-      <div className="container mx-auto px-4">
+    <section className="bg-[#fef5fe] py-12 w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-8">
           Loved by 20k+ Brands
         </h2>

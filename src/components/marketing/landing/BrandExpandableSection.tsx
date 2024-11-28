@@ -59,8 +59,8 @@ export const BrandExpandableSection = () => {
   ];
 
   return (
-    <section className="py-24 bg-[#fafafa]">
-      <div className="container mx-auto px-4">
+    <section className="py-24 bg-[#fafafa] w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <div className="space-y-6">
             {items.map((item, index) => (
