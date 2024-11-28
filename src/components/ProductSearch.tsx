@@ -36,9 +36,8 @@ export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSea
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Handle both infinite and regular query results
-  const products = ('pages' in productsData && productsData.pages?.length > 0
-    ? productsData.pages[0]?.data 
+  const products = ('pages' in productsData 
+    ? productsData.pages?.[0]?.data 
     : productsData?.data) || [];
 
   const filteredProducts = products.filter(product =>
@@ -126,4 +125,3 @@ export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSea
       )}
     </div>
   );
-};

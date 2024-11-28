@@ -21,7 +21,6 @@ export const useAuthWithPermissions = () => {
     },
     enabled: !!user?.id,
     staleTime: 1000 * 60 * 5, // Cache por 5 minutos
-    cacheTime: 1000 * 60 * 30, // Manter no cache por 30 minutos
   });
 
   const isAdmin = profile?.role === 'admin';
