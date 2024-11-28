@@ -2,7 +2,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect } from 'react';
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AppLayout } from "./AppLayout";
-import { MarketingRoutes } from "./MarketingRoutes";
+import { marketingRoutes } from "./MarketingRoutes";
 import { AdminRoutes } from "./AdminRoutes";
 import Login from "@/pages/Login";
 import SignUp from "@/pages/SignUp";
@@ -27,7 +27,6 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import LandingPage from "@/pages/marketing/LandingPage";
 
-// Language redirect component with updated logic
 const LanguageRedirect = () => {
   const { i18n } = useTranslation();
   const location = useLocation();
@@ -81,9 +80,8 @@ export const AppRoutes = () => {
   // Create routes for each supported language
   const createLocalizedRoutes = (language: string) => (
     <Route path={`/${language}`} element={<AppLayout />}>
-      {/* Public index route - no authentication required */}
-      <Route index element={<LandingPage />} />
-      <MarketingRoutes />
+      {/* Marketing routes */}
+      {marketingRoutes}
       
       {/* Protected routes */}
       <Route path="dashboard" element={

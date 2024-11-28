@@ -3,12 +3,8 @@ import LandingPage from "@/pages/marketing/LandingPage";
 import PrivacyPolicy from "@/pages/marketing/PrivacyPolicy";
 import TermsAndConditions from "@/pages/marketing/TermsAndConditions";
 
-export const MarketingRoutes = () => {
-  return (
-    <Route path="/">
-      <Route index element={<LandingPage />} />
-      <Route path="policies" element={<PrivacyPolicy />} />
-      <Route path="terms" element={<TermsAndConditions />} />
-    </Route>
-  );
-};
+export const marketingRoutes = [
+  <Route key="landing" index element={<LandingPage />} />,
+  <Route key="privacy" path="policies" element={<PrivacyPolicy />} />,
+  <Route key="terms" path="terms" element={<TermsAndConditions />} />
+];
