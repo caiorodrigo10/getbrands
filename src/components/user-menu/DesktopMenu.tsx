@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { User, ShoppingBag, LogOut, Settings } from "lucide-react";
 import { UserInfo } from "./UserInfo";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +24,8 @@ export const DesktopMenu = ({
   handleAdminNavigation,
   handleLogout,
 }: DesktopMenuProps) => {
+  const { user, isLoading } = useAuth();
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -31,7 +34,12 @@ export const DesktopMenu = ({
           className="relative h-auto w-full flex flex-col items-start gap-1 px-3 py-2 hover:bg-[#fff4fc] hover:text-black"
         >
           <div className="flex items-center gap-3 w-full">
-            <UserInfo />
+            <UserInfo 
+              isLoading={isLoading}
+              userName={user?.user_metadata?.name || 'User'}
+              userEmail={user?.email || ''}
+              userAvatar={user?.user_metadata?.avatar_url}
+            />
           </div>
         </Button>
       </DropdownMenuTrigger>
@@ -41,10 +49,14 @@ export const DesktopMenu = ({
       >
         <DropdownMenuLabel className="p-4">
           <div className="flex items-center gap-3">
-            <UserInfo />
+            <UserInfo 
+              isLoading={isLoading}
+              userName={user?.user_metadata?.name || 'User'}
+              userEmail={user?.email || ''}
+              userAvatar={user?.user_metadata?.avatar_url}
+            />
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator className="bg-gray-100" />
         
         <div className="p-2 space-y-1">
           <Link to="/profile">

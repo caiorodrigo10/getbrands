@@ -22,26 +22,22 @@ export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProduc
   const searchTerm = searchParams.get("search");
 
   const fetchProducts = async (context: { pageParam?: unknown }) => {
-    const pageParam = Number(context.pageParam) || page;
-    const from = (pageParam - 1) * limit;
+    const currentPage = (context.pageParam as number) ?? page;
+    const from = (currentPage - 1) * limit;
     const to = from + limit - 1;
 
     let query = supabase.from("products").select("*", { count: "exact" });
 
-    // Apply search filter if search term exists
     if (searchTerm) {
       query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
     }
 
-    // Get total count
-    const { count } = await query.select("*", { count: "exact", head: true });
+    const { count } = await query;
 
-    // Get paginated data
     let dataQuery = supabase
       .from("products")
       .select("*");
 
-    // Apply search filter to data query
     if (searchTerm) {
       dataQuery = dataQuery.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
     }
@@ -58,13 +54,13 @@ export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProduc
       data: data as Product[],
       totalPages: Math.ceil((count || 0) / limit),
       totalCount: count || 0,
-      nextPage: pageParam + 1,
+      nextPage: currentPage + 1,
       hasMore: from + limit < (count || 0),
     };
   };
 
   if (infinite) {
-    return useInfiniteQuery<ProductsResponse>({
+    return useInfiniteQuery({
       queryKey: ["products", "infinite", { limit, search: searchTerm }],
       queryFn: fetchProducts,
       getNextPageParam: (lastPage) => lastPage.hasMore ? lastPage.nextPage : undefined,
@@ -72,7 +68,7 @@ export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProduc
     });
   }
 
-  return useQuery<ProductsResponse>({
+  return useQuery({
     queryKey: ["products", { page, limit, search: searchTerm }],
     queryFn: () => fetchProducts({ pageParam: page }),
   });

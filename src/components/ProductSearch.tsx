@@ -14,7 +14,7 @@ interface ProductSearchProps {
 export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSearchProps) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const { data: productsData } = useProducts();
+  const productsQuery = useProducts({});
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { addItem } = useCart();
@@ -36,10 +36,9 @@ export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSea
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Handle both infinite and regular query results
-  const products = ('pages' in productsData && productsData.pages?.length > 0
-    ? productsData.pages[0]?.data 
-    : productsData?.data) || [];
+  const products = 'pages' in productsQuery.data! 
+    ? productsQuery.data.pages.flatMap(page => page.data)
+    : productsQuery.data?.data || [];
 
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(query.toLowerCase())

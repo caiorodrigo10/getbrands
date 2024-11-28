@@ -30,9 +30,9 @@ async function getInventoryItemCost(inventoryItemId: string): Promise<number | n
       raw: data.inventory_item
     });
     
-    // Tentar obter o custo na seguinte ordem:
-    // 1. cost (custo total)
-    // 2. unit_cost (custo unitário)
+    // Try to get the cost in this order:
+    // 1. cost (total cost)
+    // 2. unit_cost (unit cost)
     const finalCost = data.inventory_item?.cost || data.inventory_item?.unit_cost;
     return finalCost ? parseFloat(finalCost) : null;
   } catch (error) {
@@ -73,7 +73,7 @@ export const handleProductUpdate = async (shopifyProduct: any) => {
       });
     }
 
-    // Fallback to variant price if no cost found
+    // Only fallback to variant price if no cost found
     if (cost === null) {
       cost = parseFloat(variant.price);
       logger.info('Using variant price as cost fallback:', { cost });
@@ -107,7 +107,7 @@ export const handleProductUpdate = async (shopifyProduct: any) => {
       name: shopifyProduct.title,
       description: shopifyProduct.body_html,
       category: shopifyProduct.product_type || 'Uncategorized',
-      from_price: cost, // Garantindo que o from_price seja atualizado com o custo
+      from_price: cost, // Using the inventory item cost here
       srp: parseFloat(variant.compare_at_price || variant.price),
       image_url: shopifyProduct.images[0]?.src,
       is_new: shopifyProduct.tags?.includes('new') || false,
@@ -167,29 +167,12 @@ export const handleProductUpdate = async (shopifyProduct: any) => {
         shopify_variant_id: variant.id.toString(),
         inventory_item_id: variant.inventory_item_id?.toString(),
         last_synced_at: new Date().toISOString(),
-        last_cost_sync: cost // Adicionando o último custo sincronizado para referência
+        last_cost_sync: cost // Adding the last synced cost for reference
       });
 
     if (mappingError) {
       logger.error('Error updating shopify mapping:', mappingError);
       throw mappingError;
-    }
-
-    // Verify the update
-    const { data: verifyProduct, error: verifyError } = await supabase
-      .from('products')
-      .select('from_price')
-      .eq('id', productId)
-      .single();
-
-    if (verifyError) {
-      logger.error('Error verifying product update:', verifyError);
-    } else {
-      logger.info('Verified product update:', {
-        productId,
-        expected_from_price: cost,
-        actual_from_price: verifyProduct.from_price
-      });
     }
 
     // Update images
