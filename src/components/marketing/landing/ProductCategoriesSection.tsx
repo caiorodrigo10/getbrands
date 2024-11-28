@@ -3,8 +3,8 @@ import { Package2, Coffee, ShoppingBag, Users } from "lucide-react";
 
 export const ProductCategoriesSection = () => {
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="container mx-auto px-4">
+    <section className="py-16 bg-gray-50 w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
           Explore Our Wide Range of Products
         </h2>

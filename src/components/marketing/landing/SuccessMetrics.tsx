@@ -29,8 +29,8 @@ export const SuccessMetrics = () => {
   ];
 
   return (
-    <section className="py-20 bg-gray-50">
-      <div className="container mx-auto px-4">
+    <section className="py-20 bg-gray-50 w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-2xl shadow-lg p-12">
           <h2 className="text-3xl font-bold text-center mb-16">
             The results speak<br />for themselves

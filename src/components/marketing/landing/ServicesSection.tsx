@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 
 export const ServicesSection = () => {
   return (
-    <section className="py-32 bg-white">
-      <div className="container mx-auto px-4">
+    <section className="py-32 bg-white w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <div className="space-y-8">
             <h2 className="text-4xl font-bold tracking-tight text-gray-900">
