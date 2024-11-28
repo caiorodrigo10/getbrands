@@ -6,8 +6,15 @@ export const AppLayout = () => {
   const location = useLocation();
   useOnboardingStatus();
 
-  // Don't show navigation menu for onboarding and auth pages
-  const hideNav = ['/login', '/signup', '/onboarding'].includes(location.pathname);
+  // Don't show navigation menu for onboarding, auth pages and index
+  const hideNav = [
+    '/login', 
+    '/signup', 
+    '/onboarding',
+    '/en',
+    '/pt',
+    '/es'
+  ].includes(location.pathname);
 
   return (
     <div className="min-h-screen bg-background">
