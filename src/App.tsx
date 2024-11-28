@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, useLocation } from "react-router-dom";
+import { BrowserRouter, useLocation, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import { AppRoutes } from "./routes/AppRoutes";
@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { debugAnalytics } from "./lib/analytics/debug";
 import { trackPage } from "./lib/analytics";
+import { useTranslation } from "react-i18next";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,17 +25,44 @@ const queryClient = new QueryClient({
   },
 });
 
-// Component to handle route changes
+// Component to handle route changes and language
 const RouteTracker = () => {
   const location = useLocation();
+  const { i18n } = useTranslation();
 
   useEffect(() => {
+    // Track page view
     trackPage({
       path: location.pathname,
       search: location.search,
       url: window.location.href
     });
-  }, [location]);
+
+    // Handle language from URL
+    const path = location.pathname;
+    const firstSegment = path.split('/')[1];
+    const supportedLanguages = ['en', 'pt', 'es'];
+    
+    if (supportedLanguages.includes(firstSegment) && firstSegment !== i18n.language) {
+      i18n.changeLanguage(firstSegment);
+    }
+  }, [location, i18n]);
+
+  return null;
+};
+
+// Language redirect component
+const LanguageRedirect = () => {
+  const { i18n } = useTranslation();
+  const location = useLocation();
+  const path = location.pathname;
+  const firstSegment = path.split('/')[1];
+  const supportedLanguages = ['en', 'pt', 'es'];
+
+  if (!supportedLanguages.includes(firstSegment)) {
+    const newPath = `/${i18n.language}${path === '/' ? '' : path}`;
+    return <Navigate to={newPath} replace />;
+  }
 
   return null;
 };
@@ -56,6 +84,7 @@ const App = () => {
             <CartProvider>
               <TooltipProvider>
                 <RouteTracker />
+                <LanguageRedirect />
                 <AppRoutes />
                 <Toaster />
                 <Sonner />
