@@ -26,7 +26,7 @@ import OnboardingQuizPage from "@/pages/OnboardingQuiz";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Language redirect component
+// Language redirect component with updated logic
 const LanguageRedirect = () => {
   const { i18n } = useTranslation();
   const location = useLocation();
@@ -38,16 +38,32 @@ const LanguageRedirect = () => {
     return ['en', 'pt', 'es'].includes(browserLang) ? browserLang : 'en';
   };
 
-  // If at root, redirect to appropriate language path
+  // If at root, handle redirection based on auth status
   if (location.pathname === '/') {
     const targetLang = i18n.language || getBrowserLanguage();
+    
+    // For authenticated users, redirect to their dashboard
+    if (isAuthenticated) {
+      return <Navigate to={`/${targetLang}/dashboard`} replace />;
+    }
+    
+    // For unauthenticated users, redirect to public homepage
     return <Navigate to={`/${targetLang}`} replace />;
   }
 
-  // If at /login, redirect to language-specific login
+  // Handle direct login route access
   if (location.pathname === '/login') {
     const targetLang = i18n.language || getBrowserLanguage();
     return <Navigate to={`/${targetLang}/login`} replace />;
+  }
+
+  // Check if current path needs language prefix
+  const firstSegment = location.pathname.split('/')[1];
+  const supportedLanguages = ['en', 'pt', 'es'];
+  
+  if (!supportedLanguages.includes(firstSegment) && location.pathname !== '/') {
+    const targetLang = i18n.language || getBrowserLanguage();
+    return <Navigate to={`/${targetLang}${location.pathname}`} replace />;
   }
 
   return null;
@@ -64,11 +80,8 @@ export const AppRoutes = () => {
   // Create routes for each supported language
   const createLocalizedRoutes = (language: string) => (
     <Route path={`/${language}`} element={<AppLayout />}>
-      <Route index element={
-        <ProtectedRoute>
-          <Catalog />
-        </ProtectedRoute>
-      } />
+      {/* Public index route - no authentication required */}
+      <Route index element={<MarketingRoutes />} />
       
       <Route path="dashboard" element={
         <ProtectedRoute>
