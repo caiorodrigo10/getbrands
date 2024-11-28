@@ -23,111 +23,122 @@ import ProfitCalculator from "@/pages/ProfitCalculator";
 import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
 import OnboardingQuizPage from "@/pages/OnboardingQuiz";
+import { useTranslation } from "react-i18next";
 
 export const AppRoutes = () => {
   const location = useLocation();
+  const { i18n } = useTranslation();
   
   useEffect(() => {
     console.log('[DEBUG] AppRoutes - Current location:', location.pathname);
   }, [location]);
 
+  // Create routes for each supported language
+  const createLocalizedRoutes = (language: string) => (
+    <Route path={`/${language}`} element={<AppLayout />}>
+      <Route index element={
+        <ProtectedRoute>
+          <Catalog />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="dashboard" element={
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="start-here" element={
+        <ProtectedRoute>
+          <StartHere />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="profile" element={
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="projects" element={
+        <ProtectedRoute>
+          <Projects />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="projects/:id" element={
+        <ProtectedRoute>
+          <ProjectDetails />
+        </ProtectedRoute>
+      } />
+
+      <Route path="package-quiz/:projectId" element={
+        <ProtectedRoute>
+          <PackageQuizPage />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="catalog" element={
+        <ProtectedRoute>
+          <Catalog />
+        </ProtectedRoute>
+      } />
+
+      <Route path="catalog/:id" element={
+        <ProtectedRoute>
+          <ProductDetails />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="products" element={
+        <ProtectedRoute>
+          <Products />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="products/:id" element={
+        <ProtectedRoute>
+          <ProductDetails />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="products/success" element={
+        <ProtectedRoute>
+          <ProductSelectedSuccess />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="documents" element={
+        <ProtectedRoute>
+          <Documents />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="sample-orders" element={
+        <ProtectedRoute>
+          <SampleOrders />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="profit-calculator" element={
+        <ProtectedRoute>
+          <ProfitCalculator />
+        </ProtectedRoute>
+      } />
+
+      <Route path="*" element={<Error404 />} />
+    </Route>
+  );
+
   return (
     <Routes>
-      {/* Root Route */}
-      <Route element={<AppLayout />}>
-        <Route path="/" element={
-          <ProtectedRoute>
-            <Catalog />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        } />
-        
-        {/* Client Routes */}
-        <Route path="/start-here" element={
-          <ProtectedRoute>
-            <StartHere />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/profile" element={
-          <ProtectedRoute>
-            <Profile />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/projects" element={
-          <ProtectedRoute>
-            <Projects />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/projects/:id" element={
-          <ProtectedRoute>
-            <ProjectDetails />
-          </ProtectedRoute>
-        } />
-
-        <Route path="/package-quiz/:projectId" element={
-          <ProtectedRoute>
-            <PackageQuizPage />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/catalog" element={
-          <ProtectedRoute>
-            <Catalog />
-          </ProtectedRoute>
-        } />
-
-        <Route path="/catalog/:id" element={
-          <ProtectedRoute>
-            <ProductDetails />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/products" element={
-          <ProtectedRoute>
-            <Products />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/products/:id" element={
-          <ProtectedRoute>
-            <ProductDetails />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/products/success" element={
-          <ProtectedRoute>
-            <ProductSelectedSuccess />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/documents" element={
-          <ProtectedRoute>
-            <Documents />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/sample-orders" element={
-          <ProtectedRoute>
-            <SampleOrders />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/profit-calculator" element={
-          <ProtectedRoute>
-            <ProfitCalculator />
-          </ProtectedRoute>
-        } />
-
-        <Route path="*" element={<Error404 />} />
-      </Route>
+      {/* Redirect root to default language */}
+      <Route path="/" element={<Navigate to={`/${i18n.language}`} replace />} />
+      
+      {/* Create routes for each supported language */}
+      {createLocalizedRoutes('en')}
+      {createLocalizedRoutes('pt')}
+      {createLocalizedRoutes('es')}
 
       {/* Marketing Routes */}
       {MarketingRoutes}
@@ -149,12 +160,7 @@ export const AppRoutes = () => {
         <ProtectedRoute>
           <Checkout />
         </ProtectedRoute>
-      }>
-        <Route path="shipping" element={<Checkout />} />
-        <Route path="payment" element={<Checkout />} />
-        <Route path="confirmation" element={<Checkout />} />
-        <Route path="points" element={<Checkout />} />
-      </Route>
+      } />
 
       {/* Success page as a standalone route */}
       <Route path="/checkout/success" element={

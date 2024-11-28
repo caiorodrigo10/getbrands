@@ -15,9 +15,20 @@ export const NavigationMenu = () => {
   const navigate = useNavigate();
   const { hasFullAccess, isMember, isSampler } = useUserPermissions();
   const [isOpen, setIsOpen] = useState(false);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const showStartHere = isMember || isSampler;
+
+  // Helper function to get language-prefixed path
+  const getPrefixedPath = (path: string) => {
+    return `/${i18n.language}${path}`;
+  };
+
+  // Helper function to check if a path is active
+  const isPathActive = (path: string) => {
+    const currentPath = location.pathname.replace(`/${i18n.language}`, '');
+    return currentPath === path;
+  };
 
   const menuItems = [
     { 
@@ -68,17 +79,19 @@ export const NavigationMenu = () => {
 
   const handleRestrictedNavigation = (path: string) => {
     if (!hasFullAccess) {
-      navigate("/start-here");
+      navigate(getPrefixedPath("/start-here"));
       setIsOpen(false);
       return;
     }
-    navigate(path);
+    navigate(getPrefixedPath(path));
     setIsOpen(false);
   };
 
   const renderMenuItem = (item: typeof menuItems[0], mobile: boolean = false) => {
     const Icon = item.icon;
-    const isActive = location.pathname === item.path;
+    const isActive = isPathActive(item.path);
+    const prefixedPath = getPrefixedPath(item.path);
+    
     const baseStyles = cn(
       "flex items-center gap-3 px-4 py-2.5 my-1 text-sm rounded-md transition-all duration-200",
       isActive
@@ -106,7 +119,7 @@ export const NavigationMenu = () => {
           key={item.path}
           className={baseStyles}
           onClick={() => {
-            navigate(item.path);
+            navigate(prefixedPath);
             setIsOpen(false);
           }}
         >
@@ -119,7 +132,7 @@ export const NavigationMenu = () => {
     return (
       <Link
         key={item.path}
-        to={item.path}
+        to={prefixedPath}
         className={baseStyles}
       >
         <Icon className="h-4 w-4" />
