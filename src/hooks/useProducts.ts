@@ -21,26 +21,22 @@ export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProduc
   const [searchParams] = useSearchParams();
   const searchTerm = searchParams.get("search");
 
-  const fetchProducts = async ({ pageParam = 1 }) => {
+  const fetchProducts = async ({ pageParam = 1 }: { pageParam?: number }) => {
     const from = (pageParam - 1) * limit;
     const to = from + limit - 1;
 
     let query = supabase.from("products").select("*", { count: "exact" });
 
-    // Apply search filter if search term exists
     if (searchTerm) {
       query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
     }
 
-    // Get total count
     const { count } = await query.select("*", { count: "exact", head: true });
 
-    // Get paginated data
     let dataQuery = supabase
       .from("products")
       .select("*");
 
-    // Apply search filter to data query
     if (searchTerm) {
       dataQuery = dataQuery.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
     }
