@@ -5,6 +5,43 @@ import { useToast } from "@/components/ui/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+// Separate components to reduce file size
+const WebhookList = ({ webhooks }: { webhooks: any[] }) => (
+  <div className="border rounded-lg p-4">
+    <ScrollArea className="h-[300px]">
+      {webhooks.map((webhook: any) => (
+        <div 
+          key={webhook.node.id} 
+          className="p-4 border-b last:border-b-0"
+        >
+          <p><strong>Tópico:</strong> {webhook.node.topic}</p>
+          <p><strong>URL:</strong> {webhook.node.callbackUrl}</p>
+          <p><strong>Formato:</strong> {webhook.node.format}</p>
+        </div>
+      ))}
+    </ScrollArea>
+  </div>
+);
+
+const LogEntry = ({ log }: { log: any }) => (
+  <div className="p-4 border-b last:border-b-0">
+    <p><strong>Tópico:</strong> {log.topic}</p>
+    <p><strong>Status:</strong> {log.status}</p>
+    <p><strong>Data:</strong> {new Date(log.created_at).toLocaleString()}</p>
+    {log.error && (
+      <p className="text-destructive"><strong>Erro:</strong> {log.error}</p>
+    )}
+    <details className="mt-2">
+      <summary className="cursor-pointer text-sm text-muted-foreground">
+        Ver payload
+      </summary>
+      <pre className="mt-2 p-2 bg-muted rounded-md text-xs overflow-auto">
+        {JSON.stringify(log.payload, null, 2)}
+      </pre>
+    </details>
+  </div>
+);
+
 export const ShopifyWebhookTester = () => {
   const [webhooks, setWebhooks] = useState<any[]>([]);
   const [webhookLogs, setWebhookLogs] = useState<any[]>([]);
@@ -63,6 +100,11 @@ export const ShopifyWebhookTester = () => {
       console.log('Iniciando sincronização de custos...');
       const { data, error } = await supabase.functions.invoke('shopify-webhook-v2', {
         method: 'POST',
+        headers: {
+          'x-shopify-topic': 'products/update',
+          'x-shopify-hmac-sha256': 'test-hmac',
+          'x-shopify-shop-domain': 'test-shop.myshopify.com'
+        },
         body: { action: 'sync-costs' }
       });
       
@@ -78,7 +120,6 @@ export const ShopifyWebhookTester = () => {
         description: "Sincronização de custos iniciada com sucesso",
       });
       
-      // Refresh logs after sync
       await fetchLogs();
       
     } catch (error) {
@@ -95,7 +136,6 @@ export const ShopifyWebhookTester = () => {
 
   const fetchLogs = async () => {
     try {
-      // Fetch webhook logs
       const { data: webhookData, error: webhookError } = await supabase
         .from('webhook_logs')
         .select('*')
@@ -105,7 +145,6 @@ export const ShopifyWebhookTester = () => {
       if (webhookError) throw webhookError;
       setWebhookLogs(webhookData || []);
 
-      // Fetch Shopify logs
       const { data: shopifyData, error: shopifyError } = await supabase
         .from('shopify_logs')
         .select('*')
@@ -124,12 +163,10 @@ export const ShopifyWebhookTester = () => {
     }
   };
 
-  // Fetch webhooks and logs when component mounts
   useEffect(() => {
     handleListWebhooks();
     fetchLogs();
     
-    // Set up real-time subscription for webhook logs
     const webhookSubscription = supabase
       .channel('webhook_logs_changes')
       .on('postgres_changes', 
@@ -144,7 +181,6 @@ export const ShopifyWebhookTester = () => {
       )
       .subscribe();
 
-    // Set up real-time subscription for Shopify logs
     const shopifySubscription = supabase
       .channel('shopify_logs_changes')
       .on('postgres_changes', 
@@ -199,43 +235,14 @@ export const ShopifyWebhookTester = () => {
         </TabsList>
 
         <TabsContent value="webhooks">
-          {webhooks.length > 0 && (
-            <div className="border rounded-lg p-4">
-              <ScrollArea className="h-[300px]">
-                {webhooks.map((webhook: any, index: number) => (
-                  <div 
-                    key={webhook.node.id} 
-                    className="p-4 border-b last:border-b-0"
-                  >
-                    <p><strong>Tópico:</strong> {webhook.node.topic}</p>
-                    <p><strong>URL:</strong> {webhook.node.callbackUrl}</p>
-                    <p><strong>Formato:</strong> {webhook.node.format}</p>
-                  </div>
-                ))}
-              </ScrollArea>
-            </div>
-          )}
+          {webhooks.length > 0 && <WebhookList webhooks={webhooks} />}
         </TabsContent>
 
         <TabsContent value="webhook-logs">
           <div className="border rounded-lg p-4">
             <ScrollArea className="h-[300px]">
               {webhookLogs.map((log) => (
-                <div 
-                  key={log.id} 
-                  className="p-4 border-b last:border-b-0"
-                >
-                  <p><strong>Tópico:</strong> {log.topic}</p>
-                  <p><strong>Data:</strong> {new Date(log.created_at).toLocaleString()}</p>
-                  <details className="mt-2">
-                    <summary className="cursor-pointer text-sm text-muted-foreground">
-                      Ver payload
-                    </summary>
-                    <pre className="mt-2 p-2 bg-muted rounded-md text-xs overflow-auto">
-                      {JSON.stringify(log.payload, null, 2)}
-                    </pre>
-                  </details>
-                </div>
+                <LogEntry key={log.id} log={log} />
               ))}
             </ScrollArea>
           </div>
@@ -245,25 +252,7 @@ export const ShopifyWebhookTester = () => {
           <div className="border rounded-lg p-4">
             <ScrollArea className="h-[300px]">
               {shopifyLogs.map((log) => (
-                <div 
-                  key={log.id} 
-                  className="p-4 border-b last:border-b-0"
-                >
-                  <p><strong>Tópico:</strong> {log.topic}</p>
-                  <p><strong>Status:</strong> {log.status}</p>
-                  <p><strong>Data:</strong> {new Date(log.created_at).toLocaleString()}</p>
-                  {log.error && (
-                    <p className="text-destructive"><strong>Erro:</strong> {log.error}</p>
-                  )}
-                  <details className="mt-2">
-                    <summary className="cursor-pointer text-sm text-muted-foreground">
-                      Ver payload
-                    </summary>
-                    <pre className="mt-2 p-2 bg-muted rounded-md text-xs overflow-auto">
-                      {JSON.stringify(log.payload, null, 2)}
-                    </pre>
-                  </details>
-                </div>
+                <LogEntry key={log.id} log={log} />
               ))}
             </ScrollArea>
           </div>
