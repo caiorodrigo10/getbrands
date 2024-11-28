@@ -1,0 +1,26 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "products": "Products",
+    "catalog": "Catalog",
+    "profitCalculator": "Profit Calculator",
+    "sampleOrders": "Sample Orders",
+    "getStarted": "Get Started"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "submit": "Submit",
+    "back": "Back"
+  },
+  "messages": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success!",
+    "noData": "No data available"
+  }
+}

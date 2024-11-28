@@ -7,55 +7,58 @@ import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { ProjectPointsInfo } from "./navigation/ProjectPointsInfo";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export const NavigationMenu = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { hasFullAccess, isMember, isSampler } = useUserPermissions();
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
 
   const showStartHere = isMember || isSampler;
 
   const menuItems = [
     { 
-      label: "Dashboard", 
+      label: t('navigation.dashboard'), 
       path: "/dashboard", 
       icon: LayoutDashboard,
       restricted: false
     },
     { 
-      label: "Projects", 
+      label: t('navigation.projects'), 
       path: "/projects", 
       icon: FolderGit2,
       restricted: true
     },
     { 
-      label: "Products", 
+      label: t('navigation.products'), 
       path: "/products", 
       icon: Grid3X3,
       restricted: true
     },
     { 
-      label: "Catalog", 
+      label: t('navigation.catalog'), 
       path: "/catalog", 
       icon: Palette,
       restricted: false
     },
     { 
-      label: "Profit Calculator", 
+      label: t('navigation.profitCalculator'), 
       path: "/profit-calculator", 
       icon: Calculator,
       restricted: false
     },
     { 
-      label: "Sample Orders", 
+      label: t('navigation.sampleOrders'), 
       path: "/sample-orders", 
       icon: Package2,
       restricted: false
     },
     ...(showStartHere ? [
       { 
-        label: "Get Started", 
+        label: t('navigation.getStarted'), 
         path: "/start-here", 
         icon: PlayCircle,
         restricted: false
@@ -136,6 +139,9 @@ export const NavigationMenu = () => {
               alt="Logo"
               className="h-12 w-auto"
             />
+            <div className="mt-4">
+              <LanguageSwitcher />
+            </div>
           </div>
           
           <nav className="flex-1 px-3">

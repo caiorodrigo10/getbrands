@@ -1,0 +1,26 @@
+{
+  "navigation": {
+    "dashboard": "Panel",
+    "projects": "Proyectos",
+    "products": "Productos",
+    "catalog": "Catálogo",
+    "profitCalculator": "Calculadora de Beneficios",
+    "sampleOrders": "Pedidos de Muestra",
+    "getStarted": "Empezar"
+  },
+  "actions": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "submit": "Enviar",
+    "back": "Volver"
+  },
+  "messages": {
+    "loading": "Cargando...",
+    "error": "Se produjo un error",
+    "success": "¡Éxito!",
+    "noData": "No hay datos disponibles"
+  }
+}
