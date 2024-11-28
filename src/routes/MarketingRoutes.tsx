@@ -5,10 +5,10 @@ import TermsAndConditions from "@/pages/marketing/TermsAndConditions";
 
 export const MarketingRoutes = () => {
   return (
-    <>
+    <Route path="/">
       <Route index element={<LandingPage />} />
       <Route path="policies" element={<PrivacyPolicy />} />
       <Route path="terms" element={<TermsAndConditions />} />
-    </>
+    </Route>
   );
 };

@@ -85,6 +85,7 @@ export const AppRoutes = () => {
       <Route index element={<LandingPage />} />
       <MarketingRoutes />
       
+      {/* Protected routes */}
       <Route path="dashboard" element={
         <ProtectedRoute>
           <Dashboard />
