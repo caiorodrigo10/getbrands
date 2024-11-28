@@ -21,8 +21,9 @@ export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProduc
   const [searchParams] = useSearchParams();
   const searchTerm = searchParams.get("search");
 
-  const fetchProducts = async ({ pageParam = 1 }: { pageParam?: number }) => {
-    const from = (pageParam - 1) * limit;
+  const fetchProducts = async (context: { pageParam?: number }) => {
+    const currentPage = context.pageParam ?? page;
+    const from = (currentPage - 1) * limit;
     const to = from + limit - 1;
 
     let query = supabase.from("products").select("*", { count: "exact" });
@@ -53,7 +54,7 @@ export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProduc
       data: data as Product[],
       totalPages: Math.ceil((count || 0) / limit),
       totalCount: count || 0,
-      nextPage: pageParam + 1,
+      nextPage: currentPage + 1,
       hasMore: from + limit < (count || 0),
     };
   };
