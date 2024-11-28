@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
+import { useSearchParams } from "react-router-dom";
 
 interface UseProductsOptions {
   page?: number;
@@ -17,20 +18,35 @@ interface ProductsResponse {
 }
 
 export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProductsOptions = {}) => {
+  const [searchParams] = useSearchParams();
+  const searchTerm = searchParams.get("search");
+
   const fetchProducts = async (context: { pageParam?: unknown }) => {
     const pageParam = Number(context.pageParam) || page;
     const from = (pageParam - 1) * limit;
     const to = from + limit - 1;
 
-    // First, get total count
-    const { count } = await supabase
-      .from("products")
-      .select("*", { count: "exact", head: true });
+    let query = supabase.from("products").select("*", { count: "exact" });
 
-    // Then get paginated data
-    const { data, error } = await supabase
+    // Apply search filter if search term exists
+    if (searchTerm) {
+      query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+    }
+
+    // Get total count
+    const { count } = await query.select("*", { count: "exact", head: true });
+
+    // Get paginated data
+    let dataQuery = supabase
       .from("products")
-      .select("*")
+      .select("*");
+
+    // Apply search filter to data query
+    if (searchTerm) {
+      dataQuery = dataQuery.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+    }
+
+    const { data, error } = await dataQuery
       .range(from, to)
       .order("created_at", { ascending: false });
 
@@ -49,7 +65,7 @@ export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProduc
 
   if (infinite) {
     return useInfiniteQuery<ProductsResponse>({
-      queryKey: ["products", "infinite", { limit }],
+      queryKey: ["products", "infinite", { limit, search: searchTerm }],
       queryFn: fetchProducts,
       getNextPageParam: (lastPage) => lastPage.hasMore ? lastPage.nextPage : undefined,
       initialPageParam: 1,
@@ -57,7 +73,7 @@ export const useProducts = ({ page = 1, limit = 9, infinite = false }: UseProduc
   }
 
   return useQuery<ProductsResponse>({
-    queryKey: ["products", { page, limit }],
+    queryKey: ["products", { page, limit, search: searchTerm }],
     queryFn: () => fetchProducts({ pageParam: page }),
   });
 };
