@@ -118,11 +118,11 @@ const SignUp = () => {
       <div className="w-full max-w-md space-y-8 p-8 bg-white rounded-2xl shadow-lg">
         <div className="flex flex-col items-center space-y-2">
           <img
-            src="https://content.app-sources.com/s/97257455971736356/uploads/Logos/Logotipo_4-7282325.png?format=webp"
-            alt="Mainer Logo"
-            className="w-[180px] h-auto"
+            src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
+            alt="GetBrands Logo"
+            className="h-12 mx-auto mb-4"
           />
-          <h2 className="mt-6 text-2xl font-semibold text-gray-900">
+          <h2 className="mt-2 text-2xl font-semibold text-gray-900">
             Create your account
           </h2>
           <p className="text-gray-600">
