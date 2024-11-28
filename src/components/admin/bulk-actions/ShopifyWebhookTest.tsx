@@ -8,60 +8,26 @@ export const ShopifyWebhookTest = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const generateTestHmac = async (data: string) => {
-    const encoder = new TextEncoder();
-    const key = 'test-secret-key'; // Using a test key since this is just for testing
-    const keyData = encoder.encode(key);
-    const messageData = encoder.encode(data);
-
-    const cryptoKey = await crypto.subtle.importKey(
-      "raw",
-      keyData,
-      { name: "HMAC", hash: "SHA-256" },
-      false,
-      ["sign"]
-    );
-
-    const signature = await crypto.subtle.sign(
-      "HMAC",
-      cryptoKey,
-      messageData
-    );
-
-    return btoa(String.fromCharCode(...new Uint8Array(signature)));
-  };
-
   const handleTestWebhook = async () => {
     setIsLoading(true);
     try {
-      const testData = {
-        id: "test-" + Date.now(),
-        title: "Test Product " + new Date().toLocaleString(),
-        body_html: "<p>Test product description</p>",
-        variants: [{
-          price: "99.99",
-          compare_at_price: "129.99",
-          id: "variant-" + Date.now(),
-          inventory_item_id: "test-inventory-" + Date.now()
-        }],
-        images: [{
-          src: "https://placekitten.com/200/200",
-          position: 1
-        }]
-      };
-
-      // Generate HMAC for the request body
-      const hmac = await generateTestHmac(JSON.stringify(testData));
-
       const { data, error } = await supabase.functions.invoke('shopify-webhook', {
         body: {
           topic: "products/create",
-          data: testData
-        },
-        headers: {
-          'x-shopify-topic': 'products/create',
-          'x-shopify-hmac-sha256': hmac,
-          'x-shopify-shop-domain': 'test-shop.myshopify.com'
+          data: {
+            id: "test-" + Date.now(),
+            title: "Test Product " + new Date().toLocaleString(),
+            body_html: "<p>Test product description</p>",
+            variants: [{
+              price: "99.99",
+              compare_at_price: "129.99",
+              id: "variant-" + Date.now()
+            }],
+            images: [{
+              src: "https://placekitten.com/200/200",
+              position: 1
+            }]
+          }
         }
       });
 

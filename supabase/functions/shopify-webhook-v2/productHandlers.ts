@@ -6,7 +6,6 @@ const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const shopifyDomain = Deno.env.get('SHOPIFY_SHOP_DOMAIN')!;
 const shopifyToken = Deno.env.get('SHOPIFY_ACCESS_TOKEN')!;
 
-// Função para buscar o custo do inventory item
 async function getInventoryItemCost(inventoryItemId: string): Promise<number | null> {
   try {
     const response = await fetch(
@@ -31,7 +30,9 @@ async function getInventoryItemCost(inventoryItemId: string): Promise<number | n
       raw: data.inventory_item
     });
     
-    // Priorizar o cost total, depois unit_cost
+    // Try to get the cost in this order:
+    // 1. cost (total cost)
+    // 2. unit_cost (unit cost)
     const finalCost = data.inventory_item?.cost || data.inventory_item?.unit_cost;
     return finalCost ? parseFloat(finalCost) : null;
   } catch (error) {
@@ -62,7 +63,7 @@ export const handleProductUpdate = async (shopifyProduct: any) => {
       compareAtPrice: variant.compare_at_price
     });
 
-    // Buscar o custo do inventory item
+    // Get cost from inventory item
     let cost = null;
     if (variant.inventory_item_id) {
       cost = await getInventoryItemCost(variant.inventory_item_id);
@@ -72,13 +73,13 @@ export const handleProductUpdate = async (shopifyProduct: any) => {
       });
     }
 
-    // Se não encontrar o custo, usar o preço como fallback
+    // Only fallback to variant price if no cost found
     if (cost === null) {
       cost = parseFloat(variant.price);
       logger.info('Using variant price as cost fallback:', { cost });
     }
 
-    // Garantir que o custo é um número válido
+    // Ensure cost is a valid number
     if (isNaN(cost) || cost <= 0) {
       logger.warn('Invalid cost detected, using variant price:', {
         originalCost: cost,
@@ -93,7 +94,7 @@ export const handleProductUpdate = async (shopifyProduct: any) => {
       is_primary: img.position === 1
     })) || [];
 
-    // Verificar se o produto existe
+    // Check if product exists
     const { data: existingProduct } = await supabase
       .from('shopify_products')
       .select('product_id')
@@ -106,7 +107,7 @@ export const handleProductUpdate = async (shopifyProduct: any) => {
       name: shopifyProduct.title,
       description: shopifyProduct.body_html,
       category: shopifyProduct.product_type || 'Uncategorized',
-      from_price: cost,
+      from_price: cost, // Using the inventory item cost here
       srp: parseFloat(variant.compare_at_price || variant.price),
       image_url: shopifyProduct.images[0]?.src,
       is_new: shopifyProduct.tags?.includes('new') || false,
@@ -121,7 +122,7 @@ export const handleProductUpdate = async (shopifyProduct: any) => {
     });
 
     if (!productId) {
-      // Criar novo produto
+      // Create new product
       const { data: newProduct, error: productError } = await supabase
         .from('products')
         .insert({
@@ -141,7 +142,7 @@ export const handleProductUpdate = async (shopifyProduct: any) => {
         from_price: newProduct.from_price 
       });
     } else {
-      // Atualizar produto existente
+      // Update existing product
       const { error: updateError } = await supabase
         .from('products')
         .update(productData)
@@ -157,7 +158,7 @@ export const handleProductUpdate = async (shopifyProduct: any) => {
       });
     }
 
-    // Atualizar mapeamento Shopify
+    // Update Shopify mapping
     const { error: mappingError } = await supabase
       .from('shopify_products')
       .upsert({
@@ -166,7 +167,7 @@ export const handleProductUpdate = async (shopifyProduct: any) => {
         shopify_variant_id: variant.id.toString(),
         inventory_item_id: variant.inventory_item_id?.toString(),
         last_synced_at: new Date().toISOString(),
-        last_cost_sync: cost
+        last_cost_sync: cost // Adding the last synced cost for reference
       });
 
     if (mappingError) {
@@ -174,7 +175,7 @@ export const handleProductUpdate = async (shopifyProduct: any) => {
       throw mappingError;
     }
 
-    // Atualizar imagens
+    // Update images
     if (images.length > 0) {
       const { error: deleteImagesError } = await supabase
         .from('product_images')
