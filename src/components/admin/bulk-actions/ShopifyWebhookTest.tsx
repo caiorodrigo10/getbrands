@@ -21,13 +21,19 @@ export const ShopifyWebhookTest = () => {
             variants: [{
               price: "99.99",
               compare_at_price: "129.99",
-              id: "variant-" + Date.now()
+              id: "variant-" + Date.now(),
+              inventory_item_id: "test-inventory-" + Date.now()
             }],
             images: [{
               src: "https://placekitten.com/200/200",
               position: 1
             }]
           }
+        },
+        headers: {
+          'x-shopify-topic': 'products/create',
+          'x-shopify-hmac-sha256': 'test-hmac-' + Date.now(),
+          'x-shopify-shop-domain': 'test-shop.myshopify.com'
         }
       });
 
