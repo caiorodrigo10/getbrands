@@ -23,26 +23,26 @@ export function ProductCategoriesStep({
   const categories = [
     { 
       value: "cosmetics", 
-      label: t('onboarding.productCategories.categories.cosmetics'),
-      description: t('onboarding.productCategories.categories.cosmeticsDescription'),
+      label: t('onboarding.productCategories.cosmetics'),
+      description: t('onboarding.productCategories.cosmeticsDescription'),
       icon: Sparkles 
     },
     { 
       value: "coffee", 
-      label: t('onboarding.productCategories.categories.coffee'),
-      description: t('onboarding.productCategories.categories.coffeeDescription'),
+      label: t('onboarding.productCategories.coffee'),
+      description: t('onboarding.productCategories.coffeeDescription'),
       icon: Coffee 
     },
     { 
       value: "supplements", 
-      label: t('onboarding.productCategories.categories.supplements'),
-      description: t('onboarding.productCategories.categories.supplementsDescription'),
+      label: t('onboarding.productCategories.supplements'),
+      description: t('onboarding.productCategories.supplementsDescription'),
       icon: Dumbbell 
     },
     { 
       value: "petProducts", 
-      label: t('onboarding.productCategories.categories.petProducts'),
-      description: t('onboarding.productCategories.categories.petProductsDescription'),
+      label: t('onboarding.productCategories.petProducts'),
+      description: t('onboarding.productCategories.petProductsDescription'),
       icon: Dog 
     },
   ];
