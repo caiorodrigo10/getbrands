@@ -310,6 +310,36 @@ export type Database = {
           },
         ]
       }
+      marketing_quiz_responses_pt: {
+        Row: {
+          answers: Json
+          completed_at: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          answers: Json
+          completed_at?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          answers?: Json
+          completed_at?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       media_library: {
         Row: {
           category: string | null
