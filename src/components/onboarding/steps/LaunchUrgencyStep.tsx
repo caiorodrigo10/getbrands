@@ -20,6 +20,12 @@ export function LaunchUrgencyStep({
 }: LaunchUrgencyStepProps) {
   const { t } = useTranslation();
 
+  const handleComplete = () => {
+    if (selected) {
+      onComplete();
+    }
+  };
+
   const options = [
     { 
       value: "immediate", 
@@ -41,10 +47,6 @@ export function LaunchUrgencyStep({
     }
   ];
 
-  const handleSelectionChange = (value: string) => {
-    onAnswer(value);
-  };
-
   return (
     <div className="w-full max-w-3xl mx-auto space-y-8">
       <div className="text-center">
@@ -58,7 +60,7 @@ export function LaunchUrgencyStep({
 
       <RadioGroup
         value={selected}
-        onValueChange={handleSelectionChange}
+        onValueChange={onAnswer}
         className="grid gap-4"
       >
         {options.map((option, index) => {
@@ -98,7 +100,7 @@ export function LaunchUrgencyStep({
       </RadioGroup>
 
       <QuizNavigation
-        onNext={onComplete}
+        onNext={handleComplete}
         onBack={onBack}
         isNextDisabled={!selected}
         nextLabel={t('onboarding.navigation.complete')}
