@@ -147,7 +147,6 @@ export function OnboardingQuizPT() {
             onBack: handleBack,
             quizData: quizData,
           },
-          autoAdvance: false,
         },
       ]
     : baseSteps;
