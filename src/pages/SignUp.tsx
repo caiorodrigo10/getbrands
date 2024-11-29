@@ -96,18 +96,18 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="w-full max-w-md space-y-8 p-8">
-        <div className="flex flex-col items-center space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
+      <div className="w-full max-w-md space-y-8 p-8 bg-white rounded-2xl shadow-lg">
+        <div className="flex flex-col items-center space-y-2">
           <img
-            src="/lovable-uploads/708f603e-bfa9-4f6f-9a63-ccdb46c6329f.png"
-            alt="getbrands"
-            className="h-8"
+            src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
+            alt="Logo"
+            className="w-[180px] h-auto"
           />
-          <h2 className="text-2xl font-semibold text-gray-900">
+          <h2 className="mt-2 text-2xl font-semibold text-gray-900">
             {t('auth.createAccount')}
           </h2>
-          <p className="text-gray-600 text-center">
+          <p className="text-gray-600">
             {t('auth.joinUs')}
           </p>
         </div>
@@ -121,7 +121,7 @@ const SignUp = () => {
 
           <Button
             type="submit"
-            className="w-full bg-primary hover:bg-primary-dark text-white font-medium rounded-full"
+            className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
             disabled={isLoading}
           >
             {isLoading ? t('auth.creatingAccount') : t('auth.createAccount')}
@@ -129,7 +129,7 @@ const SignUp = () => {
 
           <div className="text-center text-sm">
             <span className="text-gray-600">{t('auth.alreadyHaveAccount')}</span>{" "}
-            <Link to="/login" className="text-primary hover:text-primary-dark font-medium">
+            <Link to="/login" className="text-[#f0562e] hover:text-[#f0562e]/90">
               {t('auth.signIn')}
             </Link>
           </div>
