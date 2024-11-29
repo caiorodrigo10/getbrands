@@ -25,7 +25,6 @@ import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
 import OnboardingQuizPage from "@/pages/OnboardingQuiz";
 import OnboardingQuizPT from "@/pages/pt/OnboardingQuiz";
-import MarketingQuizPagePT from "@/pages/pt/MarketingQuizPage";
 
 export const AppRoutes = () => {
   const location = useLocation();
@@ -138,7 +137,6 @@ export const AppRoutes = () => {
             <OnboardingQuizPT />
           </ProtectedRoute>
         } />
-        <Route path="/quizmktpt" element={<MarketingQuizPagePT />} />
 
         {/* Marketing Routes */}
         {MarketingRoutes}
