@@ -34,6 +34,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleAuthChange = async (session: any) => {
     try {
@@ -43,7 +44,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('language')
+          .select('language, onboarding_completed')
           .eq('id', session.user.id)
           .maybeSingle();
 
@@ -166,14 +167,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       const { data: profile } = await supabase
         .from('profiles')
-        .select('language')
+        .select('language, onboarding_completed')
         .eq('id', data.user.id)
         .maybeSingle();
       
       const lang = profile?.language || i18n.language || 'en';
       await i18n.changeLanguage(lang);
       
-      navigate(`/${lang}/catalog`, { replace: true });
+      // Check if onboarding is completed
+      if (profile && !profile.onboarding_completed) {
+        navigate(`/${lang}/onboarding`, { replace: true });
+      } else {
+        navigate(`/${lang}/catalog`, { replace: true });
+      }
+      
       toast.success('Logged in successfully');
     } catch (error: any) {
       console.error('Login error:', error);
