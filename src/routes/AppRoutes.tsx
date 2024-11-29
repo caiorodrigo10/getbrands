@@ -3,7 +3,7 @@ import { AppLayout } from "./AppLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { LanguageRoute } from "@/components/routing/LanguageRoute";
 import { AdminRoutes } from "./AdminRoutes";
-import { MarketingRoutes } from "./MarketingRoutes";
+import { marketingRoutes } from "./MarketingRoutes";
 
 // Pages
 import Login from "@/pages/Login";
@@ -34,7 +34,7 @@ export const AppRoutes = () => {
       <Route element={<LanguageRoute />} />
       
       {/* Marketing Routes */}
-      <Route path="/*" element={<MarketingRoutes />} />
+      <Route path="/*" element={<>{marketingRoutes}</>} />
 
       {/* Auth Routes */}
       <Route path="/:lang/login" element={<Login />} />
