@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { WelcomeStep } from "./steps/WelcomeStep";
@@ -8,6 +8,7 @@ import { ProfileTypeStep } from "./steps/ProfileTypeStep";
 import { BrandStatusStep } from "./steps/BrandStatusStep";
 import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslation } from "react-i18next";
 
 type Step = {
   component: React.ComponentType<any>;
@@ -19,6 +20,8 @@ type Step = {
 export function OnboardingQuiz() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { lang } = useParams();
+  const { i18n } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [quizData, setQuizData] = useState({
     productCategories: [] as string[],
@@ -56,7 +59,7 @@ export function OnboardingQuiz() {
       if (error) throw error;
 
       toast.success("Profile updated successfully!");
-      navigate("/start-here");
+      navigate(`/${lang || i18n.language}/start-here`);
     } catch (error: any) {
       console.error("Error updating profile:", error);
       toast.error(error.message || "Failed to update profile");

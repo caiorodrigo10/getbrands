@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { SignUpFormFields } from "@/components/auth/signup/SignUpFormFields";
 import { trackEvent } from "@/lib/analytics";
+import { useTranslation } from "react-i18next";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { lang } = useParams();
+  const { i18n } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -79,7 +82,6 @@ const SignUp = () => {
       }
 
       if (data?.user) {
-        // Update the profiles table directly
         const { error: profileError } = await supabase
           .from('profiles')
           .upsert({
@@ -103,7 +105,7 @@ const SignUp = () => {
           signupMethod: 'email',
         });
 
-        navigate("/login");
+        navigate(`/${lang || i18n.language}/onboarding`);
       }
     } catch (error: any) {
       console.error("Error signing up:", error);
@@ -147,7 +149,7 @@ const SignUp = () => {
 
           <div className="text-center text-sm">
             <span className="text-gray-600">Already have an account?</span>{" "}
-            <Link to="/login" className="text-primary hover:text-primary-dark font-medium">
+            <Link to={`/${lang || i18n.language}/login`} className="text-primary hover:text-primary-dark font-medium">
               Sign in
             </Link>
           </div>

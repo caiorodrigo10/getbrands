@@ -1,14 +1,17 @@
 import { useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const StartHere = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { lang } = useParams();
+  const { i18n } = useTranslation();
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["user-profile", user?.id],
@@ -84,7 +87,7 @@ const StartHere = () => {
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
-        <Link to="/catalog">
+        <Link to={`/${lang || i18n.language}/catalog`}>
           <Button 
             className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white"
             size="lg"
