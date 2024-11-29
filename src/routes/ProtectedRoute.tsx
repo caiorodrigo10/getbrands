@@ -49,6 +49,22 @@ export const ProtectedRoute = ({
     return <div>Loading...</div>;
   }
 
+  // Lista de rotas que não precisam de onboarding
+  const publicRoutes = ['/login', '/signup', '/onboarding', '/', '/policies', '/terms'];
+  const isPublicRoute = publicRoutes.some(route => 
+    location.pathname.endsWith(route) || 
+    location.pathname === `/${i18n.language}`
+  );
+
+  // Se o usuário está autenticado mas não completou o onboarding
+  // E não está em uma rota pública
+  if (isAuthenticated && 
+      !profile?.onboarding_completed && 
+      !isPublicRoute) {
+    console.log('[DEBUG] ProtectedRoute - Redirecting to onboarding');
+    return <Navigate to={`/${i18n.language}/onboarding`} replace />;
+  }
+
   // Se não estiver autenticado e a rota requer autenticação
   if (!isAuthenticated && requiresAuth && !location.pathname.startsWith('/login')) {
     console.log('[DEBUG] ProtectedRoute - Redirecting to login');
@@ -59,17 +75,6 @@ export const ProtectedRoute = ({
   if (requiresAdmin && !hasFullAccess) {
     console.log('[DEBUG] ProtectedRoute - No admin access');
     return <Navigate to={`/${i18n.language}/catalog`} replace />;
-  }
-
-  // Se o usuário está autenticado mas não completou o onboarding
-  // E não está na página de onboarding
-  if (isAuthenticated && 
-      !profile?.onboarding_completed && 
-      !location.pathname.includes('/onboarding') &&
-      !location.pathname.includes('/login') &&
-      !location.pathname.includes('/signup')) {
-    console.log('[DEBUG] ProtectedRoute - Redirecting to onboarding');
-    return <Navigate to={`/${i18n.language}/onboarding`} replace />;
   }
 
   // Se é uma rota restrita e o usuário não tem acesso total
