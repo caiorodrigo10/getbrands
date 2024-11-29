@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { SignUpFormFields } from "@/components/auth/signup/SignUpFormFields";
 import { trackEvent } from "@/lib/analytics";
 
-const SignUp = () => {
+const SignUpPT = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -29,18 +29,18 @@ const SignUp = () => {
     let isValid = true;
 
     if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters long";
+      newErrors.password = "A senha deve ter pelo menos 6 caracteres";
       isValid = false;
     }
 
     if (!formData.phone) {
-      newErrors.phone = "Phone number is required";
+      newErrors.phone = "Número de telefone é obrigatório";
       isValid = false;
     }
 
     if (!formData.firstName || !formData.lastName || !formData.email) {
       isValid = false;
-      toast.error("Please fill in all fields");
+      toast.error("Por favor, preencha todos os campos");
     }
 
     setErrors(newErrors);
@@ -72,7 +72,7 @@ const SignUp = () => {
 
       if (signUpError) {
         if (signUpError.message.includes("User already registered")) {
-          toast.error("This email is already registered. Please try logging in instead.");
+          toast.error("Este email já está registrado. Por favor, tente fazer login.");
           return;
         }
         throw signUpError;
@@ -88,7 +88,7 @@ const SignUp = () => {
             email: formData.email,
             phone: formData.phone,
             role: 'member',
-            language: 'en',
+            language: 'pt',
             updated_at: new Date().toISOString()
           });
 
@@ -101,14 +101,14 @@ const SignUp = () => {
           lastName: formData.lastName,
           phone: formData.phone,
           signupMethod: 'email',
-          language: 'en'
+          language: 'pt'
         });
 
-        navigate("/onboarding");
+        navigate("/pt/onboarding");
       }
     } catch (error: any) {
-      console.error("Error signing up:", error);
-      toast.error(error.message || "Failed to create account. Please try again.");
+      console.error("Erro ao criar conta:", error);
+      toast.error(error.message || "Falha ao criar conta. Por favor, tente novamente.");
     } finally {
       setIsLoading(false);
     }
@@ -124,10 +124,10 @@ const SignUp = () => {
             className="w-[180px] h-auto"
           />
           <h2 className="mt-6 text-2xl font-semibold text-gray-900">
-            Create your account
+            Crie sua conta
           </h2>
           <p className="text-gray-600">
-            Join us and start building your brand
+            Junte-se a nós e comece a construir sua marca
           </p>
         </div>
 
@@ -143,13 +143,13 @@ const SignUp = () => {
             className="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
             disabled={isLoading}
           >
-            {isLoading ? "Creating account..." : "Create account"}
+            {isLoading ? "Criando conta..." : "Criar conta"}
           </Button>
 
           <div className="text-center text-sm">
-            <span className="text-gray-600">Already have an account?</span>{" "}
+            <span className="text-gray-600">Já tem uma conta?</span>{" "}
             <Link to="/login" className="text-primary hover:text-primary-dark font-medium">
-              Sign in
+              Entrar
             </Link>
           </div>
         </form>
@@ -158,4 +158,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default SignUpPT;
