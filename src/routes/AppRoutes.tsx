@@ -25,7 +25,6 @@ import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
 import OnboardingQuizPage from "@/pages/OnboardingQuiz";
 import OnboardingQuizPT from "@/pages/pt/OnboardingQuiz";
-import MarketingQuizPTPage from "@/pages/MarketingQuizPT";
 
 export const AppRoutes = () => {
   const location = useLocation();
@@ -36,9 +35,6 @@ export const AppRoutes = () => {
 
   return (
     <Routes>
-      {/* Public Quiz Route */}
-      <Route path="/quizmktpt" element={<MarketingQuizPTPage />} />
-
       {/* Root Route */}
       <Route element={<AppLayout />}>
         <Route path="/" element={
