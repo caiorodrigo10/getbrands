@@ -117,7 +117,7 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
           language: 'pt'
         });
 
-        window.location.href = "/catalog";
+        window.location.href = "/pt/start-here";
       }
     } catch (error: any) {
       console.error("Erro ao criar conta:", error);
