@@ -29,10 +29,11 @@ const RouteTracker = () => {
   const location = useLocation();
 
   useEffect(() => {
+    const cleanUrl = window.location.href.replace('://', '://').replace(':/', '');
     trackPage({
       path: location.pathname,
       search: location.search,
-      url: window.location.href
+      url: cleanUrl
     });
   }, [location]);
 
@@ -42,7 +43,10 @@ const RouteTracker = () => {
 const App = () => {
   useEffect(() => {
     debugAnalytics();
-    trackPage();
+    const cleanUrl = window.location.href.replace('://', '://').replace(':/', '');
+    trackPage({
+      url: cleanUrl
+    });
   }, []);
 
   return (
