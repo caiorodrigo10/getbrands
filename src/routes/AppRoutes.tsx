@@ -27,8 +27,6 @@ import OnboardingQuizPage from "@/pages/OnboardingQuiz";
 import OnboardingQuizPT from "@/pages/pt/OnboardingQuiz";
 import ComecarQuiz from "@/pages/pt/ComecarQuiz";
 
-// ... keep existing code (imports)
-
 export const AppRoutes = () => {
   const location = useLocation();
   
@@ -140,11 +138,8 @@ export const AppRoutes = () => {
             <OnboardingQuizPT />
           </ProtectedRoute>
         } />
-        <Route path="/comecar" element={
-          <ProtectedRoute>
-            <ComecarQuiz />
-          </ProtectedRoute>
-        } />
+        {/* Comecar route without authentication protection */}
+        <Route path="/comecar" element={<ComecarQuiz />} />
 
       {/* Marketing Routes */}
       {MarketingRoutes}
