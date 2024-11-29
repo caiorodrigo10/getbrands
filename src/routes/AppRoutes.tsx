@@ -8,6 +8,7 @@ import Login from "@/pages/Login";
 import SignUp from "@/pages/SignUp";
 import SignUpPT from "@/pages/pt/SignUp";
 import StartHere from "@/pages/StartHere";
+import StartHerePT from "@/pages/pt/StartHerePT";
 import Profile from "@/pages/Profile";
 import Projects from "@/pages/Projects";
 import ProjectDetails from "@/pages/ProjectDetails";
@@ -54,6 +55,12 @@ export const AppRoutes = () => {
         <Route path="/start-here" element={
           <ProtectedRoute>
             <StartHere />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/pt/start-here" element={
+          <ProtectedRoute>
+            <StartHerePT />
           </ProtectedRoute>
         } />
         
