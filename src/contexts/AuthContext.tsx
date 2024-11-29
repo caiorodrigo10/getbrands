@@ -34,14 +34,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
 
   const handleAuthChange = async (session: any) => {
-    if (session?.user) {
-      setUser(session.user);
-      setIsAuthenticated(true);
-      
-      try {
+    try {
+      if (session?.user) {
+        setUser(session.user);
+        setIsAuthenticated(true);
+        
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('language')
@@ -70,54 +69,66 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else if (profile.language) {
           await i18n.changeLanguage(profile.language);
         }
-      } catch (error) {
-        console.error('Error in profile management:', error);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
       }
-    } else {
+    } catch (error) {
+      console.error('Error in handleAuthChange:', error);
       setUser(null);
       setIsAuthenticated(false);
-      const currentLang = i18n.language || 'en';
-      navigate(`/${currentLang}/login`);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
     let mounted = true;
-    
+
     const initSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
+        
         if (error) {
           console.error('Session error:', error);
-          throw error;
+          if (mounted) {
+            setUser(null);
+            setIsAuthenticated(false);
+            setIsLoading(false);
+          }
+          return;
         }
-        
+
         if (mounted) {
           await handleAuthChange(session);
+          setIsLoading(false);
         }
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-          if (mounted) {
-            await handleAuthChange(session);
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (_event, session) => {
+            if (mounted) {
+              await handleAuthChange(session);
+            }
           }
-        });
+        );
 
         return () => {
+          subscription?.unsubscribe();
           mounted = false;
-          subscription.unsubscribe();
         };
       } catch (error) {
         console.error('Session initialization error:', error);
         if (mounted) {
-          setIsLoading(false);
           setUser(null);
           setIsAuthenticated(false);
+          setIsLoading(false);
         }
       }
     };
 
     initSession();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const signOut = async () => {
