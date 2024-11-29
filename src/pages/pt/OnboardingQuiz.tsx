@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 type Step = {
   component: React.ComponentType<any>;
-  props: Record<string, any>;
+  props?: Record<string, any>;
   autoAdvance?: boolean;
   name: string;
 };
@@ -152,11 +152,10 @@ export function OnboardingQuizPT() {
     : baseSteps;
 
   const CurrentStepComponent = steps[currentStep].component;
-  const currentStepProps = steps[currentStep].props || { onBack: handleBack, quizData };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <CurrentStepComponent {...currentStepProps} />
+      <CurrentStepComponent {...(steps[currentStep].props || {})} />
     </div>
   );
 }
