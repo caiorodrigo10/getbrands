@@ -6,11 +6,12 @@ import { toast } from "sonner";
 import { SignUpFormFields } from "@/components/auth/signup/SignUpFormFields";
 import { trackEvent } from "@/lib/analytics";
 import { useTranslation } from "react-i18next";
+import { getCurrentLanguage, isValidLanguage } from "@/lib/language";
 
 const SignUp = () => {
   const navigate = useNavigate();
   const { lang } = useParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -23,6 +24,9 @@ const SignUp = () => {
     password: "",
     phone: "",
   });
+
+  // Get the current language from URL or default
+  const currentLanguage = isValidLanguage(lang) ? lang : getCurrentLanguage();
 
   const validateForm = () => {
     const newErrors = {
@@ -91,10 +95,14 @@ const SignUp = () => {
             email: formData.email,
             phone: formData.phone,
             role: 'member',
+            language: currentLanguage,
             updated_at: new Date().toISOString()
           });
 
         if (profileError) throw profileError;
+
+        // Set the application language
+        await i18n.changeLanguage(currentLanguage);
 
         trackEvent('user_signed_up', {
           userId: data.user.id,
@@ -103,9 +111,10 @@ const SignUp = () => {
           lastName: formData.lastName,
           phone: formData.phone,
           signupMethod: 'email',
+          language: currentLanguage,
         });
 
-        navigate(`/${lang}/onboarding`);
+        navigate(`/${currentLanguage}/onboarding`);
       }
     } catch (error: any) {
       console.error("Error signing up:", error);
@@ -149,7 +158,7 @@ const SignUp = () => {
 
           <div className="text-center text-sm">
             <span className="text-gray-600">{t('auth.alreadyHaveAccount')}</span>{" "}
-            <Link to={`/${lang}/login`} className="text-primary hover:text-primary-dark font-medium">
+            <Link to={`/${currentLanguage}/login`} className="text-primary hover:text-primary-dark font-medium">
               {t('auth.signIn')}
             </Link>
           </div>

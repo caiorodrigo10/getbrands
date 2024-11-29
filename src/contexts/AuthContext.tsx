@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .single();
         
       if (profile?.language) {
-        i18n.changeLanguage(profile.language);
+        await i18n.changeLanguage(profile.language);
       }
     } else {
       setUser(null);
@@ -100,8 +100,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(null);
       setIsAuthenticated(false);
       
-      // Redirect to login without language prefix
-      navigate('/login');
+      // Get current language before redirecting
+      const currentLang = i18n.language || 'en';
+      navigate(`/${currentLang}/login`);
       toast.success('Logged out successfully');
     } catch (error) {
       console.error('Error signing out:', error);
@@ -125,7 +126,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsAuthenticated(true);
       
       // Get user's language preference or use current language
-      const lang = i18n.language || 'en';
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('language')
+        .eq('id', data.user.id)
+        .single();
+      
+      const lang = profile?.language || i18n.language || 'en';
+      await i18n.changeLanguage(lang);
+      
       navigate(`/${lang}/catalog`, { replace: true });
       toast.success('Logged in successfully');
     } catch (error: any) {
