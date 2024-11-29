@@ -25,6 +25,9 @@ import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
 import OnboardingQuizPage from "@/pages/OnboardingQuiz";
 import OnboardingQuizPT from "@/pages/pt/OnboardingQuiz";
+import ComecarQuiz from "@/pages/pt/ComecarQuiz";
+
+// ... keep existing code (imports)
 
 export const AppRoutes = () => {
   const location = useLocation();
@@ -129,15 +132,19 @@ export const AppRoutes = () => {
         } />
 
         <Route path="*" element={<Error404 />} />
-      </Route>
 
-      {/* Portuguese Routes */}
-      <Route path="/pt/signup" element={<SignUpPT />} />
-      <Route path="/pt/onboarding" element={
-        <ProtectedRoute>
-          <OnboardingQuizPT />
-        </ProtectedRoute>
-      } />
+        {/* Portuguese Routes */}
+        <Route path="/pt/signup" element={<SignUpPT />} />
+        <Route path="/pt/onboarding" element={
+          <ProtectedRoute>
+            <OnboardingQuizPT />
+          </ProtectedRoute>
+        } />
+        <Route path="/comecar" element={
+          <ProtectedRoute>
+            <ComecarQuiz />
+          </ProtectedRoute>
+        } />
 
       {/* Marketing Routes */}
       {MarketingRoutes}
@@ -172,6 +179,7 @@ export const AppRoutes = () => {
           <Success />
         </ProtectedRoute>
       } />
+      </Route>
     </Routes>
   );
 };
