@@ -43,6 +43,7 @@ const RouteTracker = () => {
     const firstSegment = path.split('/')[1];
     const supportedLanguages = ['en', 'pt', 'es'];
     
+    // Only change language if it's different from current
     if (supportedLanguages.includes(firstSegment) && firstSegment !== i18n.language) {
       i18n.changeLanguage(firstSegment);
     }
@@ -59,6 +60,7 @@ const LanguageRedirect = () => {
   const firstSegment = path.split('/')[1];
   const supportedLanguages = ['en', 'pt', 'es'];
 
+  // If the first segment is not a supported language, redirect with language prefix
   if (!supportedLanguages.includes(firstSegment)) {
     const newPath = `/${i18n.language}${path === '/' ? '' : path}`;
     return <Navigate to={newPath} replace />;
@@ -68,10 +70,21 @@ const LanguageRedirect = () => {
 };
 
 const App = () => {
+  const { i18n } = useTranslation();
+
   useEffect(() => {
     debugAnalytics();
     trackPage();
-  }, []);
+
+    // Set initial language based on URL or browser preference
+    const path = window.location.pathname;
+    const firstSegment = path.split('/')[1];
+    const supportedLanguages = ['en', 'pt', 'es'];
+    
+    if (supportedLanguages.includes(firstSegment)) {
+      i18n.changeLanguage(firstSegment);
+    }
+  }, [i18n]);
 
   return (
     <SessionContextProvider 
