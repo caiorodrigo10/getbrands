@@ -25,6 +25,7 @@ import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
 import OnboardingQuizPage from "@/pages/OnboardingQuiz";
 import OnboardingQuizPT from "@/pages/pt/OnboardingQuiz";
+import Index from "@/pages/Index";
 
 export const AppRoutes = () => {
   const location = useLocation();
@@ -35,13 +36,12 @@ export const AppRoutes = () => {
 
   return (
     <Routes>
+      {/* Marketing Routes */}
+      {MarketingRoutes}
+
       {/* Root Route */}
       <Route element={<AppLayout />}>
-        <Route path="/" element={
-          <ProtectedRoute>
-            <Catalog />
-          </ProtectedRoute>
-        } />
+        <Route index element={<Index />} />
         
         <Route path="/dashboard" element={
           <ProtectedRoute>
@@ -55,19 +55,19 @@ export const AppRoutes = () => {
             <StartHere />
           </ProtectedRoute>
         } />
-        
+
         <Route path="/profile" element={
           <ProtectedRoute>
             <Profile />
           </ProtectedRoute>
         } />
-        
+
         <Route path="/projects" element={
           <ProtectedRoute>
             <Projects />
           </ProtectedRoute>
         } />
-        
+
         <Route path="/projects/:id" element={
           <ProtectedRoute>
             <ProjectDetails />
@@ -127,21 +127,8 @@ export const AppRoutes = () => {
             <ProfitCalculator />
           </ProtectedRoute>
         } />
-
-        <Route path="*" element={<Error404 />} />
       </Route>
 
-      {/* Portuguese Routes */}
-      <Route path="/pt/signup" element={<SignUpPT />} />
-      <Route path="/pt/onboarding" element={
-        <ProtectedRoute>
-          <OnboardingQuizPT />
-        </ProtectedRoute>
-      } />
-
-      {/* Marketing Routes */}
-      {MarketingRoutes}
-      
       {/* Public Routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
@@ -172,6 +159,8 @@ export const AppRoutes = () => {
           <Success />
         </ProtectedRoute>
       } />
+
+      <Route path="*" element={<Error404 />} />
     </Routes>
   );
 };
