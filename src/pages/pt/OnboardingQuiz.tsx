@@ -29,8 +29,6 @@ export function OnboardingQuizPT() {
     launchUrgency: "",
   });
 
-  const isPublicFlow = location.pathname === "/comecarpt";
-
   const handleNext = () => {
     setCurrentStep((prev) => prev + 1);
   };
@@ -71,6 +69,8 @@ export function OnboardingQuizPT() {
       handleNext();
     }
   };
+
+  const isPublicFlow = location.pathname === "/comecarpt";
 
   const baseSteps: Step[] = [
     {
@@ -155,7 +155,6 @@ export function OnboardingQuizPT() {
   const CurrentStepComponent = steps[currentStep].component;
   const currentStepProps = steps[currentStep].props;
 
-  // Type assertion to ensure props match component requirements
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <CurrentStepComponent {...currentStepProps} />
