@@ -151,7 +151,7 @@ export function QuizMktPT() {
   const CurrentStepComponent = steps[currentStep].component;
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="h-screen w-full flex items-center justify-center bg-background">
       <CurrentStepComponent {...steps[currentStep].props} />
     </div>
   );
