@@ -15,31 +15,32 @@ export const useQuizData = () => {
   };
 
   const saveQuizData = async () => {
-    if (!user?.id) {
-      // Store in localStorage for anonymous users
-      localStorage.setItem('quiz_answers', JSON.stringify(answers));
-      return;
-    }
-
     try {
+      if (!user?.id) {
+        localStorage.setItem('quiz_answers', JSON.stringify(answers));
+        return;
+      }
+
       const { error } = await supabase
         .from('marketing_quiz_responses')
         .insert({
           user_id: user.id,
           answers,
           completed_at: new Date().toISOString()
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) {
         console.error('Error saving quiz data:', error);
-        throw error;
+        toast.error("Failed to save your responses");
+        return;
       }
       
       toast.success("Your responses have been saved!");
     } catch (error) {
       console.error('Error saving quiz data:', error);
       toast.error("Failed to save your responses");
-      throw error;
     }
   };
 
