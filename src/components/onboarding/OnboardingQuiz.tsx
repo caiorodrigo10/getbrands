@@ -10,6 +10,21 @@ import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 
+type StepProps = {
+  selected?: string | string[];
+  onAnswer?: (value: any) => void;
+  onNext?: () => void;
+  onBack?: () => void;
+  onComplete?: () => void;
+};
+
+type Step = {
+  component: React.ComponentType<StepProps>;
+  name: string;
+  props: StepProps;
+  autoAdvance: boolean;
+};
+
 export function OnboardingQuiz() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -59,7 +74,7 @@ export function OnboardingQuiz() {
     }
   };
 
-  const steps = [
+  const steps: Step[] = [
     {
       component: WelcomeStep,
       name: "Welcome",
