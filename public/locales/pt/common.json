@@ -53,52 +53,66 @@
   },
   "onboarding": {
     "welcome": {
-      "title": "Bem-vindo à sua jornada Private Label",
-      "description": "Vamos conhecer você melhor para fornecer o melhor serviço possível para seu negócio private label.",
-      "startButton": "Vamos Começar"
+      "title": "Bem-vindo à sua Jornada de Marca Própria",
+      "description": "Estamos animados para conhecer mais sobre você e seu projeto. Vamos personalizar nossa plataforma para atender perfeitamente às necessidades do seu negócio de marca própria.",
+      "startButton": "Iniciar Minha Jornada"
     },
     "productCategories": {
-      "title": "Qual categoria de produto mais te interessa?",
-      "description": "Selecione uma ou mais categorias que você gostaria de explorar",
+      "title": "Qual segmento mais combina com seu projeto?",
+      "description": "Selecione uma ou mais categorias que você gostaria de explorar. Cada categoria foi cuidadosamente selecionada com base em tendências de mercado e oportunidades de negócio.",
       "categories": {
-        "cosmetics": "Cosméticos",
-        "coffee": "Café",
-        "supplements": "Suplementos",
-        "petProducts": "Produtos Pet"
+        "cosmetics": "Cosméticos e Cuidados Pessoais",
+        "cosmeticsDescription": "Produtos para cuidados com a pele, cabelo e bem-estar pessoal, formulados com ingredientes de alta qualidade",
+        "coffee": "Café Gourmet e Especiais",
+        "coffeeDescription": "Grãos selecionados, torras exclusivas e blends únicos para amantes de café",
+        "supplements": "Suplementos Nutricionais",
+        "supplementsDescription": "Fórmulas inovadoras para saúde, bem-estar e performance física",
+        "petProducts": "Produtos Premium para Pets",
+        "petProductsDescription": "Itens de qualidade superior para o cuidado e bem-estar dos animais de estimação"
       }
     },
     "profileType": {
-      "title": "Qual é o seu perfil?",
-      "description": "Isso nos ajuda a entender melhor suas necessidades",
+      "title": "Como você definiria seu perfil empreendedor?",
+      "description": "Sua resposta nos ajudará a personalizar nossa abordagem e recomendações específicas para seu modelo de negócio",
       "types": {
         "entrepreneur": "Empreendedor Individual",
-        "startup": "Startup",
+        "entrepreneurDescription": "Profissional autônomo ou microempreendedor buscando criar sua primeira marca",
+        "startup": "Startup ou Empresa Emergente",
+        "startupDescription": "Empresa inovadora em fase inicial, buscando escalar com produtos próprios",
         "established": "Empresa Estabelecida",
-        "other": "Outro"
+        "establishedDescription": "Negócio consolidado procurando expandir seu portfólio com marca própria",
+        "other": "Outro Perfil",
+        "otherDescription": "Perfil diferenciado com necessidades específicas"
       }
     },
     "brandStatus": {
-      "title": "Qual é o status atual da sua marca?",
-      "description": "Conte-nos sobre a situação atual da sua marca",
+      "title": "Em que estágio está sua marca?",
+      "description": "Entender o atual momento da sua marca nos permite oferecer o suporte mais adequado para seu crescimento",
       "options": {
-        "noBrand": "Começando do zero",
-        "partialBrand": "Tenho alguns elementos de marca",
-        "completeBrand": "Identidade de marca completa"
+        "noBrand": "Iniciando do Zero",
+        "noBrandDescription": "Ainda não tenho elementos de marca definidos, preciso desenvolver tudo",
+        "partialBrand": "Identidade em Desenvolvimento",
+        "partialBrandDescription": "Já tenho alguns elementos como nome ou logo, mas preciso estruturar melhor",
+        "completeBrand": "Marca Estabelecida",
+        "completeBrandDescription": "Possuo uma identidade visual completa e diretrizes de marca definidas"
       }
     },
     "launchUrgency": {
-      "title": "Quando você planeja lançar?",
-      "description": "Isso nos ajuda a entender seu cronograma e priorizar suas necessidades",
+      "title": "Qual é seu horizonte de lançamento?",
+      "description": "O prazo que você tem em mente nos ajuda a estabelecer um cronograma adequado e priorizar as etapas do seu projeto",
       "options": {
-        "immediate": "Imediatamente (1-2 meses)",
-        "soon": "Em breve (3-6 meses)",
-        "planning": "Fase de Planejamento (6+ meses)"
+        "immediate": "Lançamento Imediato",
+        "immediateDescription": "Preciso lançar nos próximos 1-2 meses, tenho urgência",
+        "soon": "Planejamento Curto Prazo",
+        "soonDescription": "Pretendo lançar em 3-6 meses, com tempo para planejamento adequado",
+        "planning": "Planejamento Estratégico",
+        "planningDescription": "Horizonte de 6+ meses, focando em uma estratégia bem estruturada"
       }
     },
     "navigation": {
       "back": "Voltar",
-      "next": "Próximo",
-      "complete": "Concluir"
+      "next": "Avançar",
+      "complete": "Finalizar"
     }
   }
 }
