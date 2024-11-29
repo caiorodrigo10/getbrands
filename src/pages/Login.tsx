@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
   const { toast } = useToast();
@@ -98,13 +98,13 @@ const Login = () => {
         </form>
 
         <div className="mt-4 text-center text-sm">
-          <a href="/forgot-password" className="text-[#f0562e] hover:text-[#f0562e]/90">
+          <Link to="/forgot-password" className="text-[#f0562e] hover:text-[#f0562e]/90">
             Forgot password?
-          </a>
+          </Link>
           <span className="mx-2 text-gray-400">•</span>
-          <a href="/signup" className="text-[#f0562e] hover:text-[#f0562e]/90">
+          <Link to="/signup" className="text-[#f0562e] hover:text-[#f0562e]/90">
             Create an account
-          </a>
+          </Link>
         </div>
       </div>
     </div>
