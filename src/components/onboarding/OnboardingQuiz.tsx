@@ -89,7 +89,8 @@ export function OnboardingQuiz() {
         return;
       }
 
-      const { error } = await supabase
+      // First update the profile with onboarding data
+      const { error: profileError } = await supabase
         .from("profiles")
         .update({
           product_interest: quizData.productCategories,
@@ -100,7 +101,24 @@ export function OnboardingQuiz() {
         })
         .eq("id", user.id);
 
-      if (error) throw error;
+      if (profileError) throw profileError;
+
+      // Then save the quiz response for analytics
+      const { error: quizError } = await supabase
+        .from("marketing_quiz_responses")
+        .insert({
+          user_id: user.id,
+          answers: {
+            product_categories: quizData.productCategories,
+            profile_type: mapProfileType(quizData.profileType),
+            brand_status: mapBrandStatus(quizData.brandStatus),
+            launch_urgency: mapLaunchUrgency(quizData.launchUrgency),
+            language: i18n.language,
+          },
+          completed_at: new Date().toISOString(),
+        });
+
+      if (quizError) throw quizError;
 
       toast.success(t('messages.profileUpdated'));
       
