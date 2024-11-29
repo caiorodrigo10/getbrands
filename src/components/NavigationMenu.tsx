@@ -21,7 +21,7 @@ export const NavigationMenu = () => {
       label: "Dashboard", 
       path: "/dashboard", 
       icon: LayoutDashboard,
-      restricted: false
+      restricted: true
     },
     { 
       label: "Projects", 
