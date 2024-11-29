@@ -14,7 +14,7 @@ interface OnboardingData {
 export const useOnboardingCompletion = () => {
   const navigate = useNavigate();
   const { lang } = useParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const handleComplete = async (userId: string, quizData: OnboardingData) => {
     try {
@@ -32,6 +32,7 @@ export const useOnboardingCompletion = () => {
           brand_status: mapBrandStatus(quizData.brandStatus),
           launch_urgency: mapLaunchUrgency(quizData.launchUrgency),
           onboarding_completed: true,
+          language: lang || i18n.language || 'en' // Ensure we have a valid language
         })
         .eq("id", userId);
 
@@ -55,8 +56,8 @@ export const useOnboardingCompletion = () => {
 
       toast.success(t('messages.success'));
       
-      // Ensure we have a language prefix and navigate to start-here
-      const currentLang = lang || 'en';
+      // Ensure we have a valid language prefix and navigate to start-here
+      const currentLang = lang || i18n.language || 'en';
       navigate(`/${currentLang}/start-here`, { replace: true });
       
     } catch (error: any) {
