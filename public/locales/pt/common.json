@@ -43,6 +43,12 @@
     "emailPlaceholder": "seu@email.com",
     "alreadyHaveAccount": "Já tem uma conta?",
     "signIn": "Entrar",
-    "creatingAccount": "Criando conta..."
+    "creatingAccount": "Criando conta...",
+    "loginTitle": "Entre na sua conta",
+    "loginSubtitle": "Transforme suas ideias em produtos incríveis",
+    "forgotPassword": "Esqueceu sua senha?",
+    "signingIn": "Entrando...",
+    "loginError": "Erro ao entrar",
+    "loginErrorMessage": "Email ou senha incorretos. Por favor, tente novamente."
   }
 }

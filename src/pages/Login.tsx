@@ -13,7 +13,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { lang } = useParams();
 
   useEffect(() => {
@@ -38,8 +38,8 @@ const Login = () => {
       console.error("Login error:", error);
       toast({
         variant: "destructive",
-        title: "Login Error",
-        description: "Incorrect email or password. Please try again.",
+        title: t('auth.loginError'),
+        description: t('auth.loginErrorMessage'),
       });
     } finally {
       setIsLoading(false);
@@ -56,7 +56,7 @@ const Login = () => {
             className="w-[180px] h-auto"
           />
           <p className="text-gray-600">
-            Transform your ideas into amazing products
+            {t('auth.loginSubtitle')}
           </p>
         </div>
 
@@ -70,7 +70,7 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0562e]/20"
-                placeholder="your@email.com"
+                placeholder={t('auth.emailPlaceholder')}
                 disabled={isLoading}
               />
             </div>
@@ -82,7 +82,7 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0562e]/20"
-                placeholder="••••••••"
+                placeholder={t('auth.passwordPlaceholder')}
                 disabled={isLoading}
               />
             </div>
@@ -96,21 +96,21 @@ const Login = () => {
             {isLoading ? (
               <div className="flex items-center justify-center">
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                <span>Signing in...</span>
+                <span>{t('auth.signingIn')}</span>
               </div>
             ) : (
-              "Sign in"
+              t('auth.login')
             )}
           </Button>
         </form>
 
         <div className="mt-4 text-center text-sm">
           <Link to={`/${lang || i18n.language}/forgot-password`} className="text-[#f0562e] hover:text-[#f0562e]/90">
-            Forgot password?
+            {t('auth.forgotPassword')}
           </Link>
           <span className="mx-2 text-gray-400">•</span>
           <Link to={`/${lang || i18n.language}/signup`} className="text-[#f0562e] hover:text-[#f0562e]/90">
-            Create an account
+            {t('auth.createAccount')}
           </Link>
         </div>
       </div>
