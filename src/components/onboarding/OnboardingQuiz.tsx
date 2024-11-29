@@ -25,6 +25,46 @@ type Step = {
   autoAdvance: boolean;
 };
 
+// Map translated values to standardized English values for Supabase
+const mapProfileType = (value: string): string => {
+  const profileTypeMap: Record<string, string> = {
+    'criador': 'creator',
+    'empreendedor': 'entrepreneur',
+    'profissional': 'marketer',
+    // Add English values as-is
+    'creator': 'creator',
+    'entrepreneur': 'entrepreneur',
+    'marketer': 'marketer'
+  };
+  return profileTypeMap[value] || value;
+};
+
+const mapBrandStatus = (value: string): string => {
+  const brandStatusMap: Record<string, string> = {
+    'ideia': 'idea',
+    'em_desenvolvimento': 'in_development',
+    'pronto_para_lancar': 'ready_to_launch',
+    // Add English values as-is
+    'idea': 'idea',
+    'in_development': 'in_development',
+    'ready_to_launch': 'ready_to_launch'
+  };
+  return brandStatusMap[value] || value;
+};
+
+const mapLaunchUrgency = (value: string): string => {
+  const urgencyMap: Record<string, string> = {
+    'imediato': 'immediate',
+    '3_meses': '3_months',
+    '6_meses': '6_months',
+    // Add English values as-is
+    'immediate': 'immediate',
+    '3_months': '3_months',
+    '6_months': '6_months'
+  };
+  return urgencyMap[value] || value;
+};
+
 export function OnboardingQuiz() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -53,13 +93,14 @@ export function OnboardingQuiz() {
         return;
       }
 
+      // Map values to standardized English before saving to Supabase
       const { error } = await supabase
         .from("profiles")
         .update({
           product_interest: quizData.productCategories,
-          profile_type: quizData.profileType,
-          brand_status: quizData.brandStatus,
-          launch_urgency: quizData.launchUrgency,
+          profile_type: mapProfileType(quizData.profileType),
+          brand_status: mapBrandStatus(quizData.brandStatus),
+          launch_urgency: mapLaunchUrgency(quizData.launchUrgency),
           onboarding_completed: true,
         })
         .eq("id", user.id);
