@@ -38,7 +38,7 @@ export function QuizMktPT() {
   const handleComplete = async () => {
     try {
       const { error } = await supabase
-        .from("marketing_quiz_responses_pt")
+        .from("marketing_quiz_responses")
         .insert({
           answers: {
             product_interest: quizData.productCategories,
@@ -136,10 +136,8 @@ export function QuizMktPT() {
   const CurrentStepComponent = steps[currentStep].component;
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <CurrentStepComponent {...steps[currentStep].props} />
-      </div>
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <CurrentStepComponent {...steps[currentStep].props} />
     </div>
   );
 }
