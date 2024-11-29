@@ -48,10 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           .eq('id', session.user.id)
           .maybeSingle();
 
-        if (profileError) {
-          console.error('Error fetching profile:', profileError);
-          return;
-        }
+        if (profileError) throw profileError;
 
         if (!profile) {
           const { error: insertError } = await supabase
@@ -63,10 +60,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               role: 'member'
             });
 
-          if (insertError) {
-            console.error('Error creating profile:', insertError);
-            return;
-          }
+          if (insertError) throw insertError;
         } else if (profile.language) {
           await i18n.changeLanguage(profile.language);
         }
@@ -78,6 +72,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Error in handleAuthChange:', error);
       setUser(null);
       setIsAuthenticated(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -86,21 +82,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const initSession = async () => {
       try {
+        setIsLoading(true);
         const { data: { session }, error } = await supabase.auth.getSession();
         
-        if (error) {
-          console.error('Session error:', error);
-          if (mounted) {
-            setUser(null);
-            setIsAuthenticated(false);
-            setIsLoading(false);
-          }
-          return;
-        }
+        if (error) throw error;
 
         if (mounted) {
           await handleAuthChange(session);
-          setIsLoading(false);
         }
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -174,7 +162,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const lang = profile?.language || i18n.language || 'en';
       await i18n.changeLanguage(lang);
       
-      // Check if onboarding is completed
       if (profile && !profile.onboarding_completed) {
         navigate(`/${lang}/onboarding`, { replace: true });
       } else {
