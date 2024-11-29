@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 const SignUp = () => {
   const navigate = useNavigate();
   const { lang } = useParams();
-  const { i18n } = useTranslation();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -105,7 +105,7 @@ const SignUp = () => {
           signupMethod: 'email',
         });
 
-        navigate(`/${lang || i18n.language}/onboarding`);
+        navigate(`/${lang}/onboarding`);
       }
     } catch (error: any) {
       console.error("Error signing up:", error);
@@ -125,10 +125,10 @@ const SignUp = () => {
             className="h-12 mx-auto mb-4"
           />
           <h2 className="mt-2 text-2xl font-semibold text-gray-900">
-            Create your account
+            {t('auth.createAccount')}
           </h2>
           <p className="text-gray-600">
-            Join us and start building your brand
+            {t('auth.joinUs')}
           </p>
         </div>
 
@@ -144,13 +144,13 @@ const SignUp = () => {
             className="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
             disabled={isLoading}
           >
-            {isLoading ? "Creating account..." : "Create account"}
+            {isLoading ? t('auth.creatingAccount') : t('auth.createAccount')}
           </Button>
 
           <div className="text-center text-sm">
-            <span className="text-gray-600">Already have an account?</span>{" "}
-            <Link to={`/${lang || i18n.language}/login`} className="text-primary hover:text-primary-dark font-medium">
-              Sign in
+            <span className="text-gray-600">{t('auth.alreadyHaveAccount')}</span>{" "}
+            <Link to={`/${lang}/login`} className="text-primary hover:text-primary-dark font-medium">
+              {t('auth.signIn')}
             </Link>
           </div>
         </form>

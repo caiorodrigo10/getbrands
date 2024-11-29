@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import { useTranslation } from "react-i18next";
 
 interface SignUpFormFieldsProps {
   formData: {
@@ -18,6 +19,8 @@ interface SignUpFormFieldsProps {
 }
 
 export const SignUpFormFields = ({ formData, errors, setFormData }: SignUpFormFieldsProps) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
@@ -29,7 +32,7 @@ export const SignUpFormFields = ({ formData, errors, setFormData }: SignUpFormFi
             onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
             required
             className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
-            placeholder="First name"
+            placeholder={t('auth.firstName')}
           />
         </div>
         <div>
@@ -40,7 +43,7 @@ export const SignUpFormFields = ({ formData, errors, setFormData }: SignUpFormFi
             onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
             required
             className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
-            placeholder="Last name"
+            placeholder={t('auth.lastName')}
           />
         </div>
       </div>
@@ -52,7 +55,7 @@ export const SignUpFormFields = ({ formData, errors, setFormData }: SignUpFormFi
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           required
           className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
-          placeholder="your@email.com"
+          placeholder={t('auth.emailPlaceholder')}
         />
       </div>
       <div>
@@ -63,7 +66,7 @@ export const SignUpFormFields = ({ formData, errors, setFormData }: SignUpFormFi
           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
           required
           className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
-          placeholder="••••••••"
+          placeholder={t('auth.passwordPlaceholder')}
         />
         {errors.password && (
           <p className="text-sm text-red-500 mt-1">{errors.password}</p>

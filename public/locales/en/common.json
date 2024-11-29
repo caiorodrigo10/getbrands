@@ -34,6 +34,15 @@
     "signup": "Sign Up",
     "logout": "Logout",
     "email": "Email",
-    "password": "Password"
+    "password": "Password",
+    "createAccount": "Create your account",
+    "joinUs": "Join us and start building your brand",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "passwordPlaceholder": "••••••••",
+    "emailPlaceholder": "your@email.com",
+    "alreadyHaveAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "creatingAccount": "Creating account..."
   }
 }
