@@ -40,8 +40,9 @@ export const useUserPermissions = () => {
 export const RESTRICTED_ROUTES = [
   '/projects',
   '/products',
+  '/dashboard'
 ];
 
 export const isRestrictedRoute = (pathname: string) => {
-  return RESTRICTED_ROUTES.some(route => pathname.startsWith(route));
+  return RESTRICTED_ROUTES.some(route => pathname.includes(route));
 };
