@@ -1,7 +1,7 @@
-import { OnboardingQuiz } from "@/components/onboarding/OnboardingQuiz";
+import { OnboardingQuizPT } from "@/pages/pt/OnboardingQuiz";
 
 const ComecarPT = () => {
-  return <OnboardingQuiz />;
+  return <OnboardingQuizPT />;
 };
 
 export default ComecarPT;
