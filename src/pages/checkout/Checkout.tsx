@@ -31,7 +31,7 @@ const Checkout = () => {
 
   const goBack = () => {
     if (currentStep === 0) {
-      navigate("/cart");
+      navigate("/catalog");
     } else {
       const prevStep = steps[currentStep - 1];
       if (prevStep) {
