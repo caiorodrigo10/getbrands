@@ -9,6 +9,8 @@ import ProjectsOverview from "@/components/dashboard/ProjectsOverview";
 import ProjectDetails from "@/components/dashboard/ProjectDetails";
 import UpcomingMeetings from "@/components/dashboard/UpcomingMeetings";
 import { useDashboardData } from "@/hooks/useDashboardData";
+import { useUserPermissions } from "@/lib/permissions";
+import { useEffect } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -19,6 +21,7 @@ import {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { hasFullAccess } = useUserPermissions();
   const {
     profile,
     projects,
@@ -29,12 +32,14 @@ const Dashboard = () => {
     isAuthenticated,
   } = useDashboardData();
 
-  if (!isAuthenticated) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-lg text-gray-600">Please log in to view your dashboard.</p>
-      </div>
-    );
+  useEffect(() => {
+    if (!hasFullAccess) {
+      navigate('/catalog');
+    }
+  }, [hasFullAccess, navigate]);
+
+  if (!isAuthenticated || !hasFullAccess) {
+    return null;
   }
 
   const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : "there";
