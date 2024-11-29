@@ -152,10 +152,11 @@ export function OnboardingQuizPT() {
     : baseSteps;
 
   const CurrentStepComponent = steps[currentStep].component;
+  const currentStepProps = steps[currentStep].props || { onBack: handleBack, quizData };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <CurrentStepComponent {...steps[currentStep].props} />
+      <CurrentStepComponent {...currentStepProps} />
     </div>
   );
 }
