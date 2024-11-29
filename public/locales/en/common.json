@@ -53,65 +53,75 @@
   },
   "onboarding": {
     "welcome": {
-      "title": "Welcome to Lovable!",
-      "description": "Let's get started with your brand journey"
+      "title": "Welcome to Your Brand Journey!",
+      "description": "Let's create something amazing together",
+      "startButton": "Get Started"
     },
     "productCategories": {
-      "title": "Which product categories are you interested in creating?",
-      "description": "Select all that apply",
+      "title": "What type of products would you like to create?",
+      "description": "Choose the categories that interest you most",
       "categories": {
         "beverages": {
           "title": "Beverages",
-          "description": "Premium coffee, instant coffee, and RTD beverages."
+          "description": "Create your own line of premium beverages, from coffee to ready-to-drink products"
         },
         "supplements": {
           "title": "Supplements",
-          "description": "Vitamins, minerals, and specialty capsules."
+          "description": "Develop high-quality vitamins, minerals, and nutritional supplements"
         },
         "beauty": {
           "title": "Beauty & Personal Care",
-          "description": "Skincare products, hair care treatments, and body lotions."
+          "description": "Design innovative skincare, haircare, and body care products"
         },
         "sportsNutrition": {
           "title": "Sports Nutrition",
-          "description": "Protein powders, pre-workouts, and meal replacement shakes."
+          "description": "Launch your own sports supplements, from protein powders to pre-workouts"
         },
         "petCare": {
           "title": "Pet Care",
-          "description": "Pet supplements, vitamins, and wellness products."
+          "description": "Create premium pet supplements and wellness products"
         }
       }
     },
     "profileType": {
-      "title": "Which of the following best describes you?",
-      "description": "Tell us about your role",
+      "title": "Tell us about yourself",
+      "description": "Select the option that best describes you",
       "types": {
-        "creator": "Creator/Influencer",
-        "entrepreneur": "Entrepreneur",
-        "marketer": "Digital Marketer"
-      }
+        "creator": "Content Creator / Influencer",
+        "entrepreneur": "Business Owner / Entrepreneur",
+        "marketer": "Marketing Professional"
+      },
+      "creatorDescription": "I create content and have an engaged audience",
+      "entrepreneurDescription": "I'm building or expanding my business",
+      "marketerDescription": "I work with digital marketing and brand growth"
     },
     "brandStatus": {
-      "title": "What's your current brand status?",
-      "description": "Tell us about your current branding situation",
+      "title": "Where are you in your brand journey?",
+      "description": "Help us understand your current situation",
       "options": {
-        "scratch": "Starting from scratch",
-        "partial": "Have some branding elements",
-        "complete": "Complete brand identity"
+        "noBrand": "Starting from Scratch",
+        "noBrandDescription": "I have an idea but haven't started developing my brand",
+        "partialBrand": "In Development",
+        "partialBrandDescription": "I have some branding elements but need to complete them",
+        "completeBrand": "Ready to Launch",
+        "completeBrandDescription": "I have a complete brand identity ready to go"
       }
     },
     "launchUrgency": {
-      "title": "When are you planning to launch?",
-      "description": "This helps us understand your timeline and prioritize your needs",
+      "title": "What's your target launch timeline?",
+      "description": "This helps us prepare the best strategy for your needs",
       "options": {
-        "immediate": "Immediately (1-2 months)",
-        "soon": "Soon (3-6 months)",
-        "planning": "Planning Phase (6+ months)"
+        "immediate": "As Soon as Possible (1-2 months)",
+        "immediateDescription": "I want to launch quickly and am ready to move fast",
+        "soon": "Next Quarter (3-6 months)",
+        "soonDescription": "I'm planning for a launch in the next few months",
+        "planning": "Future Launch (6+ months)",
+        "planningDescription": "I'm in the early planning stages"
       }
     },
     "navigation": {
-      "back": "Back",
-      "next": "Next",
+      "back": "Previous",
+      "next": "Continue",
       "complete": "Complete"
     }
   }
