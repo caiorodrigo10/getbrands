@@ -11,6 +11,9 @@ export const AppLayout = () => {
     '/login', 
     '/signup', 
     '/onboarding',
+    '/en/onboarding',
+    '/pt/onboarding',
+    '/es/onboarding',
     '/en',
     '/pt',
     '/es'
