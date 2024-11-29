@@ -1,7 +1,7 @@
 {
   "navigation": {
     "dashboard": "Dashboard",
-    "projects": "Projects",
+    "projects": "Projects", 
     "products": "Products",
     "catalog": "Catalog",
     "profitCalculator": "Profit Calculator",
@@ -53,7 +53,7 @@
   },
   "onboarding": {
     "welcome": {
-      "title": "Welcome to Your Brand Journey!",
+      "title": "Welcome to Your Brand Journey",
       "description": "Let's create something amazing together",
       "startButton": "Get Started"
     },
@@ -61,25 +61,21 @@
       "title": "What type of products would you like to create?",
       "description": "Choose the categories that interest you most",
       "categories": {
-        "beverages": {
-          "title": "Beverages",
-          "description": "Create your own line of premium beverages, from coffee to ready-to-drink products"
+        "cosmetics": {
+          "title": "Cosmetics",
+          "description": "Create innovative skincare, haircare, and personal care products"
+        },
+        "coffee": {
+          "title": "Coffee",
+          "description": "Develop your own premium coffee brand and beverages"
         },
         "supplements": {
           "title": "Supplements",
-          "description": "Develop high-quality vitamins, minerals, and nutritional supplements"
+          "description": "Launch high-quality vitamins, minerals, and nutritional supplements"
         },
-        "beauty": {
-          "title": "Beauty & Personal Care",
-          "description": "Design innovative skincare, haircare, and body care products"
-        },
-        "sportsNutrition": {
-          "title": "Sports Nutrition",
-          "description": "Launch your own sports supplements, from protein powders to pre-workouts"
-        },
-        "petCare": {
-          "title": "Pet Care",
-          "description": "Create premium pet supplements and wellness products"
+        "petProducts": {
+          "title": "Pet Products",
+          "description": "Design premium pet supplements and wellness products"
         }
       }
     },
@@ -89,11 +85,11 @@
       "types": {
         "creator": "Content Creator / Influencer",
         "entrepreneur": "Business Owner / Entrepreneur",
-        "marketer": "Marketing Professional"
-      },
-      "creatorDescription": "I create content and have an engaged audience",
-      "entrepreneurDescription": "I'm building or expanding my business",
-      "marketerDescription": "I work with digital marketing and brand growth"
+        "marketer": "Marketing Professional",
+        "creatorDescription": "I create content and have an engaged audience",
+        "entrepreneurDescription": "I'm building or expanding my business",
+        "marketerDescription": "I work with digital marketing and brand growth"
+      }
     },
     "brandStatus": {
       "title": "Where are you in your brand journey?",
