@@ -67,7 +67,11 @@ export function OnboardingQuiz() {
       if (error) throw error;
 
       toast.success("Perfil atualizado com sucesso!");
-      navigate(`/${lang || i18n.language}/start-here`);
+      
+      // Ensure we have a language prefix
+      const currentLang = lang || i18n.language || 'pt';
+      navigate(`/${currentLang}/start-here`);
+      
     } catch (error: any) {
       console.error("Error updating profile:", error);
       toast.error(error.message || "Falha ao atualizar perfil");
