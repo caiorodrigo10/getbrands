@@ -1,15 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { BrandLogosSection } from "./BrandLogosSection";
+import { useTranslation } from "react-i18next";
 
 export const HeroSection = () => {
+  const { i18n } = useTranslation();
+  const { lang } = useParams();
+  const currentLang = lang || i18n.language;
+
   return (
     <>
       <section className="relative bg-white pt-20 pb-16 lg:pt-32 w-full">
         {/* Login Button */}
         <div className="absolute top-4 right-4 z-20">
-          <Link to="/login">
+          <Link to={`/${currentLang}/login`}>
             <Button 
               variant="ghost" 
               size="sm"
@@ -38,7 +43,7 @@ export const HeroSection = () => {
             </p>
 
             <div className="flex justify-center gap-4">
-              <Link to="/signup">
+              <Link to={`/${currentLang}/signup`}>
                 <Button 
                   size="lg"
                   className="bg-[#f0562e] hover:bg-[#f0562e]/90 text-white font-semibold px-8"

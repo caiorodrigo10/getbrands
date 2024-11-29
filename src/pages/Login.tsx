@@ -15,17 +15,18 @@ const Login = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { lang } = useParams();
+  const currentLang = lang || i18n.language;
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(`/${lang || i18n.language}/dashboard`);
+      navigate(`/${currentLang}/dashboard`);
     }
     
     // Update language if URL param differs from current
     if (lang && lang !== i18n.language) {
       i18n.changeLanguage(lang);
     }
-  }, [isAuthenticated, navigate, lang, i18n]);
+  }, [isAuthenticated, navigate, lang, i18n, currentLang]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +34,7 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate(`/${lang || i18n.language}/catalog`);
+      navigate(`/${currentLang}/catalog`);
     } catch (error: any) {
       console.error("Login error:", error);
       toast({
@@ -108,11 +109,11 @@ const Login = () => {
         </form>
 
         <div className="mt-4 text-center text-sm">
-          <Link to={`/${lang || i18n.language}/forgot-password`} className="text-[#f0562e] hover:text-[#f0562e]/90">
+          <Link to={`/${currentLang}/forgot-password`} className="text-[#f0562e] hover:text-[#f0562e]/90">
             {t('auth.forgotPassword')}
           </Link>
           <span className="mx-2 text-gray-400">•</span>
-          <Link to={`/${lang || i18n.language}/signup`} className="text-[#f0562e] hover:text-[#f0562e]/90">
+          <Link to={`/${currentLang}/signup`} className="text-[#f0562e] hover:text-[#f0562e]/90">
             {t('auth.createAccount')}
           </Link>
         </div>

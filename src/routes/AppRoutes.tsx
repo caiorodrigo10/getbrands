@@ -15,6 +15,7 @@ import Profile from "@/pages/Profile";
 import LandingPage from "@/pages/marketing/LandingPage";
 import PrivacyPolicy from "@/pages/marketing/PrivacyPolicy";
 import TermsAndConditions from "@/pages/marketing/TermsAndConditions";
+import SignUp from "@/pages/SignUp";
 
 export const AppRoutes = () => {
   const { i18n } = useTranslation();
@@ -29,6 +30,7 @@ export const AppRoutes = () => {
         {/* Public routes */}
         <Route index element={<LandingPage />} />
         <Route path="login" element={<Login />} />
+        <Route path="signup" element={<SignUp />} />
         <Route path="policies" element={<PrivacyPolicy />} />
         <Route path="terms" element={<TermsAndConditions />} />
 
