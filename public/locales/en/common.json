@@ -50,5 +50,69 @@
     "signingIn": "Signing in...",
     "loginError": "Login Error",
     "loginErrorMessage": "Incorrect email or password. Please try again."
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "Welcome to Lovable!",
+      "description": "Let's get started with your brand journey"
+    },
+    "productCategories": {
+      "title": "Which product categories are you interested in creating?",
+      "description": "Select all that apply",
+      "categories": {
+        "beverages": {
+          "title": "Beverages",
+          "description": "Premium coffee, instant coffee, and RTD beverages."
+        },
+        "supplements": {
+          "title": "Supplements",
+          "description": "Vitamins, minerals, and specialty capsules."
+        },
+        "beauty": {
+          "title": "Beauty & Personal Care",
+          "description": "Skincare products, hair care treatments, and body lotions."
+        },
+        "sportsNutrition": {
+          "title": "Sports Nutrition",
+          "description": "Protein powders, pre-workouts, and meal replacement shakes."
+        },
+        "petCare": {
+          "title": "Pet Care",
+          "description": "Pet supplements, vitamins, and wellness products."
+        }
+      }
+    },
+    "profileType": {
+      "title": "Which of the following best describes you?",
+      "description": "Tell us about your role",
+      "types": {
+        "creator": "Creator/Influencer",
+        "entrepreneur": "Entrepreneur",
+        "marketer": "Digital Marketer"
+      }
+    },
+    "brandStatus": {
+      "title": "What's your current brand status?",
+      "description": "Tell us about your current branding situation",
+      "options": {
+        "scratch": "Starting from scratch",
+        "partial": "Have some branding elements",
+        "complete": "Complete brand identity"
+      }
+    },
+    "launchUrgency": {
+      "title": "When are you planning to launch?",
+      "description": "This helps us understand your timeline and prioritize your needs",
+      "options": {
+        "immediate": "Immediately (1-2 months)",
+        "soon": "Soon (3-6 months)",
+        "planning": "Planning Phase (6+ months)"
+      }
+    },
+    "navigation": {
+      "back": "Back",
+      "next": "Next",
+      "complete": "Complete"
+    }
   }
 }
