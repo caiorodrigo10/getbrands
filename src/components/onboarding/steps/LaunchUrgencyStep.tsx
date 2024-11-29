@@ -8,11 +8,16 @@ import { Flame, Clock, Calendar } from "lucide-react";
 interface LaunchUrgencyStepProps {
   selected: string;
   onAnswer: (value: string) => void;
-  onNext: () => void;
+  onComplete: () => void;
   onBack: () => void;
 }
 
-export function LaunchUrgencyStep({ selected, onAnswer, onNext, onBack }: LaunchUrgencyStepProps) {
+export function LaunchUrgencyStep({ 
+  selected, 
+  onAnswer, 
+  onComplete, 
+  onBack 
+}: LaunchUrgencyStepProps) {
   const { t } = useTranslation();
 
   const options = [
@@ -23,18 +28,22 @@ export function LaunchUrgencyStep({ selected, onAnswer, onNext, onBack }: Launch
       icon: Flame
     },
     { 
-      value: "soon", 
+      value: "3_months", 
       label: t('onboarding.launchUrgency.options.soon'),
       description: t('onboarding.launchUrgency.options.soonDescription'),
       icon: Clock
     },
     { 
-      value: "planning", 
+      value: "6_months", 
       label: t('onboarding.launchUrgency.options.planning'),
       description: t('onboarding.launchUrgency.options.planningDescription'),
       icon: Calendar
     }
   ];
+
+  const handleSelectionChange = (value: string) => {
+    onAnswer(value);
+  };
 
   return (
     <div className="w-full max-w-3xl mx-auto space-y-8">
@@ -49,7 +58,7 @@ export function LaunchUrgencyStep({ selected, onAnswer, onNext, onBack }: Launch
 
       <RadioGroup
         value={selected}
-        onValueChange={onAnswer}
+        onValueChange={handleSelectionChange}
         className="grid gap-4"
       >
         {options.map((option, index) => {
@@ -89,9 +98,10 @@ export function LaunchUrgencyStep({ selected, onAnswer, onNext, onBack }: Launch
       </RadioGroup>
 
       <QuizNavigation
-        onNext={onNext}
+        onNext={onComplete}
         onBack={onBack}
         isNextDisabled={!selected}
+        nextLabel={t('onboarding.navigation.complete')}
       />
     </div>
   );
