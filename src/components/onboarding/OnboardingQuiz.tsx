@@ -9,6 +9,7 @@ import { BrandStatusStep } from "./steps/BrandStatusStep";
 import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
+import { useOnboardingCompletion } from "./hooks/useOnboardingCompletion";
 
 type StepProps = {
   selected?: string | string[];
@@ -25,42 +26,6 @@ type Step = {
   autoAdvance: boolean;
 };
 
-const mapProfileType = (value: string): string => {
-  const profileTypeMap: Record<string, string> = {
-    'criador': 'creator',
-    'empreendedor': 'entrepreneur',
-    'profissional': 'marketer',
-    'creator': 'creator',
-    'entrepreneur': 'entrepreneur',
-    'marketer': 'marketer'
-  };
-  return profileTypeMap[value] || value;
-};
-
-const mapBrandStatus = (value: string): string => {
-  const brandStatusMap: Record<string, string> = {
-    'ideia': 'idea',
-    'em_desenvolvimento': 'in_development',
-    'pronto_para_lancar': 'ready_to_launch',
-    'idea': 'idea',
-    'in_development': 'in_development',
-    'ready_to_launch': 'ready_to_launch'
-  };
-  return brandStatusMap[value] || value;
-};
-
-const mapLaunchUrgency = (value: string): string => {
-  const urgencyMap: Record<string, string> = {
-    'imediato': 'immediate',
-    '3_meses': '3_months',
-    '6_meses': '6_months',
-    'immediate': 'immediate',
-    '3_months': '3_months',
-    '6_months': '6_months'
-  };
-  return urgencyMap[value] || value;
-};
-
 export function OnboardingQuiz() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -74,62 +39,14 @@ export function OnboardingQuiz() {
     launchUrgency: "",
   });
 
+  const { handleComplete } = useOnboardingCompletion();
+
   const handleNext = () => {
     setCurrentStep((prev) => prev + 1);
   };
 
   const handleBack = () => {
     setCurrentStep((prev) => prev - 1);
-  };
-
-  const handleComplete = async () => {
-    try {
-      if (!user?.id) {
-        toast.error(t('messages.error'));
-        return;
-      }
-
-      // First update the profile with onboarding data
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({
-          product_interest: quizData.productCategories,
-          profile_type: mapProfileType(quizData.profileType),
-          brand_status: mapBrandStatus(quizData.brandStatus),
-          launch_urgency: mapLaunchUrgency(quizData.launchUrgency),
-          onboarding_completed: true,
-        })
-        .eq("id", user.id);
-
-      if (profileError) throw profileError;
-
-      // Then save the quiz response for analytics
-      const { error: quizError } = await supabase
-        .from("marketing_quiz_responses")
-        .insert({
-          user_id: user.id,
-          answers: {
-            product_categories: quizData.productCategories,
-            profile_type: mapProfileType(quizData.profileType),
-            brand_status: mapBrandStatus(quizData.brandStatus),
-            launch_urgency: mapLaunchUrgency(quizData.launchUrgency),
-            language: i18n.language,
-          },
-          completed_at: new Date().toISOString(),
-        });
-
-      if (quizError) throw quizError;
-
-      toast.success(t('messages.profileUpdated'));
-      
-      // Ensure we have a language prefix
-      const currentLang = lang || i18n.language || 'pt';
-      navigate(`/${currentLang}/start-here`);
-      
-    } catch (error: any) {
-      console.error("Error updating profile:", error);
-      toast.error(t('messages.profileUpdateError'));
-    }
   };
 
   const steps: Step[] = [
@@ -190,7 +107,11 @@ export function OnboardingQuiz() {
         onAnswer: (value: string) => {
           setQuizData({ ...quizData, launchUrgency: value });
         },
-        onComplete: handleComplete,
+        onComplete: () => {
+          if (user?.id) {
+            handleComplete(user.id, quizData);
+          }
+        },
         onBack: handleBack,
       },
       autoAdvance: false,
