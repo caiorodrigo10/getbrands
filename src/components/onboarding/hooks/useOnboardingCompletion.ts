@@ -23,7 +23,7 @@ export const useOnboardingCompletion = () => {
         return;
       }
 
-      // First update the profile with onboarding data
+      // First update the profile with onboarding data AND set onboarding_completed to true
       const { error: profileError } = await supabase
         .from("profiles")
         .update({
