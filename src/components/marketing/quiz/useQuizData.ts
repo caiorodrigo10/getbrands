@@ -28,14 +28,18 @@ export const useQuizData = () => {
           user_id: user.id,
           answers,
           completed_at: new Date().toISOString()
-        } as any); // Temporary type assertion until Database types are updated
+        });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error saving quiz data:', error);
+        throw error;
+      }
       
       toast.success("Your responses have been saved!");
     } catch (error) {
       console.error('Error saving quiz data:', error);
       toast.error("Failed to save your responses");
+      throw error;
     }
   };
 
