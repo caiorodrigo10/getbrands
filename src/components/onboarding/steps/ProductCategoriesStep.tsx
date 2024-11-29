@@ -61,17 +61,17 @@ export function ProductCategoriesStep({
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-8">
+    <div className="w-full max-w-3xl mx-auto space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
           {t('onboarding.productCategories.title')}
         </h2>
-        <p className="text-sm sm:text-base text-gray-600 mb-8">
+        <p className="text-sm sm:text-base text-gray-600 mb-6">
           {t('onboarding.productCategories.description')}
         </p>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-3">
         {categories.map((category, index) => {
           const Icon = category.icon;
           return (
@@ -87,7 +87,7 @@ export function ProductCategoriesStep({
               <Label
                 htmlFor={category.value}
                 className={`
-                  flex items-start gap-4 p-6 rounded-xl border-2 cursor-pointer
+                  flex items-start gap-3 p-3 rounded-lg border cursor-pointer
                   transition-all duration-200
                   ${selected.includes(category.value) ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50'}
                 `}
@@ -99,12 +99,12 @@ export function ProductCategoriesStep({
                     onCheckedChange={() => handleToggleCategory(category.value)}
                   />
                 </div>
-                <div className="flex-grow space-y-2">
+                <div className="flex-grow space-y-1">
                   <div className="flex items-center gap-2">
-                    <Icon className="h-5 w-5 text-primary" />
-                    <span className="text-lg font-medium">{category.label}</span>
+                    <Icon className="h-4 w-4 text-primary" />
+                    <span className="text-base font-medium">{category.label}</span>
                   </div>
-                  <p className="text-sm text-gray-600">{category.description}</p>
+                  <p className="text-xs text-gray-600">{category.description}</p>
                 </div>
               </Label>
             </motion.div>
