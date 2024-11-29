@@ -11,7 +11,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { debugAnalytics } from "./lib/analytics/debug";
 import { trackPage } from "./lib/analytics";
-import '@/lib/i18n';
 
 const queryClient = new QueryClient({
   defaultOptions: {
