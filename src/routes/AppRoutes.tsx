@@ -16,6 +16,7 @@ import LandingPage from "@/pages/marketing/LandingPage";
 import PrivacyPolicy from "@/pages/marketing/PrivacyPolicy";
 import TermsAndConditions from "@/pages/marketing/TermsAndConditions";
 import SignUp from "@/pages/SignUp";
+import OnboardingQuizPage from "@/pages/OnboardingQuiz";
 
 export const AppRoutes = () => {
   const { i18n } = useTranslation();
@@ -33,6 +34,16 @@ export const AppRoutes = () => {
         <Route path="signup" element={<SignUp />} />
         <Route path="policies" element={<PrivacyPolicy />} />
         <Route path="terms" element={<TermsAndConditions />} />
+
+        {/* Onboarding route - protected but accessible without completing onboarding */}
+        <Route
+          path="onboarding"
+          element={
+            <ProtectedRoute>
+              <OnboardingQuizPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Protected admin routes */}
         <Route
