@@ -20,11 +20,46 @@ const SignUp = () => {
     password: "",
     phone: "",
   });
+  const [errors, setErrors] = useState({
+    password: "",
+    phone: "",
+  });
 
   const currentLanguage = isValidLanguage(lang) ? lang : getCurrentLanguage();
 
+  const validateForm = () => {
+    const newErrors = {
+      password: "",
+      phone: "",
+    };
+    let isValid = true;
+
+    if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters long";
+      isValid = false;
+    }
+
+    if (!formData.phone) {
+      newErrors.phone = "Phone number is required";
+      isValid = false;
+    }
+
+    if (!formData.firstName || !formData.lastName || !formData.email) {
+      isValid = false;
+      toast.error("Please fill in all fields");
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -77,6 +112,7 @@ const SignUp = () => {
           <SignUpFormFields
             formData={formData}
             setFormData={setFormData}
+            errors={errors}
           />
 
           <div>
