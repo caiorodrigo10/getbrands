@@ -44,7 +44,7 @@ const Checkout = () => {
     <div className="min-h-screen bg-background">
       <NavigationMenu />
       <main className="flex-1 md:pl-64 w-full mt-16 md:mt-0">
-        <div className="max-w-3xl mx-auto px-0 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
             <Button
               variant="ghost"
