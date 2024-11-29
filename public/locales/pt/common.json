@@ -36,6 +36,20 @@
       "description": "Estamos entusiasmados em conhecer mais sobre você e seu projeto. Vamos personalizar nossa plataforma para atender perfeitamente às suas necessidades e ajudá-lo a construir uma marca de sucesso.",
       "startButton": "Iniciar Minha Jornada"
     },
+    "productCategories": {
+      "title": "Qual categoria de produtos você tem interesse em criar?",
+      "description": "Selecione todas as opções que se aplicam",
+      "beverages": "Bebidas",
+      "beveragesDescription": "Café premium, café instantâneo e bebidas prontas para beber.",
+      "supplements": "Suplementos",
+      "supplementsDescription": "Vitaminas, minerais e cápsulas especiais.",
+      "beautyAndPersonalCare": "Beleza e Cuidados Pessoais",
+      "beautyAndPersonalCareDescription": "Produtos para pele, tratamentos capilares e loções corporais.",
+      "sportsNutrition": "Nutrição Esportiva",
+      "sportsNutritionDescription": "Whey protein, pré-treinos e shakes substitutos de refeição.",
+      "petCare": "Cuidados com Pets",
+      "petCareDescription": "Suplementos para pets, vitaminas e produtos de bem-estar animal."
+    },
     "profileType": {
       "title": "Qual das opções melhor descreve você?",
       "description": "Sua resposta nos ajudará a personalizar nossa abordagem e recomendações específicas para seu perfil.",
@@ -46,20 +60,6 @@
         "entrepreneurDescription": "Ideal para visionários e empreendedores que buscam criar uma marca distintiva no mercado.",
         "marketer": "Marketing Digital",
         "marketerDescription": "Perfeito para profissionais de marketing digital que querem expandir seu portfólio."
-      }
-    },
-    "productCategories": {
-      "title": "Qual segmento mais combina com seu projeto?",
-      "description": "Selecione uma ou mais categorias que você gostaria de explorar.",
-      "categories": {
-        "cosmetics": "Cosméticos e Cuidados Pessoais",
-        "cosmeticsDescription": "Desenvolva produtos inovadores para cuidados com a pele, cabelo e bem-estar pessoal.",
-        "coffee": "Café Gourmet e Especiais",
-        "coffeeDescription": "Crie sua marca de café premium com grãos selecionados e processos artesanais.",
-        "supplements": "Suplementos Nutricionais",
-        "supplementsDescription": "Lance sua linha de suplementos com fórmulas inovadoras para saúde e performance.",
-        "petProducts": "Produtos Premium para Pets",
-        "petProductsDescription": "Entre no crescente mercado pet com produtos de alta qualidade."
       }
     },
     "brandStatus": {
