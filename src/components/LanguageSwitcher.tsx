@@ -23,7 +23,11 @@ export const LanguageSwitcher = () => {
       if (user?.id) {
         const { error } = await supabase
           .from('profiles')
-          .update({ language: value })
+          .upsert({ 
+            id: user.id,
+            language: value,
+            updated_at: new Date().toISOString()
+          })
           .eq('id', user.id);
 
         if (error) throw error;
