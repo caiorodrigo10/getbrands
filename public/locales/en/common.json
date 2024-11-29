@@ -20,8 +20,10 @@
   "messages": {
     "loading": "Loading...",
     "error": "An error occurred",
-    "success": "Success!",
-    "noData": "No data available"
+    "success": "Profile updated successfully!",
+    "noData": "No data available",
+    "profileUpdated": "Profile updated successfully!",
+    "profileUpdateError": "Error updating profile"
   },
   "dashboard": {
     "welcome": "Welcome!",

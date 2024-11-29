@@ -14,7 +14,7 @@ interface OnboardingData {
 export const useOnboardingCompletion = () => {
   const navigate = useNavigate();
   const { lang } = useParams();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const handleComplete = async (userId: string, quizData: OnboardingData) => {
     try {
@@ -47,22 +47,21 @@ export const useOnboardingCompletion = () => {
             profile_type: mapProfileType(quizData.profileType),
             brand_status: mapBrandStatus(quizData.brandStatus),
             launch_urgency: mapLaunchUrgency(quizData.launchUrgency),
-            language: i18n.language,
           },
           completed_at: new Date().toISOString(),
         });
 
       if (quizError) throw quizError;
 
-      toast.success(t('messages.profileUpdated'));
+      toast.success(t('messages.success'));
       
       // Ensure we have a language prefix and navigate to start-here
-      const currentLang = lang || i18n.language;
+      const currentLang = lang || 'en';
       navigate(`/${currentLang}/start-here`, { replace: true });
       
     } catch (error: any) {
       console.error("Error updating profile:", error);
-      toast.error(t('messages.profileUpdateError'));
+      toast.error(t('messages.error'));
     }
   };
 
