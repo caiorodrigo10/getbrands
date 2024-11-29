@@ -64,9 +64,9 @@ export const useOnboardingCompletion = () => {
 
       toast.success(t('messages.success'));
       
-      // Ensure we have a valid language prefix and navigate to start-here
+      // Ensure we have a valid language prefix and navigate to catalog
       const currentLang = lang || i18n.language || 'en';
-      navigate(`/${currentLang}/start-here`, { replace: true });
+      navigate(`/${currentLang}/catalog`, { replace: true });
       
     } catch (error: any) {
       console.error("Error completing onboarding:", error);
