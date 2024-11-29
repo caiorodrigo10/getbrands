@@ -3,7 +3,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { QuizNavigation } from "./QuizNavigation";
 import { useTranslation } from "react-i18next";
-import { Sparkles, Coffee, Dumbbell, Dog } from "lucide-react";
+import { Coffee, Pill, Sparkles, Dumbbell, Dog } from "lucide-react";
 
 interface ProductCategoriesStepProps {
   selected: string[];
@@ -22,27 +22,33 @@ export function ProductCategoriesStep({
 
   const categories = [
     { 
-      value: "cosmetics", 
-      label: t('onboarding.productCategories.cosmetics'),
-      description: t('onboarding.productCategories.cosmeticsDescription'),
-      icon: Sparkles 
-    },
-    { 
-      value: "coffee", 
-      label: t('onboarding.productCategories.coffee'),
-      description: t('onboarding.productCategories.coffeeDescription'),
+      value: "beverages", 
+      label: t('onboarding.productCategories.beverages'),
+      description: t('onboarding.productCategories.beveragesDescription'),
       icon: Coffee 
     },
     { 
       value: "supplements", 
       label: t('onboarding.productCategories.supplements'),
       description: t('onboarding.productCategories.supplementsDescription'),
+      icon: Pill 
+    },
+    { 
+      value: "beautyAndPersonalCare", 
+      label: t('onboarding.productCategories.beautyAndPersonalCare'),
+      description: t('onboarding.productCategories.beautyAndPersonalCareDescription'),
+      icon: Sparkles 
+    },
+    { 
+      value: "sportsNutrition", 
+      label: t('onboarding.productCategories.sportsNutrition'),
+      description: t('onboarding.productCategories.sportsNutritionDescription'),
       icon: Dumbbell 
     },
     { 
-      value: "petProducts", 
-      label: t('onboarding.productCategories.petProducts'),
-      description: t('onboarding.productCategories.petProductsDescription'),
+      value: "petCare", 
+      label: t('onboarding.productCategories.petCare'),
+      description: t('onboarding.productCategories.petCareDescription'),
       icon: Dog 
     },
   ];

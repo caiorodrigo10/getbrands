@@ -58,16 +58,18 @@
       "startButton": "Get Started"
     },
     "productCategories": {
-      "title": "What type of products would you like to create?",
-      "description": "Choose the categories that interest you most",
-      "cosmetics": "Cosmetics",
-      "cosmeticsDescription": "Create innovative skincare, haircare, and personal care products",
-      "coffee": "Coffee",
-      "coffeeDescription": "Develop your own premium coffee brand and beverages",
+      "title": "Which product categories are you interested in creating?",
+      "description": "Select all that apply",
+      "beverages": "Beverages",
+      "beveragesDescription": "Premium coffee, instant coffee, and RTD beverages.",
       "supplements": "Supplements",
-      "supplementsDescription": "Launch high-quality vitamins, minerals, and nutritional supplements",
-      "petProducts": "Pet Products",
-      "petProductsDescription": "Design premium pet supplements and wellness products"
+      "supplementsDescription": "Vitamins, minerals, and specialty capsules.",
+      "beautyAndPersonalCare": "Beauty & Personal Care",
+      "beautyAndPersonalCareDescription": "Skincare products, hair care treatments, and body lotions.",
+      "sportsNutrition": "Sports Nutrition",
+      "sportsNutritionDescription": "Protein powders, pre-workouts, and meal replacement shakes.",
+      "petCare": "Pet Care",
+      "petCareDescription": "Pet supplements, vitamins, and wellness products."
     },
     "profileType": {
       "title": "Tell us about yourself",
