@@ -34,7 +34,7 @@ export const AppRoutes = () => {
       <Route element={<LanguageRoute />} />
       
       {/* Marketing Routes */}
-      <Route path="/*" element={<>{marketingRoutes}</>} />
+      {marketingRoutes}
 
       {/* Auth Routes */}
       <Route path="/:lang/login" element={<Login />} />
