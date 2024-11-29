@@ -68,7 +68,7 @@ export function OnboardingQuizPT() {
         toast.error(error.message || "Falha ao atualizar perfil");
       }
     } else {
-      handleNext(); // Move to signup step
+      handleNext();
     }
   };
 
@@ -137,7 +137,6 @@ export function OnboardingQuizPT() {
     },
   ];
 
-  // Add signup step for public flow
   const steps = isPublicFlow
     ? [
         ...baseSteps,
@@ -156,6 +155,7 @@ export function OnboardingQuizPT() {
   const CurrentStepComponent = steps[currentStep].component;
   const currentStepProps = steps[currentStep].props;
 
+  // Type assertion to ensure props match component requirements
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <CurrentStepComponent {...currentStepProps} />
