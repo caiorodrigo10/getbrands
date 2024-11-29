@@ -37,38 +37,23 @@ export function QuizMktPT() {
 
   const handleComplete = async () => {
     try {
-      // Primeiro criar o usuário com os dados básicos
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email: quizData.email,
-        password: "Temp123!", // Senha temporária que o usuário deverá alterar
-        options: {
-          data: {
-            phone: quizData.phone,
-          },
-        },
-      });
-
-      if (signUpError) throw signUpError;
-
-      if (authData.user) {
-        // Atualizar o perfil com os dados do quiz
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({
-            phone: quizData.phone,
+      const { error } = await supabase
+        .from("marketing_quiz_responses")
+        .insert({
+          answers: {
             product_interest: quizData.productCategories,
             profile_type: quizData.profileType,
             brand_status: quizData.brandStatus,
             launch_urgency: quizData.launchUrgency,
-            language: 'pt',
-          })
-          .eq('id', authData.user.id);
+          },
+          email: quizData.email,
+          phone: quizData.phone,
+        });
 
-        if (profileError) throw profileError;
+      if (error) throw error;
 
-        toast.success("Cadastro realizado com sucesso!");
-        navigate("/pt/login");
-      }
+      toast.success("Respostas salvas com sucesso!");
+      navigate("/");
     } catch (error: any) {
       console.error("Erro ao salvar respostas:", error);
       toast.error(error.message || "Falha ao salvar respostas");
@@ -151,7 +136,7 @@ export function QuizMktPT() {
   const CurrentStepComponent = steps[currentStep].component;
 
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-background">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <CurrentStepComponent {...steps[currentStep].props} />
     </div>
   );

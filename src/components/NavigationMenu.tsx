@@ -14,11 +14,6 @@ export const NavigationMenu = () => {
   const { hasFullAccess, isMember, isSampler } = useUserPermissions();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Hide navigation for marketing routes
-  if (location.pathname.includes('/quizmktpt')) {
-    return null;
-  }
-
   const showStartHere = isMember || isSampler;
 
   const menuItems = [
