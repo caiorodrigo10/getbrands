@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { SignUpFormFields } from "@/components/auth/signup/SignUpFormFields";
 import { trackEvent } from "@/lib/analytics";
@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { lang } = useParams();
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -104,7 +105,7 @@ const SignUp = () => {
           signupMethod: 'email',
         });
 
-        navigate("/pt/login");
+        navigate(`/${lang || 'pt'}/onboarding`);
       }
     } catch (error: any) {
       console.error("Erro ao criar conta:", error);
@@ -148,7 +149,7 @@ const SignUp = () => {
 
           <div className="text-center text-sm">
             <span className="text-gray-600">{t('auth.alreadyHaveAccount')}</span>{" "}
-            <Link to="/pt/login" className="text-primary hover:text-primary-dark font-medium">
+            <Link to={`/${lang || 'pt'}/login`} className="text-primary hover:text-primary-dark font-medium">
               {t('auth.signIn')}
             </Link>
           </div>
