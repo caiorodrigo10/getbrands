@@ -21,37 +21,16 @@
     "loading": "Carregando...",
     "error": "Ocorreu um erro",
     "success": "Sucesso!",
-    "noData": "Nenhum dado disponível"
-  },
-  "dashboard": {
-    "welcome": "Bem-vindo!",
-    "overview": "Visão Geral",
-    "recentActivity": "Atividade Recente",
-    "upcomingTasks": "Próximas Tarefas"
-  },
-  "auth": {
-    "login": "Entrar",
-    "signup": "Cadastrar",
-    "logout": "Sair",
-    "email": "Email",
-    "password": "Senha",
-    "createAccount": "Crie sua conta",
-    "joinUs": "Junte-se a nós e comece a construir sua marca",
-    "firstName": "Nome",
-    "lastName": "Sobrenome",
-    "passwordPlaceholder": "••••••••",
-    "emailPlaceholder": "seu@email.com",
-    "alreadyHaveAccount": "Já tem uma conta?",
-    "signIn": "Entrar",
-    "creatingAccount": "Criando conta...",
-    "loginTitle": "Entre na sua conta",
-    "loginSubtitle": "Transforme suas ideias em produtos incríveis",
-    "forgotPassword": "Esqueceu sua senha?",
-    "signingIn": "Entrando...",
-    "loginError": "Erro de Login",
-    "loginErrorMessage": "Email ou senha incorretos. Por favor, tente novamente."
+    "noData": "Nenhum dado disponível",
+    "profileUpdated": "Perfil atualizado com sucesso!",
+    "profileUpdateError": "Erro ao atualizar perfil"
   },
   "onboarding": {
+    "navigation": {
+      "back": "Voltar",
+      "next": "Avançar",
+      "complete": "Completar"
+    },
     "welcome": {
       "title": "Bem-vindo à sua Jornada de Marca Própria",
       "description": "Estamos entusiasmados em conhecer mais sobre você e seu projeto. Vamos personalizar nossa plataforma para atender perfeitamente às suas necessidades e ajudá-lo a construir uma marca de sucesso.",
@@ -62,55 +41,50 @@
       "description": "Sua resposta nos ajudará a personalizar nossa abordagem e recomendações específicas para seu perfil.",
       "types": {
         "creator": "Criador/Influenciador",
-        "creatorDescription": "Para criadores de conteúdo e influenciadores que desejam expandir sua marca pessoal com produtos próprios. Oferecemos suporte completo desde o desenvolvimento até o lançamento, com foco em autenticidade e engajamento.",
+        "creatorDescription": "Para criadores de conteúdo e influenciadores que desejam expandir sua marca pessoal com produtos próprios.",
         "entrepreneur": "Empreendedor",
-        "entrepreneurDescription": "Ideal para visionários e empreendedores que buscam criar uma marca distintiva no mercado. Nossa plataforma oferece as ferramentas e o suporte necessários para transformar sua visão em realidade.",
+        "entrepreneurDescription": "Ideal para visionários e empreendedores que buscam criar uma marca distintiva no mercado.",
         "marketer": "Marketing Digital",
-        "marketerDescription": "Perfeito para profissionais de marketing digital que querem expandir seu portfólio com produtos próprios. Fornecemos insights de mercado e estratégias de posicionamento para maximizar seu sucesso."
+        "marketerDescription": "Perfeito para profissionais de marketing digital que querem expandir seu portfólio."
       }
     },
     "productCategories": {
       "title": "Qual segmento mais combina com seu projeto?",
-      "description": "Selecione uma ou mais categorias que você gostaria de explorar. Cada categoria foi cuidadosamente selecionada com base em tendências de mercado e oportunidades de negócio.",
+      "description": "Selecione uma ou mais categorias que você gostaria de explorar.",
       "categories": {
         "cosmetics": "Cosméticos e Cuidados Pessoais",
-        "cosmeticsDescription": "Desenvolva produtos inovadores para cuidados com a pele, cabelo e bem-estar pessoal. Nossa linha inclui fórmulas exclusivas com ingredientes naturais e tecnológicos.",
+        "cosmeticsDescription": "Desenvolva produtos inovadores para cuidados com a pele, cabelo e bem-estar pessoal.",
         "coffee": "Café Gourmet e Especiais",
-        "coffeeDescription": "Crie sua marca de café premium com grãos selecionados e processos artesanais. Oferecemos blends exclusivos e torras personalizadas.",
+        "coffeeDescription": "Crie sua marca de café premium com grãos selecionados e processos artesanais.",
         "supplements": "Suplementos Nutricionais",
-        "supplementsDescription": "Lance sua linha de suplementos com fórmulas inovadoras para saúde e performance. Desenvolvemos produtos com ingredientes de alta qualidade e certificações.",
+        "supplementsDescription": "Lance sua linha de suplementos com fórmulas inovadoras para saúde e performance.",
         "petProducts": "Produtos Premium para Pets",
-        "petProductsDescription": "Entre no crescente mercado pet com produtos de alta qualidade. Nossa linha inclui alimentos naturais e produtos de cuidados desenvolvidos por especialistas."
+        "petProductsDescription": "Entre no crescente mercado pet com produtos de alta qualidade."
       }
     },
     "brandStatus": {
       "title": "Em que estágio está sua marca?",
-      "description": "Entender o atual momento da sua marca nos permite oferecer o suporte mais adequado para impulsionar seu crescimento.",
+      "description": "Entender o atual momento da sua marca nos permite oferecer o suporte mais adequado.",
       "options": {
         "noBrand": "Iniciando do Zero",
-        "noBrandDescription": "Perfeito para quem está começando agora. Vamos desenvolver juntos todos os elementos da sua marca, desde o nome até a identidade visual completa.",
+        "noBrandDescription": "Perfeito para quem está começando agora.",
         "partialBrand": "Identidade em Desenvolvimento",
-        "partialBrandDescription": "Ideal para quem já tem alguns elementos como nome ou logo. Vamos refinar e complementar sua identidade visual, garantindo consistência.",
+        "partialBrandDescription": "Ideal para quem já tem alguns elementos como nome ou logo.",
         "completeBrand": "Marca Estabelecida",
-        "completeBrandDescription": "Para marcas com identidade visual definida. Vamos garantir que seus novos produtos mantenham a consistência com suas diretrizes existentes."
+        "completeBrandDescription": "Para marcas com identidade visual definida."
       }
     },
     "launchUrgency": {
       "title": "Qual é seu horizonte de lançamento?",
-      "description": "O prazo que você tem em mente nos ajuda a estabelecer um cronograma adequado e priorizar as etapas do seu projeto.",
+      "description": "O prazo que você tem em mente nos ajuda a estabelecer um cronograma adequado.",
       "options": {
         "immediate": "Lançamento Imediato (1-2 meses)",
-        "immediateDescription": "Para projetos que precisam ir ao mercado rapidamente. Nossa equipe prioriza seu projeto com processos acelerados.",
+        "immediateDescription": "Para projetos que precisam ir ao mercado rapidamente.",
         "soon": "Curto Prazo (3-6 meses)",
-        "soonDescription": "Ideal para um planejamento detalhado e desenvolvimento cuidadoso do produto.",
+        "soonDescription": "Ideal para um planejamento detalhado do produto.",
         "planning": "Planejamento Estratégico (6+ meses)",
-        "planningDescription": "Para uma abordagem abrangente, com pesquisa de mercado aprofundada e estratégia robusta."
+        "planningDescription": "Para uma abordagem abrangente e estratégia robusta."
       }
-    },
-    "navigation": {
-      "back": "Voltar",
-      "next": "Avançar",
-      "complete": "Finalizar"
     }
   }
 }

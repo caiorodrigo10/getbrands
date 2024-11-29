@@ -25,13 +25,11 @@ type Step = {
   autoAdvance: boolean;
 };
 
-// Map translated values to standardized English values for Supabase
 const mapProfileType = (value: string): string => {
   const profileTypeMap: Record<string, string> = {
     'criador': 'creator',
     'empreendedor': 'entrepreneur',
     'profissional': 'marketer',
-    // Add English values as-is
     'creator': 'creator',
     'entrepreneur': 'entrepreneur',
     'marketer': 'marketer'
@@ -44,7 +42,6 @@ const mapBrandStatus = (value: string): string => {
     'ideia': 'idea',
     'em_desenvolvimento': 'in_development',
     'pronto_para_lancar': 'ready_to_launch',
-    // Add English values as-is
     'idea': 'idea',
     'in_development': 'in_development',
     'ready_to_launch': 'ready_to_launch'
@@ -57,7 +54,6 @@ const mapLaunchUrgency = (value: string): string => {
     'imediato': 'immediate',
     '3_meses': '3_months',
     '6_meses': '6_months',
-    // Add English values as-is
     'immediate': 'immediate',
     '3_months': '3_months',
     '6_months': '6_months'
@@ -69,7 +65,7 @@ export function OnboardingQuiz() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { lang } = useParams();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [quizData, setQuizData] = useState({
     productCategories: [] as string[],
@@ -89,11 +85,10 @@ export function OnboardingQuiz() {
   const handleComplete = async () => {
     try {
       if (!user?.id) {
-        toast.error("User not found");
+        toast.error(t('messages.error'));
         return;
       }
 
-      // Map values to standardized English before saving to Supabase
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -107,7 +102,7 @@ export function OnboardingQuiz() {
 
       if (error) throw error;
 
-      toast.success("Profile updated successfully!");
+      toast.success(t('messages.profileUpdated'));
       
       // Ensure we have a language prefix
       const currentLang = lang || i18n.language || 'pt';
@@ -115,7 +110,7 @@ export function OnboardingQuiz() {
       
     } catch (error: any) {
       console.error("Error updating profile:", error);
-      toast.error(error.message || "Failed to update profile");
+      toast.error(t('messages.profileUpdateError'));
     }
   };
 
