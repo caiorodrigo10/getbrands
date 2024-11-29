@@ -3,7 +3,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { QuizNavigation } from "./QuizNavigation";
 import { useTranslation } from "react-i18next";
-import { User, Rocket, Building2, Users } from "lucide-react";
+import { Users, Rocket, LineChart } from "lucide-react";
 
 interface ProfileTypeStepProps {
   selected: string;
@@ -22,28 +22,22 @@ export const ProfileTypeStep = ({
 
   const profileTypes = [
     { 
+      id: "creator", 
+      label: t('onboarding.profileType.types.creator'),
+      description: t('onboarding.profileType.types.creatorDescription'),
+      icon: Users
+    },
+    { 
       id: "entrepreneur", 
       label: t('onboarding.profileType.types.entrepreneur'),
       description: t('onboarding.profileType.types.entrepreneurDescription'),
-      icon: User
-    },
-    { 
-      id: "startup", 
-      label: t('onboarding.profileType.types.startup'),
-      description: t('onboarding.profileType.types.startupDescription'),
       icon: Rocket
     },
     { 
-      id: "established", 
-      label: t('onboarding.profileType.types.established'),
-      description: t('onboarding.profileType.types.establishedDescription'),
-      icon: Building2
-    },
-    { 
-      id: "other", 
-      label: t('onboarding.profileType.types.other'),
-      description: t('onboarding.profileType.types.otherDescription'),
-      icon: Users
+      id: "marketer", 
+      label: t('onboarding.profileType.types.marketer'),
+      description: t('onboarding.profileType.types.marketerDescription'),
+      icon: LineChart
     }
   ];
 
@@ -106,4 +100,4 @@ export const ProfileTypeStep = ({
       />
     </div>
   );
-}
+};

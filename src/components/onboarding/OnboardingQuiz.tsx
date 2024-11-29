@@ -10,13 +10,6 @@ import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 
-type Step = {
-  component: React.ComponentType<any>;
-  props: Record<string, any>;
-  autoAdvance?: boolean;
-  name: string;
-};
-
 export function OnboardingQuiz() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -58,15 +51,15 @@ export function OnboardingQuiz() {
 
       if (error) throw error;
 
-      toast.success("Profile updated successfully!");
+      toast.success("Perfil atualizado com sucesso!");
       navigate(`/${lang || i18n.language}/start-here`);
     } catch (error: any) {
       console.error("Error updating profile:", error);
-      toast.error(error.message || "Failed to update profile");
+      toast.error(error.message || "Falha ao atualizar perfil");
     }
   };
 
-  const steps: Step[] = [
+  const steps = [
     {
       component: WelcomeStep,
       name: "Welcome",

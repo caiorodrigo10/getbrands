@@ -57,32 +57,30 @@
       "description": "Estamos entusiasmados em conhecer mais sobre você e seu projeto. Vamos personalizar nossa plataforma para atender perfeitamente às suas necessidades e ajudá-lo a construir uma marca de sucesso.",
       "startButton": "Iniciar Minha Jornada"
     },
+    "profileType": {
+      "title": "Qual das opções melhor descreve você?",
+      "description": "Sua resposta nos ajudará a personalizar nossa abordagem e recomendações específicas para seu perfil.",
+      "types": {
+        "creator": "Criador/Influenciador",
+        "creatorDescription": "Para criadores de conteúdo e influenciadores que desejam expandir sua marca pessoal com produtos próprios. Oferecemos suporte completo desde o desenvolvimento até o lançamento, com foco em autenticidade e engajamento.",
+        "entrepreneur": "Empreendedor",
+        "entrepreneurDescription": "Ideal para visionários e empreendedores que buscam criar uma marca distintiva no mercado. Nossa plataforma oferece as ferramentas e o suporte necessários para transformar sua visão em realidade.",
+        "marketer": "Marketing Digital",
+        "marketerDescription": "Perfeito para profissionais de marketing digital que querem expandir seu portfólio com produtos próprios. Fornecemos insights de mercado e estratégias de posicionamento para maximizar seu sucesso."
+      }
+    },
     "productCategories": {
       "title": "Qual segmento mais combina com seu projeto?",
       "description": "Selecione uma ou mais categorias que você gostaria de explorar. Cada categoria foi cuidadosamente selecionada com base em tendências de mercado e oportunidades de negócio.",
       "categories": {
         "cosmetics": "Cosméticos e Cuidados Pessoais",
-        "cosmeticsDescription": "Desenvolva produtos inovadores para cuidados com a pele, cabelo e bem-estar pessoal. Nossa linha inclui fórmulas exclusivas com ingredientes naturais e tecnológicos, perfeitos para criar uma marca diferenciada no mercado de beleza.",
+        "cosmeticsDescription": "Desenvolva produtos inovadores para cuidados com a pele, cabelo e bem-estar pessoal. Nossa linha inclui fórmulas exclusivas com ingredientes naturais e tecnológicos.",
         "coffee": "Café Gourmet e Especiais",
-        "coffeeDescription": "Crie sua marca de café premium com grãos selecionados e processos artesanais. Oferecemos blends exclusivos, torras personalizadas e opções orgânicas para atender um público cada vez mais exigente.",
+        "coffeeDescription": "Crie sua marca de café premium com grãos selecionados e processos artesanais. Oferecemos blends exclusivos e torras personalizadas.",
         "supplements": "Suplementos Nutricionais",
-        "supplementsDescription": "Lance sua linha de suplementos com fórmulas inovadoras para saúde, bem-estar e performance. Desenvolvemos produtos com ingredientes de alta qualidade, certificações e embalagens premium.",
+        "supplementsDescription": "Lance sua linha de suplementos com fórmulas inovadoras para saúde e performance. Desenvolvemos produtos com ingredientes de alta qualidade e certificações.",
         "petProducts": "Produtos Premium para Pets",
-        "petProductsDescription": "Entre no crescente mercado pet com produtos de alta qualidade. Nossa linha inclui alimentos naturais, suplementos e produtos de cuidados, desenvolvidos por especialistas em nutrição animal."
-      }
-    },
-    "profileType": {
-      "title": "Como você definiria seu perfil empreendedor?",
-      "description": "Sua resposta nos ajudará a personalizar nossa abordagem e recomendações específicas para seu modelo de negócio.",
-      "types": {
-        "entrepreneur": "Empreendedor Individual",
-        "entrepreneurDescription": "Ideal para profissionais autônomos, influenciadores digitais ou microempreendedores que desejam criar sua primeira marca própria. Oferecemos suporte completo desde o desenvolvimento do produto até o lançamento.",
-        "startup": "Startup ou Empresa Emergente",
-        "startupDescription": "Perfeito para empresas inovadoras em fase inicial que buscam escalar com produtos próprios. Nosso programa inclui suporte em desenvolvimento de produto, branding e estratégias de crescimento.",
-        "established": "Empresa Estabelecida",
-        "establishedDescription": "Para negócios consolidados que desejam expandir seu portfólio com marca própria. Oferecemos soluções personalizadas que se integram à sua operação existente e ampliam seu alcance no mercado.",
-        "other": "Outro Perfil",
-        "otherDescription": "Tem um perfil diferenciado ou necessidades específicas? Conte-nos mais sobre seu projeto e desenvolveremos uma solução sob medida para seus objetivos."
+        "petProductsDescription": "Entre no crescente mercado pet com produtos de alta qualidade. Nossa linha inclui alimentos naturais e produtos de cuidados desenvolvidos por especialistas."
       }
     },
     "brandStatus": {
@@ -90,23 +88,23 @@
       "description": "Entender o atual momento da sua marca nos permite oferecer o suporte mais adequado para impulsionar seu crescimento.",
       "options": {
         "noBrand": "Iniciando do Zero",
-        "noBrandDescription": "Perfeito para quem está começando agora. Vamos desenvolver juntos todos os elementos da sua marca, desde o nome até a identidade visual completa, garantindo uma base sólida para seu sucesso.",
+        "noBrandDescription": "Perfeito para quem está começando agora. Vamos desenvolver juntos todos os elementos da sua marca, desde o nome até a identidade visual completa.",
         "partialBrand": "Identidade em Desenvolvimento",
-        "partialBrandDescription": "Ideal para quem já tem alguns elementos como nome ou logo. Vamos refinar e complementar sua identidade visual, garantindo consistência e profissionalismo em todos os pontos de contato.",
+        "partialBrandDescription": "Ideal para quem já tem alguns elementos como nome ou logo. Vamos refinar e complementar sua identidade visual, garantindo consistência.",
         "completeBrand": "Marca Estabelecida",
-        "completeBrandDescription": "Para marcas com identidade visual definida. Vamos garantir que seus novos produtos mantenham a consistência com suas diretrizes de marca existentes, fortalecendo ainda mais seu posicionamento."
+        "completeBrandDescription": "Para marcas com identidade visual definida. Vamos garantir que seus novos produtos mantenham a consistência com suas diretrizes existentes."
       }
     },
     "launchUrgency": {
       "title": "Qual é seu horizonte de lançamento?",
       "description": "O prazo que você tem em mente nos ajuda a estabelecer um cronograma adequado e priorizar as etapas do seu projeto.",
       "options": {
-        "immediate": "Lançamento Imediato",
-        "immediateDescription": "Para projetos que precisam ir ao mercado nos próximos 1-2 meses. Nossa equipe prioriza seu projeto com processos acelerados, mantendo a qualidade e atenção aos detalhes.",
-        "soon": "Planejamento Curto Prazo",
-        "soonDescription": "Ideal para lançamentos em 3-6 meses. Tempo suficiente para um planejamento detalhado, desenvolvimento cuidadoso e estratégia de lançamento bem estruturada.",
-        "planning": "Planejamento Estratégico",
-        "planningDescription": "Para projetos com horizonte de 6+ meses. Permite uma abordagem abrangente, com pesquisa de mercado aprofundada, testes de produto e estratégia de marca robusta."
+        "immediate": "Lançamento Imediato (1-2 meses)",
+        "immediateDescription": "Para projetos que precisam ir ao mercado rapidamente. Nossa equipe prioriza seu projeto com processos acelerados.",
+        "soon": "Curto Prazo (3-6 meses)",
+        "soonDescription": "Ideal para um planejamento detalhado e desenvolvimento cuidadoso do produto.",
+        "planning": "Planejamento Estratégico (6+ meses)",
+        "planningDescription": "Para uma abordagem abrangente, com pesquisa de mercado aprofundada e estratégia robusta."
       }
     },
     "navigation": {
