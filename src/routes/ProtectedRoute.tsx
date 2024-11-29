@@ -30,19 +30,29 @@ export const ProtectedRoute = ({
     queryKey: ["user-profile", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
+      
+      console.log("Fetching profile for user:", user.id); // Debug log
+      
       const { data, error } = await supabase
         .from("profiles")
         .select("onboarding_completed")
         .eq("id", user.id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching profile:", error); // Debug log
+        throw error;
+      }
+      
+      console.log("Profile data:", data); // Debug log
       return data;
     },
     enabled: !!user?.id,
   });
 
-  console.log('[DEBUG] ProtectedRoute - Path:', location.pathname, 'Auth:', isAuthenticated, 'Loading:', isLoading, 'Admin:', hasFullAccess);
+  // Debug logs
+  console.log("Current path:", location.pathname);
+  console.log("Auth status:", { isAuthenticated, isLoading, profile });
 
   // Se ainda estiver carregando, mostrar loading
   if (isLoading || isLoadingProfile) {
@@ -59,27 +69,28 @@ export const ProtectedRoute = ({
   // Se o usuário está autenticado mas não completou o onboarding
   // E não está em uma rota pública
   if (isAuthenticated && 
-      !profile?.onboarding_completed && 
+      profile && 
+      profile.onboarding_completed === false && 
       !isPublicRoute) {
-    console.log('[DEBUG] ProtectedRoute - Redirecting to onboarding');
+    console.log("Redirecting to onboarding - Profile:", profile); // Debug log
     return <Navigate to={`/${i18n.language}/onboarding`} replace />;
   }
 
   // Se não estiver autenticado e a rota requer autenticação
   if (!isAuthenticated && requiresAuth && !location.pathname.startsWith('/login')) {
-    console.log('[DEBUG] ProtectedRoute - Redirecting to login');
+    console.log("Redirecting to login"); // Debug log
     return <Navigate to={`/${i18n.language}/login`} state={{ from: location.pathname }} replace />;
   }
 
   // Se a rota requer admin e o usuário não tem acesso total
   if (requiresAdmin && !hasFullAccess) {
-    console.log('[DEBUG] ProtectedRoute - No admin access');
+    console.log("No admin access"); // Debug log
     return <Navigate to={`/${i18n.language}/catalog`} replace />;
   }
 
   // Se é uma rota restrita e o usuário não tem acesso total
   if ((isRestrictedRoute(location.pathname) || location.pathname.includes('/dashboard')) && !hasFullAccess && !requiresAdmin) {
-    console.log('[DEBUG] ProtectedRoute - Restricted route');
+    console.log("Restricted route"); // Debug log
     return <Navigate to={`/${i18n.language}/start-here`} replace />;
   }
 
