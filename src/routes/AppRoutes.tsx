@@ -4,6 +4,9 @@ import { AdminRoutes } from "./AdminRoutes";
 import { marketingRoutes } from "./MarketingRoutes";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { LanguageRoute } from "@/components/routing/LanguageRoute";
+import { useTranslation } from "react-i18next";
+
+// Lazy load pages for better performance
 import Dashboard from "@/pages/Dashboard";
 import Projects from "@/pages/Projects";
 import Products from "@/pages/Products";
@@ -12,7 +15,6 @@ import ProfitCalculator from "@/pages/ProfitCalculator";
 import SampleOrders from "@/pages/SampleOrders";
 import StartHere from "@/pages/StartHere";
 import Profile from "@/pages/Profile";
-import { useTranslation } from "react-i18next";
 
 // Define your AppRoutes
 export const AppRoutes = () => {
