@@ -43,71 +43,21 @@ export const AppRoutes = () => {
         />
 
         {/* Protected app routes */}
-        <Route element={<AppLayout />}>
-          <Route
-            path="dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route 
-            path="projects" 
-            element={
-              <ProtectedRoute>
-                <Projects />
-              </ProtectedRoute>
-            }
-          />
-          <Route 
-            path="products" 
-            element={
-              <ProtectedRoute>
-                <Products />
-              </ProtectedRoute>
-            }
-          />
-          <Route 
-            path="catalog" 
-            element={
-              <ProtectedRoute>
-                <Catalog />
-              </ProtectedRoute>
-            }
-          />
-          <Route 
-            path="profit-calculator" 
-            element={
-              <ProtectedRoute>
-                <ProfitCalculator />
-              </ProtectedRoute>
-            }
-          />
-          <Route 
-            path="sample-orders" 
-            element={
-              <ProtectedRoute>
-                <SampleOrders />
-              </ProtectedRoute>
-            }
-          />
-          <Route 
-            path="start-here" 
-            element={
-              <ProtectedRoute>
-                <StartHere />
-              </ProtectedRoute>
-            }
-          />
-          <Route 
-            path="profile" 
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="projects" element={<Projects />} />
+          <Route path="products" element={<Products />} />
+          <Route path="catalog" element={<Catalog />} />
+          <Route path="profit-calculator" element={<ProfitCalculator />} />
+          <Route path="sample-orders" element={<SampleOrders />} />
+          <Route path="start-here" element={<StartHere />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
       </Route>
 
