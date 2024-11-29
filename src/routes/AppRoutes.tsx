@@ -1,18 +1,28 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AppLayout } from "./AppLayout";
 import { AdminRoutes } from "./AdminRoutes";
-import { MarketingRoutes } from "./MarketingRoutes";
+import { marketingRoutes } from "./MarketingRoutes";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { LanguageRoute } from "@/components/routing/LanguageRoute";
 import Dashboard from "@/pages/Dashboard";
+import Projects from "@/pages/Projects";
+import Products from "@/pages/Products";
+import Catalog from "@/pages/Catalog";
+import ProfitCalculator from "@/pages/ProfitCalculator";
+import SampleOrders from "@/pages/SampleOrders";
+import StartHere from "@/pages/StartHere";
+import Profile from "@/pages/Profile";
+import { useTranslation } from "react-i18next";
 
 // Define your AppRoutes
 export const AppRoutes = () => {
+  const { i18n } = useTranslation();
+  
   return (
     <Routes>
       <Route element={<LanguageRoute />}>
         <Route path="/" element={<Navigate to="/en" replace />} />
-        <Route path="/:lang" element={<MarketingRoutes />} />
+        <Route path="/:lang" element={<>{marketingRoutes}</>} />
         
         <Route
           path="/:lang/admin/*"
