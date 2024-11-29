@@ -5,6 +5,7 @@ import { QuizNavigation } from "./QuizNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface LaunchUrgencyStepProps {
   selected: string;
@@ -20,10 +21,12 @@ export const LaunchUrgencyStep = ({
   onBack
 }: LaunchUrgencyStepProps) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
+
   const options = [
-    { value: "immediate", label: "Immediately (1-2 months)" },
-    { value: "soon", label: "Soon (3-6 months)" },
-    { value: "planning", label: "Planning Phase (6+ months)" },
+    { value: "immediate", label: t('onboarding.launchUrgency.options.immediate') },
+    { value: "soon", label: t('onboarding.launchUrgency.options.soon') },
+    { value: "planning", label: t('onboarding.launchUrgency.options.planning') },
   ];
 
   const handleOptionSelect = async (value: string) => {
@@ -32,10 +35,8 @@ export const LaunchUrgencyStep = ({
         throw new Error('User not authenticated');
       }
 
-      // First update local state
       onAnswer(value);
 
-      // Then update Supabase
       const { error } = await supabase
         .from('profiles')
         .update({ 
@@ -45,14 +46,13 @@ export const LaunchUrgencyStep = ({
         .eq('id', user.id);
 
       if (error) {
-        console.error('Supabase error:', error);
         throw error;
       }
 
-      toast.success("Launch timeline preference saved!");
+      toast.success("Preferência de lançamento salva!");
     } catch (error: any) {
       console.error('Error updating launch urgency:', error);
-      toast.error(error.message || "Failed to save your selection. Please try again.");
+      toast.error(error.message || "Falha ao salvar sua seleção. Por favor, tente novamente.");
     }
   };
 
@@ -60,10 +60,10 @@ export const LaunchUrgencyStep = ({
     <div className="w-full max-w-2xl mx-auto space-y-8">
       <div className="text-center">
         <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4">
-          When are you planning to launch?
+          {t('onboarding.launchUrgency.title')}
         </h2>
         <p className="text-sm sm:text-base text-gray-600 mb-4">
-          This helps us understand your timeline and prioritize your needs
+          {t('onboarding.launchUrgency.description')}
         </p>
       </div>
 
@@ -100,7 +100,7 @@ export const LaunchUrgencyStep = ({
       <QuizNavigation
         onNext={onComplete}
         onBack={onBack}
-        nextLabel="Complete"
+        nextLabel={t('onboarding.navigation.complete')}
         isNextDisabled={!selected}
       />
     </div>

@@ -1,54 +1,62 @@
 {
-  "navigation": {
-    "dashboard": "Painel",
-    "projects": "Projetos",
-    "products": "Produtos",
-    "catalog": "Catálogo",
-    "profitCalculator": "Calculadora de Lucro",
-    "sampleOrders": "Pedidos de Amostra",
-    "getStarted": "Começar"
-  },
-  "actions": {
-    "save": "Salvar",
-    "cancel": "Cancelar",
-    "delete": "Excluir",
-    "edit": "Editar",
-    "create": "Criar",
-    "submit": "Enviar",
-    "back": "Voltar"
-  },
-  "messages": {
-    "loading": "Carregando...",
-    "error": "Ocorreu um erro",
-    "success": "Sucesso!",
-    "noData": "Nenhum dado disponível"
-  },
-  "dashboard": {
-    "welcome": "Bem-vindo!",
-    "overview": "Visão Geral",
-    "recentActivity": "Atividade Recente",
-    "upcomingTasks": "Tarefas Pendentes"
-  },
   "auth": {
     "login": "Entrar",
-    "signup": "Cadastrar",
     "logout": "Sair",
+    "signup": "Cadastrar",
     "email": "Email",
     "password": "Senha",
-    "createAccount": "Criar sua conta",
-    "joinUs": "Junte-se a nós e comece a construir sua marca",
-    "firstName": "Nome",
-    "lastName": "Sobrenome",
-    "passwordPlaceholder": "••••••••",
-    "emailPlaceholder": "seu@email.com",
-    "alreadyHaveAccount": "Já tem uma conta?",
-    "signIn": "Entrar",
-    "creatingAccount": "Criando conta...",
-    "loginTitle": "Entre na sua conta",
-    "loginSubtitle": "Transforme suas ideias em produtos incríveis",
+    "confirmPassword": "Confirmar Senha",
     "forgotPassword": "Esqueceu sua senha?",
-    "signingIn": "Entrando...",
-    "loginError": "Erro ao entrar",
-    "loginErrorMessage": "Email ou senha incorretos. Por favor, tente novamente."
+    "resetPassword": "Redefinir Senha"
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "Bem-vindo à sua jornada Private Label",
+      "description": "Vamos conhecer você melhor para fornecer o melhor serviço possível para seu negócio private label.",
+      "startButton": "Vamos Começar"
+    },
+    "productCategories": {
+      "title": "Qual categoria de produto mais te interessa?",
+      "description": "Selecione uma ou mais categorias que você gostaria de explorar",
+      "categories": {
+        "cosmetics": "Cosméticos",
+        "coffee": "Café",
+        "supplements": "Suplementos",
+        "petProducts": "Produtos Pet"
+      }
+    },
+    "profileType": {
+      "title": "Qual é o seu perfil?",
+      "description": "Isso nos ajuda a entender melhor suas necessidades",
+      "types": {
+        "entrepreneur": "Empreendedor Individual",
+        "startup": "Startup",
+        "established": "Empresa Estabelecida",
+        "other": "Outro"
+      }
+    },
+    "brandStatus": {
+      "title": "Qual é o status atual da sua marca?",
+      "description": "Conte-nos sobre a situação atual da sua marca",
+      "options": {
+        "noBrand": "Começando do zero",
+        "partialBrand": "Tenho alguns elementos de marca",
+        "completeBrand": "Identidade de marca completa"
+      }
+    },
+    "launchUrgency": {
+      "title": "Quando você planeja lançar?",
+      "description": "Isso nos ajuda a entender seu cronograma e priorizar suas necessidades",
+      "options": {
+        "immediate": "Imediatamente (1-2 meses)",
+        "soon": "Em breve (3-6 meses)",
+        "planning": "Fase de Planejamento (6+ meses)"
+      }
+    },
+    "navigation": {
+      "back": "Voltar",
+      "next": "Próximo",
+      "complete": "Concluir"
+    }
   }
 }

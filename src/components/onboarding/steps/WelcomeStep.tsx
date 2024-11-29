@@ -1,11 +1,14 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 interface WelcomeStepProps {
   onNext: () => void;
 }
 
 export const WelcomeStep = ({ onNext }: WelcomeStepProps) => {
+  const { t } = useTranslation();
+
   return (
     <div className="text-center space-y-6 max-w-lg mx-auto px-4">
       <motion.div
@@ -14,10 +17,10 @@ export const WelcomeStep = ({ onNext }: WelcomeStepProps) => {
         className="space-y-4"
       >
         <h2 className="text-2xl sm:text-4xl font-bold text-gray-900">
-          Welcome to Your Private Label Journey
+          {t('onboarding.welcome.title')}
         </h2>
         <p className="text-sm sm:text-base text-gray-600 max-w-md mx-auto">
-          Let's get to know you better so we can provide the best possible service for your private label business.
+          {t('onboarding.welcome.description')}
         </p>
       </motion.div>
 
@@ -30,7 +33,7 @@ export const WelcomeStep = ({ onNext }: WelcomeStepProps) => {
           onClick={onNext}
           className="w-full sm:w-auto px-8"
         >
-          Let's Begin
+          {t('onboarding.welcome.startButton')}
         </Button>
       </motion.div>
     </div>

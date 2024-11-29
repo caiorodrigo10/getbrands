@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { QuizNavigation } from "./QuizNavigation";
+import { useTranslation } from "react-i18next";
 
 interface BrandStatusStepProps {
   selected: string;
@@ -11,20 +12,22 @@ interface BrandStatusStepProps {
 }
 
 export function BrandStatusStep({ selected, onAnswer, onNext, onBack }: BrandStatusStepProps) {
+  const { t } = useTranslation();
+
   const options = [
-    { value: "no_brand", label: "Starting from scratch" },
-    { value: "partial_brand", label: "Have some branding elements" },
-    { value: "complete_brand", label: "Complete brand identity" },
+    { value: "no_brand", label: t('onboarding.brandStatus.options.noBrand') },
+    { value: "partial_brand", label: t('onboarding.brandStatus.options.partialBrand') },
+    { value: "complete_brand", label: t('onboarding.brandStatus.options.completeBrand') },
   ];
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-8">
       <div className="text-center">
         <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4">
-          What's your current brand status?
+          {t('onboarding.brandStatus.title')}
         </h2>
         <p className="text-sm sm:text-base text-gray-600 mb-4">
-          Tell us about your current branding situation
+          {t('onboarding.brandStatus.description')}
         </p>
       </div>
 
