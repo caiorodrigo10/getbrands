@@ -11,6 +11,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { debugAnalytics } from "./lib/analytics/debug";
 import { trackPage } from "./lib/analytics";
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,6 +26,37 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Initialize i18next
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    debug: true,
+    fallbackLng: 'en',
+    supportedLngs: ['en', 'pt', 'es'],
+    ns: ['common'],
+    defaultNS: 'common',
+    interpolation: {
+      escapeValue: false,
+    },
+    detection: {
+      order: ['path', 'localStorage', 'navigator'],
+      lookupFromPathIndex: 0,
+      caches: ['localStorage']
+    },
+    resources: {
+      en: {
+        common: require('./locales/en/common.json')
+      },
+      pt: {
+        common: require('./locales/pt/common.json')
+      },
+      es: {
+        common: require('./locales/es/common.json')
+      }
+    }
+  });
 
 const App = () => {
   useEffect(() => {

@@ -11,7 +11,7 @@ import { getCurrentLanguage, isValidLanguage } from "@/lib/language";
 const SignUp = () => {
   const navigate = useNavigate();
   const { lang } = useParams();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -101,9 +101,6 @@ const SignUp = () => {
 
         if (profileError) throw profileError;
 
-        // Set the application language
-        await i18n.changeLanguage(currentLanguage);
-
         trackEvent('user_signed_up', {
           userId: data.user.id,
           email: formData.email,
@@ -115,6 +112,7 @@ const SignUp = () => {
         });
 
         navigate(`/${currentLanguage}/onboarding`);
+        toast.success("Account created successfully!");
       }
     } catch (error: any) {
       console.error("Error signing up:", error);
@@ -150,7 +148,7 @@ const SignUp = () => {
 
           <Button
             type="submit"
-            className="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
+            className="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-lg transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
           >
             {isLoading ? t('auth.creatingAccount') : t('auth.createAccount')}
