@@ -35,7 +35,7 @@ export const AddressSelectionSection = ({
             <Button 
               variant="outline" 
               size="sm" 
-              className="w-auto sm:w-auto sm:text-base text-xs px-2 sm:px-4 h-7 sm:h-9"
+              className="w-full sm:w-auto text-sm sm:text-base px-3 sm:px-4 h-9 sm:h-10"
             >
               Select Previous Address
             </Button>
