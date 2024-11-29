@@ -5,9 +5,14 @@ import { toast } from "sonner";
 import { SignUpFormFields } from "@/components/auth/signup/SignUpFormFields";
 import { trackEvent } from "@/lib/analytics";
 
-interface SignUpFormStepPTProps {
+export interface SignUpFormStepPTProps {
   onBack: () => void;
-  quizData: any;
+  quizData: {
+    productCategories: string[];
+    profileType: string;
+    brandStatus: string;
+    launchUrgency: string;
+  };
 }
 
 export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) => {
