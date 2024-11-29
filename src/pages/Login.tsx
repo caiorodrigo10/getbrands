@@ -55,6 +55,9 @@ const Login = () => {
             alt="Logo"
             className="w-[180px] h-auto"
           />
+          <h2 className="mt-2 text-2xl font-semibold text-gray-900">
+            {t('auth.loginTitle')}
+          </h2>
           <p className="text-gray-600">
             {t('auth.loginSubtitle')}
           </p>
