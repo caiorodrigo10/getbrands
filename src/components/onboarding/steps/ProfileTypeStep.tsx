@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { QuizNavigation } from "./QuizNavigation";
+import { useTranslation } from "react-i18next";
+import { User, Rocket, Building2, Users } from "lucide-react";
 
 interface ProfileTypeStepProps {
   selected: string;
@@ -10,24 +12,50 @@ interface ProfileTypeStepProps {
   onBack: () => void;
 }
 
-const profileTypes = [
-  { id: "Creator/Influencer", label: "Creator/Influencer" },
-  { id: "Entrepreneur", label: "Entrepreneur" },
-  { id: "Digital Marketer", label: "Digital Marketer" }
-];
-
 export const ProfileTypeStep = ({ 
   selected, 
   onAnswer,
   onNext,
   onBack
 }: ProfileTypeStepProps) => {
+  const { t } = useTranslation();
+
+  const profileTypes = [
+    { 
+      id: "entrepreneur", 
+      label: t('onboarding.profileType.types.entrepreneur'),
+      description: t('onboarding.profileType.types.entrepreneurDescription'),
+      icon: User
+    },
+    { 
+      id: "startup", 
+      label: t('onboarding.profileType.types.startup'),
+      description: t('onboarding.profileType.types.startupDescription'),
+      icon: Rocket
+    },
+    { 
+      id: "established", 
+      label: t('onboarding.profileType.types.established'),
+      description: t('onboarding.profileType.types.establishedDescription'),
+      icon: Building2
+    },
+    { 
+      id: "other", 
+      label: t('onboarding.profileType.types.other'),
+      description: t('onboarding.profileType.types.otherDescription'),
+      icon: Users
+    }
+  ];
+
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-8">
+    <div className="w-full max-w-3xl mx-auto space-y-8">
       <div className="text-center">
-        <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4">
-          Which of the following best describes you?
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+          {t('onboarding.profileType.title')}
         </h2>
+        <p className="text-sm sm:text-base text-gray-600 mb-8">
+          {t('onboarding.profileType.description')}
+        </p>
       </div>
 
       <RadioGroup
@@ -35,29 +63,40 @@ export const ProfileTypeStep = ({
         onValueChange={onAnswer}
         className="grid gap-4"
       >
-        {profileTypes.map((type, index) => (
-          <motion.div
-            key={type.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ 
-              opacity: 1, 
-              y: 0,
-              transition: { delay: index * 0.1 }
-            }}
-          >
-            <Label
-              htmlFor={type.id}
-              className={`
-                flex items-center space-x-3 p-4 sm:p-6 rounded-xl border-2 cursor-pointer
-                transition-all duration-200
-                ${selected === type.id ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50'}
-              `}
+        {profileTypes.map((type, index) => {
+          const Icon = type.icon;
+          return (
+            <motion.div
+              key={type.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ 
+                opacity: 1, 
+                y: 0,
+                transition: { delay: index * 0.1 }
+              }}
             >
-              <RadioGroupItem value={type.id} id={type.id} />
-              <span className="text-base sm:text-xl">{type.label}</span>
-            </Label>
-          </motion.div>
-        ))}
+              <Label
+                htmlFor={type.id}
+                className={`
+                  flex items-start gap-4 p-6 rounded-xl border-2 cursor-pointer
+                  transition-all duration-200
+                  ${selected === type.id ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50'}
+                `}
+              >
+                <div className="flex-shrink-0 mt-1">
+                  <RadioGroupItem value={type.id} id={type.id} />
+                </div>
+                <div className="flex-grow space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-5 w-5 text-primary" />
+                    <span className="text-lg font-medium">{type.label}</span>
+                  </div>
+                  <p className="text-sm text-gray-600">{type.description}</p>
+                </div>
+              </Label>
+            </motion.div>
+          );
+        })}
       </RadioGroup>
 
       <QuizNavigation
@@ -67,4 +106,4 @@ export const ProfileTypeStep = ({
       />
     </div>
   );
-};
+}
