@@ -27,9 +27,7 @@ export const useQuizData = () => {
           user_id: user.id,
           answers,
           completed_at: new Date().toISOString()
-        })
-        .select('id')
-        .single();
+        });
 
       if (error) {
         console.error('Error saving quiz data:', error);
