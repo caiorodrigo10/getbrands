@@ -39,6 +39,7 @@ export const AppRoutes = () => {
       {/* Auth Routes */}
       <Route path="/:lang/login" element={<Login />} />
       <Route path="/:lang/signup" element={<SignUp />} />
+      <Route path="/:lang/onboarding" element={<OnboardingQuiz />} />
 
       {/* Protected Routes */}
       <Route
@@ -57,7 +58,6 @@ export const AppRoutes = () => {
         <Route path="projects" element={<Projects />} />
         <Route path="projects/:id" element={<ProjectDetails />} />
         <Route path="documents" element={<Documents />} />
-        <Route path="onboarding" element={<OnboardingQuiz />} />
         <Route path="sample-orders" element={<SampleOrders />} />
         <Route path="start-here" element={<StartHere />} />
         

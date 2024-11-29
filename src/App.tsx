@@ -16,10 +16,9 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 60 * 24,
-      refetchOnWindowFocus: true,
+      refetchOnWindowFocus: false,
       refetchOnMount: true,
-      retry: 2,
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      retry: 1,
     },
   },
 });
@@ -31,11 +30,11 @@ const App = () => {
   }, []);
 
   return (
-    <SessionContextProvider 
-      supabaseClient={supabase} 
-      initialSession={null}
-    >
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <SessionContextProvider 
+        supabaseClient={supabase} 
+        initialSession={null}
+      >
         <BrowserRouter>
           <AuthProvider>
             <CartProvider>
@@ -47,8 +46,8 @@ const App = () => {
             </CartProvider>
           </AuthProvider>
         </BrowserRouter>
-      </QueryClientProvider>
-    </SessionContextProvider>
+      </SessionContextProvider>
+    </QueryClientProvider>
   );
 };
 
