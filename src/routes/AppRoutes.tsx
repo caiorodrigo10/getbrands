@@ -129,18 +129,20 @@ export const AppRoutes = () => {
         } />
 
         <Route path="*" element={<Error404 />} />
+      </Route>
 
-        {/* Portuguese Routes */}
-        <Route path="/pt/signup" element={<SignUpPT />} />
-        <Route path="/pt/onboarding" element={
-          <ProtectedRoute>
-            <OnboardingQuizPT />
-          </ProtectedRoute>
-        } />
+      {/* Portuguese Routes */}
+      <Route path="/pt/signup" element={<SignUpPT />} />
+      <Route path="/pt/onboarding" element={
+        <ProtectedRoute>
+          <OnboardingQuizPT />
+        </ProtectedRoute>
+      } />
 
-        {/* Marketing Routes */}
-        {MarketingRoutes}
-        
+      {/* Marketing Routes */}
+      {MarketingRoutes}
+      
+      {/* Public Routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/onboarding" element={<OnboardingQuizPage />} />
@@ -170,7 +172,6 @@ export const AppRoutes = () => {
           <Success />
         </ProtectedRoute>
       } />
-      </Route>
     </Routes>
   );
 };
