@@ -1,85 +1,81 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { AppLayout } from "./AppLayout";
-import { ProtectedRoute } from "./ProtectedRoute";
-import { LanguageRoute } from "@/components/routing/LanguageRoute";
 import { AdminRoutes } from "./AdminRoutes";
-import { marketingRoutes } from "./MarketingRoutes";
-
-// Pages
+import { ProtectedRoute } from "./ProtectedRoute";
+import { useTranslation } from "react-i18next";
 import Login from "@/pages/Login";
-import SignUp from "@/pages/SignUp";
 import Dashboard from "@/pages/Dashboard";
-import Catalog from "@/pages/Catalog";
-import Products from "@/pages/Products";
-import ProductDetails from "@/pages/ProductDetails";
-import Profile from "@/pages/Profile";
 import Projects from "@/pages/Projects";
-import ProjectDetails from "@/pages/ProjectDetails";
-import Documents from "@/pages/Documents";
-import OnboardingQuiz from "@/pages/OnboardingQuiz";
+import Products from "@/pages/Products";
+import Catalog from "@/pages/Catalog";
+import ProfitCalculator from "@/pages/ProfitCalculator";
 import SampleOrders from "@/pages/SampleOrders";
 import StartHere from "@/pages/StartHere";
-import Error404 from "@/pages/Error404";
-import Index from "@/pages/Index";
-
-// Checkout pages
-import CartReview from "@/pages/checkout/CartReview";
-import Shipping from "@/pages/checkout/Shipping";
-import Payment from "@/pages/checkout/Payment";
-import Success from "@/pages/checkout/Success";
+import Profile from "@/pages/Profile";
+import LandingPage from "@/pages/marketing/LandingPage";
+import PrivacyPolicy from "@/pages/marketing/PrivacyPolicy";
+import TermsAndConditions from "@/pages/marketing/TermsAndConditions";
+import SignUp from "@/pages/SignUp";
+import OnboardingQuizPage from "@/pages/OnboardingQuiz";
 
 export const AppRoutes = () => {
+  const { i18n } = useTranslation();
+  
   return (
     <Routes>
-      <Route element={<LanguageRoute />} />
+      {/* Root redirect */}
+      <Route path="/" element={<Navigate to={`/${i18n.language}`} replace />} />
       
-      {/* Marketing Routes */}
-      {marketingRoutes}
+      {/* Language-specific routes */}
+      <Route path="/:lang">
+        {/* Public routes */}
+        <Route index element={<LandingPage />} />
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<SignUp />} />
+        <Route path="policies" element={<PrivacyPolicy />} />
+        <Route path="terms" element={<TermsAndConditions />} />
 
-      {/* Auth Routes */}
-      <Route path="/:lang/login" element={<Login />} />
-      <Route path="/:lang/signup" element={<SignUp />} />
-      <Route path="/:lang/onboarding" element={<OnboardingQuiz />} />
+        {/* Onboarding route - protected but accessible without completing onboarding */}
+        <Route
+          path="onboarding"
+          element={
+            <ProtectedRoute>
+              <OnboardingQuizPage />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Protected Routes */}
-      <Route
-        path="/:lang"
-        element={
-          <ProtectedRoute>
-            <AppLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="catalog" element={<Catalog />} />
-        <Route path="products" element={<Products />} />
-        <Route path="products/:id" element={<ProductDetails />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="projects" element={<Projects />} />
-        <Route path="projects/:id" element={<ProjectDetails />} />
-        <Route path="documents" element={<Documents />} />
-        <Route path="sample-orders" element={<SampleOrders />} />
-        <Route path="start-here" element={<StartHere />} />
-        
-        {/* Checkout Routes */}
-        <Route path="cart" element={<CartReview />} />
-        <Route path="shipping" element={<Shipping />} />
-        <Route path="payment" element={<Payment />} />
-        <Route path="success" element={<Success />} />
+        {/* Protected admin routes */}
+        <Route
+          path="admin/*"
+          element={
+            <ProtectedRoute requiresAdmin>
+              <AdminRoutes />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Protected app routes */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="projects" element={<Projects />} />
+          <Route path="products" element={<Products />} />
+          <Route path="catalog" element={<Catalog />} />
+          <Route path="profit-calculator" element={<ProfitCalculator />} />
+          <Route path="sample-orders" element={<SampleOrders />} />
+          <Route path="start-here" element={<StartHere />} />
+          <Route path="profile" element={<Profile />} />
+        </Route>
       </Route>
 
-      {/* Admin Routes */}
-      <Route
-        path="/:lang/admin/*"
-        element={
-          <ProtectedRoute requiresAdmin>
-            <AdminRoutes />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* 404 Route */}
-      <Route path="*" element={<Error404 />} />
+      {/* Catch-all redirect */}
+      <Route path="*" element={<Navigate to={`/${i18n.language}`} replace />} />
     </Routes>
   );
 };

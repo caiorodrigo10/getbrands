@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { SignUpFormFields } from "@/components/auth/signup/SignUpFormFields";
 import { trackEvent } from "@/lib/analytics";
 import { useTranslation } from "react-i18next";
+import { getCurrentLanguage, isValidLanguage } from "@/lib/language";
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { lang } = useParams();
+  const { t, i18n } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -23,6 +25,9 @@ const SignUp = () => {
     phone: "",
   });
 
+  // Get the current language from URL or default
+  const currentLanguage = isValidLanguage(lang) ? lang : getCurrentLanguage();
+
   const validateForm = () => {
     const newErrors = {
       password: "",
@@ -31,18 +36,18 @@ const SignUp = () => {
     let isValid = true;
 
     if (formData.password.length < 6) {
-      newErrors.password = t("auth.errors.passwordLength");
+      newErrors.password = "Password must be at least 6 characters long";
       isValid = false;
     }
 
     if (!formData.phone) {
-      newErrors.phone = t("auth.errors.phoneRequired");
+      newErrors.phone = "Phone number is required";
       isValid = false;
     }
 
     if (!formData.firstName || !formData.lastName || !formData.email) {
       isValid = false;
-      toast.error(t("auth.errors.allFieldsRequired"));
+      toast.error("Please fill in all fields");
     }
 
     setErrors(newErrors);
@@ -72,9 +77,33 @@ const SignUp = () => {
         },
       });
 
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        if (signUpError.message.includes("User already registered")) {
+          toast.error("This email is already registered. Please try logging in instead.");
+          return;
+        }
+        throw signUpError;
+      }
 
       if (data?.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: data.user.id,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            role: 'member',
+            language: currentLanguage,
+            updated_at: new Date().toISOString()
+          });
+
+        if (profileError) throw profileError;
+
+        // Set the application language
+        await i18n.changeLanguage(currentLanguage);
+
         trackEvent('user_signed_up', {
           userId: data.user.id,
           email: formData.email,
@@ -82,27 +111,27 @@ const SignUp = () => {
           lastName: formData.lastName,
           phone: formData.phone,
           signupMethod: 'email',
+          language: currentLanguage,
         });
 
-        navigate("/onboarding");
-        toast.success(t("messages.signupSuccess"));
+        navigate(`/${currentLanguage}/onboarding`);
       }
     } catch (error: any) {
-      console.error("Signup error:", error);
-      toast.error(error.message || t("messages.error"));
+      console.error("Error signing up:", error);
+      toast.error(error.message || "Failed to create account. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-purple-50">
       <div className="w-full max-w-md space-y-8 p-8 bg-white rounded-2xl shadow-lg">
         <div className="flex flex-col items-center space-y-2">
           <img
             src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
-            alt="Logo"
-            className="w-[180px] h-auto"
+            alt="GetBrands Logo"
+            className="h-12 mx-auto mb-4"
           />
           <h2 className="mt-2 text-2xl font-semibold text-gray-900">
             {t('auth.createAccount')}
@@ -121,7 +150,7 @@ const SignUp = () => {
 
           <Button
             type="submit"
-            className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
+            className="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
             disabled={isLoading}
           >
             {isLoading ? t('auth.creatingAccount') : t('auth.createAccount')}
@@ -129,7 +158,7 @@ const SignUp = () => {
 
           <div className="text-center text-sm">
             <span className="text-gray-600">{t('auth.alreadyHaveAccount')}</span>{" "}
-            <Link to="/login" className="text-[#f0562e] hover:text-[#f0562e]/90">
+            <Link to={`/${currentLanguage}/login`} className="text-primary hover:text-primary-dark font-medium">
               {t('auth.signIn')}
             </Link>
           </div>

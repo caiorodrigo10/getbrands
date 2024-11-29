@@ -31,43 +31,47 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
 
   const handleAuthChange = async (session: any) => {
-    if (!session?.user) {
-      setUser(null);
-      setIsAuthenticated(false);
-      return;
-    }
-
     try {
-      setUser(session.user);
-      setIsAuthenticated(true);
-      
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('language, onboarding_completed')
-        .eq('id', session.user.id)
-        .maybeSingle();
-
-      if (profileError) throw profileError;
-
-      if (!profile) {
-        const { error: insertError } = await supabase
+      if (session?.user) {
+        setUser(session.user);
+        setIsAuthenticated(true);
+        
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .insert({
-            id: session.user.id,
-            email: session.user.email,
-            language: i18n.language || 'en',
-            role: 'member'
-          });
+          .select('language')
+          .eq('id', session.user.id)
+          .maybeSingle();
 
-        if (insertError) throw insertError;
-      } else if (profile.language) {
-        await i18n.changeLanguage(profile.language);
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+          return;
+        }
+
+        if (!profile) {
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              id: session.user.id,
+              email: session.user.email,
+              language: i18n.language || 'en',
+              role: 'member'
+            });
+
+          if (insertError) {
+            console.error('Error creating profile:', insertError);
+            return;
+          }
+        } else if (profile.language) {
+          await i18n.changeLanguage(profile.language);
+        }
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
       }
     } catch (error) {
       console.error('Error in handleAuthChange:', error);
@@ -80,24 +84,44 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     let mounted = true;
 
     const initSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (mounted) {
-        await handleAuthChange(session);
-      }
-
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (_event, session) => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Session error:', error);
           if (mounted) {
-            await handleAuthChange(session);
+            setUser(null);
+            setIsAuthenticated(false);
+            setIsLoading(false);
           }
+          return;
         }
-      );
 
-      return () => {
-        subscription?.unsubscribe();
-        mounted = false;
-      };
+        if (mounted) {
+          await handleAuthChange(session);
+          setIsLoading(false);
+        }
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (_event, session) => {
+            if (mounted) {
+              await handleAuthChange(session);
+            }
+          }
+        );
+
+        return () => {
+          subscription?.unsubscribe();
+          mounted = false;
+        };
+      } catch (error) {
+        console.error('Session initialization error:', error);
+        if (mounted) {
+          setUser(null);
+          setIsAuthenticated(false);
+          setIsLoading(false);
+        }
+      }
     };
 
     initSession();
@@ -142,19 +166,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       const { data: profile } = await supabase
         .from('profiles')
-        .select('language, onboarding_completed')
+        .select('language')
         .eq('id', data.user.id)
         .maybeSingle();
       
       const lang = profile?.language || i18n.language || 'en';
       await i18n.changeLanguage(lang);
       
-      if (profile && !profile.onboarding_completed) {
-        navigate(`/${lang}/onboarding`, { replace: true });
-      } else {
-        navigate(`/${lang}/catalog`, { replace: true });
-      }
-      
+      navigate(`/${lang}/catalog`, { replace: true });
       toast.success('Logged in successfully');
     } catch (error: any) {
       console.error('Login error:', error);
