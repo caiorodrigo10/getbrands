@@ -24,8 +24,8 @@ export const AppRoutes = () => {
       <Route element={<LanguageRoute />}>
         <Route path="/" element={<Navigate to={`/${i18n.language}`} replace />} />
         
-        {/* Marketing Routes */}
         <Route path="/:lang">
+          {/* Marketing Routes */}
           {marketingRoutes}
           
           {/* Admin Routes */}
