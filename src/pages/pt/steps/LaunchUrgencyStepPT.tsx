@@ -32,6 +32,9 @@ export const LaunchUrgencyStepPT = ({
     try {
       if (!user?.id) {
         onAnswer(value);
+        if (showNextButton) {
+          onNext();
+        }
         return;
       }
 
@@ -51,6 +54,10 @@ export const LaunchUrgencyStepPT = ({
       }
 
       toast.success("Preferência de lançamento salva!");
+      
+      if (showNextButton) {
+        onNext();
+      }
     } catch (error: any) {
       console.error('Erro ao atualizar urgência de lançamento:', error);
       toast.error(error.message || "Falha ao salvar sua seleção. Por favor, tente novamente.");

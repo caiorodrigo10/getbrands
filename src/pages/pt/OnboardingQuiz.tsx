@@ -134,7 +134,7 @@ export function OnboardingQuizPT() {
         onBack: handleBack,
         showNextButton: isPublicFlow,
       },
-      autoAdvance: false,
+      autoAdvance: true,
     },
   ];
 
