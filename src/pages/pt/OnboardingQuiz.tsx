@@ -130,8 +130,9 @@ export function OnboardingQuizPT() {
         onAnswer: (value: string) => {
           setQuizData({ ...quizData, launchUrgency: value });
         },
-        onComplete: handleComplete,
+        onNext: isPublicFlow ? handleNext : handleComplete,
         onBack: handleBack,
+        showNextButton: isPublicFlow,
       },
       autoAdvance: false,
     },

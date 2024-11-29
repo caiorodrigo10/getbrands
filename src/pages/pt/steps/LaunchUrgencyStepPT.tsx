@@ -9,15 +9,17 @@ import { toast } from "sonner";
 interface LaunchUrgencyStepProps {
   selected: string;
   onAnswer: (value: string) => void;
-  onComplete: () => void;
+  onNext: () => void;
   onBack: () => void;
+  showNextButton?: boolean;
 }
 
 export const LaunchUrgencyStepPT = ({ 
   selected, 
   onAnswer,
-  onComplete,
-  onBack
+  onNext,
+  onBack,
+  showNextButton = false
 }: LaunchUrgencyStepProps) => {
   const { user } = useAuth();
   const options = [
@@ -29,7 +31,8 @@ export const LaunchUrgencyStepPT = ({
   const handleOptionSelect = async (value: string) => {
     try {
       if (!user?.id) {
-        throw new Error('Usuário não autenticado');
+        onAnswer(value);
+        return;
       }
 
       onAnswer(value);
@@ -96,9 +99,9 @@ export const LaunchUrgencyStepPT = ({
       </RadioGroup>
 
       <QuizNavigation
-        onNext={onComplete}
+        onNext={onNext}
         onBack={onBack}
-        nextLabel="Completar"
+        nextLabel={showNextButton ? "Próximo" : "Completar"}
         isNextDisabled={!selected}
       />
     </div>
