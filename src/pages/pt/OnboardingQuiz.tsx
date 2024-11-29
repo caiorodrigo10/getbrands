@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { WelcomeStepPT } from "./steps/WelcomeStepPT";
@@ -7,6 +7,7 @@ import { ProductCategoriesStepPT } from "./steps/ProductCategoriesStepPT";
 import { ProfileTypeStepPT } from "./steps/ProfileTypeStepPT";
 import { BrandStatusStepPT } from "./steps/BrandStatusStepPT";
 import { LaunchUrgencyStepPT } from "./steps/LaunchUrgencyStepPT";
+import { SignUpFormStepPT } from "./steps/SignUpFormStepPT";
 import { useAuth } from "@/contexts/AuthContext";
 
 type Step = {
@@ -18,6 +19,7 @@ type Step = {
 
 export function OnboardingQuizPT() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [quizData, setQuizData] = useState({
@@ -26,6 +28,8 @@ export function OnboardingQuizPT() {
     brandStatus: "",
     launchUrgency: "",
   });
+
+  const isPublicFlow = location.pathname === "/comecarpt";
 
   const handleNext = () => {
     setCurrentStep((prev) => prev + 1);
@@ -36,35 +40,39 @@ export function OnboardingQuizPT() {
   };
 
   const handleComplete = async () => {
-    try {
-      if (!user?.id) {
-        toast.error("Usuário não encontrado");
-        return;
+    if (!isPublicFlow) {
+      try {
+        if (!user?.id) {
+          toast.error("Usuário não encontrado");
+          return;
+        }
+
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            product_interest: quizData.productCategories,
+            profile_type: quizData.profileType,
+            brand_status: quizData.brandStatus,
+            launch_urgency: quizData.launchUrgency,
+            onboarding_completed: true,
+            language: 'pt'
+          })
+          .eq("id", user.id);
+
+        if (error) throw error;
+
+        toast.success("Perfil atualizado com sucesso!");
+        navigate("/catalog");
+      } catch (error: any) {
+        console.error("Erro ao atualizar perfil:", error);
+        toast.error(error.message || "Falha ao atualizar perfil");
       }
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          product_interest: quizData.productCategories,
-          profile_type: quizData.profileType,
-          brand_status: quizData.brandStatus,
-          launch_urgency: quizData.launchUrgency,
-          onboarding_completed: true,
-          language: 'pt'
-        })
-        .eq("id", user.id);
-
-      if (error) throw error;
-
-      toast.success("Perfil atualizado com sucesso!");
-      navigate("/start-here");
-    } catch (error: any) {
-      console.error("Erro ao atualizar perfil:", error);
-      toast.error(error.message || "Falha ao atualizar perfil");
+    } else {
+      handleNext(); // Move to signup step
     }
   };
 
-  const steps: Step[] = [
+  const baseSteps: Step[] = [
     {
       component: WelcomeStepPT,
       name: "Bem-vindo",
@@ -93,7 +101,7 @@ export function OnboardingQuizPT() {
         selected: quizData.profileType,
         onAnswer: (value: string) => {
           setQuizData({ ...quizData, profileType: value });
-          if (steps[2].autoAdvance) handleNext();
+          if (baseSteps[2].autoAdvance) handleNext();
         },
         onNext: handleNext,
         onBack: handleBack,
@@ -107,7 +115,7 @@ export function OnboardingQuizPT() {
         selected: quizData.brandStatus,
         onAnswer: (value: string) => {
           setQuizData({ ...quizData, brandStatus: value });
-          if (steps[3].autoAdvance) handleNext();
+          if (baseSteps[3].autoAdvance) handleNext();
         },
         onNext: handleNext,
         onBack: handleBack,
@@ -128,6 +136,22 @@ export function OnboardingQuizPT() {
       autoAdvance: false,
     },
   ];
+
+  // Add signup step for public flow
+  const steps = isPublicFlow
+    ? [
+        ...baseSteps,
+        {
+          component: SignUpFormStepPT,
+          name: "Cadastro",
+          props: {
+            onBack: handleBack,
+            quizData: quizData,
+          },
+          autoAdvance: false,
+        },
+      ]
+    : baseSteps;
 
   const CurrentStepComponent = steps[currentStep].component;
 
