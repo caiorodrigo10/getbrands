@@ -32,11 +32,15 @@ export const useOnboardingCompletion = () => {
           brand_status: mapBrandStatus(quizData.brandStatus),
           launch_urgency: mapLaunchUrgency(quizData.launchUrgency),
           onboarding_completed: true,
-          language: lang || i18n.language || 'en' // Ensure we have a valid language
+          language: lang || i18n.language || 'en'
         })
         .eq("id", userId);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+        toast.error(t('messages.error'));
+        return;
+      }
 
       // Then save the quiz response for analytics
       const { error: quizError } = await supabase
@@ -52,7 +56,11 @@ export const useOnboardingCompletion = () => {
           completed_at: new Date().toISOString(),
         });
 
-      if (quizError) throw quizError;
+      if (quizError) {
+        console.error('Quiz response error:', quizError);
+        toast.error(t('messages.error'));
+        return;
+      }
 
       toast.success(t('messages.success'));
       
@@ -61,7 +69,7 @@ export const useOnboardingCompletion = () => {
       navigate(`/${currentLang}/start-here`, { replace: true });
       
     } catch (error: any) {
-      console.error("Error updating profile:", error);
+      console.error("Error completing onboarding:", error);
       toast.error(t('messages.error'));
     }
   };

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { WelcomeStep } from "./steps/WelcomeStep";
 import { ProductCategoriesStep } from "./steps/ProductCategoriesStep";
 import { ProfileTypeStep } from "./steps/ProfileTypeStep";
@@ -30,7 +29,7 @@ export function OnboardingQuiz() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { lang } = useParams();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [quizData, setQuizData] = useState({
     productCategories: [] as string[],
@@ -47,6 +46,15 @@ export function OnboardingQuiz() {
 
   const handleBack = () => {
     setCurrentStep((prev) => prev - 1);
+  };
+
+  const handleCompletion = async () => {
+    if (!user?.id) {
+      toast.error(t('messages.error'));
+      return;
+    }
+
+    await handleComplete(user.id, quizData);
   };
 
   const steps: Step[] = [
@@ -107,11 +115,7 @@ export function OnboardingQuiz() {
         onAnswer: (value: string) => {
           setQuizData({ ...quizData, launchUrgency: value });
         },
-        onComplete: () => {
-          if (user?.id) {
-            handleComplete(user.id, quizData);
-          }
-        },
+        onComplete: handleCompletion,
         onBack: handleBack,
       },
       autoAdvance: false,
