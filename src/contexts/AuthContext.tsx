@@ -41,15 +41,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(session.user);
       setIsAuthenticated(true);
       
-      // Fetch and set user language preference
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('language')
-        .eq('id', session.user.id)
-        .single();
-        
-      if (profile?.language) {
-        await i18n.changeLanguage(profile.language);
+      try {
+        // First try to get the existing profile
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('language')
+          .eq('id', session.user.id)
+          .maybeSingle();
+
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+          return;
+        }
+
+        // If no profile exists, create one with default values
+        if (!profile) {
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              id: session.user.id,
+              email: session.user.email,
+              language: i18n.language || 'en',
+              role: 'member'
+            });
+
+          if (insertError) {
+            console.error('Error creating profile:', insertError);
+            return;
+          }
+        } else if (profile.language) {
+          // Only change language if we have a valid value
+          await i18n.changeLanguage(profile.language);
+        }
+      } catch (error) {
+        console.error('Error in profile management:', error);
       }
     } else {
       setUser(null);
@@ -130,7 +155,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .from('profiles')
         .select('language')
         .eq('id', data.user.id)
-        .single();
+        .maybeSingle();
       
       const lang = profile?.language || i18n.language || 'en';
       await i18n.changeLanguage(lang);
