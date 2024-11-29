@@ -1,7 +1,11 @@
 import { motion } from "framer-motion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import type { QuizStep } from "./MarketingQuiz";
+
+interface QuizStep {
+  question: string;
+  options: string[];
+}
 
 interface QuizQuestionProps {
   step: QuizStep;
