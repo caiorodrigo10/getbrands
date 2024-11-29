@@ -11,6 +11,12 @@ interface ProductSearchProps {
   addToCart?: boolean;
 }
 
+interface ProductsResponse {
+  data: Product[];
+  totalPages: number;
+  totalCount: number;
+}
+
 export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSearchProps) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -36,12 +42,8 @@ export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSea
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Safely handle the products data
-  const products = productsQuery.data ? (
-    'pages' in productsQuery.data 
-      ? productsQuery.data.pages.flatMap(page => page.data)
-      : productsQuery.data.data || []
-  ) : [];
+  // Safely handle the products data with proper typing
+  const products = productsQuery.data ? (productsQuery.data as ProductsResponse).data : [];
 
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(query.toLowerCase())
