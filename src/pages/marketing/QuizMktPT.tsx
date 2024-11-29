@@ -37,23 +37,38 @@ export function QuizMktPT() {
 
   const handleComplete = async () => {
     try {
-      const { error } = await supabase
-        .from("marketing_quiz_responses")
-        .insert({
-          answers: {
+      // Primeiro criar o usuário com os dados básicos
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: quizData.email,
+        password: "Temp123!", // Senha temporária que o usuário deverá alterar
+        options: {
+          data: {
+            phone: quizData.phone,
+          },
+        },
+      });
+
+      if (signUpError) throw signUpError;
+
+      if (authData.user) {
+        // Atualizar o perfil com os dados do quiz
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            phone: quizData.phone,
             product_interest: quizData.productCategories,
             profile_type: quizData.profileType,
             brand_status: quizData.brandStatus,
             launch_urgency: quizData.launchUrgency,
-          },
-          email: quizData.email,
-          phone: quizData.phone,
-        });
+            language: 'pt',
+          })
+          .eq('id', authData.user.id);
 
-      if (error) throw error;
+        if (profileError) throw profileError;
 
-      toast.success("Respostas salvas com sucesso!");
-      navigate("/");
+        toast.success("Cadastro realizado com sucesso!");
+        navigate("/pt/login");
+      }
     } catch (error: any) {
       console.error("Erro ao salvar respostas:", error);
       toast.error(error.message || "Falha ao salvar respostas");
