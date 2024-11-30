@@ -85,7 +85,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
             <img 
               src="/lovable-uploads/08ee0a1f-fed9-4b8a-8381-acda14355625.png"
               alt="FDA Approved"
-              className="h-16 mx-auto"
+              className="h-32 mx-auto"
             />
           </div>
         </div>
