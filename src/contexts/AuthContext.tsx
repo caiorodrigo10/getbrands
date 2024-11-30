@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { identifyUser } from "@/lib/analytics";
 import Gleap from "gleap";
@@ -35,34 +35,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleAuthChange = async (session: any) => {
-    try {
-      setIsLoading(true);
-      
-      if (!session?.user) {
-        setUser(null);
-        setIsAuthenticated(false);
-        return;
-      }
+    if (session?.user) {
+      setUser(session.user);
+      setIsAuthenticated(true);
 
-      const { data: profile, error: profileError } = await supabase
+      // Fetch user profile data for analytics
+      const { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
         .single();
 
-      if (profileError) {
-        console.error('Error fetching profile:', profileError);
-        toast.error("Error loading user profile");
-        return;
-      }
-
       if (profile) {
-        setUser(session.user);
-        setIsAuthenticated(true);
-
-        // Identify user in analytics tools
+        // Identify user in Segment
         await identifyUser(session.user.id, {
           email: session.user.email,
           first_name: profile.first_name,
@@ -80,12 +68,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           phone: profile.phone
         });
       }
-    } catch (error) {
-      console.error('Error in handleAuthChange:', error);
-      toast.error("Error updating session");
-    } finally {
-      setIsLoading(false);
+    } else {
+      setUser(null);
+      setIsAuthenticated(false);
+      // Clear Gleap identity when user logs out
+      Gleap.clearIdentity();
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -97,17 +86,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (error) throw error;
         
         if (mounted) {
-          if (session) {
-            await handleAuthChange(session);
-          } else {
-            setIsLoading(false);
-          }
+          await handleAuthChange(session);
         }
       } catch (error) {
         console.error('Session error:', error);
         if (mounted) {
           setIsLoading(false);
-          toast.error("Session error occurred");
         }
       }
     };
