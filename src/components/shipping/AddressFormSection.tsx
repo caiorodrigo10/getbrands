@@ -69,6 +69,7 @@ export const AddressFormSection = ({
     localStorage.setItem('shipping_state', values.state);
     localStorage.setItem('shipping_zip', values.zipCode);
     localStorage.setItem('useSameForBilling', useSameForBilling.toString());
+    localStorage.setItem('addressSaved', 'true');
 
     // Store billing address if different from shipping
     if (!useSameForBilling) {
@@ -106,7 +107,13 @@ export const AddressFormSection = ({
     if (!form.getValues().firstName) {
       form.reset(savedValues);
     }
-  }, [form]);
+
+    // Check if address was previously saved
+    const wasAddressSaved = localStorage.getItem('addressSaved') === 'true';
+    if (wasAddressSaved) {
+      setIsAddressSaved(true);
+    }
+  }, [form, setIsAddressSaved]);
 
   React.useEffect(() => {
     form.setValue("useSameForBilling", true);
