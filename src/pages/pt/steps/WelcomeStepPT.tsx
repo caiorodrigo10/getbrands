@@ -113,7 +113,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
             {[...productImages, ...productImages].map((image, index) => (
               <div 
                 key={`${index}`}
-                className="flex-none w-[200px] sm:w-[250px] aspect-square bg-white rounded-lg p-4"
+                className="flex-none w-[220px] sm:w-[280px] aspect-square bg-white rounded-lg p-4"
               >
                 <img 
                   src={image} 
