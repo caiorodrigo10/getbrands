@@ -21,24 +21,27 @@ const formSchema = z.object({
 });
 
 export const useShippingForm = () => {
+  // Get saved values from localStorage
+  const savedValues = {
+    firstName: localStorage.getItem('firstName') || "",
+    lastName: localStorage.getItem('lastName') || "",
+    address1: localStorage.getItem('shipping_address') || "",
+    address2: localStorage.getItem('shipping_address2') || "",
+    city: localStorage.getItem('shipping_city') || "",
+    state: localStorage.getItem('shipping_state') || "",
+    zipCode: localStorage.getItem('shipping_zip') || "",
+    phone: localStorage.getItem('phone') || "",
+    useSameForBilling: localStorage.getItem('useSameForBilling') === 'true',
+    billingAddress1: localStorage.getItem('billing_address') || "",
+    billingAddress2: localStorage.getItem('billing_address2') || "",
+    billingCity: localStorage.getItem('billing_city') || "",
+    billingState: localStorage.getItem('billing_state') || "",
+    billingZipCode: localStorage.getItem('billing_zip') || "",
+  };
+
   return useForm<ShippingFormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      address1: "",
-      address2: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      phone: "",
-      useSameForBilling: true,
-      billingAddress1: "",
-      billingAddress2: "",
-      billingCity: "",
-      billingState: "",
-      billingZipCode: "",
-    },
+    defaultValues: savedValues,
     mode: "onChange",
   });
 };
