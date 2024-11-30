@@ -1,9 +1,14 @@
 import { User } from "@supabase/supabase-js";
-import { identifyUser, trackEvent } from "@/lib/analytics";
 import { ProfileType } from "./types";
 import Gleap from "gleap";
 
 export const handleAnalytics = async (user: User, profile: ProfileType) => {
+  if (!window.analytics) {
+    console.warn('Segment analytics not initialized, retrying in 1s...');
+    setTimeout(() => handleAnalytics(user, profile), 1000);
+    return;
+  }
+
   try {
     // Prepare user traits for Segment
     const traits = {
@@ -19,12 +24,6 @@ export const handleAnalytics = async (user: User, profile: ProfileType) => {
       shipping_address_city: profile.shipping_address_city,
       shipping_address_state: profile.shipping_address_state,
       shipping_address_zip: profile.shipping_address_zip,
-      // Billing information
-      billing_address_street: profile.billing_address_street,
-      billing_address_street2: profile.billing_address_street2,
-      billing_city: profile.billing_city,
-      billing_state: profile.billing_state,
-      billing_zip: profile.billing_zip,
       // Business/Marketing information
       role: profile.role,
       instagram_handle: profile.instagram_handle,
@@ -36,16 +35,20 @@ export const handleAnalytics = async (user: User, profile: ProfileType) => {
       // Metadata
       created_at: user.created_at,
       last_sign_in: user.last_sign_in_at,
+      preferred_language: profile.language || 'en'
     };
 
-    await identifyUser(user.id, traits);
-
-    await trackEvent("User Logged In", {
-      user_id: user.id,
+    window.analytics.identify(user.id, traits);
+    
+    // Track identification event
+    window.analytics.track("User Identified", {
+      userId: user.id,
       email: user.email,
-      login_method: "email",
       role: profile.role,
+      language: profile.language || 'en',
+      timestamp: new Date().toISOString()
     });
+
   } catch (error) {
     console.error('Analytics error:', error);
   }
@@ -56,6 +59,11 @@ export const handleGleapIdentification = (user: User, profile: ProfileType) => {
     Gleap.identify(user.id, {
       email: user.email,
       name: profile.first_name ? `${profile.first_name} ${profile.last_name}` : user.email,
+      phone: profile.phone,
+      plan: profile.role,
+      customData: {
+        preferredLanguage: profile.language || 'en'
+      }
     });
   } catch (error) {
     console.error('Gleap error:', error);

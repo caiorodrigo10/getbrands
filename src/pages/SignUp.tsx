@@ -94,15 +94,26 @@ const SignUp = () => {
 
         if (profileError) throw profileError;
 
-        trackEvent('user_signed_up', {
-          userId: data.user.id,
-          email: formData.email,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          phone: formData.phone,
-          signupMethod: 'email',
-          language: 'en'
-        });
+        // Track signup event in Segment
+        if (window.analytics) {
+          window.analytics.identify(data.user.id, {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            language: 'en'
+          });
+
+          window.analytics.track('user_signed_up', {
+            userId: data.user.id,
+            email: formData.email,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            phone: formData.phone,
+            signupMethod: 'email',
+            language: 'en'
+          });
+        }
 
         navigate("/onboarding");
       }

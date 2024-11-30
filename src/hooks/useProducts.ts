@@ -28,17 +28,17 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
     let query = supabase.from("products").select("*", { count: "exact" });
 
     if (searchTerm) {
-      query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+      const formattedSearch = searchTerm.replace(/[%_]/g, '\\$&').trim();
+      query = query.ilike('name', `%${formattedSearch}%`).or(`description.ilike.%${formattedSearch}%`);
     }
 
     const { count } = await query;
 
-    let dataQuery = supabase
-      .from("products")
-      .select("*");
+    let dataQuery = supabase.from("products").select("*");
 
     if (searchTerm) {
-      dataQuery = dataQuery.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+      const formattedSearch = searchTerm.replace(/[%_]/g, '\\$&').trim();
+      dataQuery = dataQuery.ilike('name', `%${formattedSearch}%`).or(`description.ilike.%${formattedSearch}%`);
     }
 
     const { data, error } = await dataQuery
@@ -46,7 +46,7 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
       .order("created_at", { ascending: false });
 
     if (error) {
-      throw new Error(error.message);
+      throw error;
     }
 
     const totalCount = count || 0;
@@ -60,6 +60,7 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
     };
   };
 
+  // Use React Query's useInfiniteQuery for mobile
   if (isMobile) {
     return useInfiniteQuery({
       queryKey: ["products-infinite", { limit, search: searchTerm }],
@@ -69,6 +70,7 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
     });
   }
 
+  // Use regular useQuery for desktop
   return useQuery({
     queryKey: ["products", { page, limit, search: searchTerm }],
     queryFn: () => fetchProducts({ pageParam: page }),

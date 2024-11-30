@@ -59,18 +59,20 @@ export const AddressFormSection = ({
       }
     }
 
-    // Store billing preference in localStorage
+    // Store all form values in localStorage
+    localStorage.setItem('firstName', values.firstName);
+    localStorage.setItem('lastName', values.lastName);
+    localStorage.setItem('phone', values.phone);
+    localStorage.setItem('shipping_address', values.address1);
+    localStorage.setItem('shipping_address2', values.address2 || '');
+    localStorage.setItem('shipping_city', values.city);
+    localStorage.setItem('shipping_state', values.state);
+    localStorage.setItem('shipping_zip', values.zipCode);
     localStorage.setItem('useSameForBilling', useSameForBilling.toString());
+    localStorage.setItem('addressSaved', 'true');
 
-    // If using same address for billing, copy shipping address values
-    if (useSameForBilling) {
-      localStorage.setItem('billing_address', values.address1);
-      localStorage.setItem('billing_address2', values.address2 || '');
-      localStorage.setItem('billing_city', values.city);
-      localStorage.setItem('billing_state', values.state);
-      localStorage.setItem('billing_zip', values.zipCode);
-    } else {
-      // Store separate billing address
+    // Store billing address if different from shipping
+    if (!useSameForBilling) {
       localStorage.setItem('billing_address', values.billingAddress1 || '');
       localStorage.setItem('billing_address2', values.billingAddress2 || '');
       localStorage.setItem('billing_city', values.billingCity || '');
@@ -81,6 +83,37 @@ export const AddressFormSection = ({
     await onSubmit(values);
     setIsAddressSaved(true);
   };
+
+  // Load saved values from localStorage when component mounts
+  React.useEffect(() => {
+    const savedValues = {
+      firstName: localStorage.getItem('firstName') || '',
+      lastName: localStorage.getItem('lastName') || '',
+      phone: localStorage.getItem('phone') || '',
+      address1: localStorage.getItem('shipping_address') || '',
+      address2: localStorage.getItem('shipping_address2') || '',
+      city: localStorage.getItem('shipping_city') || '',
+      state: localStorage.getItem('shipping_state') || '',
+      zipCode: localStorage.getItem('shipping_zip') || '',
+      useSameForBilling: localStorage.getItem('useSameForBilling') === 'true',
+      billingAddress1: localStorage.getItem('billing_address') || '',
+      billingAddress2: localStorage.getItem('billing_address2') || '',
+      billingCity: localStorage.getItem('billing_city') || '',
+      billingState: localStorage.getItem('billing_state') || '',
+      billingZipCode: localStorage.getItem('billing_zip') || '',
+    };
+
+    // Only set form values if they're not already set
+    if (!form.getValues().firstName) {
+      form.reset(savedValues);
+    }
+
+    // Check if address was previously saved
+    const wasAddressSaved = localStorage.getItem('addressSaved') === 'true';
+    if (wasAddressSaved) {
+      setIsAddressSaved(true);
+    }
+  }, [form, setIsAddressSaved]);
 
   React.useEffect(() => {
     form.setValue("useSameForBilling", true);

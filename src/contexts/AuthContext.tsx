@@ -3,6 +3,7 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
+import { handleAnalytics, handleGleapIdentification, clearGleapIdentity } from "@/lib/auth/analytics";
 
 interface AuthContextType {
   user: User | null;
@@ -35,22 +36,65 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleAuthChange = async (session: any) => {
-    console.log('[DEBUG] handleAuthChange - Session:', session?.user?.id, 'Path:', location.pathname);
+  // Função separada para identificar usuário nos serviços de analytics
+  const identifyUserInAnalytics = async (session: any) => {
+    if (!session?.user) return;
     
-    if (session?.user) {
-      setUser(session.user);
-      setIsAuthenticated(true);
-    } else {
-      setUser(null);
-      setIsAuthenticated(false);
+    try {
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", session.user.id)
+        .single();
+
+      if (error) throw error;
+
+      if (profile) {
+        // Retry analytics identification if it fails
+        const retryAnalytics = async (retries = 3) => {
+          try {
+            await Promise.all([
+              handleAnalytics(session.user, profile),
+              handleGleapIdentification(session.user, profile)
+            ]);
+          } catch (error) {
+            if (retries > 0) {
+              console.log(`Retrying analytics identification... (${retries} attempts left)`);
+              setTimeout(() => retryAnalytics(retries - 1), 1000);
+            } else {
+              console.error('Failed to identify user in analytics after all retries');
+            }
+          }
+        };
+
+        retryAnalytics();
+      }
+    } catch (error) {
+      console.error('Error identifying user in analytics:', error);
     }
-    setIsLoading(false);
+  };
+
+  const handleAuthChange = async (session: any) => {
+    try {
+      if (session?.user) {
+        setUser(session.user);
+        setIsAuthenticated(true);
+        // Identifica o usuário nos serviços de analytics em background
+        identifyUserInAnalytics(session);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+        clearGleapIdentity();
+      }
+    } catch (error) {
+      console.error('Error in handleAuthChange:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     let mounted = true;
-    console.log('[DEBUG] AuthContext useEffect - User:', user?.id, 'Path:', location.pathname);
     
     const initSession = async () => {
       try {
@@ -90,6 +134,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       setUser(null);
       setIsAuthenticated(false);
+      clearGleapIdentity();
       navigate('/login');
       toast.success('Logged out successfully');
     } catch (error) {
@@ -101,7 +146,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const login = async (email: string, password: string) => {
-    console.log('[DEBUG] login attempt - Path:', location.pathname);
     try {
       setIsLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -114,7 +158,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(data.user);
       setIsAuthenticated(true);
       
-      // Redirecionar para /catalog após login bem-sucedido
+      // Busca o perfil e identifica nos serviços de analytics em background
+      identifyUserInAnalytics({ user: data.user });
+      
       navigate('/catalog', { replace: true });
       toast.success('Logged in successfully');
     } catch (error: any) {

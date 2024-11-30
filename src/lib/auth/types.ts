@@ -1,4 +1,5 @@
 import { User } from "@supabase/supabase-js";
+import { Json } from "@/integrations/supabase/types";
 
 export interface ProfileType {
   onboarding_completed: boolean;
@@ -18,10 +19,11 @@ export interface ProfileType {
   billing_state: string | null;
   billing_zip: string | null;
   instagram_handle: string | null;
-  product_interest: any[] | null;
+  product_interest: Json | null;
   profile_type: string | null;
   brand_status: string | null;
   launch_urgency: string | null;
+  language: string | null;
 }
 
 export interface AuthContextType {
