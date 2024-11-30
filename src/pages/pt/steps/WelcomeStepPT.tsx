@@ -35,15 +35,15 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
   ];
 
   return (
-    <div className="text-center space-y-6 w-full max-w-lg mx-auto px-3 pt-4 sm:pt-8">
+    <div className="text-center space-y-6 w-full max-w-lg mx-auto px-3 pt-8 sm:pt-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="space-y-3"
       >
-        <div className="flex flex-col items-center gap-1">
+        <div className="flex flex-col items-center gap-1 mt-4 sm:mt-0">
           <Flag className="w-5 h-5 sm:w-6 sm:h-6 text-primary mb-1" />
-          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
             Crie Sua Marca Própria nos EUA Sem Investir em Estoque
           </h2>
         </div>
