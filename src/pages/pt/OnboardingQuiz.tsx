@@ -30,65 +30,75 @@ export const OnboardingQuizPT = () => {
     },
     {
       component: (
-        <ProductCategoriesStepPT
-          selected={quizData.productCategories}
-          onAnswer={(categories) =>
-            setQuizData({ ...quizData, productCategories: categories })
-          }
-          onNext={handleNext}
-          onBack={handleBack}
-        />
+        <div className="w-full max-w-3xl mx-auto space-y-6 px-6 sm:px-8">
+          <ProductCategoriesStepPT
+            selected={quizData.productCategories}
+            onAnswer={(categories) =>
+              setQuizData({ ...quizData, productCategories: categories })
+            }
+            onNext={handleNext}
+            onBack={handleBack}
+          />
+        </div>
       ),
       autoAdvance: true,
     },
     {
       component: (
-        <ProfileTypeStepPT
-          selected={quizData.profileType}
-          onAnswer={(type) => {
-            setQuizData({ ...quizData, profileType: type });
-            handleNext();
-          }}
-          onNext={handleNext}
-          onBack={handleBack}
-        />
+        <div className="w-full max-w-3xl mx-auto space-y-6 px-6 sm:px-8">
+          <ProfileTypeStepPT
+            selected={quizData.profileType}
+            onAnswer={(type) => {
+              setQuizData({ ...quizData, profileType: type });
+              handleNext();
+            }}
+            onNext={handleNext}
+            onBack={handleBack}
+          />
+        </div>
       ),
       autoAdvance: true,
     },
     {
       component: (
-        <BrandStatusStepPT
-          selected={quizData.brandStatus}
-          onAnswer={(status) => {
-            setQuizData({ ...quizData, brandStatus: status });
-            handleNext();
-          }}
-          onNext={handleNext}
-          onBack={handleBack}
-        />
+        <div className="w-full max-w-3xl mx-auto space-y-6 px-6 sm:px-8">
+          <BrandStatusStepPT
+            selected={quizData.brandStatus}
+            onAnswer={(status) => {
+              setQuizData({ ...quizData, brandStatus: status });
+              handleNext();
+            }}
+            onNext={handleNext}
+            onBack={handleBack}
+          />
+        </div>
       ),
       autoAdvance: true,
     },
     {
       component: (
-        <LaunchUrgencyStepPT
-          selected={quizData.launchUrgency}
-          onAnswer={(urgency) => {
-            setQuizData({ ...quizData, launchUrgency: urgency });
-            handleNext();
-          }}
-          onNext={handleNext}
-          onBack={handleBack}
-        />
+        <div className="w-full max-w-3xl mx-auto space-y-6 px-6 sm:px-8">
+          <LaunchUrgencyStepPT
+            selected={quizData.launchUrgency}
+            onAnswer={(urgency) => {
+              setQuizData({ ...quizData, launchUrgency: urgency });
+              handleNext();
+            }}
+            onNext={handleNext}
+            onBack={handleBack}
+          />
+        </div>
       ),
       autoAdvance: true,
     },
     {
       component: (
-        <SignUpFormStepPT
-          onBack={handleBack}
-          quizData={quizData}
-        />
+        <div className="w-full max-w-3xl mx-auto space-y-6 px-6 sm:px-8">
+          <SignUpFormStepPT
+            onBack={handleBack}
+            quizData={quizData}
+          />
+        </div>
       ),
       autoAdvance: false,
     },
