@@ -18,7 +18,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
       if (scrollContainer.scrollLeft >= scrollContainer.scrollWidth / 2) {
         scrollContainer.scrollLeft = 0;
       } else {
-        scrollContainer.scrollLeft += 0.5;
+        scrollContainer.scrollLeft += 1;
       }
     };
 
@@ -73,18 +73,18 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="w-full overflow-hidden -mx-3 sm:mx-0"
+        className="w-full overflow-hidden"
       >
         <div 
           ref={scrollRef}
-          className="overflow-hidden whitespace-nowrap relative w-full"
+          className="overflow-hidden whitespace-nowrap"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          <div className="inline-flex gap-2 sm:gap-3 animate-scroll" style={{ paddingRight: '1rem' }}>
+          <div className="inline-flex gap-2 sm:gap-3 min-w-full animate-scroll">
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`first-${index}`}
-                className="inline-block w-[160px] sm:w-[180px] p-3 sm:p-4 bg-primary/5 rounded-lg whitespace-normal"
+                className="inline-block w-[130px] sm:w-[160px] p-2 sm:p-3 bg-primary/5 rounded-lg whitespace-normal"
               >
                 <Flag className="w-4 h-4 sm:w-5 sm:h-5 text-primary mx-auto mb-1 sm:mb-2" />
                 <h3 className="font-semibold mb-1 text-xs sm:text-sm">{block.title}</h3>
@@ -97,7 +97,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`second-${index}`}
-                className="inline-block w-[160px] sm:w-[180px] p-3 sm:p-4 bg-primary/5 rounded-lg whitespace-normal"
+                className="inline-block w-[130px] sm:w-[160px] p-2 sm:p-3 bg-primary/5 rounded-lg whitespace-normal"
               >
                 <Flag className="w-4 h-4 sm:w-5 sm:h-5 text-primary mx-auto mb-1 sm:mb-2" />
                 <h3 className="font-semibold mb-1 text-xs sm:text-sm">{block.title}</h3>
