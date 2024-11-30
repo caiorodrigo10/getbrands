@@ -77,18 +77,18 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="w-full overflow-hidden -mx-3 sm:mx-0"
+        className="w-full -mx-3 sm:mx-0"
       >
         <div 
           ref={scrollRef}
-          className="overflow-hidden whitespace-nowrap mx-auto"
+          className="overflow-hidden relative w-screen sm:w-auto"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          <div className="inline-flex gap-2 sm:gap-3 min-w-full animate-scroll justify-center">
+          <div className="flex gap-2 sm:gap-3 animate-scroll w-[200%] justify-center">
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`first-${index}`}
-                className="inline-block w-[140px] sm:w-[170px] p-2 sm:p-3 bg-primary/5 rounded-lg whitespace-normal"
+                className="flex-none w-[140px] sm:w-[170px] p-2 sm:p-3 bg-primary/5 rounded-lg"
               >
                 <Check className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 text-primary" />
                 <h3 className="font-semibold mb-1 text-sm sm:text-base">{block.title}</h3>
@@ -101,7 +101,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`second-${index}`}
-                className="inline-block w-[140px] sm:w-[170px] p-2 sm:p-3 bg-primary/5 rounded-lg whitespace-normal"
+                className="flex-none w-[140px] sm:w-[170px] p-2 sm:p-3 bg-primary/5 rounded-lg"
               >
                 <Check className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 text-primary" />
                 <h3 className="font-semibold mb-1 text-sm sm:text-base">{block.title}</h3>
