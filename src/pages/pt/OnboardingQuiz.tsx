@@ -72,7 +72,7 @@ export function OnboardingQuizPT() {
 
   const isPublicFlow = location.pathname === "/comecarpt";
 
-  const baseSteps = [
+  const baseSteps: Step[] = [
     {
       component: WelcomeStepPT,
       name: "Bem-vindo",
