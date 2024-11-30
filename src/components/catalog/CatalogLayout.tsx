@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { useProducts } from "@/hooks/useProducts";
-import { UseQueryResult } from "@tanstack/react-query";
+import { UseQueryResult, UseInfiniteQueryResult } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { useWindowSize } from "@/hooks/useWindowSize";
 
@@ -31,26 +31,29 @@ const CatalogLayout = () => {
   const productsQuery = useProducts({ 
     page: currentPage,
     limit: itemsPerPage
-  }) as UseQueryResult<any>;
+  });
 
-  const { 
+  const {
     data: productsData,
     isLoading,
     error,
+  } = productsQuery as UseQueryResult<any>;
+
+  const {
     hasNextPage,
     isFetchingNextPage,
-    fetchNextPage
-  } = productsQuery;
+    fetchNextPage,
+    data: infiniteData,
+  } = productsQuery as UseInfiniteQueryResult<any>;
 
   useEffect(() => {
-    if (productsData?.data) {
-      if (isMobile) {
-        setAllProducts(prev => [...prev, ...productsData.data]);
-      } else {
-        setAllProducts(productsData.data);
-      }
+    if (isMobile && infiniteData?.pages) {
+      const products = infiniteData.pages.flatMap(page => page.data);
+      setAllProducts(products);
+    } else if (productsData?.data) {
+      setAllProducts(productsData.data);
     }
-  }, [productsData?.data, isMobile]);
+  }, [productsData?.data, infiniteData?.pages, isMobile]);
 
   useEffect(() => {
     if (inView && isMobile && hasNextPage && !isFetchingNextPage) {

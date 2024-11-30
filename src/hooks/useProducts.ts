@@ -61,6 +61,7 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
     return useInfiniteQuery({
       queryKey: ["products-infinite", { limit, search: searchTerm }],
       queryFn: fetchProducts,
+      initialPageParam: 1,
       getNextPageParam: (lastPage) => lastPage.nextPage,
     });
   }
