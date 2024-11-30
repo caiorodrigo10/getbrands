@@ -21,7 +21,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
       }
     };
 
-    const intervalId = setInterval(scroll, 16); // ~60fps for smooth scrolling
+    const intervalId = setInterval(scroll, 16);
 
     return () => clearInterval(intervalId);
   }, []);
@@ -64,7 +64,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
           <img
             src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
             alt="GetBrands Logo"
-            className="h-4 sm:h-5 mb-1"
+            className="h-8 sm:h-10 mb-1"
           />
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
             Crie Sua Marca Própria nos EUA Sem Investir em Estoque
@@ -92,7 +92,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
                 <img
                   src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
                   alt="GetBrands Logo"
-                  className="w-3 h-3 sm:w-4 sm:h-4 mx-auto mb-1 sm:mb-2"
+                  className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2"
                 />
                 <h3 className="font-semibold mb-1 text-xs sm:text-sm">{block.title}</h3>
                 <p className="text-xs text-muted-foreground">
@@ -109,7 +109,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
                 <img
                   src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
                   alt="GetBrands Logo"
-                  className="w-3 h-3 sm:w-4 sm:h-4 mx-auto mb-1 sm:mb-2"
+                  className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2"
                 />
                 <h3 className="font-semibold mb-1 text-xs sm:text-sm">{block.title}</h3>
                 <p className="text-xs text-muted-foreground">
