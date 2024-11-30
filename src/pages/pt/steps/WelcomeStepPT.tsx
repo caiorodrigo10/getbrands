@@ -55,14 +55,14 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
   ];
 
   return (
-    <div className="text-center space-y-8 max-w-lg mx-auto px-4 pt-12">
+    <div className="text-center space-y-6 max-w-lg mx-auto px-4 pt-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-4"
+        className="space-y-3"
       >
-        <div className="flex flex-col items-center gap-2">
-          <Flag className="w-6 h-6 text-primary mb-2" />
+        <div className="flex flex-col items-center gap-1">
+          <Flag className="w-6 h-6 text-primary mb-1" />
           <h2 className="text-xl sm:text-3xl font-bold text-gray-900 px-4 sm:px-0">
             Crie Sua Marca Própria nos EUA Sem Investir em Estoque
           </h2>
@@ -79,14 +79,14 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
           ref={scrollRef}
           className="overflow-hidden whitespace-nowrap"
         >
-          <div className="inline-flex gap-4 min-w-full">
+          <div className="inline-flex gap-3 min-w-full">
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`first-${index}`}
-                className="inline-block w-[140px] sm:w-[160px] p-3 sm:p-4 bg-primary/5 rounded-lg whitespace-normal"
+                className="inline-block w-[140px] sm:w-[160px] p-2 sm:p-3 bg-primary/5 rounded-lg whitespace-normal"
               >
-                <Check className="w-5 h-5 sm:w-6 sm:h-6 text-primary mx-auto mb-2 sm:mb-3" />
-                <h3 className="font-semibold mb-1 sm:mb-2 text-sm">{block.title}</h3>
+                <Check className="w-5 h-5 sm:w-6 sm:h-6 text-primary mx-auto mb-1 sm:mb-2" />
+                <h3 className="font-semibold mb-1 text-sm">{block.title}</h3>
                 <p className="text-xs text-muted-foreground">
                   {block.description}
                 </p>
@@ -96,10 +96,10 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`second-${index}`}
-                className="inline-block w-[140px] sm:w-[160px] p-3 sm:p-4 bg-primary/5 rounded-lg whitespace-normal"
+                className="inline-block w-[140px] sm:w-[160px] p-2 sm:p-3 bg-primary/5 rounded-lg whitespace-normal"
               >
-                <Check className="w-5 h-5 sm:w-6 sm:h-6 text-primary mx-auto mb-2 sm:mb-3" />
-                <h3 className="font-semibold mb-1 sm:mb-2 text-sm">{block.title}</h3>
+                <Check className="w-5 h-5 sm:w-6 sm:h-6 text-primary mx-auto mb-1 sm:mb-2" />
+                <h3 className="font-semibold mb-1 text-sm">{block.title}</h3>
                 <p className="text-xs text-muted-foreground">
                   {block.description}
                 </p>
