@@ -90,15 +90,15 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
                 key={`first-${index}`}
                 className="flex-none w-[140px] sm:w-[170px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[180px]"
               >
-                <div className="flex-none h-12 flex items-center">
+                <div className="flex-none h-8 flex items-center">
                   <Check className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
                 </div>
-                <div className="flex-none h-14 flex items-center">
+                <div className="flex-none h-10 flex items-center">
                   <h3 className="font-semibold text-sm sm:text-base leading-tight">
                     {block.title}
                   </h3>
                 </div>
-                <div className="flex-1 flex items-start">
+                <div className="flex-1 flex items-start pt-1 pb-3">
                   <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                     {block.description}
                   </p>
@@ -111,15 +111,15 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
                 key={`second-${index}`}
                 className="flex-none w-[140px] sm:w-[170px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[180px]"
               >
-                <div className="flex-none h-12 flex items-center">
+                <div className="flex-none h-8 flex items-center">
                   <Check className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
                 </div>
-                <div className="flex-none h-14 flex items-center">
+                <div className="flex-none h-10 flex items-center">
                   <h3 className="font-semibold text-sm sm:text-base leading-tight">
                     {block.title}
                   </h3>
                 </div>
-                <div className="flex-1 flex items-start">
+                <div className="flex-1 flex items-start pt-1 pb-3">
                   <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                     {block.description}
                   </p>
