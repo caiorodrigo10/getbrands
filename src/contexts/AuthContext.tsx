@@ -36,27 +36,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Função separada para identificar usuário nos serviços de analytics
+  const identifyUserInAnalytics = async (session: any) => {
+    if (!session?.user) return;
+    
+    try {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", session.user.id)
+        .single();
+
+      if (profile) {
+        // Não bloqueia o fluxo se falhar
+        Promise.allSettled([
+          handleAnalytics(session.user, profile),
+          handleGleapIdentification(session.user, profile)
+        ]).catch(console.error);
+      }
+    } catch (error) {
+      console.error('Error identifying user in analytics:', error);
+    }
+  };
+
   const handleAuthChange = async (session: any) => {
     try {
       if (session?.user) {
-        // Fetch user profile data
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
-
-        if (profileError) throw profileError;
-
-        // Set auth state
         setUser(session.user);
         setIsAuthenticated(true);
-
-        // Identify user in analytics services
-        if (profile) {
-          handleAnalytics(session.user, profile);
-          handleGleapIdentification(session.user, profile);
-        }
+        // Identifica o usuário nos serviços de analytics em background
+        identifyUserInAnalytics(session);
       } else {
         setUser(null);
         setIsAuthenticated(false);
@@ -64,7 +73,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch (error) {
       console.error('Error in handleAuthChange:', error);
-      // Don't clear user state on error to prevent unnecessary logouts
     } finally {
       setIsLoading(false);
     }
@@ -132,21 +140,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) throw error;
 
-      // Fetch profile data immediately after successful login
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", data.user.id)
-        .single();
-
-      if (profileError) throw profileError;
-
       setUser(data.user);
       setIsAuthenticated(true);
-
-      // Identify user in analytics services
-      handleAnalytics(data.user, profile);
-      handleGleapIdentification(data.user, profile);
+      
+      // Busca o perfil e identifica nos serviços de analytics em background
+      identifyUserInAnalytics({ user: data.user });
       
       navigate('/catalog', { replace: true });
       toast.success('Logged in successfully');

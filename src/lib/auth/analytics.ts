@@ -3,12 +3,12 @@ import { ProfileType } from "./types";
 import Gleap from "gleap";
 
 export const handleAnalytics = async (user: User, profile: ProfileType) => {
-  try {
-    if (!window.analytics) {
-      console.warn('Segment analytics not initialized');
-      return;
-    }
+  if (!window.analytics) {
+    console.warn('Segment analytics not initialized');
+    return;
+  }
 
+  try {
     // Prepare user traits for Segment
     const traits = {
       email: user.email,
@@ -37,16 +37,7 @@ export const handleAnalytics = async (user: User, profile: ProfileType) => {
       preferred_language: profile.language || 'en'
     };
 
-    // Identify user in Segment
     window.analytics.identify(user.id, traits);
-
-    // Track login event
-    window.analytics.track("User Session Started", {
-      user_id: user.id,
-      email: user.email,
-      login_method: "email",
-      role: profile.role,
-    });
   } catch (error) {
     console.error('Analytics error:', error);
   }
