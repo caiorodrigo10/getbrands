@@ -17,7 +17,6 @@ const DESKTOP_ITEMS_PER_PAGE = 9;
 
 const CatalogLayout = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const { toast } = useToast();
   const { width } = useWindowSize();
   const isMobile = width ? width < 768 : false;
   const itemsPerPage = isMobile ? MOBILE_ITEMS_PER_PAGE : DESKTOP_ITEMS_PER_PAGE;
@@ -62,11 +61,11 @@ const CatalogLayout = () => {
   }, [inView, isMobile, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (error) {
-    toast({
-      variant: "destructive",
-      title: "Error loading products",
-      description: "Failed to load products. Please try again.",
-    });
+    return (
+      <div className="text-center py-12">
+        <p className="text-lg text-red-600">Error loading products. Please try again.</p>
+      </div>
+    );
   }
 
   const totalPages = productsData?.totalPages || 1;

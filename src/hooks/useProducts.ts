@@ -28,14 +28,7 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
     let query = supabase.from("products").select("*", { count: "exact" });
 
     if (searchTerm) {
-      // Properly format search terms for PostgreSQL ilike
-      const formattedSearch = searchTerm
-        .replace(/[%_]/g, '\\$&') // Escape special PostgreSQL characters
-        .trim();
-      
-      query = query.or(
-        `name.ilike.%${formattedSearch}%,description.ilike.%${formattedSearch}%`
-      );
+      query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
     }
 
     const { count } = await query;
@@ -43,14 +36,7 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
     let dataQuery = supabase.from("products").select("*");
 
     if (searchTerm) {
-      // Use the same formatted search term
-      const formattedSearch = searchTerm
-        .replace(/[%_]/g, '\\$&')
-        .trim();
-        
-      dataQuery = dataQuery.or(
-        `name.ilike.%${formattedSearch}%,description.ilike.%${formattedSearch}%`
-      );
+      dataQuery = dataQuery.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
     }
 
     const { data, error } = await dataQuery
