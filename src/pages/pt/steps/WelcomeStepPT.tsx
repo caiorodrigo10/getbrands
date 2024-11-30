@@ -48,6 +48,8 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
     "/lovable-uploads/9954d0ec-cdbf-439d-8dc7-52e39fc08778.png",
     "/lovable-uploads/e82547dd-1abc-486c-8932-56bacd4b77bc.png",
     "/lovable-uploads/02151e6b-cad9-45a1-8115-97fd85ff7aae.png",
+    "/lovable-uploads/9ce98c58-429f-40c2-b6fd-7dc44224e3dc.png",
+    "/lovable-uploads/516b2ea6-8b74-4c84-b3fd-a91636e32f9b.png",
   ];
 
   const benefitBlocks = [
@@ -96,7 +98,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         </div>
       </motion.div>
 
-      {/* New Scrolling Images Section */}
+      {/* Scrolling Images Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
