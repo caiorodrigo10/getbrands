@@ -9,9 +9,10 @@ export const ProductDetailsHeader = () => {
     <Button
       onClick={() => navigate('/catalog')}
       variant="ghost"
-      className="hover:text-white hover:bg-orange-500 transition-colors"
+      size="sm"
+      className="hover:text-white hover:bg-orange-500 transition-colors -mt-4"
     >
-      <ArrowLeft className="mr-2 h-4 w-4" />
+      <ArrowLeft className="mr-1 h-3 w-3" />
       Back to Catalog
     </Button>
   );

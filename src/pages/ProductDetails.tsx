@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/analytics";
+import { Skeleton } from "@/components/ui/skeleton";
 import ProjectSelectionDialog from "@/components/dialogs/ProjectSelectionDialog";
 import { ProductHeader } from "@/components/products/ProductHeader";
 import { ProductBenefits } from "@/components/products/ProductBenefits";
