@@ -65,18 +65,11 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         <div className="relative inline-block">
           <motion.div
             className="absolute -inset-1 rounded-full bg-gradient-to-r from-yellow-300 to-yellow-400 opacity-75 blur-sm"
-            animate={{
-              background: [
-                "linear-gradient(0deg, #FCD34D, #FBBF24)",
-                "linear-gradient(90deg, #FBBF24, #FCD34D)",
-                "linear-gradient(180deg, #FCD34D, #FBBF24)",
-                "linear-gradient(270deg, #FBBF24, #FCD34D)",
-              ],
-            }}
+            animate={{ rotate: 360 }}
             transition={{
-              duration: 2,
+              duration: 8,
               repeat: Infinity,
-              ease: "linear",
+              ease: "linear"
             }}
           />
           <Button
