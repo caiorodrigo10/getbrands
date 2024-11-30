@@ -74,7 +74,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
-        className="mt-8 sm:mt-12 space-y-6"
+        className="mt-12 sm:mt-16 space-y-6"
       >
         <img 
           src="/lovable-uploads/cc9f9846-a08c-4a17-9291-e8274c62f7dd.png"
