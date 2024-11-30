@@ -64,14 +64,8 @@ export default {
         'section': '1rem',
       },
       fontSize: {
-        'page-title': ['1.5rem', {
-          lineHeight: '2rem',
-          fontWeight: '700',
-        }],
-        'section-title': ['1.25rem', {
-          lineHeight: '1.75rem',
-          fontWeight: '600',
-        }],
+        'page-title': ['1.5rem', { lineHeight: '2rem', fontWeight: '700' }],
+        'section-title': ['1.25rem', { lineHeight: '1.75rem', fontWeight: '600' }],
       },
       keyframes: {
         "accordion-down": {
@@ -84,18 +78,15 @@ export default {
         },
         scroll: {
           '0%': { transform: 'translateX(0)' },
-          '100%': { transform: 'translateX(-50%)' },
+          '100%': { transform: 'translateX(calc(-50% - 0.5rem))' },
         }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "scroll": "scroll 20s linear infinite",
+        "scroll": "scroll 40s linear infinite",
       },
     },
   },
-  plugins: [
-    require("tailwindcss-animate"),
-    require("@tailwindcss/typography")
-  ],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 } satisfies Config;
