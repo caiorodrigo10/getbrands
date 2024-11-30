@@ -15,11 +15,11 @@ export const QuizIntro = ({ onStart }: QuizIntroProps) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <div className="flex items-center justify-center gap-3 mb-4">
+        <div className="flex flex-col items-center gap-2">
+          <Flag className="w-6 h-6 text-primary mb-2" />
           <h1 className="text-4xl font-bold text-primary">
             Crie Sua Marca Própria nos EUA Sem Investir em Estoque
           </h1>
-          <Flag className="w-8 h-8 text-primary" />
         </div>
         <p className="text-xl text-muted-foreground mb-8">
           Lance sua marca de cosméticos, café, suplementos ou pet sem investimento em estoque, com fornecedores americanos

@@ -14,11 +14,11 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-4"
       >
-        <div className="flex items-center justify-center gap-3 mb-2">
+        <div className="flex flex-col items-center gap-2">
+          <Flag className="w-6 h-6 text-primary mb-2" />
           <h2 className="text-2xl sm:text-4xl font-bold text-gray-900">
             Crie Sua Marca Própria nos EUA Sem Investir em Estoque
           </h2>
-          <Flag className="w-8 h-8 text-primary" />
         </div>
         <p className="text-lg text-gray-600 max-w-md mx-auto">
           Lance sua marca própria sem investimento em estoque, com fornecedores americanos de alta qualidade
