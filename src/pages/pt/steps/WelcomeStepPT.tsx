@@ -98,7 +98,6 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         </div>
       </motion.div>
 
-      {/* Scrolling Images Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -132,8 +131,8 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <p className="text-lg sm:text-xl md:text-2xl text-gray-600 max-w-md mx-auto">
-          Lance sua marca própria sem investimento em estoque, com fornecedores americanos de alta qualidade
+        <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-md mx-auto">
+          Lance sua marca própria sem investimento em estoque, com fornecedores americanos de alta qualidade.
         </p>
       </motion.div>
 
@@ -222,7 +221,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
           </div>
         </motion.div>
 
-        <p className="text-lg sm:text-xl md:text-2xl text-gray-600 max-w-md mx-auto">
+        <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-md mx-auto">
           Na GetBrands, transformamos sonhos em marcas de sucesso. Nossa missão é democratizar o empreendedorismo, permitindo que você construa sua marca premium sem as barreiras tradicionais.
         </p>
         <div className="mt-8">
