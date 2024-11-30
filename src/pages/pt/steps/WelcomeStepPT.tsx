@@ -76,63 +76,6 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="w-full -mx-3 sm:mx-0"
-      >
-        <div 
-          ref={scrollRef}
-          className="overflow-hidden relative w-screen sm:w-auto"
-          style={{ WebkitOverflowScrolling: 'touch' }}
-        >
-          <div className="flex gap-2 sm:gap-3 animate-scroll w-[200%] justify-center">
-            {benefitBlocks.map((block, index) => (
-              <div 
-                key={`first-${index}`}
-                className="flex-none w-[140px] sm:w-[170px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[180px]"
-              >
-                <div className="flex-none h-8 flex items-center">
-                  <Check className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-                </div>
-                <div className="flex-none h-10 flex items-center">
-                  <h3 className="font-semibold text-sm sm:text-base leading-tight">
-                    {block.title}
-                  </h3>
-                </div>
-                <div className="flex-1 flex items-start pt-1 pb-3">
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                    {block.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-            
-            {benefitBlocks.map((block, index) => (
-              <div 
-                key={`second-${index}`}
-                className="flex-none w-[140px] sm:w-[170px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[180px]"
-              >
-                <div className="flex-none h-8 flex items-center">
-                  <Check className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-                </div>
-                <div className="flex-none h-10 flex items-center">
-                  <h3 className="font-semibold text-sm sm:text-base leading-tight">
-                    {block.title}
-                  </h3>
-                </div>
-                <div className="flex-1 flex items-start pt-1 pb-3">
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                    {block.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
         <p className="text-lg sm:text-xl md:text-2xl text-gray-600 max-w-md mx-auto">
@@ -156,8 +99,6 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         </div>
       </motion.div>
 
-      <div className="h-10"></div>
-
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -169,6 +110,64 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
           alt="Produto GetBrands"
           className="mx-auto rounded-lg shadow-lg max-w-[85%] sm:max-w-sm"
         />
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="w-full -mx-3 sm:mx-0"
+        >
+          <div 
+            ref={scrollRef}
+            className="overflow-hidden relative w-screen sm:w-auto"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
+            <div className="flex gap-2 sm:gap-3 animate-scroll w-[200%] justify-center">
+              {benefitBlocks.map((block, index) => (
+                <div 
+                  key={`first-${index}`}
+                  className="flex-none w-[140px] sm:w-[170px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[180px]"
+                >
+                  <div className="flex-none h-8 flex items-center">
+                    <Check className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                  </div>
+                  <div className="flex-none h-10 flex items-center">
+                    <h3 className="font-semibold text-sm sm:text-base leading-tight">
+                      {block.title}
+                    </h3>
+                  </div>
+                  <div className="flex-1 flex items-start pt-1 pb-3">
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                      {block.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              
+              {benefitBlocks.map((block, index) => (
+                <div 
+                  key={`second-${index}`}
+                  className="flex-none w-[140px] sm:w-[170px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[180px]"
+                >
+                  <div className="flex-none h-8 flex items-center">
+                    <Check className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                  </div>
+                  <div className="flex-none h-10 flex items-center">
+                    <h3 className="font-semibold text-sm sm:text-base leading-tight">
+                      {block.title}
+                    </h3>
+                  </div>
+                  <div className="flex-1 flex items-start pt-1 pb-3">
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                      {block.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
         <p className="text-lg sm:text-xl md:text-2xl text-gray-600 max-w-md mx-auto">
           Na GetBrands, transformamos sonhos em marcas de sucesso. Nossa missão é democratizar o empreendedorismo, permitindo que você construa sua marca premium sem as barreiras tradicionais.
         </p>
