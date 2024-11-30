@@ -8,7 +8,7 @@ interface WelcomeStepProps {
 
 export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
   return (
-    <div className="text-center space-y-6 max-w-lg mx-auto px-4">
+    <div className="text-center space-y-6 max-w-lg mx-auto px-4 pt-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
