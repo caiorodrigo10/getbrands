@@ -5,8 +5,10 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
+import { trackProfileViewed } from "@/lib/analytics/pages";
 
-const Perfil = () => {
+const Profile = () => {
   const { user } = useAuth();
 
   const { data: profile } = useQuery({
@@ -22,6 +24,10 @@ const Perfil = () => {
     },
     enabled: !!user?.id,
   });
+
+  useEffect(() => {
+    trackProfileViewed();
+  }, []);
 
   return (
     <div className="container max-w-2xl mx-auto space-y-8 p-4">
@@ -68,4 +74,4 @@ const Perfil = () => {
   );
 };
 
-export default Perfil;
+export default Profile;

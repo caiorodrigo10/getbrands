@@ -11,6 +11,7 @@ import UpcomingMeetings from "@/components/dashboard/UpcomingMeetings";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useUserPermissions } from "@/lib/permissions";
 import { useEffect } from "react";
+import { trackDashboardViewed } from "@/lib/analytics/pages";
 import {
   Carousel,
   CarouselContent,
@@ -37,6 +38,12 @@ const Dashboard = () => {
       navigate('/catalog');
     }
   }, [hasFullAccess, navigate]);
+
+  useEffect(() => {
+    if (isAuthenticated && hasFullAccess) {
+      trackDashboardViewed();
+    }
+  }, [isAuthenticated, hasFullAccess]);
 
   if (!isAuthenticated || !hasFullAccess) {
     return null;
