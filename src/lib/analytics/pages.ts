@@ -57,8 +57,9 @@ export const trackSampleOrdersViewed = () => {
   });
 };
 
-export const trackProfitCalculatorViewed = () => {
-  trackEvent("Profit Calculator Viewed", {
+export const trackSampleOrderDetailsViewed = (orderId: string) => {
+  trackEvent("Sample Order Details Viewed", {
+    orderId,
     timestamp: new Date().toISOString()
   });
 };

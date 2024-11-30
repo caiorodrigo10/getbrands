@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import OrderTable from "@/components/sample-orders/OrderTable";
@@ -6,6 +6,7 @@ import OrderStatusFilters from "@/components/sample-orders/OrderStatusFilters";
 import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackSampleOrdersViewed } from "@/lib/analytics/pages";
 import { 
   Pagination, 
   PaginationContent, 
@@ -23,6 +24,10 @@ const SampleOrders = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
   const { user } = useAuth();
+
+  useEffect(() => {
+    trackSampleOrdersViewed();
+  }, []);
 
   const { data: ordersData, isLoading, refetch } = useQuery({
     queryKey: ["sample-orders", currentPage, selectedStatus, user?.id],
