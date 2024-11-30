@@ -55,15 +55,15 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
   ];
 
   return (
-    <div className="text-center space-y-6 max-w-lg mx-auto px-4 pt-8">
+    <div className="text-center space-y-6 max-w-lg mx-auto px-4 pt-4 sm:pt-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="space-y-3"
       >
         <div className="flex flex-col items-center gap-1">
-          <Flag className="w-6 h-6 text-primary mb-1" />
-          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 px-4 sm:px-0">
+          <Flag className="w-5 h-5 sm:w-6 sm:h-6 text-primary mb-1" />
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 px-2 sm:px-0 leading-tight">
             Crie Sua Marca Própria nos EUA Sem Investir em Estoque
           </h2>
         </div>
@@ -114,7 +114,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <p className="text-base sm:text-lg text-gray-600 max-w-md mx-auto px-4 sm:px-0">
+        <p className="text-sm sm:text-lg text-gray-600 max-w-md mx-auto px-2 sm:px-0">
           Lance sua marca própria sem investimento em estoque, com fornecedores americanos de alta qualidade
         </p>
       </motion.div>
@@ -129,7 +129,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
           <Button
             size="lg"
             onClick={onNext}
-            className="relative z-10 bg-primary hover:bg-primary/90 text-white px-8 py-3 min-w-[250px] shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 border-[3px] border-white/40 hover:border-white/90 rounded-xl hover:rounded-2xl"
+            className="relative z-10 bg-primary hover:bg-primary/90 text-white px-6 sm:px-8 py-2.5 sm:py-3 min-w-[200px] sm:min-w-[250px] shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 border-[3px] border-white/40 hover:border-white/90 rounded-xl hover:rounded-2xl text-sm sm:text-base"
           >
             Ver Catálogo de Produtos
           </Button>
@@ -140,14 +140,14 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
-        className="mt-20 sm:mt-24 space-y-8"
+        className="mt-16 sm:mt-20 space-y-6 sm:space-y-8"
       >
         <img 
           src="/lovable-uploads/cc9f9846-a08c-4a17-9291-e8274c62f7dd.png"
           alt="Produto GetBrands"
-          className="mx-auto rounded-lg shadow-lg max-w-[85%] sm:max-w-sm"
+          className="mx-auto rounded-lg shadow-lg max-w-[90%] sm:max-w-sm"
         />
-        <p className="text-base sm:text-lg text-gray-600 max-w-md mx-auto px-4 sm:px-0">
+        <p className="text-sm sm:text-lg text-gray-600 max-w-md mx-auto px-2 sm:px-0">
           Na GetBrands, transformamos sonhos em marcas de sucesso. Nossa missão é democratizar o empreendedorismo, permitindo que você construa sua marca premium sem as barreiras tradicionais.
         </p>
       </motion.div>

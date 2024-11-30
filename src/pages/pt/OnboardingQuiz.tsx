@@ -72,14 +72,13 @@ export function OnboardingQuizPT() {
 
   const isPublicFlow = location.pathname === "/comecarpt";
 
-  const baseSteps: Step[] = [
+  const baseSteps = [
     {
       component: WelcomeStepPT,
       name: "Bem-vindo",
       props: {
         onNext: handleNext,
       },
-      autoAdvance: true,
     },
     {
       component: ProductCategoriesStepPT,
@@ -156,7 +155,7 @@ export function OnboardingQuizPT() {
   const currentStepProps = steps[currentStep].props || {};
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-2 sm:p-4">
       <CurrentStepComponent {...currentStepProps} />
     </div>
   );
