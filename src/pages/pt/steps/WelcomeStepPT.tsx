@@ -88,7 +88,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`first-${index}`}
-                className="flex-none w-[140px] sm:w-[170px] p-2 sm:p-3 bg-primary/5 rounded-lg flex flex-col justify-center items-center h-full"
+                className="flex-none w-[140px] sm:w-[170px] p-2 sm:p-3 bg-primary/5 rounded-lg"
               >
                 <Check className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 text-primary" />
                 <h3 className="font-semibold mb-1 text-sm sm:text-base">{block.title}</h3>
@@ -101,7 +101,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`second-${index}`}
-                className="flex-none w-[140px] sm:w-[170px] p-2 sm:p-3 bg-primary/5 rounded-lg flex flex-col justify-center items-center h-full"
+                className="flex-none w-[140px] sm:w-[170px] p-2 sm:p-3 bg-primary/5 rounded-lg"
               >
                 <Check className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 text-primary" />
                 <h3 className="font-semibold mb-1 text-sm sm:text-base">{block.title}</h3>
