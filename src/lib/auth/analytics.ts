@@ -34,7 +34,7 @@ export const handleAnalytics = async (user: User, profile: ProfileType) => {
       // Metadata
       created_at: user.created_at,
       last_sign_in: user.last_sign_in_at,
-      language: profile.language || 'en'
+      preferred_language: profile.language || 'en'
     };
 
     // Identify user in Segment
@@ -59,7 +59,9 @@ export const handleGleapIdentification = (user: User, profile: ProfileType) => {
       name: profile.first_name ? `${profile.first_name} ${profile.last_name}` : user.email,
       phone: profile.phone,
       plan: profile.role,
-      language: profile.language || 'en'
+      customData: {
+        preferredLanguage: profile.language || 'en'
+      }
     });
   } catch (error) {
     console.error('Gleap error:', error);
