@@ -42,12 +42,14 @@ export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSea
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Safely handle the products data with proper typing
-  const products = productsQuery.data ? (productsQuery.data as ProductsResponse).data : [];
+  // Safely handle the products data with proper typing and null checks
+  const products = (productsQuery.data as ProductsResponse)?.data || [];
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(query.toLowerCase())
-  );
+  const filteredProducts = query 
+    ? products.filter(product =>
+        product.name.toLowerCase().includes(query.toLowerCase())
+      )
+    : products;
 
   const handleSelect = async (product: Product) => {
     if (addToCart) {
