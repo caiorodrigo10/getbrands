@@ -56,7 +56,7 @@ export const ProductCategoriesStepPT = ({
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-6 px-6 sm:px-8">
+    <div className="w-full max-w-3xl mx-auto space-y-6">
       <div className="text-center">
         <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-2">
           Qual categoria de produto você tem interesse em criar?
