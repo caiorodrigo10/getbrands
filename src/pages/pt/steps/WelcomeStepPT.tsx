@@ -81,7 +81,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
           alt="Produto GetBrands"
           className="mx-auto rounded-lg shadow-lg max-w-sm"
         />
-        <p className="text-lg text-gray-700 font-medium max-w-md mx-auto">
+        <p className="text-lg text-gray-600 max-w-md mx-auto">
           Na GetBrands, transformamos sonhos em marcas de sucesso. Nossa missão é democratizar o empreendedorismo, permitindo que você construa sua marca premium sem as barreiras tradicionais.
         </p>
       </motion.div>
