@@ -36,8 +36,8 @@ const CatalogLayout = () => {
   const totalPages = productsData?.totalPages || 1;
 
   return (
-    <div className="flex flex-col min-h-screen pb-16">
-      <div className="flex-grow">
+    <div className="flex flex-col min-h-screen">
+      <div className="flex-grow pb-20 md:pb-0">
         <div>
           <h1 className="text-page-title mb-2">Welcome!</h1>
           <p className="text-muted-foreground">Choose a product to customize</p>
@@ -75,7 +75,7 @@ const CatalogLayout = () => {
       </div>
       
       {totalPages > 1 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t md:relative md:border-0 md:bg-transparent">
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t w-full md:relative md:border-0 md:bg-transparent md:mt-8">
           <div className="container mx-auto py-4 md:py-0">
             <CatalogPagination
               currentPage={currentPage}

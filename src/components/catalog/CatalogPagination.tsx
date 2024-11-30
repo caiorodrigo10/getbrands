@@ -55,7 +55,7 @@ const CatalogPagination = ({ currentPage, totalPages, onPageChange }: CatalogPag
 
   return (
     <Pagination>
-      <PaginationContent className="text-gray-900">
+      <PaginationContent className="flex items-center justify-center gap-1">
         <PaginationItem>
           <PaginationPrevious
             onClick={() => onPageChange(Math.max(1, currentPage - 1))}
@@ -64,7 +64,7 @@ const CatalogPagination = ({ currentPage, totalPages, onPageChange }: CatalogPag
         </PaginationItem>
 
         {getPageNumbers().map((page, index) => (
-          <PaginationItem key={index} className="hidden md:block">
+          <PaginationItem key={index}>
             {page === "..." ? (
               <span className="px-4 py-2">...</span>
             ) : (
