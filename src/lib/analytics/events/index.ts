@@ -159,8 +159,3 @@ export const trackPageView = async (data: PageEvent) => {
     }
   }
 };
-
-// Initialize analytics silently
-if (typeof window !== 'undefined') {
-  initializeAnalytics();
-}
