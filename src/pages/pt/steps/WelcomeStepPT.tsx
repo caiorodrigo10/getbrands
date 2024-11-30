@@ -66,7 +66,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
           onClick={onNext}
           className="mt-6 sm:mt-8"
         >
-          Começar Minha Marca
+          Ver Catálogo de Produtos
         </Button>
       </motion.div>
 
