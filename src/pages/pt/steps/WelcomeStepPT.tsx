@@ -1,12 +1,32 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Flag } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 interface WelcomeStepProps {
   onNext: () => void;
 }
 
 export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
+
+    const scroll = () => {
+      if (scrollContainer.scrollLeft >= scrollContainer.scrollWidth / 2) {
+        scrollContainer.scrollLeft = 0;
+      } else {
+        scrollContainer.scrollLeft += 1;
+      }
+    };
+
+    const intervalId = setInterval(scroll, 50);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   const benefitBlocks = [
     {
       title: "Sem Investimento em Estoque",
@@ -56,9 +76,11 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         className="w-full overflow-hidden"
       >
         <div 
+          ref={scrollRef}
           className="overflow-hidden whitespace-nowrap"
+          style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          <div className="inline-flex gap-2 sm:gap-3 min-w-full">
+          <div className="inline-flex gap-2 sm:gap-3 min-w-full animate-scroll">
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`first-${index}`}

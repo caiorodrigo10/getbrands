@@ -30,8 +30,9 @@ export const BrandLogosSection = () => {
         <div 
           ref={scrollRef}
           className="overflow-hidden whitespace-nowrap"
+          style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          <div className="inline-flex gap-16 min-w-full">
+          <div className="inline-flex gap-16 min-w-full animate-scroll">
             {/* First set of logos */}
             <img src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png" alt="Brand 1" className="h-8 object-contain grayscale opacity-70" />
             <img src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673bdb22d88b41701ceb84ba.png" alt="Brand 2" className="h-8 object-contain grayscale opacity-70" />
