@@ -61,7 +61,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-3"
       >
-        <div className="flex flex-col items-center gap-1 mt-8 sm:mt-4">
+        <div className="flex flex-col items-center gap-1 mt-16 sm:mt-12">
           <img
             src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
             alt="GetBrands Logo"
