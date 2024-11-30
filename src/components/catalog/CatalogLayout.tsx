@@ -24,8 +24,8 @@ const CatalogLayout = () => {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   
   const { ref: loadMoreRef, inView } = useInView({
-    threshold: 0.1,
-    triggerOnce: false,
+    threshold: 0,
+    rootMargin: '100px',
   });
 
   const productsQuery = useProducts({ 
