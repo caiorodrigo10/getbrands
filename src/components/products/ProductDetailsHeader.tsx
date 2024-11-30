@@ -10,7 +10,7 @@ export const ProductDetailsHeader = () => {
       onClick={() => navigate('/catalog')}
       variant="ghost"
       size="sm"
-      className="hover:text-white hover:bg-orange-500 transition-colors -mt-4"
+      className="hover:text-primary transition-colors -mt-4"
     >
       <ArrowLeft className="mr-1 h-3 w-3" />
       Back to Catalog
