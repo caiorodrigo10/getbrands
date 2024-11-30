@@ -4,7 +4,6 @@ import {
   ProductEvent, 
   CartEvent, 
   PageEvent,
-  MarketingEvent,
   CheckoutEvent 
 } from "@/types/analytics/events";
 import { waitForAnalytics } from "../index";
@@ -106,39 +105,6 @@ export const trackCartView = async (data: CartEvent) => {
   } catch (error) {
     if (process.env.NODE_ENV !== 'production') {
       console.error('Error tracking cart view:', error);
-    }
-  }
-};
-
-// Marketing Events
-export const trackMarketingQuizStart = async (data: MarketingEvent) => {
-  try {
-    await waitForAnalytics();
-    window.analytics.track('marketing_quiz_started', {
-      ...data,
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV,
-      source: 'web_app'
-    });
-  } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('Error tracking marketing quiz start:', error);
-    }
-  }
-};
-
-export const trackMarketingQuizComplete = async (data: MarketingEvent) => {
-  try {
-    await waitForAnalytics();
-    window.analytics.track('marketing_quiz_completed', {
-      ...data,
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV,
-      source: 'web_app'
-    });
-  } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('Error tracking marketing quiz completion:', error);
     }
   }
 };
