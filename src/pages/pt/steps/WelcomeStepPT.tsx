@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
+import { Check } from "lucide-react";
 
 interface WelcomeStepProps {
   onNext: () => void;
@@ -89,11 +90,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
                 key={`first-${index}`}
                 className="inline-block w-[130px] sm:w-[160px] p-2 sm:p-3 bg-primary/5 rounded-lg whitespace-normal"
               >
-                <img
-                  src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
-                  alt="GetBrands Logo"
-                  className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2"
-                />
+                <Check className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 text-primary" />
                 <h3 className="font-semibold mb-1 text-xs sm:text-sm">{block.title}</h3>
                 <p className="text-xs text-muted-foreground">
                   {block.description}
@@ -106,11 +103,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
                 key={`second-${index}`}
                 className="inline-block w-[130px] sm:w-[160px] p-2 sm:p-3 bg-primary/5 rounded-lg whitespace-normal"
               >
-                <img
-                  src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
-                  alt="GetBrands Logo"
-                  className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2"
-                />
+                <Check className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 text-primary" />
                 <h3 className="font-semibold mb-1 text-xs sm:text-sm">{block.title}</h3>
                 <p className="text-xs text-muted-foreground">
                   {block.description}
