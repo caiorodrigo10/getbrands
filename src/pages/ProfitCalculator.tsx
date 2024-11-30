@@ -4,6 +4,7 @@ import { ProfitCalculatorForm } from "@/components/profit-calculator/ProfitCalcu
 import { ProfitProjections } from "@/components/profit-calculator/ProfitProjections";
 import { Product } from "@/types/product";
 import { Card } from "@/components/ui/card";
+import { trackProfitCalculation, trackProfitCalculatorProductSelect } from "@/lib/analytics/events/profit-calculator";
 
 interface CalculationValues {
   monthlySales: number;
@@ -26,12 +27,46 @@ const ProfitCalculator = () => {
     setCalculationValues(prev => ({
       ...prev,
       costPrice: product.from_price,
-      sellingPrice: product.srp, // Set the selling price to the product's SRP
+      sellingPrice: product.srp,
     }));
+    
+    trackProfitCalculatorProductSelect(product.id, product.name);
   };
 
   const handleCalculate = (values: CalculationValues) => {
     setCalculationValues(values);
+    
+    // Apenas rastreia o evento se houver um produto selecionado
+    if (selectedProduct) {
+      trackProfitCalculation({
+        productId: selectedProduct.id,
+        productName: selectedProduct.name,
+        ...values,
+        projectedAnnualProfit: calculateAnnualProfit(values),
+        averageMonthlyProfit: calculateMonthlyProfit(values)
+      });
+    }
+  };
+
+  const calculateAnnualProfit = (values: CalculationValues) => {
+    let totalProfit = 0;
+    let currentSales = values.monthlySales;
+    
+    for (let month = 0; month < 12; month++) {
+      const monthlyRevenue = currentSales * values.sellingPrice;
+      const monthlyCost = currentSales * values.costPrice;
+      const monthlyProfit = monthlyRevenue - monthlyCost;
+      totalProfit += monthlyProfit;
+      
+      // Aplica a taxa de crescimento mensal
+      currentSales *= (1 + values.growthRate / 100);
+    }
+    
+    return totalProfit;
+  };
+
+  const calculateMonthlyProfit = (values: CalculationValues) => {
+    return calculateAnnualProfit(values) / 12;
   };
 
   return (
