@@ -141,7 +141,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         </div>
       </motion.div>
 
-      <div className="h-20"></div>
+      <div className="h-10"></div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -166,7 +166,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
             Ver Catálogo de Produtos
           </Button>
         </div>
-        <div className="h-20"></div>
+        <div className="h-10"></div>
       </motion.div>
     </div>
   );
