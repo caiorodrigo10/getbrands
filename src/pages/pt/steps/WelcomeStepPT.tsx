@@ -149,7 +149,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         <div className="relative inline-block">
           <Button
             onClick={onNext}
-            className="w-48"
+            className="w-72"
           >
             Ver Catálogo de Produtos
           </Button>
@@ -175,7 +175,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         <div className="mt-8">
           <Button
             onClick={onNext}
-            className="w-48"
+            className="w-72"
           >
             Ver Catálogo de Produtos
           </Button>
