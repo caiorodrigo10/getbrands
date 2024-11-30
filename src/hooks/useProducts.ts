@@ -28,11 +28,13 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
     let query = supabase.from("products").select("*", { count: "exact" });
 
     if (searchTerm) {
-      // Create a properly formatted search filter
+      // Properly format search terms for PostgreSQL ilike
+      const formattedSearch = searchTerm
+        .replace(/[%_]/g, '\\$&') // Escape special PostgreSQL characters
+        .trim();
+      
       query = query.or(
-        `name.ilike.%${searchTerm.replace(/[%,]/g, "").trim()}%,description.ilike.%${searchTerm
-          .replace(/[%,]/g, "")
-          .trim()}%`
+        `name.ilike.%${formattedSearch}%,description.ilike.%${formattedSearch}%`
       );
     }
 
@@ -41,11 +43,13 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
     let dataQuery = supabase.from("products").select("*");
 
     if (searchTerm) {
-      // Use the same formatted search filter
+      // Use the same formatted search term
+      const formattedSearch = searchTerm
+        .replace(/[%_]/g, '\\$&')
+        .trim();
+        
       dataQuery = dataQuery.or(
-        `name.ilike.%${searchTerm.replace(/[%,]/g, "").trim()}%,description.ilike.%${searchTerm
-          .replace(/[%,]/g, "")
-          .trim()}%`
+        `name.ilike.%${formattedSearch}%,description.ilike.%${formattedSearch}%`
       );
     }
 
@@ -68,6 +72,7 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
     };
   };
 
+  // Use React Query's useInfiniteQuery for mobile
   if (isMobile) {
     return useInfiniteQuery({
       queryKey: ["products-infinite", { limit, search: searchTerm }],
@@ -77,6 +82,7 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
     });
   }
 
+  // Use regular useQuery for desktop
   return useQuery({
     queryKey: ["products", { page, limit, search: searchTerm }],
     queryFn: () => fetchProducts({ pageParam: page }),
