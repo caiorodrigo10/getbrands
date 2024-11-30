@@ -61,11 +61,11 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-3"
       >
-        <div className="flex flex-col items-center gap-1 mt-4 sm:mt-0">
+        <div className="flex flex-col items-center gap-1 mt-8 sm:mt-4">
           <img
             src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
             alt="GetBrands Logo"
-            className="h-8 sm:h-10 mb-1"
+            className="h-8 sm:h-10 mb-2"
           />
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
             Crie Sua Marca Própria nos EUA Sem Investir em Estoque
