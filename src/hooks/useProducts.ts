@@ -28,7 +28,8 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
     let query = supabase.from("products").select("*", { count: "exact" });
 
     if (searchTerm) {
-      query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+      const formattedSearch = searchTerm.replace(/[%_]/g, '\\$&').trim();
+      query = query.ilike('name', `%${formattedSearch}%`).or(`description.ilike.%${formattedSearch}%`);
     }
 
     const { count } = await query;
@@ -36,7 +37,8 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
     let dataQuery = supabase.from("products").select("*");
 
     if (searchTerm) {
-      dataQuery = dataQuery.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+      const formattedSearch = searchTerm.replace(/[%_]/g, '\\$&').trim();
+      dataQuery = dataQuery.ilike('name', `%${formattedSearch}%`).or(`description.ilike.%${formattedSearch}%`);
     }
 
     const { data, error } = await dataQuery
