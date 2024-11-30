@@ -40,7 +40,7 @@ const PedidoAmostra = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 space-y-6">
+    <div className="max-w-4xl mx-auto px-0 sm:px-4 space-y-6">
       <div className="flex-1">
         <ProductSearch addToCart />
       </div>
