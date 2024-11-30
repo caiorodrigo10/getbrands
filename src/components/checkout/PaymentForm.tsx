@@ -27,7 +27,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!stripe || !elements || !user?.id || !user?.email) {
+    if (!stripe || !elements || !user?.id || !user?.email || isProcessing) {
       return;
     }
 
@@ -84,7 +84,6 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
       });
 
       clearCart();
-      
       navigate(`/checkout/success?order_id=${orderId}&payment_intent=${paymentIntent?.id}`);
 
     } catch (error) {

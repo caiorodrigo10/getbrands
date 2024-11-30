@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
 
 interface ShippingButtonsProps {
   isAddressSaved: boolean;
@@ -13,8 +14,12 @@ export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue }: Shippi
   const navigate = useNavigate();
   const { clearCart } = useCart();
   const { toast } = useToast();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleCancel = async () => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+    
     try {
       await clearCart();
       onCancel();
@@ -28,6 +33,19 @@ export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue }: Shippi
         title: "Error",
         description: "Failed to cancel order. Please try again.",
       });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleContinue = () => {
+    if (isProcessing || !isAddressSaved) return;
+    setIsProcessing(true);
+    
+    try {
+      onContinue();
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -38,8 +56,9 @@ export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue }: Shippi
         variant="destructive"
         className="text-sm sm:text-base px-3 sm:px-4 h-10 sm:h-11 w-full sm:w-auto"
         onClick={handleCancel}
+        disabled={isProcessing}
       >
-        Cancel Order
+        {isProcessing ? "Processing..." : "Cancel Order"}
       </Button>
       <Button
         type="button"
@@ -47,10 +66,10 @@ export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue }: Shippi
         className={`text-sm sm:text-base px-3 sm:px-4 h-12 sm:h-14 w-full sm:w-auto ${
           isAddressSaved ? "bg-green-600 hover:bg-green-700" : ""
         }`}
-        disabled={!isAddressSaved}
-        onClick={onContinue}
+        disabled={!isAddressSaved || isProcessing}
+        onClick={handleContinue}
       >
-        Continue to Payment
+        {isProcessing ? "Processing..." : "Continue to Payment"}
       </Button>
     </div>
   );
