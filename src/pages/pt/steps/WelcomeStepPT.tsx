@@ -148,9 +148,8 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
       >
         <div className="relative inline-block">
           <Button
-            size="lg"
             onClick={onNext}
-            className="relative z-10 bg-primary hover:bg-primary/90 text-white px-6 sm:px-10 py-3 sm:py-4 min-w-[200px] sm:min-w-[280px] shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 border-[3px] border-white/40 hover:border-white/90 rounded-xl hover:rounded-2xl text-base sm:text-lg"
+            className="w-32"
           >
             Ver Catálogo de Produtos
           </Button>
@@ -175,9 +174,8 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         </p>
         <div className="mt-8">
           <Button
-            size="lg"
             onClick={onNext}
-            className="relative z-10 bg-primary hover:bg-primary/90 text-white px-6 sm:px-10 py-3 sm:py-4 min-w-[200px] sm:min-w-[280px] shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 border-[3px] border-white/40 hover:border-white/90 rounded-xl hover:rounded-2xl text-base sm:text-lg"
+            className="w-32"
           >
             Ver Catálogo de Produtos
           </Button>
