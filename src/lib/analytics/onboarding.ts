@@ -1,26 +1,33 @@
 import { trackEvent } from "@/lib/analytics";
 
-export const trackOnboardingStarted = (userId: string) => {
-  trackEvent("Onboarding Started", { user_id: userId });
+export const trackOnboardingStarted = (userId: string, source: string) => {
+  trackEvent("onboarding_started", { 
+    user_id: userId,
+    source: source // 'comecarpt', 'onboarding', 'pt_onboarding'
+  });
 };
 
 export const trackOnboardingStepCompleted = (
   userId: string,
   step: string,
-  stepData: any
+  stepData: any,
+  source: string
 ) => {
-  trackEvent("Onboarding Step Completed", {
+  trackEvent("onboarding_step_completed", {
     user_id: userId,
     step_name: step,
-    step_data: stepData
+    step_data: stepData,
+    source: source
   });
 };
 
-export const trackOnboardingCompleted = (userId: string, profileData: any) => {
-  trackEvent("Onboarding Completed", {
+export const trackOnboardingCompleted = (userId: string, profileData: any, source: string) => {
+  trackEvent("onboarding_completed", {
     user_id: userId,
     profile_type: profileData.profile_type,
     product_interests: profileData.product_interest,
-    brand_status: profileData.brand_status
+    brand_status: profileData.brand_status,
+    source: source,
+    language: profileData.language || 'en'
   });
 };

@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { trackSignUpEvents } from "@/components/auth/signup/pt/SignUpAnalytics";
 import { SignUpForm } from "@/components/auth/signup/pt/SignUpForm";
+import { trackOnboardingCompleted } from "@/lib/analytics/onboarding";
 
 export interface SignUpFormStepPTProps {
   onBack: () => void;
@@ -70,8 +71,8 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
 
         if (profileError) throw profileError;
 
-        // Track analytics events in background
-        trackSignUpEvents(
+        // Track signup events
+        await trackSignUpEvents(
           data.user.id,
           {
             firstName: formData.firstName,
@@ -80,7 +81,15 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
             phone: formData.phone
           },
           quizData
-        ).catch(console.error); // Handle analytics errors separately
+        );
+
+        // Track onboarding completion separately
+        await trackOnboardingCompleted(data.user.id, {
+          profile_type: quizData.profileType,
+          product_interest: quizData.productCategories,
+          brand_status: quizData.brandStatus,
+          language: 'pt'
+        }, 'comecarpt');
 
         window.location.href = "/pt/start-here";
       }

@@ -1,12 +1,16 @@
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { WelcomeStepPT } from "./steps/WelcomeStepPT";
 import { ProductCategoriesStepPT } from "./steps/ProductCategoriesStepPT";
 import { ProfileTypeStepPT } from "./steps/ProfileTypeStepPT";
 import { BrandStatusStepPT } from "./steps/BrandStatusStepPT";
 import { LaunchUrgencyStepPT } from "./steps/LaunchUrgencyStepPT";
 import { SignUpFormStepPT } from "./steps/SignUpFormStepPT";
+import { trackOnboardingStarted, trackOnboardingStepCompleted } from "@/lib/analytics/onboarding";
+import { useEffect } from "react";
 
 export const OnboardingQuizPT = () => {
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [quizData, setQuizData] = useState({
     productCategories: [] as string[],
@@ -15,7 +19,19 @@ export const OnboardingQuizPT = () => {
     launchUrgency: "",
   });
 
+  useEffect(() => {
+    if (user?.id) {
+      trackOnboardingStarted(user.id, 'pt_onboarding');
+    }
+  }, [user?.id]);
+
   const handleNext = () => {
+    if (user?.id) {
+      trackOnboardingStepCompleted(user.id, `step_${currentStep + 1}`, {
+        ...quizData,
+        step: currentStep + 1
+      }, 'pt_onboarding');
+    }
     setCurrentStep((prev) => prev + 1);
   };
 
