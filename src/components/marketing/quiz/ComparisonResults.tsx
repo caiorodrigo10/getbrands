@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { trackMarketingQuizComplete } from "@/lib/analytics/events";
-import { useQuizData } from "./useQuizData";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
@@ -9,7 +8,6 @@ import { motion } from "framer-motion";
 
 export const ComparisonResults = () => {
   const { user } = useAuth();
-  const { quizAnswers, resetQuiz } = useQuizData();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,9 +15,7 @@ export const ComparisonResults = () => {
       try {
         await trackMarketingQuizComplete({
           language: 'en',
-          source: 'marketing_page',
-          userId: user?.id,
-          answers: quizAnswers
+          source: 'marketing_page'
         });
       } catch (error) {
         console.error('Error tracking quiz completion:', error);
@@ -27,10 +23,10 @@ export const ComparisonResults = () => {
     };
 
     trackQuizCompletion();
-  }, [user?.id, quizAnswers]);
+  }, []);
 
   const handleStartOver = () => {
-    resetQuiz();
+    navigate('/marketing/quiz');
   };
 
   const handleSignUp = () => {

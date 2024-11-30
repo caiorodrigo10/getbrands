@@ -4,7 +4,8 @@ import {
   ProductEvent, 
   CartEvent, 
   PageEvent,
-  MarketingEvent 
+  MarketingEvent,
+  CheckoutEvent 
 } from "@/types/analytics/events";
 import { waitForAnalytics } from "../index";
 
@@ -75,6 +76,23 @@ export const trackProductView = async (data: ProductEvent) => {
   }
 };
 
+// Checkout Events
+export const trackCheckoutCompleted = async (data: CheckoutEvent) => {
+  try {
+    await waitForAnalytics();
+    window.analytics.track('Order Completed', {
+      ...data,
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV,
+      source: 'web_app'
+    });
+  } catch (error) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error tracking checkout completion:', error);
+    }
+  }
+};
+
 // Cart Events
 export const trackCartView = async (data: CartEvent) => {
   try {
@@ -141,3 +159,8 @@ export const trackPageView = async (data: PageEvent) => {
     }
   }
 };
+
+// Initialize analytics silently
+if (typeof window !== 'undefined') {
+  initializeAnalytics();
+}

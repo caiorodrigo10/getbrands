@@ -41,6 +41,28 @@ export interface CartEvent extends BaseEvent {
   items_count: number;
 }
 
+// Eventos de Checkout
+export interface CheckoutEvent extends BaseEvent {
+  orderId: string;
+  total: number;
+  shippingCost: number;
+  customerEmail: string;
+  products: {
+    product_id: string;
+    product_name: string;
+    quantity: number;
+    price: number;
+  }[];
+}
+
+// Eventos de Marketing
+export interface MarketingEvent extends BaseEvent {
+  language: string;
+  source?: string;
+  answers?: Record<string, any>;
+  quizId?: string;
+}
+
 // Eventos de Página
 export interface PageEvent extends BaseEvent {
   url: string;
@@ -48,13 +70,4 @@ export interface PageEvent extends BaseEvent {
   title?: string;
   referrer?: string;
   search?: string;
-}
-
-// Eventos de Marketing
-export interface MarketingEvent extends BaseEvent {
-  quizId?: string;
-  language: string;
-  answers?: Record<string, any>;
-  source?: string;
-  referrer?: string;
 }
