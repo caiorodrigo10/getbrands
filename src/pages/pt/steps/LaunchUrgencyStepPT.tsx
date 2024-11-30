@@ -28,8 +28,9 @@ export const LaunchUrgencyStepPT = ({
 
   const options = [
     { value: "immediate", label: "Imediatamente (1-2 meses)" },
-    { value: "soon", label: "Em breve (3-6 meses)" },
-    { value: "planning", label: "Fase de Planejamento (6+ meses)" },
+    { value: "next_month", label: "Em breve (3-6 meses)" },
+    { value: "next_quarter", label: "Fase de Planejamento (6+ meses)" },
+    { value: "no_rush", label: "Apenas explorando" }
   ];
 
   const handleOptionSelect = async (value: string) => {
