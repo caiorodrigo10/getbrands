@@ -30,59 +30,87 @@ export const AddressFormSection = ({
   const useSameForBilling = form.watch("useSameForBilling");
   const { toast } = useToast();
 
-  const handleSubmit = async () => {
-    const values = form.getValues();
-    const isValid = await form.trigger();
+  // Watch all required fields to automatically validate the form
+  const firstName = form.watch("firstName");
+  const lastName = form.watch("lastName");
+  const address1 = form.watch("address1");
+  const city = form.watch("city");
+  const state = form.watch("state");
+  const zipCode = form.watch("zipCode");
+  const phone = form.watch("phone");
+  const billingAddress1 = form.watch("billingAddress1");
+  const billingCity = form.watch("billingCity");
+  const billingState = form.watch("billingState");
+  const billingZipCode = form.watch("billingZipCode");
 
-    if (!isValid) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please fill in all required fields for shipping address.",
-      });
-      return;
-    }
+  // Effect to automatically save address when all required fields are filled
+  React.useEffect(() => {
+    const checkAndSaveAddress = async () => {
+      const values = form.getValues();
+      const isValid = await form.trigger();
 
-    if (!useSameForBilling) {
-      const hasBillingFields = values.billingAddress1 && 
-                              values.billingCity && 
-                              values.billingState && 
-                              values.billingZipCode;
-      
-      if (!hasBillingFields) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Please fill in all required billing address fields.",
-        });
-        return;
+      const hasRequiredFields = firstName && 
+                              lastName && 
+                              address1 && 
+                              city && 
+                              state && 
+                              zipCode &&
+                              phone;
+
+      const hasBillingFields = useSameForBilling || 
+                              (billingAddress1 && 
+                               billingCity && 
+                               billingState && 
+                               billingZipCode);
+
+      if (isValid && hasRequiredFields && hasBillingFields) {
+        // Store all form values in localStorage
+        localStorage.setItem('firstName', values.firstName);
+        localStorage.setItem('lastName', values.lastName);
+        localStorage.setItem('phone', values.phone);
+        localStorage.setItem('shipping_address', values.address1);
+        localStorage.setItem('shipping_address2', values.address2 || '');
+        localStorage.setItem('shipping_city', values.city);
+        localStorage.setItem('shipping_state', values.state);
+        localStorage.setItem('shipping_zip', values.zipCode);
+        localStorage.setItem('useSameForBilling', useSameForBilling.toString());
+        localStorage.setItem('addressSaved', 'true');
+
+        // Store billing address if different from shipping
+        if (!useSameForBilling) {
+          localStorage.setItem('billing_address', values.billingAddress1 || '');
+          localStorage.setItem('billing_address2', values.billingAddress2 || '');
+          localStorage.setItem('billing_city', values.billingCity || '');
+          localStorage.setItem('billing_state', values.billingState || '');
+          localStorage.setItem('billing_zip', values.billingZipCode || '');
+        }
+
+        await onSubmit(values);
+        setIsAddressSaved(true);
+      } else {
+        setIsAddressSaved(false);
+        localStorage.setItem('addressSaved', 'false');
       }
-    }
+    };
 
-    // Store all form values in localStorage
-    localStorage.setItem('firstName', values.firstName);
-    localStorage.setItem('lastName', values.lastName);
-    localStorage.setItem('phone', values.phone);
-    localStorage.setItem('shipping_address', values.address1);
-    localStorage.setItem('shipping_address2', values.address2 || '');
-    localStorage.setItem('shipping_city', values.city);
-    localStorage.setItem('shipping_state', values.state);
-    localStorage.setItem('shipping_zip', values.zipCode);
-    localStorage.setItem('useSameForBilling', useSameForBilling.toString());
-    localStorage.setItem('addressSaved', 'true');
-
-    // Store billing address if different from shipping
-    if (!useSameForBilling) {
-      localStorage.setItem('billing_address', values.billingAddress1 || '');
-      localStorage.setItem('billing_address2', values.billingAddress2 || '');
-      localStorage.setItem('billing_city', values.billingCity || '');
-      localStorage.setItem('billing_state', values.billingState || '');
-      localStorage.setItem('billing_zip', values.billingZipCode || '');
-    }
-
-    await onSubmit(values);
-    setIsAddressSaved(true);
-  };
+    checkAndSaveAddress();
+  }, [
+    firstName, 
+    lastName, 
+    address1, 
+    city, 
+    state, 
+    zipCode, 
+    phone,
+    billingAddress1,
+    billingCity,
+    billingState,
+    billingZipCode,
+    useSameForBilling,
+    form,
+    onSubmit,
+    setIsAddressSaved
+  ]);
 
   // Load saved values from localStorage when component mounts
   React.useEffect(() => {
@@ -165,7 +193,6 @@ export const AddressFormSection = ({
           isAddressSaved={isAddressSaved}
           onCancel={onCancel}
           onContinue={onContinue}
-          onSave={handleSubmit}
         />
       </form>
     </Form>
