@@ -88,26 +88,42 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`first-${index}`}
-                className="flex-none w-[140px] sm:w-[170px] p-2 sm:p-3 bg-gray-50/80 rounded-lg flex flex-col justify-center items-center h-[160px]"
+                className="flex-none w-[140px] sm:w-[170px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[180px]"
               >
-                <Check className="w-6 h-6 sm:w-8 sm:h-8 text-primary mb-2" />
-                <h3 className="font-semibold mb-1 text-sm sm:text-base">{block.title}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  {block.description}
-                </p>
+                <div className="flex-none h-12 flex items-center">
+                  <Check className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                </div>
+                <div className="flex-none h-14 flex items-center">
+                  <h3 className="font-semibold text-sm sm:text-base leading-tight">
+                    {block.title}
+                  </h3>
+                </div>
+                <div className="flex-1 flex items-start">
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                    {block.description}
+                  </p>
+                </div>
               </div>
             ))}
             
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`second-${index}`}
-                className="flex-none w-[140px] sm:w-[170px] p-2 sm:p-3 bg-gray-50/80 rounded-lg flex flex-col justify-center items-center h-[160px]"
+                className="flex-none w-[140px] sm:w-[170px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[180px]"
               >
-                <Check className="w-6 h-6 sm:w-8 sm:h-8 text-primary mb-2" />
-                <h3 className="font-semibold mb-1 text-sm sm:text-base">{block.title}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  {block.description}
-                </p>
+                <div className="flex-none h-12 flex items-center">
+                  <Check className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                </div>
+                <div className="flex-none h-14 flex items-center">
+                  <h3 className="font-semibold text-sm sm:text-base leading-tight">
+                    {block.title}
+                  </h3>
+                </div>
+                <div className="flex-1 flex items-start">
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                    {block.description}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
