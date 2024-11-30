@@ -4,67 +4,26 @@ import CatalogFilters from "@/components/CatalogFilters";
 import ProductGrid from "@/components/ProductGrid";
 import CatalogPagination from "./CatalogPagination";
 import { CartButton } from "@/components/CartButton";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { useProducts } from "@/hooks/useProducts";
-import { useWindowSize } from "@/hooks/useWindowSize";
-import { UseInfiniteQueryResult, UseQueryResult } from "@tanstack/react-query";
+import { UseQueryResult } from "@tanstack/react-query";
 
 const CatalogLayout = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
-  const { width } = useWindowSize();
-  const isMobile = width < 768;
-  const loadMoreRef = useRef(null);
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
   
   const productsQuery = useProducts({ 
     page: currentPage,
-    limit: isMobile ? 7 : 9,
-    infinite: isMobile
-  });
+    limit: 9
+  }) as UseQueryResult<any>;
 
   const { 
     data: productsData,
     isLoading,
     error,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage
-  } = productsQuery as UseInfiniteQueryResult<any>;
-
-  useEffect(() => {
-    if (productsData) {
-      if ('pages' in productsData) {
-        // Handle infinite query data
-        const products = productsData.pages.flatMap(page => page.data);
-        setAllProducts(products);
-      } else {
-        // Handle regular query data
-        setAllProducts(productsData.data);
-      }
-    }
-  }, [productsData]);
-
-  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
-    const [target] = entries;
-    if (target.isIntersecting && hasNextPage && !isFetchingNextPage && isMobile) {
-      fetchNextPage();
-    }
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage, isMobile]);
-
-  useEffect(() => {
-    const element = loadMoreRef.current;
-    if (!element || !isMobile) return;
-
-    const observer = new IntersectionObserver(handleObserver, {
-      threshold: 0.1,
-    });
-
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [handleObserver, isMobile]);
+  } = productsQuery;
 
   if (error) {
     toast({
@@ -74,7 +33,7 @@ const CatalogLayout = () => {
     });
   }
 
-  const totalPages = productsData && !('pages' in productsData) ? productsData.totalPages : 1;
+  const totalPages = productsData?.totalPages || 1;
 
   return (
     <div className="space-y-page">
@@ -96,7 +55,7 @@ const CatalogLayout = () => {
 
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {Array.from({ length: isMobile ? 7 : 9 }).map((_, i) => (
+            {Array.from({ length: 9 }).map((_, i) => (
               <div key={i} className="space-y-4">
                 <Skeleton className="h-[200px] w-full" />
                 <Skeleton className="h-4 w-[250px]" />
@@ -104,22 +63,9 @@ const CatalogLayout = () => {
               </div>
             ))}
           </div>
-        ) : allProducts && allProducts.length > 0 ? (
+        ) : productsData?.data && productsData.data.length > 0 ? (
           <>
-            <ProductGrid products={allProducts} />
-            {isMobile && (
-              <div 
-                ref={loadMoreRef} 
-                className="w-full py-8 flex justify-center"
-              >
-                {isFetchingNextPage && (
-                  <div className="space-y-4">
-                    <Skeleton className="h-[200px] w-full" />
-                    <Skeleton className="h-4 w-[250px]" />
-                  </div>
-                )}
-              </div>
-            )}
+            <ProductGrid products={productsData.data} />
           </>
         ) : (
           <div className="text-center py-12">
@@ -127,7 +73,7 @@ const CatalogLayout = () => {
           </div>
         )}
         
-        {!isMobile && totalPages > 1 && (
+        {totalPages > 1 && (
           <div className="mt-section flex justify-center">
             <CatalogPagination
               currentPage={currentPage}

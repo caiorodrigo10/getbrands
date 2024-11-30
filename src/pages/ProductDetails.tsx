@@ -1,17 +1,16 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/analytics";
+import { Skeleton } from "@/components/ui/skeleton";
 import ProjectSelectionDialog from "@/components/dialogs/ProjectSelectionDialog";
 import { ProductHeader } from "@/components/products/ProductHeader";
 import { ProductBenefits } from "@/components/products/ProductBenefits";
 import { ProductCalculator } from "@/components/products/ProductCalculator";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ProductDetailsHeader } from "@/components/products/ProductDetailsHeader";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -206,15 +205,9 @@ const ProductDetails = () => {
   if (!product) return null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <Button
-        onClick={() => navigate('/catalog')}
-        variant="ghost"
-        className="mb-6 hover:text-white hover:bg-orange-500 transition-colors"
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Catalog
-      </Button>
+    <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pt-0 pb-4">
+      <ProductDetailsHeader />
+      
       <ProductHeader 
         product={product} 
         onSelectProduct={handleSelectProduct}

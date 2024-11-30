@@ -5,21 +5,27 @@ import { QuizNavigation } from "@/components/onboarding/steps/QuizNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useLocation } from "react-router-dom";
 
 interface LaunchUrgencyStepProps {
   selected: string;
   onAnswer: (value: string) => void;
-  onComplete: () => void;
+  onNext: () => void;
   onBack: () => void;
+  showNextButton?: boolean;
 }
 
 export const LaunchUrgencyStepPT = ({ 
   selected, 
   onAnswer,
-  onComplete,
-  onBack
+  onNext,
+  onBack,
+  showNextButton = false
 }: LaunchUrgencyStepProps) => {
   const { user } = useAuth();
+  const location = useLocation();
+  const isOnboarding = location.pathname === "/pt/onboarding";
+
   const options = [
     { value: "immediate", label: "Imediatamente (1-2 meses)" },
     { value: "soon", label: "Em breve (3-6 meses)" },
@@ -29,7 +35,11 @@ export const LaunchUrgencyStepPT = ({
   const handleOptionSelect = async (value: string) => {
     try {
       if (!user?.id) {
-        throw new Error('Usuário não autenticado');
+        onAnswer(value);
+        if (showNextButton) {
+          onNext();
+        }
+        return;
       }
 
       onAnswer(value);
@@ -48,6 +58,10 @@ export const LaunchUrgencyStepPT = ({
       }
 
       toast.success("Preferência de lançamento salva!");
+      
+      if (showNextButton) {
+        onNext();
+      }
     } catch (error: any) {
       console.error('Erro ao atualizar urgência de lançamento:', error);
       toast.error(error.message || "Falha ao salvar sua seleção. Por favor, tente novamente.");
@@ -96,9 +110,9 @@ export const LaunchUrgencyStepPT = ({
       </RadioGroup>
 
       <QuizNavigation
-        onNext={onComplete}
+        onNext={onNext}
         onBack={onBack}
-        nextLabel="Completar"
+        nextLabel={isOnboarding ? "Completar" : "Próximo"}
         isNextDisabled={!selected}
       />
     </div>

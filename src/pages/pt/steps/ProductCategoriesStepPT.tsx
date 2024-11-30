@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Coffee, Pill, Sparkles, Dumbbell, Dog } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { QuizNavigation } from "@/components/onboarding/steps/QuizNavigation";
 
 interface ProductCategoriesStepProps {
@@ -49,25 +50,26 @@ export const ProductCategoriesStepPT = ({
   onNext,
   onBack
 }: ProductCategoriesStepProps) => {
-  const toggleCategory = (categoryId: string) => {
-    const newSelected = selected.includes(categoryId)
-      ? selected.filter(id => id !== categoryId)
-      : [...selected, categoryId];
-    onAnswer(newSelected);
+  const handleSelection = (categoryId: string) => {
+    onAnswer([categoryId]);
+    onNext();
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-6">
+    <div className="w-full max-w-3xl mx-auto space-y-6">
       <div className="text-center">
         <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-2">
-          Quais categorias de produtos você tem interesse em criar?
+          Qual categoria de produto você tem interesse em criar?
         </h2>
-        <p className="text-sm sm:text-base text-gray-600 mb-4">Selecione todas que se aplicam</p>
+        <p className="text-sm sm:text-base text-gray-600 mb-4">Selecione uma opção</p>
       </div>
 
-      <div className="space-y-2">
+      <RadioGroup
+        value={selected[0]}
+        onValueChange={handleSelection}
+        className="space-y-2"
+      >
         {categories.map((category) => {
-          const isSelected = selected.includes(category.id);
           const Icon = category.icon;
           
           return (
@@ -76,18 +78,16 @@ export const ProductCategoriesStepPT = ({
               className={`
                 relative rounded-lg border py-3.5 sm:py-4 px-4 cursor-pointer
                 transition-all duration-200
-                ${isSelected ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50'}
+                ${selected[0] === category.id ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50'}
               `}
-              onClick={() => toggleCategory(category.id)}
               whileHover={{ y: -2 }}
             >
-              <div className="flex flex-col">
+              <Label
+                htmlFor={category.id}
+                className="flex flex-col cursor-pointer"
+              >
                 <div className="flex items-center gap-3">
-                  <Checkbox 
-                    checked={isSelected}
-                    className="h-4 w-4"
-                    onCheckedChange={() => toggleCategory(category.id)}
-                  />
+                  <RadioGroupItem value={category.id} id={category.id} />
                   <div className="p-1.5 rounded-full bg-primary/10">
                     <Icon className="w-4 h-4 text-primary" />
                   </div>
@@ -98,16 +98,17 @@ export const ProductCategoriesStepPT = ({
                 <p className="text-xs sm:text-sm text-gray-500 mt-1 ml-10">
                   {category.description}
                 </p>
-              </div>
+              </Label>
             </motion.div>
           );
         })}
-      </div>
+      </RadioGroup>
 
       <QuizNavigation
         onNext={onNext}
         onBack={onBack}
-        isNextDisabled={selected.length === 0}
+        isNextDisabled={!selected.length}
+        showBack={true}
       />
     </div>
   );

@@ -73,55 +73,16 @@ export default {
           fontWeight: '600',
         }],
       },
-      typography: {
-        DEFAULT: {
-          css: {
-            'strong': {
-              fontWeight: '700',
-            },
-            'em': {
-              fontStyle: 'italic',
-              color: 'inherit',
-            },
-            'ul': {
-              listStyleType: 'disc',
-              marginLeft: '1.5em',
-            },
-            'ol': {
-              listStyleType: 'decimal',
-              marginLeft: '1.5em',
-            },
-            'a': {
-              color: '#f0562e',
-              '&:hover': {
-                color: '#d64a26',
-              },
-            },
-            'p': {
-              marginTop: '1em',
-              marginBottom: '1em',
-            },
-          },
-        },
-      },
       keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
+        scroll: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        }
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        scroll: "scroll 30s linear infinite",
       },
     },
   },
-  plugins: [
-    require("tailwindcss-animate"),
-    require("@tailwindcss/typography")
-  ],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 } satisfies Config;

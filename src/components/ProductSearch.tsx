@@ -11,6 +11,12 @@ interface ProductSearchProps {
   addToCart?: boolean;
 }
 
+interface ProductsResponse {
+  data: Product[];
+  totalPages: number;
+  totalCount: number;
+}
+
 export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSearchProps) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -36,9 +42,8 @@ export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSea
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const products = 'pages' in productsQuery.data! 
-    ? productsQuery.data.pages.flatMap(page => page.data)
-    : productsQuery.data?.data || [];
+  // Safely handle the products data with proper typing
+  const products = productsQuery.data ? (productsQuery.data as ProductsResponse).data : [];
 
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(query.toLowerCase())
@@ -94,7 +99,11 @@ export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSea
           ref={dropdownRef}
           className="absolute z-50 mt-2 w-full bg-white rounded-lg border border-gray-200 shadow-lg max-h-[400px] overflow-y-auto"
         >
-          {filteredProducts.length === 0 ? (
+          {productsQuery.isLoading ? (
+            <div className="p-4 text-center text-gray-500">
+              Loading products...
+            </div>
+          ) : filteredProducts.length === 0 ? (
             <div className="p-4 text-center text-gray-500">
               No products found
             </div>

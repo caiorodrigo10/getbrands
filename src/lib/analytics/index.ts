@@ -36,6 +36,16 @@ const waitForAnalytics = () => {
   });
 };
 
+const formatUrl = (url: string) => {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.toString();
+  } catch (e) {
+    console.error('Invalid URL:', url);
+    return url;
+  }
+};
+
 export const identifyUser = async (userId: string, traits?: Record<string, any>) => {
   try {
     await waitForAnalytics();
@@ -79,7 +89,7 @@ export const trackPage = async (properties?: Record<string, any>) => {
     await waitForAnalytics();
     
     const pageProperties = {
-      url: window.location.href,
+      url: formatUrl(window.location.href),
       path: window.location.pathname,
       referrer: document.referrer,
       title: document.title,
@@ -87,7 +97,8 @@ export const trackPage = async (properties?: Record<string, any>) => {
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV,
       source: 'web_app',
-      ...properties
+      ...properties,
+      ...(properties?.url ? { url: formatUrl(properties.url) } : {})
     };
 
     window.analytics.page("Page Viewed", pageProperties);
