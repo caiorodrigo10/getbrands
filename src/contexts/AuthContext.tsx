@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { identifyUser } from "@/lib/analytics";
 import Gleap from "gleap";
@@ -35,46 +35,55 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
 
   const handleAuthChange = async (session: any) => {
-    if (session?.user) {
-      setUser(session.user);
-      setIsAuthenticated(true);
+    try {
+      if (session?.user) {
+        setUser(session.user);
+        setIsAuthenticated(true);
 
-      // Fetch user profile data for analytics
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
+        // Fetch user profile data for analytics
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
 
-      if (profile) {
-        // Identify user in Segment
-        await identifyUser(session.user.id, {
-          email: session.user.email,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          role: profile.role,
-          phone: profile.phone,
-          created_at: session.user.created_at,
-          last_sign_in: session.user.last_sign_in_at
-        });
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+          return;
+        }
 
-        // Identify user in Gleap
-        Gleap.identify(session.user.id, {
-          email: session.user.email,
-          name: profile.first_name ? `${profile.first_name} ${profile.last_name}` : session.user.email,
-          phone: profile.phone
-        });
+        if (profile) {
+          // Identify user in Segment
+          await identifyUser(session.user.id, {
+            email: session.user.email,
+            first_name: profile.first_name,
+            last_name: profile.last_name,
+            role: profile.role,
+            phone: profile.phone,
+            created_at: session.user.created_at,
+            last_sign_in: session.user.last_sign_in_at
+          });
+
+          // Identify user in Gleap
+          Gleap.identify(session.user.id, {
+            email: session.user.email,
+            name: profile.first_name ? `${profile.first_name} ${profile.last_name}` : session.user.email,
+            phone: profile.phone
+          });
+        }
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+        // Clear Gleap identity when user logs out
+        Gleap.clearIdentity();
       }
-    } else {
-      setUser(null);
-      setIsAuthenticated(false);
-      // Clear Gleap identity when user logs out
-      Gleap.clearIdentity();
+    } catch (error) {
+      console.error('Error in handleAuthChange:', error);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
