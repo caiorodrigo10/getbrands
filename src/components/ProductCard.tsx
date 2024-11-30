@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { trackProductView } from "@/lib/analytics/events";
 
 interface ProductCardProps {
   product: Product;
@@ -33,8 +34,20 @@ const ProductCard = ({ product }: ProductCardProps) => {
     enabled: Boolean(product.id),
   });
 
-  const handleCardClick = () => {
-    navigate(`/catalog/${product.id}`);
+  const handleCardClick = async () => {
+    try {
+      await trackProductView({
+        productId: product.id,
+        productName: product.name,
+        category: product.category,
+        price: product.from_price
+      });
+      navigate(`/catalog/${product.id}`);
+    } catch (error) {
+      console.error('Error tracking product view:', error);
+      // Still navigate even if tracking fails
+      navigate(`/catalog/${product.id}`);
+    }
   };
 
   const handleImageError = () => {
