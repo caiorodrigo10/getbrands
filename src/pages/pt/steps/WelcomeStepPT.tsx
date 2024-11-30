@@ -141,11 +141,13 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         </div>
       </motion.div>
 
+      <div className="h-32 sm:h-40"></div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
-        className="mt-32 sm:mt-40 space-y-16 sm:space-y-20"
+        className="space-y-16 sm:space-y-20"
       >
         <img 
           src="/lovable-uploads/cc9f9846-a08c-4a17-9291-e8274c62f7dd.png"
