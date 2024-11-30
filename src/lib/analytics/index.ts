@@ -1,56 +1,20 @@
 import { toast } from "sonner";
 
-let analyticsInitialized = false;
-let initializationAttempts = 0;
-const MAX_INITIALIZATION_ATTEMPTS = 5;
-const INITIALIZATION_RETRY_DELAY = 1000; // 1 second
-
 const initializeAnalytics = () => {
   if (typeof window === 'undefined') return false;
   if (!window.analytics) {
-    if (initializationAttempts < MAX_INITIALIZATION_ATTEMPTS) {
-      initializationAttempts++;
-      console.log(`🔄 Attempting to initialize analytics (attempt ${initializationAttempts}/${MAX_INITIALIZATION_ATTEMPTS})`);
-      setTimeout(initializeAnalytics, INITIALIZATION_RETRY_DELAY);
-      return false;
-    }
-    console.error('❌ Failed to initialize analytics after maximum attempts');
     return false;
   }
-  
-  analyticsInitialized = true;
-  window.analytics.debug();
-  console.log('✅ Segment analytics initialized with write key:', window.analytics._writeKey);
   return true;
 };
 
 export const waitForAnalytics = () => {
   return new Promise<void>((resolve, reject) => {
-    if (analyticsInitialized) {
-      console.log('✅ Analytics already initialized');
+    if (initializeAnalytics()) {
       resolve();
       return;
     }
-
-    let attempts = 0;
-    const maxAttempts = 10;
-    const retryInterval = 1000; // 1 second
-
-    const check = () => {
-      attempts++;
-      console.log(`🔄 Checking analytics initialization (attempt ${attempts}/${maxAttempts})`);
-      
-      if (initializeAnalytics()) {
-        console.log('✅ Analytics initialized successfully');
-        resolve();
-      } else if (attempts >= maxAttempts) {
-        console.error(`❌ Failed to initialize analytics after ${maxAttempts} attempts`);
-        reject(new Error('Failed to initialize analytics after multiple attempts'));
-      } else {
-        setTimeout(check, retryInterval);
-      }
-    };
-    check();
+    reject(new Error('Failed to initialize analytics'));
   });
 };
 
@@ -59,7 +23,6 @@ const formatUrl = (url: string) => {
     const urlObj = new URL(url);
     return urlObj.toString();
   } catch (e) {
-    console.error('Invalid URL:', url);
     return url;
   }
 };
@@ -76,9 +39,11 @@ export const identifyUser = async (userId: string, traits?: Record<string, any>)
     };
 
     window.analytics.identify(userId, identifyTraits);
-    console.log('✅ Identify call successful:', { userId, traits: identifyTraits });
   } catch (error) {
-    console.error('❌ Error in identify call:', error);
+    // Silent fail in production
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error in identify call:', error);
+    }
   }
 };
 
@@ -94,9 +59,11 @@ export const trackEvent = async (eventName: string, properties?: Record<string, 
     };
 
     window.analytics.track(eventName, eventProperties);
-    console.log('✅ Track event:', { eventName, properties: eventProperties });
   } catch (error) {
-    console.error('❌ Error tracking event:', error);
+    // Silent fail in production
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error tracking event:', error);
+    }
   }
 };
 
@@ -118,14 +85,15 @@ export const trackPage = async (properties?: Record<string, any>) => {
     };
 
     window.analytics.page(pageProperties.title || "Page Viewed", pageProperties);
-    console.log('✅ Page view:', pageProperties);
   } catch (error) {
-    console.error('❌ Error tracking page view:', error);
+    // Silent fail in production
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error tracking page view:', error);
+    }
   }
 };
 
-// Initialize analytics as soon as possible
+// Initialize analytics silently
 if (typeof window !== 'undefined') {
-  console.log('🔄 Starting analytics initialization...');
   initializeAnalytics();
 }

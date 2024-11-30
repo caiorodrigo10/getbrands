@@ -23,9 +23,7 @@ export const trackSignUpEvents = async (
   retries = 3
 ): Promise<void> => {
   if (!window.analytics) {
-    console.error('Analytics not initialized');
     if (retries > 0) {
-      console.log(`Retrying analytics tracking... (${retries} attempts left)`);
       setTimeout(() => trackSignUpEvents(userId, userData, quizData, retries - 1), 1000);
       return;
     }
@@ -34,8 +32,6 @@ export const trackSignUpEvents = async (
   }
 
   try {
-    console.log('Attempting to track signup events...');
-    
     window.analytics.identify(userId, {
       firstName: userData.firstName,
       lastName: userData.lastName,
@@ -66,14 +62,10 @@ export const trackSignUpEvents = async (
       source: 'comecarpt'
     }, 'comecarpt');
 
-    console.log('Successfully tracked all signup events');
   } catch (error) {
-    console.error('Error tracking analytics:', error);
     if (retries > 0) {
-      console.log(`Retrying analytics tracking... (${retries} attempts left)`);
       setTimeout(() => trackSignUpEvents(userId, userData, quizData, retries - 1), 1000);
     } else {
-      console.error('Failed to track signup events after all retries');
       toast.error('Erro ao registrar eventos de analytics');
     }
   }

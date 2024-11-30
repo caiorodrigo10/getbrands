@@ -36,10 +36,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Função separada para identificar usuário nos serviços de analytics
   const identifyUserInAnalytics = async (session: any) => {
     if (!session?.user) return;
-    
+
     try {
       const { data: profile, error } = await supabase
         .from("profiles")
@@ -50,7 +49,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (error) throw error;
 
       if (profile) {
-        // Retry analytics identification if it fails
         const retryAnalytics = async (retries = 3) => {
           try {
             await Promise.all([
@@ -59,10 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             ]);
           } catch (error) {
             if (retries > 0) {
-              console.log(`Retrying analytics identification... (${retries} attempts left)`);
               setTimeout(() => retryAnalytics(retries - 1), 1000);
-            } else {
-              console.error('Failed to identify user in analytics after all retries');
             }
           }
         };
@@ -70,7 +65,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         retryAnalytics();
       }
     } catch (error) {
-      console.error('Error identifying user in analytics:', error);
+      // Silent fail in production
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('Error identifying user in analytics:', error);
+      }
     }
   };
 
@@ -79,7 +77,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (session?.user) {
         setUser(session.user);
         setIsAuthenticated(true);
-        // Identifica o usuário nos serviços de analytics em background
         identifyUserInAnalytics(session);
       } else {
         setUser(null);
@@ -87,7 +84,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         clearGleapIdentity();
       }
     } catch (error) {
-      console.error('Error in handleAuthChange:', error);
+      // Silent fail in production
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('Error in handleAuthChange:', error);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -95,17 +95,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     let mounted = true;
-    
+
     const initSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) throw error;
-        
+
         if (mounted) {
           await handleAuthChange(session);
         }
       } catch (error) {
-        console.error('Session error:', error);
+        // Silent fail in production
+        if (process.env.NODE_ENV !== 'production') {
+          console.error('Session error:', error);
+        }
         if (mounted) {
           setIsLoading(false);
         }
@@ -131,14 +134,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      
+
       setUser(null);
       setIsAuthenticated(false);
       clearGleapIdentity();
       navigate('/login');
       toast.success('Logged out successfully');
     } catch (error) {
-      console.error('Error signing out:', error);
+      // Silent fail in production
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('Error signing out:', error);
+      }
       toast.error('Error signing out');
     } finally {
       setIsLoading(false);
@@ -157,14 +163,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       setUser(data.user);
       setIsAuthenticated(true);
-      
-      // Busca o perfil e identifica nos serviços de analytics em background
       identifyUserInAnalytics({ user: data.user });
-      
       navigate('/catalog', { replace: true });
       toast.success('Logged in successfully');
     } catch (error: any) {
-      console.error('Login error:', error);
+      // Silent fail in production
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('Login error:', error);
+      }
       toast.error(error.message || 'Error logging in');
       throw error;
     } finally {
