@@ -1,4 +1,3 @@
-// Tipos base para eventos
 export interface BaseEvent {
   timestamp?: string;
   environment?: string;
@@ -49,4 +48,13 @@ export interface PageEvent extends BaseEvent {
   title?: string;
   referrer?: string;
   search?: string;
+}
+
+// Eventos de Marketing
+export interface MarketingEvent extends BaseEvent {
+  quizId?: string;
+  language: string;
+  answers?: Record<string, any>;
+  source?: string;
+  referrer?: string;
 }
