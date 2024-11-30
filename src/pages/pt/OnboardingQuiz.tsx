@@ -26,6 +26,7 @@ export const OnboardingQuizPT = () => {
   const steps = [
     {
       component: <WelcomeStepPT onNext={handleNext} />,
+      autoAdvance: true,
     },
     {
       component: (
@@ -38,38 +39,49 @@ export const OnboardingQuizPT = () => {
           onBack={handleBack}
         />
       ),
+      autoAdvance: true,
     },
     {
       component: (
         <ProfileTypeStepPT
           selected={quizData.profileType}
-          onAnswer={(type) => setQuizData({ ...quizData, profileType: type })}
+          onAnswer={(type) => {
+            setQuizData({ ...quizData, profileType: type });
+            handleNext();
+          }}
           onNext={handleNext}
           onBack={handleBack}
         />
       ),
+      autoAdvance: true,
     },
     {
       component: (
         <BrandStatusStepPT
           selected={quizData.brandStatus}
-          onAnswer={(status) => setQuizData({ ...quizData, brandStatus: status })}
+          onAnswer={(status) => {
+            setQuizData({ ...quizData, brandStatus: status });
+            handleNext();
+          }}
           onNext={handleNext}
           onBack={handleBack}
         />
       ),
+      autoAdvance: true,
     },
     {
       component: (
         <LaunchUrgencyStepPT
           selected={quizData.launchUrgency}
-          onAnswer={(urgency) =>
-            setQuizData({ ...quizData, launchUrgency: urgency })
-          }
+          onAnswer={(urgency) => {
+            setQuizData({ ...quizData, launchUrgency: urgency });
+            handleNext();
+          }}
           onNext={handleNext}
           onBack={handleBack}
         />
       ),
+      autoAdvance: true,
     },
     {
       component: (
@@ -78,6 +90,7 @@ export const OnboardingQuizPT = () => {
           quizData={quizData}
         />
       ),
+      autoAdvance: false,
     },
   ];
 
