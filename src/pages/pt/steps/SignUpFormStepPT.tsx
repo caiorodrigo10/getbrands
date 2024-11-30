@@ -145,15 +145,7 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
           setFormData={setFormData}
         />
 
-        <div className="flex justify-between">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onBack}
-            className="w-32"
-          >
-            Voltar
-          </Button>
+        <div className="flex flex-col items-center space-y-4">
           <Button
             type="submit"
             className="w-auto px-6"
@@ -161,6 +153,14 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
           >
             {isLoading ? "Criando..." : "Acessar Catálogo de Produtos"}
           </Button>
+          
+          <button
+            type="button"
+            onClick={onBack}
+            className="text-sm text-gray-600 hover:text-gray-900"
+          >
+            Voltar
+          </button>
         </div>
       </form>
     </div>
