@@ -38,49 +38,51 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const handleAuthChange = async (session: any) => {
     try {
-      if (session?.user) {
+      setIsLoading(true);
+      
+      if (!session?.user) {
+        setUser(null);
+        setIsAuthenticated(false);
+        return;
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        toast.error("Error loading user profile");
+        return;
+      }
+
+      if (profile) {
         setUser(session.user);
         setIsAuthenticated(true);
 
-        // Fetch user profile data for analytics
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
+        // Identify user in analytics tools
+        await identifyUser(session.user.id, {
+          email: session.user.email,
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          role: profile.role,
+          phone: profile.phone,
+          created_at: session.user.created_at,
+          last_sign_in: session.user.last_sign_in_at
+        });
 
-        if (profileError) {
-          console.error('Error fetching profile:', profileError);
-          return;
-        }
-
-        if (profile) {
-          // Identify user in Segment
-          await identifyUser(session.user.id, {
-            email: session.user.email,
-            first_name: profile.first_name,
-            last_name: profile.last_name,
-            role: profile.role,
-            phone: profile.phone,
-            created_at: session.user.created_at,
-            last_sign_in: session.user.last_sign_in_at
-          });
-
-          // Identify user in Gleap
-          Gleap.identify(session.user.id, {
-            email: session.user.email,
-            name: profile.first_name ? `${profile.first_name} ${profile.last_name}` : session.user.email,
-            phone: profile.phone
-          });
-        }
-      } else {
-        setUser(null);
-        setIsAuthenticated(false);
-        // Clear Gleap identity when user logs out
-        Gleap.clearIdentity();
+        // Identify user in Gleap
+        Gleap.identify(session.user.id, {
+          email: session.user.email,
+          name: profile.first_name ? `${profile.first_name} ${profile.last_name}` : session.user.email,
+          phone: profile.phone
+        });
       }
     } catch (error) {
       console.error('Error in handleAuthChange:', error);
+      toast.error("Error updating session");
     } finally {
       setIsLoading(false);
     }
@@ -95,12 +97,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (error) throw error;
         
         if (mounted) {
-          await handleAuthChange(session);
+          if (session) {
+            await handleAuthChange(session);
+          } else {
+            setIsLoading(false);
+          }
         }
       } catch (error) {
         console.error('Session error:', error);
         if (mounted) {
           setIsLoading(false);
+          toast.error("Session error occurred");
         }
       }
     };
