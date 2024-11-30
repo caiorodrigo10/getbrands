@@ -57,14 +57,30 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.6 }}
+        className="relative"
       >
+        <motion.div
+          className="absolute inset-0 -m-1"
+          animate={{
+            rotate: 360,
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        >
+          <div className="w-full h-full border-4 border-dashed border-yellow-400 rounded-full opacity-75" />
+        </motion.div>
+        
         <Button
           size="lg"
           onClick={onNext}
-          className="mt-2 sm:mt-4"
+          className="mt-2 sm:mt-4 relative z-10 bg-primary hover:bg-primary/90 text-white px-8 py-3"
         >
           Ver Catálogo de Produtos
         </Button>
