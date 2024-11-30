@@ -181,18 +181,18 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
               {benefitBlocks.map((block, index) => (
                 <div 
                   key={`first-${index}`}
-                  className="flex-none w-[140px] sm:w-[170px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[180px]"
+                  className="flex-none w-[160px] sm:w-[200px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[200px]"
                 >
                   <div className="flex-none h-8 flex items-center">
-                    <Check className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                    <Check className="w-7 h-7 sm:w-9 sm:h-9 text-primary" />
                   </div>
-                  <div className="flex-none h-10 flex items-center">
-                    <h3 className="font-semibold text-sm sm:text-base leading-tight">
+                  <div className="flex-none h-12 flex items-center">
+                    <h3 className="font-semibold text-base sm:text-lg leading-tight">
                       {block.title}
                     </h3>
                   </div>
                   <div className="flex-1 flex items-start pt-1 pb-3">
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                       {block.description}
                     </p>
                   </div>
@@ -202,18 +202,18 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
               {benefitBlocks.map((block, index) => (
                 <div 
                   key={`second-${index}`}
-                  className="flex-none w-[140px] sm:w-[170px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[180px]"
+                  className="flex-none w-[160px] sm:w-[200px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[200px]"
                 >
                   <div className="flex-none h-8 flex items-center">
-                    <Check className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                    <Check className="w-7 h-7 sm:w-9 sm:h-9 text-primary" />
                   </div>
-                  <div className="flex-none h-10 flex items-center">
-                    <h3 className="font-semibold text-sm sm:text-base leading-tight">
+                  <div className="flex-none h-12 flex items-center">
+                    <h3 className="font-semibold text-base sm:text-lg leading-tight">
                       {block.title}
                     </h3>
                   </div>
                   <div className="flex-1 flex items-start pt-1 pb-3">
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                       {block.description}
                     </p>
                   </div>
