@@ -9,10 +9,12 @@ interface WelcomeStepProps {
 
 export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const productsScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const scrollContainer = scrollRef.current;
-    if (!scrollContainer) return;
+    const productsContainer = productsScrollRef.current;
+    if (!scrollContainer || !productsContainer) return;
 
     const scroll = () => {
       if (scrollContainer.scrollLeft >= scrollContainer.scrollWidth / 2) {
@@ -22,9 +24,21 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
       }
     };
 
-    const intervalId = setInterval(scroll, 16);
+    const scrollProducts = () => {
+      if (productsContainer.scrollLeft >= productsContainer.scrollWidth / 2) {
+        productsContainer.scrollLeft = 0;
+      } else {
+        productsContainer.scrollLeft += 0.5;
+      }
+    };
 
-    return () => clearInterval(intervalId);
+    const intervalId = setInterval(scroll, 16);
+    const productsIntervalId = setInterval(scrollProducts, 16);
+
+    return () => {
+      clearInterval(intervalId);
+      clearInterval(productsIntervalId);
+    };
   }, []);
 
   const benefitBlocks = [
@@ -54,6 +68,29 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
     }
   ];
 
+  const productImages = [
+    {
+      url: "/lovable-uploads/bff16054-81c3-4a5c-b453-7947f15aa214.png",
+      alt: "Produto 1"
+    },
+    {
+      url: "/lovable-uploads/af7de79b-3c99-43cd-89b5-2b540e93d152.png",
+      alt: "Produto 2"
+    },
+    {
+      url: "/lovable-uploads/dc15b5b9-5c9f-4f78-9f39-b6040c4ea841.png",
+      alt: "Produto 3"
+    },
+    {
+      url: "/lovable-uploads/db5bb336-501c-4bed-8d20-a0dca92abb87.png",
+      alt: "Produto 4"
+    },
+    {
+      url: "/lovable-uploads/a9d08f30-d6bd-4f29-a7c2-faa505ac0f22.png",
+      alt: "Produto 5"
+    }
+  ];
+
   return (
     <div className="text-center space-y-6 w-full max-w-lg mx-auto px-3 pt-8 sm:pt-8">
       <motion.div
@@ -70,6 +107,35 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
             Crie Sua Marca Própria nos EUA Sem Investir em Estoque
           </h2>
+        </div>
+      </motion.div>
+
+      {/* Products Scroll Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="w-full -mx-3 sm:mx-0 mt-8"
+      >
+        <div 
+          ref={productsScrollRef}
+          className="overflow-hidden relative w-screen sm:w-auto"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
+          <div className="flex gap-4 animate-scroll w-[200%] justify-center">
+            {productImages.concat(productImages).map((image, index) => (
+              <div 
+                key={`${index}`}
+                className="flex-none w-[200px] h-[200px] rounded-lg overflow-hidden shadow-lg"
+              >
+                <img 
+                  src={image.url}
+                  alt={image.alt}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </motion.div>
 
@@ -130,58 +196,6 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         </div>
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
-        <p className="text-lg sm:text-xl md:text-2xl text-gray-600 max-w-md mx-auto">
-          Lance sua marca própria sem investimento em estoque, com fornecedores americanos de alta qualidade
-        </p>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.6 }}
-        className="relative"
-      >
-        <div className="relative inline-block">
-          <Button
-            onClick={onNext}
-            className="w-72"
-          >
-            Ver Catálogo de Produtos
-          </Button>
-        </div>
-      </motion.div>
-
-      <div className="h-10"></div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
-        className="space-y-8"
-      >
-        <img 
-          src="/lovable-uploads/cc9f9846-a08c-4a17-9291-e8274c62f7dd.png"
-          alt="Produto GetBrands"
-          className="mx-auto rounded-lg shadow-lg max-w-[85%] sm:max-w-sm"
-        />
-        <p className="text-lg sm:text-xl md:text-2xl text-gray-600 max-w-md mx-auto">
-          Na GetBrands, transformamos sonhos em marcas de sucesso. Nossa missão é democratizar o empreendedorismo, permitindo que você construa sua marca premium sem as barreiras tradicionais.
-        </p>
-        <div className="mt-8">
-          <Button
-            onClick={onNext}
-            className="w-72"
-          >
-            Ver Catálogo de Produtos
-          </Button>
-        </div>
-        <div className="h-10"></div>
-      </motion.div>
     </div>
   );
 };
