@@ -106,7 +106,7 @@ export const OnboardingQuizPT = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="flex-1 flex items-center justify-center py-12">
+      <div className="flex-1 py-12">
         {steps[currentStep].component}
       </div>
     </div>
