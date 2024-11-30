@@ -15,6 +15,7 @@ export function CartButton() {
   const navigate = useNavigate();
 
   const handleCartClick = () => {
+    // Usando a nova estrutura de eventos
     trackCartView({
       items: items.map(item => ({
         product_id: item.id,

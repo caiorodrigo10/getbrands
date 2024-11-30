@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SignUpFormFields } from "@/components/auth/signup/SignUpFormFields";
 import { toast } from "sonner";
+import { trackSignUp } from "@/lib/analytics/events";
 
 interface FormData {
   firstName: string;
@@ -60,7 +61,20 @@ export const SignUpForm = ({ onSubmit, isLoading, onBack }: SignUpFormProps) => 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    await onSubmit(formData);
+
+    try {
+      await onSubmit(formData);
+      // Usando a nova estrutura de eventos
+      await trackSignUp({
+        userId: "", // Será preenchido após criação do usuário
+        email: formData.email,
+        signupMethod: "email",
+        language: "pt"
+      });
+    } catch (error) {
+      console.error("Signup error:", error);
+      toast.error("Erro ao criar conta. Por favor, tente novamente.");
+    }
   };
 
   return (

@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { createOrder } from "@/lib/utils/paymentUtils";
 import { PaymentFormButton } from "./payment/PaymentFormButton";
 import { useCreateSampleRequest } from "./payment/useCreateSampleRequest";
+import { trackCheckoutCompleted } from "@/lib/analytics/events";
 
 interface PaymentFormProps {
   clientSecret: string;
@@ -83,8 +84,21 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         orderId,
       });
 
+      // Usando a nova estrutura de eventos
+      await trackCheckoutCompleted({
+        orderId,
+        total,
+        shippingCost,
+        customerEmail: user.email,
+        products: items.map(item => ({
+          product_id: item.id,
+          product_name: item.name,
+          quantity: item.quantity || 1,
+          price: item.from_price
+        }))
+      });
+
       clearCart();
-      
       navigate(`/checkout/success?order_id=${orderId}&payment_intent=${paymentIntent?.id}`);
 
     } catch (error) {
