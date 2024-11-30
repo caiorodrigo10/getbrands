@@ -124,7 +124,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
           <Button
             size="lg"
             onClick={onNext}
-            className="relative z-10 bg-primary hover:bg-primary/90 text-white px-8 py-3 min-w-[250px] shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 border-2 border-white/30 hover:border-white/60"
+            className="relative z-10 bg-primary hover:bg-primary/90 text-white px-8 py-3 min-w-[250px] shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 border-[3px] border-white/40 hover:border-white/90 rounded-xl hover:rounded-2xl"
           >
             Ver Catálogo de Produtos
           </Button>
