@@ -131,10 +131,10 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
     <div className="w-full max-w-2xl mx-auto space-y-8">
       <div className="text-center">
         <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4">
-          Crie sua conta para continuar
+          Última Etapa
         </h2>
         <p className="text-gray-600">
-          Junte-se a nós e comece a construir sua marca
+          Preencha seus dados abaixo para desbloquear acesso ao nosso catálogo completo de produtos
         </p>
       </div>
 
@@ -156,10 +156,10 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
           </Button>
           <Button
             type="submit"
-            className="w-32"
+            className="w-auto px-6"
             disabled={isLoading}
           >
-            {isLoading ? "Criando..." : "Criar conta"}
+            {isLoading ? "Criando..." : "Acessar Catálogo de Produtos"}
           </Button>
         </div>
       </form>
