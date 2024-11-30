@@ -17,7 +17,7 @@ export const QuizIntro = ({ onStart }: QuizIntroProps) => {
       >
         <div className="flex items-center justify-center gap-3 mb-4">
           <h1 className="text-4xl font-bold text-primary">
-            Crie Sua Marca nos EUA
+            Crie Sua Marca Própria nos EUA Sem Investir em Estoque
           </h1>
           <Flag className="w-8 h-8 text-primary" />
         </div>
