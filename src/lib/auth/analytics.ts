@@ -39,16 +39,6 @@ export const handleAnalytics = async (user: User, profile: ProfileType) => {
     };
 
     window.analytics.identify(user.id, traits);
-    
-    // Track identification event
-    window.analytics.track("User Identified", {
-      userId: user.id,
-      email: user.email,
-      role: profile.role,
-      language: profile.language || 'en',
-      timestamp: new Date().toISOString()
-    });
-
   } catch (error) {
     console.error('Analytics error:', error);
   }
