@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Flag } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 interface WelcomeStepProps {
@@ -62,7 +61,11 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         className="space-y-3"
       >
         <div className="flex flex-col items-center gap-1 mt-4 sm:mt-0">
-          <Flag className="w-5 h-5 sm:w-6 sm:h-6 text-primary mb-1" />
+          <img
+            src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
+            alt="GetBrands Logo"
+            className="h-4 sm:h-5 mb-1"
+          />
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
             Crie Sua Marca Própria nos EUA Sem Investir em Estoque
           </h2>
@@ -86,7 +89,11 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
                 key={`first-${index}`}
                 className="inline-block w-[130px] sm:w-[160px] p-2 sm:p-3 bg-primary/5 rounded-lg whitespace-normal"
               >
-                <Flag className="w-4 h-4 sm:w-5 sm:h-5 text-primary mx-auto mb-1 sm:mb-2" />
+                <img
+                  src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
+                  alt="GetBrands Logo"
+                  className="w-3 h-3 sm:w-4 sm:h-4 mx-auto mb-1 sm:mb-2"
+                />
                 <h3 className="font-semibold mb-1 text-xs sm:text-sm">{block.title}</h3>
                 <p className="text-xs text-muted-foreground">
                   {block.description}
@@ -99,7 +106,11 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
                 key={`second-${index}`}
                 className="inline-block w-[130px] sm:w-[160px] p-2 sm:p-3 bg-primary/5 rounded-lg whitespace-normal"
               >
-                <Flag className="w-4 h-4 sm:w-5 sm:h-5 text-primary mx-auto mb-1 sm:mb-2" />
+                <img
+                  src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
+                  alt="GetBrands Logo"
+                  className="w-3 h-3 sm:w-4 sm:h-4 mx-auto mb-1 sm:mb-2"
+                />
                 <h3 className="font-semibold mb-1 text-xs sm:text-sm">{block.title}</h3>
                 <p className="text-xs text-muted-foreground">
                   {block.description}
