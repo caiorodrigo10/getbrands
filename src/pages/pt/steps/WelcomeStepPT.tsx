@@ -81,18 +81,18 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
       >
         <div 
           ref={scrollRef}
-          className="overflow-hidden whitespace-nowrap"
+          className="overflow-hidden whitespace-nowrap mx-auto"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          <div className="inline-flex gap-2 sm:gap-3 min-w-full animate-scroll">
+          <div className="inline-flex gap-2 sm:gap-3 min-w-full animate-scroll justify-center">
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`first-${index}`}
-                className="inline-block w-[130px] sm:w-[160px] p-2 sm:p-3 bg-primary/5 rounded-lg whitespace-normal"
+                className="inline-block w-[140px] sm:w-[170px] p-2 sm:p-3 bg-primary/5 rounded-lg whitespace-normal"
               >
                 <Check className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 text-primary" />
-                <h3 className="font-semibold mb-1 text-xs sm:text-sm">{block.title}</h3>
-                <p className="text-xs text-muted-foreground">
+                <h3 className="font-semibold mb-1 text-sm sm:text-base">{block.title}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   {block.description}
                 </p>
               </div>
@@ -101,11 +101,11 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`second-${index}`}
-                className="inline-block w-[130px] sm:w-[160px] p-2 sm:p-3 bg-primary/5 rounded-lg whitespace-normal"
+                className="inline-block w-[140px] sm:w-[170px] p-2 sm:p-3 bg-primary/5 rounded-lg whitespace-normal"
               >
                 <Check className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 text-primary" />
-                <h3 className="font-semibold mb-1 text-xs sm:text-sm">{block.title}</h3>
-                <p className="text-xs text-muted-foreground">
+                <h3 className="font-semibold mb-1 text-sm sm:text-base">{block.title}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   {block.description}
                 </p>
               </div>
