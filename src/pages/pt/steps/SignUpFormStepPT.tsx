@@ -129,11 +129,11 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-8">
-      <div className="text-center">
-        <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4">
-          Última Etapa
+      <div className="text-center space-y-3">
+        <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-2">
+          Estamos Quase Lá!
         </h2>
-        <p className="text-gray-600">
+        <p className="text-lg text-gray-600 max-w-xl mx-auto">
           Preencha seus dados abaixo para desbloquear acesso ao nosso catálogo completo de produtos
         </p>
       </div>
