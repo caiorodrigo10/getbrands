@@ -62,8 +62,9 @@ export const trackSignUpEvents = async (
       profile_type: quizData.profileType,
       product_interest: quizData.productCategories,
       brand_status: quizData.brandStatus,
+      language: 'pt',
       source: 'comecarpt'
-    });
+    }, 'comecarpt');
 
     console.log('Successfully tracked all signup events');
   } catch (error) {
