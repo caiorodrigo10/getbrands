@@ -8,7 +8,7 @@ interface WelcomeStepProps {
 
 export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
   return (
-    <div className="text-center space-y-6 max-w-lg mx-auto px-4 pt-12">
+    <div className="text-center space-y-8 max-w-lg mx-auto px-4 pt-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -62,28 +62,31 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         transition={{ delay: 0.6 }}
         className="relative"
       >
-        <motion.div
-          className="absolute inset-0 -m-1"
-          animate={{
-            rotate: 360,
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        >
-          <div className="w-full h-full border-4 border-dashed border-yellow-400 rounded-full opacity-75" />
-        </motion.div>
-        
-        <Button
-          size="lg"
-          onClick={onNext}
-          className="mt-2 sm:mt-4 relative z-10 bg-primary hover:bg-primary/90 text-white px-8 py-3"
-        >
-          Ver Catálogo de Produtos
-        </Button>
+        <div className="relative inline-block">
+          <motion.div
+            className="absolute -inset-1 rounded-full bg-gradient-to-r from-yellow-300 to-yellow-400 opacity-75 blur-sm"
+            animate={{
+              background: [
+                "linear-gradient(0deg, #FCD34D, #FBBF24)",
+                "linear-gradient(90deg, #FBBF24, #FCD34D)",
+                "linear-gradient(180deg, #FCD34D, #FBBF24)",
+                "linear-gradient(270deg, #FBBF24, #FCD34D)",
+              ],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          />
+          <Button
+            size="lg"
+            onClick={onNext}
+            className="relative z-10 bg-primary hover:bg-primary/90 text-white px-8 py-3 min-w-[250px] shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
+          >
+            Ver Catálogo de Produtos
+          </Button>
+        </div>
       </motion.div>
 
       <motion.div
