@@ -45,6 +45,12 @@ export const QuizIntro = ({ onStart }: QuizIntroProps) => {
               Trabalhe com fabricantes confiáveis e focados em qualidade
             </p>
           </div>
+          <div className="p-4 bg-primary/5 rounded-lg col-span-full">
+            <h3 className="font-semibold mb-2">+250 Produtos Disponíveis</h3>
+            <p className="text-sm text-muted-foreground">
+              Amplo catálogo de produtos para você escolher e personalizar sua marca
+            </p>
+          </div>
         </div>
       </motion.div>
 
