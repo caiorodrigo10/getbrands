@@ -16,7 +16,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
       >
         <div className="flex flex-col items-center gap-2">
           <Flag className="w-6 h-6 text-primary mb-2" />
-          <h2 className="text-2xl sm:text-4xl font-bold text-gray-900">
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-900">
             Crie Sua Marca Própria nos EUA Sem Investir em Estoque
           </h2>
         </div>
