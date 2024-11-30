@@ -114,6 +114,8 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         </div>
       </motion.div>
 
+      <div className="h-6 sm:h-8"></div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -141,7 +143,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         </div>
       </motion.div>
 
-      <div className="h-12 sm:h-16"></div>
+      <div className="h-20"></div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
