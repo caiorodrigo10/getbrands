@@ -4,6 +4,7 @@ interface QuizNavigationProps {
   onNext: () => void;
   onBack?: () => void;
   nextLabel?: string;
+  backLabel?: string;
   isNextDisabled?: boolean;
   showBack?: boolean;
 }
@@ -11,7 +12,8 @@ interface QuizNavigationProps {
 export const QuizNavigation = ({
   onNext,
   onBack,
-  nextLabel = "Next",
+  nextLabel = "Próximo",
+  backLabel = "Voltar",
   isNextDisabled = false,
   showBack = true,
 }: QuizNavigationProps) => {
@@ -23,7 +25,7 @@ export const QuizNavigation = ({
           onClick={onBack}
           className="w-32"
         >
-          Back
+          {backLabel}
         </Button>
       )}
       <Button
