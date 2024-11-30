@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SignUpFormFields } from "@/components/auth/signup/SignUpFormFields";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent, waitForAnalytics } from "@/lib/analytics";
 import { trackOnboardingCompleted } from "@/lib/analytics/onboarding";
 
 export interface SignUpFormStepPTProps {
@@ -54,6 +54,60 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
 
     setErrors(newErrors);
     return isValid;
+  };
+
+  const retryAnalytics = async (userId: string, retries = 3) => {
+    try {
+      console.log('Attempting to track signup events...');
+      await waitForAnalytics();
+      
+      window.analytics.identify(userId, {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        language: 'pt',
+        product_interest: quizData.productCategories,
+        profile_type: quizData.profileType,
+        brand_status: quizData.brandStatus,
+        launch_urgency: quizData.launchUrgency
+      });
+
+      window.analytics.track('user_signed_up', {
+        userId: userId,
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        signupMethod: 'email',
+        language: 'pt',
+        product_interest: quizData.productCategories,
+        profile_type: quizData.profileType,
+        brand_status: quizData.brandStatus,
+        launch_urgency: quizData.launchUrgency,
+        onboarding_completed: true,
+        source: 'comecarpt'
+      });
+
+      // Track onboarding completed event
+      trackOnboardingCompleted(userId, {
+        profile_type: quizData.profileType,
+        product_interest: quizData.productCategories,
+        brand_status: quizData.brandStatus,
+        source: 'comecarpt'
+      });
+
+      console.log('Successfully tracked all signup events');
+    } catch (error) {
+      console.error('Error tracking analytics:', error);
+      if (retries > 0) {
+        console.log(`Retrying analytics tracking... (${retries} attempts left)`);
+        setTimeout(() => retryAnalytics(userId, retries - 1), 1000);
+      } else {
+        console.error('Failed to track signup events after all retries');
+        toast.error('Erro ao registrar eventos de analytics');
+      }
+    }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -109,45 +163,8 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
 
         if (profileError) throw profileError;
 
-        // Track signup event in Segment
-        if (window.analytics) {
-          window.analytics.identify(data.user.id, {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            phone: formData.phone,
-            language: 'pt',
-            product_interest: quizData.productCategories,
-            profile_type: quizData.profileType,
-            brand_status: quizData.brandStatus,
-            launch_urgency: quizData.launchUrgency
-          });
-
-          // Track user_signed_up event
-          window.analytics.track('user_signed_up', {
-            userId: data.user.id,
-            email: formData.email,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            phone: formData.phone,
-            signupMethod: 'email',
-            language: 'pt',
-            product_interest: quizData.productCategories,
-            profile_type: quizData.profileType,
-            brand_status: quizData.brandStatus,
-            launch_urgency: quizData.launchUrgency,
-            onboarding_completed: true,
-            source: 'comecarpt'
-          });
-
-          // Track onboarding completed event
-          trackOnboardingCompleted(data.user.id, {
-            profile_type: quizData.profileType,
-            product_interest: quizData.productCategories,
-            brand_status: quizData.brandStatus,
-            source: 'comecarpt'
-          });
-        }
+        // Iniciar o processo de tracking com retry
+        retryAnalytics(data.user.id);
 
         window.location.href = "/pt/start-here";
       }
