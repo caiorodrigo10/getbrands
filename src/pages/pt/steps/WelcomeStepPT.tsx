@@ -64,7 +64,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         <Button
           size="lg"
           onClick={onNext}
-          className="mt-4 sm:mt-6"
+          className="mt-2 sm:mt-4"
         >
           Ver Catálogo de Produtos
         </Button>
@@ -74,7 +74,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
-        className="mt-16 sm:mt-20 space-y-6"
+        className="mt-20 sm:mt-24 space-y-6"
       >
         <img 
           src="/lovable-uploads/cc9f9846-a08c-4a17-9291-e8274c62f7dd.png"
