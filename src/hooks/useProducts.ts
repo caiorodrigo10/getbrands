@@ -28,17 +28,25 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
     let query = supabase.from("products").select("*", { count: "exact" });
 
     if (searchTerm) {
-      query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+      // Create a properly formatted search filter
+      query = query.or(
+        `name.ilike.%${searchTerm.replace(/[%,]/g, "").trim()}%,description.ilike.%${searchTerm
+          .replace(/[%,]/g, "")
+          .trim()}%`
+      );
     }
 
     const { count } = await query;
 
-    let dataQuery = supabase
-      .from("products")
-      .select("*");
+    let dataQuery = supabase.from("products").select("*");
 
     if (searchTerm) {
-      dataQuery = dataQuery.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+      // Use the same formatted search filter
+      dataQuery = dataQuery.or(
+        `name.ilike.%${searchTerm.replace(/[%,]/g, "").trim()}%,description.ilike.%${searchTerm
+          .replace(/[%,]/g, "")
+          .trim()}%`
+      );
     }
 
     const { data, error } = await dataQuery
@@ -46,7 +54,7 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
       .order("created_at", { ascending: false });
 
     if (error) {
-      throw new Error(error.message);
+      throw error;
     }
 
     const totalCount = count || 0;
