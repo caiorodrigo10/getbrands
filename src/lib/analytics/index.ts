@@ -57,9 +57,8 @@ export const identifyUser = async (userId: string, traits?: Record<string, any>)
       source: 'web_app'
     };
 
-    // Make sure to call identify before any other tracking calls
     window.analytics.identify(userId, identifyTraits);
-    console.log('✅ User identified in Segment:', { userId, traits: identifyTraits });
+    console.log('Identify call successful:', { userId, traits: identifyTraits });
   } catch (error) {
     console.error('Error in identify call:', error);
     toast.error('Analytics Error: Failed to identify user');
@@ -102,8 +101,8 @@ export const trackPage = async (properties?: Record<string, any>) => {
       ...(properties?.url ? { url: formatUrl(properties.url) } : {})
     };
 
-    window.analytics.page(pageProperties);
-    console.log('✅ Page view tracked:', pageProperties);
+    window.analytics.page("Page Viewed", pageProperties);
+    console.log('Page view:', pageProperties);
   } catch (error) {
     console.error('Error tracking page view:', error);
     toast.error('Analytics Error: Failed to track page view');
