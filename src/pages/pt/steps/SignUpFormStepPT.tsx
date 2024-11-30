@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SignUpFormFields } from "@/components/auth/signup/SignUpFormFields";
 import { trackEvent } from "@/lib/analytics";
+import { trackOnboardingCompleted } from "@/lib/analytics/onboarding";
 
 export interface SignUpFormStepPTProps {
   onBack: () => void;
@@ -122,6 +123,7 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
             launch_urgency: quizData.launchUrgency
           });
 
+          // Track user_signed_up event
           window.analytics.track('user_signed_up', {
             userId: data.user.id,
             email: formData.email,
@@ -134,7 +136,16 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
             profile_type: quizData.profileType,
             brand_status: quizData.brandStatus,
             launch_urgency: quizData.launchUrgency,
-            onboarding_completed: true
+            onboarding_completed: true,
+            source: 'comecarpt'
+          });
+
+          // Track onboarding completed event
+          trackOnboardingCompleted(data.user.id, {
+            profile_type: quizData.profileType,
+            product_interest: quizData.productCategories,
+            brand_status: quizData.brandStatus,
+            source: 'comecarpt'
           });
         }
 
