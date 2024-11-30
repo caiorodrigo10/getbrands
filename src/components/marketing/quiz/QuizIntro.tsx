@@ -35,22 +35,22 @@ export const QuizIntro = ({ onStart }: QuizIntroProps) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 bg-primary/5 rounded-lg">
             <Check className="w-6 h-6 text-primary mx-auto mb-3" />
-            <h3 className="font-semibold mb-2">Sem Investimento em Estoque</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="font-semibold mb-2 text-sm">Sem Investimento em Estoque</h3>
+            <p className="text-xs text-muted-foreground">
               Comece sua marca sem o peso dos custos de inventário
             </p>
           </div>
           <div className="p-4 bg-primary/5 rounded-lg">
             <Check className="w-6 h-6 text-primary mx-auto mb-3" />
-            <h3 className="font-semibold mb-2">Fornecedores Americanos</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="font-semibold mb-2 text-sm">Fornecedores Americanos</h3>
+            <p className="text-xs text-muted-foreground">
               Trabalhe com fabricantes confiáveis e focados em qualidade
             </p>
           </div>
           <div className="p-4 bg-primary/5 rounded-lg">
             <Check className="w-6 h-6 text-primary mx-auto mb-3" />
-            <h3 className="font-semibold mb-2">+250 Produtos Disponíveis</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="font-semibold mb-2 text-sm">+250 Produtos Disponíveis</h3>
+            <p className="text-xs text-muted-foreground">
               Amplo catálogo de produtos para você escolher e personalizar sua marca
             </p>
           </div>
