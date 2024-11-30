@@ -92,17 +92,17 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
   ];
 
   return (
-    <div className="text-center space-y-6 w-full max-w-lg mx-auto px-3 pt-8 sm:pt-8">
+    <div className="w-full max-w-4xl mx-auto px-4 space-y-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-3"
+        className="space-y-6 text-center"
       >
-        <div className="flex flex-col items-center gap-1 mt-16 sm:mt-12">
+        <div className="flex flex-col items-center gap-4">
           <img
             src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
             alt="GetBrands Logo"
-            className="h-8 sm:h-10 mb-2"
+            className="h-8 sm:h-10"
           />
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
             Crie Sua Marca Própria nos EUA Sem Investir em Estoque
@@ -110,12 +110,11 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         </div>
       </motion.div>
 
-      {/* Products Scroll Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="w-full -mx-3 sm:mx-0 mt-8"
+        className="w-full -mx-4 sm:mx-0"
       >
         <div 
           ref={productsScrollRef}
@@ -143,7 +142,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="w-full -mx-3 sm:mx-0"
+        className="w-full -mx-4 sm:mx-0"
       >
         <div 
           ref={scrollRef}
@@ -196,6 +195,20 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         </div>
       </motion.div>
 
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+        className="flex justify-center pt-8"
+      >
+        <Button
+          onClick={onNext}
+          size="lg"
+          className="w-full sm:w-auto px-8"
+        >
+          Começar Agora
+        </Button>
+      </motion.div>
     </div>
   );
 };
