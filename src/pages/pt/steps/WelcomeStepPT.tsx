@@ -39,6 +39,18 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
     {
       title: "+250 Produtos Disponíveis",
       description: "Amplo catálogo de produtos para você escolher e personalizar sua marca"
+    },
+    {
+      title: "Suporte Dedicado",
+      description: "Equipe especializada para ajudar em cada etapa"
+    },
+    {
+      title: "Entrega Rápida",
+      description: "Logística eficiente para seus produtos"
+    },
+    {
+      title: "Qualidade Premium",
+      description: "Produtos de alta qualidade para sua marca"
     }
   ];
 
@@ -75,7 +87,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`first-${index}`}
-                className="inline-block w-[280px] p-3 sm:p-4 bg-primary/5 rounded-lg whitespace-normal"
+                className="inline-block w-[220px] sm:w-[240px] p-3 sm:p-4 bg-primary/5 rounded-lg whitespace-normal"
               >
                 <Check className="w-5 h-5 sm:w-6 sm:h-6 text-primary mx-auto mb-2 sm:mb-3" />
                 <h3 className="font-semibold mb-1 sm:mb-2 text-sm">{block.title}</h3>
@@ -89,7 +101,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`second-${index}`}
-                className="inline-block w-[280px] p-3 sm:p-4 bg-primary/5 rounded-lg whitespace-normal"
+                className="inline-block w-[220px] sm:w-[240px] p-3 sm:p-4 bg-primary/5 rounded-lg whitespace-normal"
               >
                 <Check className="w-5 h-5 sm:w-6 sm:h-6 text-primary mx-auto mb-2 sm:mb-3" />
                 <h3 className="font-semibold mb-1 sm:mb-2 text-sm">{block.title}</h3>
