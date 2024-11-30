@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
-import { Check } from "lucide-react";
+import { BenefitBlock } from "@/components/marketing/landing/BenefitBlock";
 
 interface WelcomeStepProps {
   onNext: () => void;
@@ -179,45 +179,23 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
           >
             <div className="flex gap-2 sm:gap-3 animate-scroll w-[200%] justify-center">
               {benefitBlocks.map((block, index) => (
-                <div 
+                <BenefitBlock
                   key={`first-${index}`}
-                  className="flex-none w-[160px] sm:w-[200px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[200px]"
-                >
-                  <div className="flex-none h-8 flex items-center">
-                    <Check className="w-7 h-7 sm:w-9 sm:h-9 text-primary" />
-                  </div>
-                  <div className="flex-none h-12 flex items-center">
-                    <h3 className="font-semibold text-base sm:text-lg leading-tight">
-                      {block.title}
-                    </h3>
-                  </div>
-                  <div className="flex-1 flex items-start pt-1 pb-3">
-                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                      {block.description}
-                    </p>
-                  </div>
-                </div>
+                  title={block.title}
+                  description={block.description}
+                  keyPrefix="first"
+                  index={index}
+                />
               ))}
               
               {benefitBlocks.map((block, index) => (
-                <div 
+                <BenefitBlock
                   key={`second-${index}`}
-                  className="flex-none w-[160px] sm:w-[200px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[200px]"
-                >
-                  <div className="flex-none h-8 flex items-center">
-                    <Check className="w-7 h-7 sm:w-9 sm:h-9 text-primary" />
-                  </div>
-                  <div className="flex-none h-12 flex items-center">
-                    <h3 className="font-semibold text-base sm:text-lg leading-tight">
-                      {block.title}
-                    </h3>
-                  </div>
-                  <div className="flex-1 flex items-start pt-1 pb-3">
-                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                      {block.description}
-                    </p>
-                  </div>
-                </div>
+                  title={block.title}
+                  description={block.description}
+                  keyPrefix="second"
+                  index={index}
+                />
               ))}
             </div>
           </div>
