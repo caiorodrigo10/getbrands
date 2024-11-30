@@ -9,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useShippingCalculation } from "@/hooks/useShippingCalculation";
 import PaymentForm from "@/components/checkout/PaymentForm";
 import PaymentSummary from "@/components/checkout/PaymentSummary";
-import { calculateOrderSubtotal } from "@/lib/orderCalculations";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
 
@@ -30,6 +29,8 @@ const Payment = () => {
 
   useEffect(() => {
     const createPaymentIntent = async () => {
+      if (!items.length) return;
+      
       try {
         const { data, error } = await supabase.functions.invoke('create-payment-intent', {
           body: { 
@@ -60,12 +61,27 @@ const Payment = () => {
       }
     };
 
-    if (items.length > 0 && !isLoadingShipping) {
+    if (!isLoadingShipping) {
       createPaymentIntent();
     }
   }, [items, toast, isLoadingShipping, total, shippingCost, subtotal]);
 
-  if (!clientSecret || isLoadingShipping) {
+  // Show loading state only when shipping is loading or when we have items but no client secret yet
+  const isLoading = isLoadingShipping || (items.length > 0 && !clientSecret);
+
+  if (items.length === 0) {
+    return (
+      <div className="max-w-2xl mx-auto py-6">
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-center text-muted-foreground">Your cart is empty</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -93,13 +109,15 @@ const Payment = () => {
             shippingCost={shippingCost}
             total={total}
           />
-          <Elements stripe={stripePromise} options={options}>
-            <PaymentForm 
-              clientSecret={clientSecret} 
-              total={total} 
-              shippingCost={shippingCost}
-            />
-          </Elements>
+          {clientSecret && (
+            <Elements stripe={stripePromise} options={options}>
+              <PaymentForm 
+                clientSecret={clientSecret} 
+                total={total} 
+                shippingCost={shippingCost}
+              />
+            </Elements>
+          )}
         </CardContent>
       </Card>
     </div>
