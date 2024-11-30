@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Flag } from "lucide-react";
+import { Flag, Check } from "lucide-react";
 
 interface QuizIntroProps {
   onStart: () => void;
@@ -32,20 +32,23 @@ export const QuizIntro = ({ onStart }: QuizIntroProps) => {
         transition={{ delay: 0.4 }}
         className="space-y-4"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 bg-primary/5 rounded-lg">
+            <Check className="w-6 h-6 text-primary mx-auto mb-3" />
             <h3 className="font-semibold mb-2">Sem Investimento em Estoque</h3>
             <p className="text-sm text-muted-foreground">
               Comece sua marca sem o peso dos custos de inventário
             </p>
           </div>
           <div className="p-4 bg-primary/5 rounded-lg">
+            <Check className="w-6 h-6 text-primary mx-auto mb-3" />
             <h3 className="font-semibold mb-2">Fornecedores Americanos</h3>
             <p className="text-sm text-muted-foreground">
               Trabalhe com fabricantes confiáveis e focados em qualidade
             </p>
           </div>
-          <div className="p-4 bg-primary/5 rounded-lg col-span-full">
+          <div className="p-4 bg-primary/5 rounded-lg">
+            <Check className="w-6 h-6 text-primary mx-auto mb-3" />
             <h3 className="font-semibold mb-2">+250 Produtos Disponíveis</h3>
             <p className="text-sm text-muted-foreground">
               Amplo catálogo de produtos para você escolher e personalizar sua marca
