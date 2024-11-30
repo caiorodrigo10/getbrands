@@ -12,7 +12,7 @@ const initializeAnalytics = () => {
   return true;
 };
 
-const waitForAnalytics = () => {
+export const waitForAnalytics = () => {
   return new Promise<void>((resolve, reject) => {
     if (analyticsInitialized) {
       resolve();
