@@ -29,7 +29,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
 
   const benefitBlocks = [
     {
-      title: "Sem Investimento em Estoque",
+      title: "Sob Demanda",
       description: "Comece sua marca sem o peso dos custos de inventário"
     },
     {
