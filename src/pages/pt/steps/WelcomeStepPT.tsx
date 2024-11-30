@@ -155,6 +155,16 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         <p className="text-sm sm:text-lg text-gray-600 max-w-md mx-auto">
           Na GetBrands, transformamos sonhos em marcas de sucesso. Nossa missão é democratizar o empreendedorismo, permitindo que você construa sua marca premium sem as barreiras tradicionais.
         </p>
+        <div className="mt-8">
+          <Button
+            size="lg"
+            onClick={onNext}
+            className="relative z-10 bg-primary hover:bg-primary/90 text-white px-4 sm:px-8 py-2.5 sm:py-3 min-w-[180px] sm:min-w-[250px] shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 border-[3px] border-white/40 hover:border-white/90 rounded-xl hover:rounded-2xl text-sm sm:text-base"
+          >
+            Ver Catálogo de Produtos
+          </Button>
+        </div>
+        <div className="h-20"></div>
       </motion.div>
     </div>
   );
