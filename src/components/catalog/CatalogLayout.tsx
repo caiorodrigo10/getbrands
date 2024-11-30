@@ -36,14 +36,14 @@ const CatalogLayout = () => {
   const totalPages = productsData?.totalPages || 1;
 
   return (
-    <div className="space-y-page">
-      <div className="space-y-section">
+    <div className="flex flex-col min-h-screen">
+      <div className="flex-grow">
         <div>
           <h1 className="text-page-title mb-2">Welcome!</h1>
           <p className="text-muted-foreground">Choose a product to customize</p>
         </div>
 
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mt-6">
           <div className="w-full md:flex-1 overflow-x-auto">
             <CatalogFilters />
           </div>
@@ -54,7 +54,7 @@ const CatalogLayout = () => {
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
             {Array.from({ length: 9 }).map((_, i) => (
               <div key={i} className="space-y-4">
                 <Skeleton className="h-[200px] w-full" />
@@ -64,25 +64,25 @@ const CatalogLayout = () => {
             ))}
           </div>
         ) : productsData?.data && productsData.data.length > 0 ? (
-          <>
+          <div className="mt-6">
             <ProductGrid products={productsData.data} />
-          </>
+          </div>
         ) : (
           <div className="text-center py-12">
             <p className="text-lg text-muted-foreground">No products found.</p>
           </div>
         )}
-        
-        {totalPages > 1 && (
-          <div className="mt-section flex justify-center">
-            <CatalogPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </div>
-        )}
       </div>
+      
+      {totalPages > 1 && (
+        <div className="mt-8 mb-4">
+          <CatalogPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
     </div>
   );
 };
