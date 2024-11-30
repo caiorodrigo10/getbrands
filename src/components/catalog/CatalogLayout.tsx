@@ -25,7 +25,7 @@ const CatalogLayout = () => {
   
   const { ref: loadMoreRef, inView } = useInView({
     threshold: 0,
-    rootMargin: '100px',
+    rootMargin: '300px',
   });
 
   const productsQuery = useProducts({ 

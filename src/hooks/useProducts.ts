@@ -49,12 +49,13 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
       throw new Error(error.message);
     }
 
-    const hasNextPage = to < (count || 0) - 1;
+    const totalCount = count || 0;
+    const hasNextPage = from + limit < totalCount;
 
     return {
       data: data as Product[],
-      totalPages: Math.ceil((count || 0) / limit),
-      totalCount: count || 0,
+      totalPages: Math.ceil(totalCount / limit),
+      totalCount: totalCount,
       nextPage: hasNextPage ? pageParam + 1 : undefined,
     };
   };
