@@ -9,10 +9,13 @@ interface WelcomeStepProps {
 
 export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const productsScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const scrollContainer = scrollRef.current;
-    if (!scrollContainer) return;
+    const productsContainer = productsScrollRef.current;
+    
+    if (!scrollContainer || !productsContainer) return;
 
     const scroll = () => {
       if (scrollContainer.scrollLeft >= scrollContainer.scrollWidth / 2) {
@@ -22,9 +25,21 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
       }
     };
 
-    const intervalId = setInterval(scroll, 16);
+    const scrollProducts = () => {
+      if (productsContainer.scrollLeft >= productsContainer.scrollWidth / 2) {
+        productsContainer.scrollLeft = 0;
+      } else {
+        productsContainer.scrollLeft += 0.5;
+      }
+    };
 
-    return () => clearInterval(intervalId);
+    const intervalId = setInterval(scroll, 16);
+    const productsIntervalId = setInterval(scrollProducts, 16);
+
+    return () => {
+      clearInterval(intervalId);
+      clearInterval(productsIntervalId);
+    };
   }, []);
 
   const benefitBlocks = [
@@ -52,6 +67,14 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
       title: "Qualidade Premium",
       description: "Produtos de alta qualidade para sua marca"
     }
+  ];
+
+  const productImages = [
+    "/lovable-uploads/d0da9d7f-2d47-488a-8088-001ae673ceee.png",
+    "/lovable-uploads/387ca795-b88f-426e-9ee2-8188e8108a64.png",
+    "/lovable-uploads/7a409451-160c-48e9-9240-3e452527fbd2.png",
+    "/lovable-uploads/781c67a7-1ee3-40f3-9a71-ec4f898e364a.png",
+    "/lovable-uploads/db679e3d-c955-4f20-aece-718125c1fe40.png"
   ];
 
   return (
@@ -102,85 +125,100 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
-        className="space-y-8"
+        transition={{ delay: 0.4 }}
+        className="w-full -mx-3 sm:mx-0"
       >
-        <img 
-          src="/lovable-uploads/cc9f9846-a08c-4a17-9291-e8274c62f7dd.png"
-          alt="Produto GetBrands"
-          className="mx-auto rounded-lg shadow-lg max-w-[85%] sm:max-w-sm"
-        />
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="w-full -mx-3 sm:mx-0"
+        <div 
+          ref={productsScrollRef}
+          className="overflow-hidden relative w-screen sm:w-auto"
+          style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          <div 
-            ref={scrollRef}
-            className="overflow-hidden relative w-screen sm:w-auto"
-            style={{ WebkitOverflowScrolling: 'touch' }}
-          >
-            <div className="flex gap-2 sm:gap-3 animate-scroll w-[200%] justify-center">
-              {benefitBlocks.map((block, index) => (
-                <div 
-                  key={`first-${index}`}
-                  className="flex-none w-[140px] sm:w-[170px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[180px]"
-                >
-                  <div className="flex-none h-8 flex items-center">
-                    <Check className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-                  </div>
-                  <div className="flex-none h-10 flex items-center">
-                    <h3 className="font-semibold text-sm sm:text-base leading-tight">
-                      {block.title}
-                    </h3>
-                  </div>
-                  <div className="flex-1 flex items-start pt-1 pb-3">
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                      {block.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-              
-              {benefitBlocks.map((block, index) => (
-                <div 
-                  key={`second-${index}`}
-                  className="flex-none w-[140px] sm:w-[170px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[180px]"
-                >
-                  <div className="flex-none h-8 flex items-center">
-                    <Check className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-                  </div>
-                  <div className="flex-none h-10 flex items-center">
-                    <h3 className="font-semibold text-sm sm:text-base leading-tight">
-                      {block.title}
-                    </h3>
-                  </div>
-                  <div className="flex-1 flex items-start pt-1 pb-3">
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                      {block.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="flex gap-4 sm:gap-6 animate-scroll w-[200%] justify-center">
+            {productImages.concat(productImages).map((image, index) => (
+              <div 
+                key={`${index}`}
+                className="flex-none w-[200px] sm:w-[250px] aspect-square p-4 bg-gray-50/80 rounded-lg"
+              >
+                <img 
+                  src={image} 
+                  alt={`Product ${index + 1}`}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            ))}
           </div>
-        </motion.div>
-
-        <p className="text-lg sm:text-xl md:text-2xl text-gray-600 max-w-md mx-auto">
-          Na GetBrands, transformamos sonhos em marcas de sucesso. Nossa missão é democratizar o empreendedorismo, permitindo que você construa sua marca premium sem as barreiras tradicionais.
-        </p>
-        <div className="mt-8">
-          <Button
-            onClick={onNext}
-            className="w-72"
-          >
-            Ver Catálogo de Produtos
-          </Button>
         </div>
-        <div className="h-10"></div>
       </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="w-full -mx-3 sm:mx-0"
+      >
+        <div 
+          ref={scrollRef}
+          className="overflow-hidden relative w-screen sm:w-auto"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
+          <div className="flex gap-2 sm:gap-3 animate-scroll w-[200%] justify-center">
+            {benefitBlocks.map((block, index) => (
+              <div 
+                key={`first-${index}`}
+                className="flex-none w-[140px] sm:w-[170px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[180px]"
+              >
+                <div className="flex-none h-8 flex items-center">
+                  <Check className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                </div>
+                <div className="flex-none h-10 flex items-center">
+                  <h3 className="font-semibold text-sm sm:text-base leading-tight">
+                    {block.title}
+                  </h3>
+                </div>
+                <div className="flex-1 flex items-start pt-1 pb-3">
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                    {block.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+            
+            {benefitBlocks.map((block, index) => (
+              <div 
+                key={`second-${index}`}
+                className="flex-none w-[140px] sm:w-[170px] p-3 sm:p-4 bg-gray-50/80 rounded-lg flex flex-col items-center h-[180px]"
+              >
+                <div className="flex-none h-8 flex items-center">
+                  <Check className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                </div>
+                <div className="flex-none h-10 flex items-center">
+                  <h3 className="font-semibold text-sm sm:text-base leading-tight">
+                    {block.title}
+                  </h3>
+                </div>
+                <div className="flex-1 flex items-start pt-1 pb-3">
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                    {block.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      <p className="text-lg sm:text-xl md:text-2xl text-gray-600 max-w-md mx-auto">
+        Na GetBrands, transformamos sonhos em marcas de sucesso. Nossa missão é democratizar o empreendedorismo, permitindo que você construa sua marca premium sem as barreiras tradicionais.
+      </p>
+      <div className="mt-8">
+        <Button
+          onClick={onNext}
+          className="w-72"
+        >
+          Ver Catálogo de Produtos
+        </Button>
+      </div>
+      <div className="h-10"></div>
     </div>
   );
 };
