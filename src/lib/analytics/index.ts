@@ -102,7 +102,7 @@ export const trackPage = async (properties?: Record<string, any>) => {
       ...(properties?.url ? { url: formatUrl(properties.url) } : {})
     };
 
-    window.analytics.page(pageProperties);
+    window.analytics.page("Page View", pageProperties);
     console.log('✅ Page view tracked:', pageProperties);
   } catch (error) {
     console.error('Error tracking page view:', error);
