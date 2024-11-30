@@ -14,9 +14,10 @@ interface ProductsResponse {
 
 interface ProductSearchProps {
   addToCart?: boolean;
+  onSelectProduct?: (product: Product) => void;
 }
 
-export const ProductSearch = ({ addToCart }: ProductSearchProps) => {
+export const ProductSearch = ({ addToCart, onSelectProduct }: ProductSearchProps) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const { addItem } = useCart();
@@ -79,6 +80,10 @@ export const ProductSearch = ({ addToCart }: ProductSearchProps) => {
           description: "Failed to add product to cart. Please try again.",
         });
       }
+    }
+    if (onSelectProduct) {
+      onSelectProduct(product);
+      setOpen(false);
     }
   };
 
