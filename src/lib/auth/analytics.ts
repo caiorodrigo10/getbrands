@@ -1,10 +1,14 @@
 import { User } from "@supabase/supabase-js";
-import { identifyUser, trackEvent } from "@/lib/analytics";
 import { ProfileType } from "./types";
 import Gleap from "gleap";
 
 export const handleAnalytics = async (user: User, profile: ProfileType) => {
   try {
+    if (!window.analytics) {
+      console.warn('Segment analytics not initialized');
+      return;
+    }
+
     // Prepare user traits for Segment
     const traits = {
       email: user.email,
@@ -19,12 +23,6 @@ export const handleAnalytics = async (user: User, profile: ProfileType) => {
       shipping_address_city: profile.shipping_address_city,
       shipping_address_state: profile.shipping_address_state,
       shipping_address_zip: profile.shipping_address_zip,
-      // Billing information
-      billing_address_street: profile.billing_address_street,
-      billing_address_street2: profile.billing_address_street2,
-      billing_city: profile.billing_city,
-      billing_state: profile.billing_state,
-      billing_zip: profile.billing_zip,
       // Business/Marketing information
       role: profile.role,
       instagram_handle: profile.instagram_handle,
@@ -36,11 +34,14 @@ export const handleAnalytics = async (user: User, profile: ProfileType) => {
       // Metadata
       created_at: user.created_at,
       last_sign_in: user.last_sign_in_at,
+      language: profile.language || 'en'
     };
 
-    await identifyUser(user.id, traits);
+    // Identify user in Segment
+    window.analytics.identify(user.id, traits);
 
-    await trackEvent("User Logged In", {
+    // Track login event
+    window.analytics.track("User Session Started", {
       user_id: user.id,
       email: user.email,
       login_method: "email",
@@ -56,6 +57,9 @@ export const handleGleapIdentification = (user: User, profile: ProfileType) => {
     Gleap.identify(user.id, {
       email: user.email,
       name: profile.first_name ? `${profile.first_name} ${profile.last_name}` : user.email,
+      phone: profile.phone,
+      plan: profile.role,
+      language: profile.language || 'en'
     });
   } catch (error) {
     console.error('Gleap error:', error);

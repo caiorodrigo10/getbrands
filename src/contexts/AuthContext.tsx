@@ -3,6 +3,7 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
+import { handleAnalytics, handleGleapIdentification, clearGleapIdentity } from "@/lib/auth/analytics";
 
 interface AuthContextType {
   user: User | null;
@@ -36,21 +37,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   const handleAuthChange = async (session: any) => {
-    console.log('[DEBUG] handleAuthChange - Session:', session?.user?.id, 'Path:', location.pathname);
-    
-    if (session?.user) {
-      setUser(session.user);
-      setIsAuthenticated(true);
-    } else {
-      setUser(null);
-      setIsAuthenticated(false);
+    try {
+      if (session?.user) {
+        // Fetch user profile data
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+
+        if (profileError) throw profileError;
+
+        // Set auth state
+        setUser(session.user);
+        setIsAuthenticated(true);
+
+        // Identify user in analytics services
+        if (profile) {
+          handleAnalytics(session.user, profile);
+          handleGleapIdentification(session.user, profile);
+        }
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+        clearGleapIdentity();
+      }
+    } catch (error) {
+      console.error('Error in handleAuthChange:', error);
+      // Don't clear user state on error to prevent unnecessary logouts
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
     let mounted = true;
-    console.log('[DEBUG] AuthContext useEffect - User:', user?.id, 'Path:', location.pathname);
     
     const initSession = async () => {
       try {
@@ -90,6 +111,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       setUser(null);
       setIsAuthenticated(false);
+      clearGleapIdentity();
       navigate('/login');
       toast.success('Logged out successfully');
     } catch (error) {
@@ -101,7 +123,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const login = async (email: string, password: string) => {
-    console.log('[DEBUG] login attempt - Path:', location.pathname);
     try {
       setIsLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -111,10 +132,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) throw error;
 
+      // Fetch profile data immediately after successful login
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", data.user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
       setUser(data.user);
       setIsAuthenticated(true);
+
+      // Identify user in analytics services
+      handleAnalytics(data.user, profile);
+      handleGleapIdentification(data.user, profile);
       
-      // Redirecionar para /catalog após login bem-sucedido
       navigate('/catalog', { replace: true });
       toast.success('Logged in successfully');
     } catch (error: any) {
