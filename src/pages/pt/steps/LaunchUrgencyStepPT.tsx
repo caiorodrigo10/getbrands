@@ -5,6 +5,7 @@ import { QuizNavigation } from "@/components/onboarding/steps/QuizNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useLocation } from "react-router-dom";
 
 interface LaunchUrgencyStepProps {
   selected: string;
@@ -22,6 +23,9 @@ export const LaunchUrgencyStepPT = ({
   showNextButton = false
 }: LaunchUrgencyStepProps) => {
   const { user } = useAuth();
+  const location = useLocation();
+  const isOnboarding = location.pathname === "/pt/onboarding";
+
   const options = [
     { value: "immediate", label: "Imediatamente (1-2 meses)" },
     { value: "soon", label: "Em breve (3-6 meses)" },
@@ -108,7 +112,7 @@ export const LaunchUrgencyStepPT = ({
       <QuizNavigation
         onNext={onNext}
         onBack={onBack}
-        nextLabel={showNextButton ? "Próximo" : "Completar"}
+        nextLabel={isOnboarding ? "Completar" : "Próximo"}
         isNextDisabled={!selected}
       />
     </div>
