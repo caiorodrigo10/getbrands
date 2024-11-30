@@ -67,9 +67,6 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
             Crie Sua Marca Própria nos EUA Sem Investir em Estoque
           </h2>
         </div>
-        <p className="text-base sm:text-lg text-gray-600 max-w-md mx-auto px-4 sm:px-0">
-          Lance sua marca própria sem investimento em estoque, com fornecedores americanos de alta qualidade
-        </p>
       </motion.div>
 
       <motion.div
@@ -83,7 +80,6 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
           className="overflow-hidden whitespace-nowrap"
         >
           <div className="inline-flex gap-4 min-w-full">
-            {/* First set of blocks */}
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`first-${index}`}
@@ -97,7 +93,6 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
               </div>
             ))}
             
-            {/* Duplicate set for seamless scrolling */}
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`second-${index}`}
@@ -112,6 +107,16 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
             ))}
           </div>
         </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <p className="text-base sm:text-lg text-gray-600 max-w-md mx-auto px-4 sm:px-0">
+          Lance sua marca própria sem investimento em estoque, com fornecedores americanos de alta qualidade
+        </p>
       </motion.div>
 
       <motion.div
