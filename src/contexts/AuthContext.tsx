@@ -3,6 +3,8 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
+import { identifyUser } from "@/lib/analytics";
+import Gleap from "gleap";
 
 interface AuthContextType {
   user: User | null;
@@ -36,21 +38,47 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   const handleAuthChange = async (session: any) => {
-    console.log('[DEBUG] handleAuthChange - Session:', session?.user?.id, 'Path:', location.pathname);
-    
     if (session?.user) {
       setUser(session.user);
       setIsAuthenticated(true);
+
+      // Fetch user profile data for analytics
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+
+      if (profile) {
+        // Identify user in Segment
+        await identifyUser(session.user.id, {
+          email: session.user.email,
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          role: profile.role,
+          phone: profile.phone,
+          created_at: session.user.created_at,
+          last_sign_in: session.user.last_sign_in_at
+        });
+
+        // Identify user in Gleap
+        Gleap.identify(session.user.id, {
+          email: session.user.email,
+          name: profile.first_name ? `${profile.first_name} ${profile.last_name}` : session.user.email,
+          phone: profile.phone
+        });
+      }
     } else {
       setUser(null);
       setIsAuthenticated(false);
+      // Clear Gleap identity when user logs out
+      Gleap.clearIdentity();
     }
     setIsLoading(false);
   };
 
   useEffect(() => {
     let mounted = true;
-    console.log('[DEBUG] AuthContext useEffect - User:', user?.id, 'Path:', location.pathname);
     
     const initSession = async () => {
       try {
@@ -90,6 +118,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       setUser(null);
       setIsAuthenticated(false);
+      Gleap.clearIdentity();
       navigate('/login');
       toast.success('Logged out successfully');
     } catch (error) {
@@ -101,7 +130,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const login = async (email: string, password: string) => {
-    console.log('[DEBUG] login attempt - Path:', location.pathname);
     try {
       setIsLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -114,7 +142,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(data.user);
       setIsAuthenticated(true);
       
-      // Redirecionar para /catalog após login bem-sucedido
       navigate('/catalog', { replace: true });
       toast.success('Logged in successfully');
     } catch (error: any) {
