@@ -1,39 +1,43 @@
-import { Search, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { useProducts } from "@/hooks/useProducts";
-import { Product } from "@/types/product";
+import { useQuery } from "@tanstack/react-query";
+import { Command } from "cmdk";
+import { Search } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { supabase } from "@/integrations/supabase/client";
+import { Product } from "@/types/product";
 import { useToast } from "@/components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
-
-interface ProductSearchProps {
-  onSelectProduct?: (product: Product) => void;
-  addToCart?: boolean;
-}
 
 interface ProductsResponse {
   data: Product[];
-  totalPages: number;
-  totalCount: number;
+  error: any;
 }
 
-export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSearchProps) => {
+interface ProductSearchProps {
+  addToCart?: boolean;
+  onSelectProduct?: (product: Product) => void;
+}
+
+export const ProductSearch = ({ addToCart, onSelectProduct }: ProductSearchProps) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const productsQuery = useProducts({});
-  const inputRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const { addItem } = useCart();
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  const productsQuery = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .order("name");
+      return { data, error } as ProductsResponse;
+    }
+  });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current && 
-        !dropdownRef.current.contains(event.target as Node) &&
-        !inputRef.current?.contains(event.target as Node)
-      ) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setOpen(false);
       }
     };
@@ -42,96 +46,89 @@ export const ProductSearch = ({ onSelectProduct, addToCart = false }: ProductSea
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Safely handle the products data with proper typing
-  const products = productsQuery.data ? (productsQuery.data as ProductsResponse).data : [];
+  // Handle loading and error states
+  if (productsQuery.isLoading) {
+    return <div>Loading...</div>;
+  }
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(query.toLowerCase())
-  );
+  if (productsQuery.error) {
+    return <div>Error loading products</div>;
+  }
+
+  // Safely handle the products data with proper typing and null checks
+  const products = productsQuery.data?.data || [];
+
+  const filteredProducts = query 
+    ? products.filter(product =>
+        product.name.toLowerCase().includes(query.toLowerCase())
+      )
+    : [];
 
   const handleSelect = async (product: Product) => {
     if (addToCart) {
       try {
         await addItem(product);
+        toast({
+          title: "Success",
+          description: "Product added to cart",
+        });
         setOpen(false);
-        setQuery("");
       } catch (error) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Could not add product to cart.",
+          description: "Failed to add product to cart. Please try again.",
         });
       }
-    } else if (onSelectProduct) {
+    }
+    if (onSelectProduct) {
       onSelectProduct(product);
       setOpen(false);
-      setQuery("");
     }
   };
 
   return (
-    <div className="relative w-full">
-      <div className="relative flex items-center w-full">
-        <Search className="absolute left-3 text-gray-400 h-4 w-4" />
-        <input
-          ref={inputRef}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => setOpen(true)}
-          placeholder="Find your products"
-          className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20"
-        />
-        {query && (
-          <button
-            onClick={() => {
-              setQuery("");
-              inputRef.current?.focus();
-            }}
-            className="absolute right-3 text-gray-400 hover:text-gray-600"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        )}
-      </div>
-
-      {open && (
-        <div
-          ref={dropdownRef}
-          className="absolute z-50 mt-2 w-full bg-white rounded-lg border border-gray-200 shadow-lg max-h-[400px] overflow-y-auto"
-        >
-          {productsQuery.isLoading ? (
-            <div className="p-4 text-center text-gray-500">
-              Loading products...
-            </div>
-          ) : filteredProducts.length === 0 ? (
-            <div className="p-4 text-center text-gray-500">
-              No products found
-            </div>
-          ) : (
-            <div className="p-2">
-              {filteredProducts.map((product) => (
-                <button
-                  key={product.id}
-                  onClick={() => handleSelect(product)}
-                  className="w-full flex items-center gap-3 p-2 hover:bg-gray-50 rounded-md transition-colors"
-                >
-                  <img
-                    src={product.image_url || "/placeholder.svg"}
-                    alt={product.name}
-                    className="w-12 h-12 object-cover rounded-md"
-                  />
-                  <div className="flex-1 text-left">
-                    <p className="font-medium text-gray-900">{product.name}</p>
-                    <p className="text-sm text-gray-500">
-                      ${product.from_price.toFixed(2)}
-                    </p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
+    <div ref={searchRef} className="relative w-full">
+      <Command className="relative z-50 overflow-visible bg-white">
+        <div className="flex items-center border rounded-md px-3">
+          <Search className="h-4 w-4 shrink-0 opacity-50" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => setOpen(true)}
+            className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            placeholder="Search products..."
+          />
         </div>
-      )}
+        {open && query && (
+          <div className="absolute top-full z-50 w-full rounded-md border bg-white shadow-md mt-2">
+            <Command.List className="max-h-[300px] overflow-y-auto p-2">
+              {filteredProducts.length === 0 && (
+                <div className="py-6 text-center text-sm">No products found.</div>
+              )}
+              {filteredProducts.map((product) => (
+                <Command.Item
+                  key={product.id}
+                  value={product.name}
+                  onSelect={() => handleSelect(product)}
+                  className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent cursor-pointer"
+                >
+                  {product.image_url && (
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                      className="h-8 w-8 object-cover rounded"
+                    />
+                  )}
+                  <span>{product.name}</span>
+                </Command.Item>
+              ))}
+            </Command.List>
+          </div>
+        )}
+      </Command>
     </div>
   );
 };
+
+export default ProductSearch;
