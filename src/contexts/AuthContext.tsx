@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { handleAnalytics, handleGleapIdentification, clearGleapIdentity } from "@/lib/auth/analytics";
+import { trackSignIn, trackSignOut } from "@/lib/analytics/events/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -65,7 +66,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         retryAnalytics();
       }
     } catch (error) {
-      // Silent fail in production
       if (process.env.NODE_ENV !== 'production') {
         console.error('Error identifying user in analytics:', error);
       }
@@ -84,7 +84,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         clearGleapIdentity();
       }
     } catch (error) {
-      // Silent fail in production
       if (process.env.NODE_ENV !== 'production') {
         console.error('Error in handleAuthChange:', error);
       }
@@ -105,7 +104,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           await handleAuthChange(session);
         }
       } catch (error) {
-        // Silent fail in production
         if (process.env.NODE_ENV !== 'production') {
           console.error('Session error:', error);
         }
@@ -132,6 +130,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     try {
       setIsLoading(true);
+      
+      if (user?.id) {
+        await trackSignOut(user.id);
+      }
+
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
@@ -141,7 +144,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       navigate('/login');
       toast.success('Logged out successfully');
     } catch (error) {
-      // Silent fail in production
       if (process.env.NODE_ENV !== 'production') {
         console.error('Error signing out:', error);
       }
@@ -163,11 +165,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       setUser(data.user);
       setIsAuthenticated(true);
+      
+      await trackSignIn({
+        userId: data.user.id,
+        email: data.user.email || '',
+        signupMethod: 'email',
+      });
+      
       identifyUserInAnalytics({ user: data.user });
       navigate('/catalog', { replace: true });
       toast.success('Logged in successfully');
     } catch (error: any) {
-      // Silent fail in production
       if (process.env.NODE_ENV !== 'production') {
         console.error('Login error:', error);
       }

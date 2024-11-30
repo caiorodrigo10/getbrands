@@ -10,6 +10,9 @@ export interface AuthEvent extends BaseEvent {
   email: string;
   signupMethod?: string;
   language?: string;
+  provider?: string;
+  success?: boolean;
+  error?: string;
 }
 
 // Eventos de Onboarding
@@ -71,3 +74,4 @@ export interface PageEvent extends BaseEvent {
   referrer?: string;
   search?: string;
 }
+
