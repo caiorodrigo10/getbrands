@@ -36,7 +36,7 @@ const CatalogLayout = () => {
   const totalPages = productsData?.totalPages || 1;
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen pb-16">
       <div className="flex-grow">
         <div>
           <h1 className="text-page-title mb-2">Welcome!</h1>
@@ -75,12 +75,14 @@ const CatalogLayout = () => {
       </div>
       
       {totalPages > 1 && (
-        <div className="mt-8 mb-4">
-          <CatalogPagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t md:relative md:border-0 md:bg-transparent">
+          <div className="container mx-auto py-4 md:py-0">
+            <CatalogPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
         </div>
       )}
     </div>
