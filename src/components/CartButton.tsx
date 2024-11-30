@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
-import { trackEvent } from "@/lib/analytics";
+import { trackCartView } from "@/lib/analytics/events";
 import {
   Tooltip,
   TooltipContent,
@@ -15,14 +15,14 @@ export function CartButton() {
   const navigate = useNavigate();
 
   const handleCartClick = () => {
-    trackEvent("Cart Viewed", {
-      items_count: items.length,
+    trackCartView({
       items: items.map(item => ({
         product_id: item.id,
         product_name: item.name,
         quantity: item.quantity,
         price: item.from_price
-      }))
+      })),
+      items_count: items.length
     });
     navigate("/checkout/confirmation");
   };
