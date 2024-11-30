@@ -76,14 +76,13 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="w-full overflow-hidden"
+        className="w-full overflow-hidden sm:max-w-[160%] sm:-mx-[30%]"
       >
         <div 
           ref={scrollRef}
           className="overflow-hidden whitespace-nowrap"
         >
           <div className="inline-flex gap-4 min-w-full">
-            {/* First set of blocks */}
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`first-${index}`}
@@ -97,7 +96,6 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
               </div>
             ))}
             
-            {/* Duplicate set for seamless scrolling */}
             {benefitBlocks.map((block, index) => (
               <div 
                 key={`second-${index}`}
