@@ -10,11 +10,11 @@ const initializeAnalytics = () => {
   if (!window.analytics) {
     if (initializationAttempts < MAX_INITIALIZATION_ATTEMPTS) {
       initializationAttempts++;
-      console.log(`Attempting to initialize analytics (attempt ${initializationAttempts}/${MAX_INITIALIZATION_ATTEMPTS})`);
+      console.log(`🔄 Attempting to initialize analytics (attempt ${initializationAttempts}/${MAX_INITIALIZATION_ATTEMPTS})`);
       setTimeout(initializeAnalytics, INITIALIZATION_RETRY_DELAY);
       return false;
     }
-    console.error('Failed to initialize analytics after maximum attempts');
+    console.error('❌ Failed to initialize analytics after maximum attempts');
     return false;
   }
   
@@ -27,6 +27,7 @@ const initializeAnalytics = () => {
 export const waitForAnalytics = () => {
   return new Promise<void>((resolve, reject) => {
     if (analyticsInitialized) {
+      console.log('✅ Analytics already initialized');
       resolve();
       return;
     }
@@ -37,10 +38,13 @@ export const waitForAnalytics = () => {
 
     const check = () => {
       attempts++;
+      console.log(`🔄 Checking analytics initialization (attempt ${attempts}/${maxAttempts})`);
+      
       if (initializeAnalytics()) {
+        console.log('✅ Analytics initialized successfully');
         resolve();
       } else if (attempts >= maxAttempts) {
-        console.error('Failed to initialize analytics after', maxAttempts, 'attempts');
+        console.error(`❌ Failed to initialize analytics after ${maxAttempts} attempts`);
         reject(new Error('Failed to initialize analytics after multiple attempts'));
       } else {
         setTimeout(check, retryInterval);
@@ -72,10 +76,9 @@ export const identifyUser = async (userId: string, traits?: Record<string, any>)
     };
 
     window.analytics.identify(userId, identifyTraits);
-    console.log('Identify call successful:', { userId, traits: identifyTraits });
+    console.log('✅ Identify call successful:', { userId, traits: identifyTraits });
   } catch (error) {
-    console.error('Error in identify call:', error);
-    // Don't show toast for analytics errors to avoid spamming users
+    console.error('❌ Error in identify call:', error);
   }
 };
 
@@ -91,10 +94,9 @@ export const trackEvent = async (eventName: string, properties?: Record<string, 
     };
 
     window.analytics.track(eventName, eventProperties);
-    console.log('Track event:', { eventName, properties: eventProperties });
+    console.log('✅ Track event:', { eventName, properties: eventProperties });
   } catch (error) {
-    console.error('Error tracking event:', error);
-    // Don't show toast for analytics errors to avoid spamming users
+    console.error('❌ Error tracking event:', error);
   }
 };
 
@@ -116,14 +118,14 @@ export const trackPage = async (properties?: Record<string, any>) => {
     };
 
     window.analytics.page(pageProperties.title || "Page Viewed", pageProperties);
-    console.log('Page view:', pageProperties);
+    console.log('✅ Page view:', pageProperties);
   } catch (error) {
-    console.error('Error tracking page view:', error);
-    // Don't show toast for analytics errors to avoid spamming users
+    console.error('❌ Error tracking page view:', error);
   }
 };
 
 // Initialize analytics as soon as possible
 if (typeof window !== 'undefined') {
+  console.log('🔄 Starting analytics initialization...');
   initializeAnalytics();
 }
