@@ -18,11 +18,11 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
       if (scrollContainer.scrollLeft >= scrollContainer.scrollWidth / 2) {
         scrollContainer.scrollLeft = 0;
       } else {
-        scrollContainer.scrollLeft += 1;
+        scrollContainer.scrollLeft += 0.5;
       }
     };
 
-    const intervalId = setInterval(scroll, 50);
+    const intervalId = setInterval(scroll, 16); // ~60fps for smooth scrolling
 
     return () => clearInterval(intervalId);
   }, []);
@@ -73,7 +73,7 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="w-full overflow-hidden"
+        className="w-full overflow-hidden -mx-3 sm:mx-0"
       >
         <div 
           ref={scrollRef}
