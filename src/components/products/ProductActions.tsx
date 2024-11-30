@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useProductActions } from "@/hooks/useProductActions";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ProductActionsProps {
   productId: string;
@@ -10,13 +11,21 @@ interface ProductActionsProps {
 export const ProductActions = ({ productId, onSelectProduct }: ProductActionsProps) => {
   const { isLoading, handleRequestSample } = useProductActions(productId);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleOrderSample = async () => {
     try {
-      await handleRequestSample();
-      navigate("/checkout/confirmation");
+      const success = await handleRequestSample();
+      if (success) {
+        // Use replace: true to prevent back navigation issues
+        navigate("/checkout/confirmation", { replace: true });
+      }
     } catch (error) {
-      console.error('Error handling sample request:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to process your request. Please try again.",
+      });
     }
   };
 
