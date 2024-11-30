@@ -65,6 +65,19 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
     setIsLoading(true);
 
     try {
+      // First check if user exists
+      const { data: existingUser } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', formData.email)
+        .single();
+
+      if (existingUser) {
+        toast.error("Este email já está cadastrado. Por favor, faça login.");
+        setIsLoading(false);
+        return;
+      }
+
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -80,7 +93,7 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
 
       if (signUpError) {
         if (signUpError.message.includes("User already registered")) {
-          toast.error("Este email já está registrado. Por favor, tente fazer login.");
+          toast.error("Este email já está cadastrado. Por favor, faça login.");
           return;
         }
         throw signUpError;
