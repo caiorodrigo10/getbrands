@@ -69,6 +69,22 @@ export const WelcomeStepPT = ({ onNext }: WelcomeStepProps) => {
           Começar Minha Marca
         </Button>
       </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+        className="mt-12 space-y-6"
+      >
+        <img 
+          src="/lovable-uploads/cc9f9846-a08c-4a17-9291-e8274c62f7dd.png"
+          alt="Produto GetBrands"
+          className="mx-auto rounded-lg shadow-lg max-w-sm"
+        />
+        <p className="text-lg text-gray-700 font-medium max-w-md mx-auto">
+          Na GetBrands, transformamos sonhos em marcas de sucesso. Nossa missão é democratizar o empreendedorismo, permitindo que você construa sua marca premium sem as barreiras tradicionais.
+        </p>
+      </motion.div>
     </div>
   );
 };
