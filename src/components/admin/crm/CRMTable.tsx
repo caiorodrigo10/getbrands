@@ -7,7 +7,7 @@ import { UserTableRow } from "./components/UserTableRow";
 import { CRMUser } from "./types";
 import { useUserSelection } from "./hooks/useUserSelection";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
-import { SelectionBar } from "./SelectionBar";
+import { CRMSelectionBar } from "./CRMSelectionBar";
 
 export function CRMTable() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -39,12 +39,13 @@ export function CRMTable() {
   return (
     <div className="space-y-4">
       {selectedUsers.length > 0 && (
-        <SelectionBar
+        <CRMSelectionBar
           selectedCount={selectedUsers.length}
           totalCount={users.length}
           selectAllPages={selectAllPages}
           onSelectAllPages={handleSelectAllPages}
-          onDelete={() => setShowDeleteDialog(true)}
+          onDeleteClick={() => setShowDeleteDialog(true)}
+          usersInPage={users.length}
         />
       )}
 
@@ -59,8 +60,9 @@ export function CRMTable() {
               <UserTableRow
                 key={user.id}
                 user={user}
-                selected={selectedUsers.includes(user.id)}
+                isSelected={selectedUsers.includes(user.id)}
                 onSelect={(checked) => handleSelectUser(user.id, checked)}
+                onEdit={() => {}}
               />
             ))}
           </TableBody>
@@ -68,10 +70,10 @@ export function CRMTable() {
       </div>
 
       <DeleteConfirmationDialog
-        isOpen={showDeleteDialog}
-        onClose={() => setShowDeleteDialog(false)}
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
         onConfirm={handleDeleteSelected}
-        count={selectedUsers.length}
+        selectAllPages={selectAllPages}
       />
     </div>
   );
