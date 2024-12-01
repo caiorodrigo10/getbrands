@@ -58,13 +58,16 @@ const SignUp = () => {
 
     try {
       // First check if user exists
-      const { data: existingUser } = await supabase
+      const { data: existingProfiles, error: profileError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('email', formData.email)
-        .single();
+        .eq('email', formData.email);
 
-      if (existingUser) {
+      if (profileError) {
+        throw profileError;
+      }
+
+      if (existingProfiles && existingProfiles.length > 0) {
         toast.error("This email is already registered. Please try logging in instead.");
         setIsLoading(false);
         return;
@@ -83,18 +86,12 @@ const SignUp = () => {
         },
       });
 
-      if (signUpError) {
-        if (signUpError.message.includes("User already registered")) {
-          toast.error("This email is already registered. Please try logging in instead.");
-          return;
-        }
-        throw signUpError;
-      }
+      if (signUpError) throw signUpError;
 
       if (data?.user) {
         const { error: profileError } = await supabase
           .from('profiles')
-          .upsert({
+          .insert({
             id: data.user.id,
             first_name: formData.firstName,
             last_name: formData.lastName,
@@ -133,7 +130,11 @@ const SignUp = () => {
       }
     } catch (error: any) {
       console.error("Error signing up:", error);
-      toast.error(error.message || "Failed to create account. Please try again.");
+      if (error.message.includes("User already registered")) {
+        toast.error("This email is already registered. Please try logging in instead.");
+      } else {
+        toast.error(error.message || "Failed to create account. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }

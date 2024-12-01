@@ -56,8 +56,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
         const { data, error } = await supabase
           .from("profiles")
           .select()
-          .eq("id", user.id)
-          .single();
+          .eq("id", user.id);
           
         if (error) {
           console.error('Error fetching profile:', error);
@@ -65,8 +64,12 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           return;
         }
 
-        if (data && isMounted) {
-          setProfile(data);
+        if (data && data.length > 0 && isMounted) {
+          setProfile(data[0]);
+        } else {
+          console.log('No profile found for user:', user.id);
+          // Handle case where no profile exists
+          toast.error("Profile not found. Please contact support.");
         }
       } catch (error) {
         console.error('Error in profile fetch:', error);
