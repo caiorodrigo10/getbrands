@@ -14,13 +14,17 @@ const CartReview = () => {
     const trackInitialStep = async () => {
       if (items.length > 0) {
         await trackCheckoutStarted({
-          items: items.map(item => ({
+          products: items.map(item => ({
             product_id: item.id,
             product_name: item.name,
             quantity: item.quantity || 1,
             price: item.from_price
           })),
-          items_count: items.length
+          total: items.reduce((sum, item) => sum + (item.from_price * (item.quantity || 1)), 0),
+          shippingCost: 4.50,
+          subtotal: items.reduce((sum, item) => sum + (item.from_price * (item.quantity || 1)), 0),
+          customerEmail: '',  // Will be filled later in the checkout process
+          paymentMethod: 'credit_card'
         });
       }
     };

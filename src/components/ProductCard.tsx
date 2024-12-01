@@ -40,7 +40,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         id: product.id,
         name: product.name,
         category: product.category,
-        price: product.from_price
+        from_price: product.from_price
       });
       navigate(`/catalog/${product.id}`);
     } catch (error) {
@@ -55,7 +55,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
     setImageLoaded(true);
   };
 
-  // Get the primary image and secondary image for hover effect
   const primaryImage = productImages?.find(img => img.is_primary)?.image_url || 
                       productImages?.[0]?.image_url ||
                       product.image_url || 
@@ -63,7 +62,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
                       
   const secondaryImage = productImages?.[1]?.image_url || primaryImage;
 
-  // Ensure we have valid numbers for calculations
   const fromPrice = typeof product.from_price === 'number' ? product.from_price : 0;
   const srp = typeof product.srp === 'number' ? product.srp : 0;
   const profit = srp - fromPrice;
