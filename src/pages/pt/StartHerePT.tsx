@@ -41,7 +41,7 @@ const StartHerePT = () => {
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto py-12 px-4">
+      <div className="max-w-3xl mx-auto py-12 px-6">
         <h1 className="text-2xl md:text-4xl font-bold mb-8">Carregando...</h1>
       </div>
     );
@@ -52,7 +52,7 @@ const StartHerePT = () => {
     : "Bem-vindo à GetBrands!";
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4">
+    <div className="max-w-3xl mx-auto py-12 px-6">
       <h1 className="text-2xl md:text-4xl font-bold mb-8">
         {welcomeMessage}
       </h1>
