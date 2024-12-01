@@ -42,9 +42,6 @@ const RouteTracker = () => {
 const App = () => {
   useEffect(() => {
     debugAnalytics();
-    trackPage({
-      url: window.location.href
-    });
   }, []);
 
   return (
