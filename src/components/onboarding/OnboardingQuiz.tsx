@@ -10,6 +10,12 @@ import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { useAuth } from "@/contexts/AuthContext";
 import { trackOnboardingStarted, trackOnboardingStepCompleted, trackOnboardingCompleted } from "@/lib/analytics/onboarding";
 
+type Step = {
+  name: string;
+  component: React.ComponentType<any>;
+  props: Record<string, any>;
+};
+
 export function OnboardingQuiz() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -67,7 +73,7 @@ export function OnboardingQuiz() {
     }
   };
 
-  const steps = [
+  const steps: Step[] = [
     {
       name: "Welcome",
       component: WelcomeStep,
@@ -131,11 +137,10 @@ export function OnboardingQuiz() {
   }, [user?.id]);
 
   const CurrentStep = steps[currentStep].component;
-  const currentStepProps = steps[currentStep].props;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <CurrentStep {...currentStepProps} />
+      <CurrentStep {...steps[currentStep].props} />
     </div>
   );
 }
