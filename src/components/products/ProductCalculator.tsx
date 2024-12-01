@@ -25,6 +25,15 @@ export const ProductCalculator = ({ product }: ProductCalculatorProps) => {
       <h2 className="text-2xl font-bold">Product Calculator</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
+          <label className="block text-sm font-medium">From Price</label>
+          <input
+            type="number"
+            value={product.from_price}
+            disabled
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md bg-gray-50"
+          />
+        </div>
+        <div>
           <label className="block text-sm font-medium">Selling Price</label>
           <input
             type="number"
