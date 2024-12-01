@@ -1,6 +1,11 @@
 import { waitForAnalytics } from "../index";
 import { AuthEvent, OnboardingEvent, PageEvent } from "@/types/analytics/events";
 
+// Re-export all event tracking functions
+export * from './products';
+export * from './cart';
+export * from './checkout';
+
 // Auth Events
 export const trackSignUp = async (data: AuthEvent) => {
   try {
