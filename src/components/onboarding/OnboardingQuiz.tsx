@@ -10,18 +10,38 @@ import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { useAuth } from "@/contexts/AuthContext";
 import { trackOnboardingStarted, trackOnboardingStepCompleted, trackOnboardingCompleted } from "@/lib/analytics/onboarding";
 
-interface StepProps {
+interface BaseStepProps {
   onNext: () => void;
   onBack?: () => void;
-  selected?: string | string[];
-  onAnswer?: (value: string | string[]) => void;
-  onComplete?: () => void;
+}
+
+interface WelcomeStepProps extends BaseStepProps {}
+
+interface ProductCategoriesStepProps extends BaseStepProps {
+  selected: string[];
+  onAnswer: (categories: string[]) => void;
+}
+
+interface ProfileTypeStepProps extends BaseStepProps {
+  selected: string;
+  onAnswer: (type: string) => void;
+}
+
+interface BrandStatusStepProps extends BaseStepProps {
+  selected: string;
+  onAnswer: (status: string) => void;
+}
+
+interface LaunchUrgencyStepProps extends BaseStepProps {
+  selected: string;
+  onAnswer: (urgency: string) => void;
+  onComplete: () => void;
 }
 
 type Step = {
   name: string;
-  component: React.ComponentType<StepProps>;
-  props: StepProps;
+  component: React.ComponentType<any>;
+  props: any;
 };
 
 export function OnboardingQuiz() {
@@ -132,6 +152,7 @@ export function OnboardingQuiz() {
         onAnswer: (urgency: string) => {
           setQuizData({ ...quizData, launchUrgency: urgency });
         },
+        onNext: handleNext,
         onComplete: handleComplete,
         onBack: handleBack
       }
