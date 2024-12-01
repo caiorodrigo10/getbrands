@@ -6,6 +6,7 @@ import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { useToast } from "@/components/ui/use-toast";
+import { trackProductSearch } from "@/lib/analytics/events/products";
 
 interface ProductsResponse {
   data: Product[];
@@ -63,6 +64,13 @@ export const ProductSearch = ({ addToCart, onSelectProduct }: ProductSearchProps
         product.name.toLowerCase().includes(query.toLowerCase())
       )
     : [];
+
+  // Add tracking when search results update
+  useEffect(() => {
+    if (query) {
+      trackProductSearch(query, filteredProducts.length);
+    }
+  }, [query, filteredProducts.length]);
 
   const handleSelect = async (product: Product) => {
     if (addToCart) {

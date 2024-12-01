@@ -26,11 +26,26 @@ export interface OnboardingEvent extends BaseEvent {
 }
 
 // Eventos de Produto
+
+// Product Events
 export interface ProductEvent extends BaseEvent {
   productId: string;
   productName: string;
   category?: string;
   price?: number;
+  fromPrice?: number;
+  srp?: number;
+  profitMargin?: number;
+  isNew?: boolean;
+  isTiktok?: boolean;
+  imageUrl?: string;
+  totalImages?: number;
+  description?: string;
+  projectId?: string;
+  projectName?: string;
+  sellingPrice?: number;
+  points?: number;
+  pointsUsed?: number;
 }
 
 // Eventos de Carrinho
@@ -95,3 +110,4 @@ export interface PageEvent extends BaseEvent {
   referrer?: string;
   search?: string;
 }
+

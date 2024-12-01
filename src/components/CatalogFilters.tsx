@@ -9,14 +9,24 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
+import { trackProductFilter } from "@/lib/analytics/events/products";
 
 const FilterPopover = ({ 
   title, 
-  options 
+  options,
+  onFilterApply 
 }: { 
   title: string;
   options: { id: string; label: string; }[];
+  onFilterApply: (filters: string[]) => void;
 }) => {
+  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+
+  const handleApplyFilter = () => {
+    onFilterApply(selectedFilters);
+    trackProductFilter({ [title.toLowerCase()]: selectedFilters }, 0); // resultsCount será atualizado depois
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -85,13 +95,40 @@ const CatalogFilters = () => {
     { id: "organic", label: "Organic" },
   ];
 
+  const handleFilterApply = (filterType: string, selectedValues: string[]) => {
+    // Aqui você pode implementar a lógica de filtragem
+    // e obter o número de resultados para passar para o tracking
+    const resultsCount = 0; // Substitua pelo número real de resultados
+    trackProductFilter({ [filterType]: selectedValues }, resultsCount);
+  };
+
   return (
     <div className="flex gap-1 md:gap-2 overflow-x-auto pb-2 md:pb-0">
-      <FilterPopover title="Category" options={categoryOptions} />
-      <FilterPopover title="Type" options={typeOptions} />
-      <FilterPopover title="Audience" options={audienceOptions} />
-      <FilterPopover title="Purpose" options={purposeOptions} />
-      <FilterPopover title="Dietary" options={dietaryOptions} />
+      <FilterPopover 
+        title="Category" 
+        options={categoryOptions} 
+        onFilterApply={(filters) => handleFilterApply("category", filters)}
+      />
+      <FilterPopover 
+        title="Type" 
+        options={typeOptions} 
+        onFilterApply={(filters) => handleFilterApply("type", filters)}
+      />
+      <FilterPopover 
+        title="Audience" 
+        options={audienceOptions} 
+        onFilterApply={(filters) => handleFilterApply("audience", filters)}
+      />
+      <FilterPopover 
+        title="Purpose" 
+        options={purposeOptions} 
+        onFilterApply={(filters) => handleFilterApply("purpose", filters)}
+      />
+      <FilterPopover 
+        title="Dietary" 
+        options={dietaryOptions} 
+        onFilterApply={(filters) => handleFilterApply("dietary", filters)}
+      />
     </div>
   );
 };
