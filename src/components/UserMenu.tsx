@@ -43,7 +43,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
         
         if (sessionError) {
           console.error('Session error:', sessionError);
-          toast.error("Session error. Please try logging in again.");
+          toast.error("Erro na sessão. Por favor, faça login novamente.");
           navigate('/');
           return;
         }
@@ -53,27 +53,44 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           return;
         }
 
-        const { data, error } = await supabase
+        // First try to get existing profile
+        const { data: existingProfile, error: profileError } = await supabase
           .from("profiles")
           .select()
-          .eq("id", user.id);
+          .eq("id", user.id)
+          .single();
           
-        if (error) {
-          console.error('Error fetching profile:', error);
-          toast.error("Failed to load profile data. Please refresh the page.");
+        if (profileError && profileError.code !== 'PGRST116') { // Not found error code
+          console.error('Error fetching profile:', profileError);
+          toast.error("Erro ao carregar dados do perfil. Por favor, atualize a página.");
           return;
         }
 
-        if (data && data.length > 0 && isMounted) {
-          setProfile(data[0]);
+        if (existingProfile && isMounted) {
+          setProfile(existingProfile);
         } else {
-          console.log('No profile found for user:', user.id);
-          // Handle case where no profile exists
-          toast.error("Profile not found. Please contact support.");
+          // Create new profile if none exists
+          const { data: newProfile, error: createError } = await supabase
+            .from('profiles')
+            .insert([{ 
+              id: user.id, 
+              email: user.email,
+              language: location.pathname.startsWith('/pt') ? 'pt' : 'en',
+              role: 'member'
+            }])
+            .select()
+            .single();
+            
+          if (createError) {
+            console.error('Error creating profile:', createError);
+            toast.error("Erro ao criar perfil. Por favor, tente novamente.");
+          } else if (newProfile && isMounted) {
+            setProfile(newProfile);
+          }
         }
       } catch (error) {
         console.error('Error in profile fetch:', error);
-        toast.error("Network error. Please check your connection.");
+        toast.error("Erro de conexão. Por favor, verifique sua internet.");
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -86,7 +103,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
     return () => {
       isMounted = false;
     };
-  }, [user, navigate]);
+  }, [user, navigate, location.pathname]);
 
   if (!user) return null;
 
