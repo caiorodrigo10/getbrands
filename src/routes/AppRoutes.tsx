@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AppLayout } from "./AppLayout";
 import { MarketingRoutes } from "./MarketingRoutes";
@@ -28,8 +28,15 @@ import PackageQuizPage from "@/pages/PackageQuizPage";
 import OnboardingQuizPage from "@/pages/OnboardingQuiz";
 import { OnboardingQuizPT } from "@/pages/pt/OnboardingQuiz";
 import ComecarPT from "@/pages/pt/ComecarPT";
+import PedidoAmostra from "@/pages/PedidoAmostra";
 
 export const AppRoutes = () => {
+  const location = useLocation();
+  
+  useEffect(() => {
+    console.log('[DEBUG] AppRoutes - Current location:', location.pathname);
+  }, [location]);
+
   return (
     <Routes>
       {/* Root Route */}
@@ -156,17 +163,17 @@ export const AppRoutes = () => {
         </ProtectedRoute>
       } />
 
-      {/* Checkout Routes - Mantidas separadas e fora do AppLayout */}
+      {/* Checkout Routes - Mantidas fora do AppLayout */}
       <Route path="/checkout" element={
         <ProtectedRoute>
           <Checkout />
         </ProtectedRoute>
       }>
         <Route index element={<Navigate to="confirmation" replace />} />
-        <Route path="confirmation" element={<Success />} />
+        <Route path="confirmation" element={<PedidoAmostra />} />
         <Route path="shipping" element={<Shipping />} />
         <Route path="payment" element={<Payment />} />
-        <Route path="points" element={<Success />} />
+        <Route path="points" element={<PedidoAmostra />} />
       </Route>
 
       <Route path="/checkout/success" element={
@@ -174,9 +181,6 @@ export const AppRoutes = () => {
           <Success />
         </ProtectedRoute>
       } />
-
-      {/* Catch all route */}
-      <Route path="*" element={<Error404 />} />
     </Routes>
   );
 };

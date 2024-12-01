@@ -1,10 +1,7 @@
-import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, CheckCircle, Truck, CreditCard } from "lucide-react";
-import PedidoAmostra from "../PedidoAmostra";
-import Shipping from "./Shipping";
-import Payment from "./Payment";
 import { NavigationMenu } from "@/components/NavigationMenu";
 import { CartProvider } from "@/contexts/CartContext";
 
@@ -76,13 +73,7 @@ const Checkout = () => {
 
           <div className="bg-card rounded-lg border border-border/50 shadow-sm p-4 md:p-6 lg:p-8">
             <CartProvider>
-              <Routes>
-                <Route path="confirmation" element={<PedidoAmostra />} />
-                <Route path="shipping" element={<Shipping />} />
-                <Route path="payment" element={<Payment />} />
-                <Route path="points" element={<PedidoAmostra />} />
-                <Route path="*" element={<Navigate to="/checkout/confirmation" replace />} />
-              </Routes>
+              <Outlet />
             </CartProvider>
           </div>
         </div>
