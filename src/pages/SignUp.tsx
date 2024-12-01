@@ -126,7 +126,6 @@ const SignUp = () => {
         }
 
         navigate("/onboarding");
-        toast.success("Account created successfully! Please check your email to verify your account.");
       }
     } catch (error: any) {
       console.error("Error signing up:", error);
