@@ -8,14 +8,7 @@ import { AnimatePresence } from "framer-motion";
 import OrderStatusBadge from "@/components/sample-orders/OrderStatusBadge";
 import { formatCurrency } from "@/lib/utils";
 import { calculateOrderSubtotal, calculateShippingCost, calculateOrderTotal } from "@/lib/orderCalculations";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import CatalogPagination from "@/components/catalog/CatalogPagination";
 import { OrderSummarySection } from "./OrderSummarySection";
 import { OrderDetailsSection } from "./OrderDetailsSection";
 
@@ -138,32 +131,11 @@ export const ClientSamples = ({ userId }: ClientSamplesProps) => {
 
       {totalPages > 1 && (
         <div className="mt-6">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                  className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <PaginationItem key={page}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(page)}
-                    isActive={currentPage === page}
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+          <CatalogPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </div>
       )}
     </Card>
