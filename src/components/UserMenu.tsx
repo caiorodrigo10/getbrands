@@ -67,21 +67,25 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
         if (data && data.length > 0 && isMounted) {
           setProfile(data[0]);
         } else {
-          // Se não encontrar o perfil, podemos criar um novo
-          const { data: newProfile, error: createError } = await supabase
+          // Se o perfil não existir, vamos criar/atualizar
+          const { data: upsertedProfile, error: upsertError } = await supabase
             .from("profiles")
-            .insert([{ id: user.id, email: user.email }])
+            .upsert({ 
+              id: user.id, 
+              email: user.email,
+              updated_at: new Date().toISOString()
+            })
             .select()
             .single();
 
-          if (createError) {
-            console.error('Error creating profile:', createError);
-            toast.error("Failed to create profile. Please try again.");
+          if (upsertError) {
+            console.error('Error upserting profile:', upsertError);
+            toast.error("Failed to create/update profile. Please try again.");
             return;
           }
 
-          if (newProfile && isMounted) {
-            setProfile(newProfile);
+          if (upsertedProfile && isMounted) {
+            setProfile(upsertedProfile);
           }
         }
       } catch (error) {
