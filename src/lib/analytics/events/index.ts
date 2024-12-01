@@ -1,12 +1,5 @@
-import { 
-  AuthEvent, 
-  OnboardingEvent, 
-  ProductEvent, 
-  CartEvent, 
-  PageEvent,
-  CheckoutEvent 
-} from "@/types/analytics/events";
 import { waitForAnalytics } from "../index";
+import { AuthEvent, OnboardingEvent, PageEvent } from "@/types/analytics/events";
 
 // Auth Events
 export const trackSignUp = async (data: AuthEvent) => {
@@ -54,57 +47,6 @@ export const trackOnboardingComplete = async (data: OnboardingEvent) => {
   } catch (error) {
     if (process.env.NODE_ENV !== 'production') {
       console.error('Error tracking onboarding completion:', error);
-    }
-  }
-};
-
-// Product Events
-export const trackProductView = async (data: ProductEvent) => {
-  try {
-    await waitForAnalytics();
-    window.analytics.track('Product Viewed', {
-      ...data,
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV,
-      source: 'web_app'
-    });
-  } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('Error tracking product view:', error);
-    }
-  }
-};
-
-// Checkout Events
-export const trackCheckoutCompleted = async (data: CheckoutEvent) => {
-  try {
-    await waitForAnalytics();
-    window.analytics.track('Order Completed', {
-      ...data,
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV,
-      source: 'web_app'
-    });
-  } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('Error tracking checkout completion:', error);
-    }
-  }
-};
-
-// Cart Events
-export const trackCartView = async (data: CartEvent) => {
-  try {
-    await waitForAnalytics();
-    window.analytics.track('Cart Viewed', {
-      ...data,
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV,
-      source: 'web_app'
-    });
-  } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('Error tracking cart view:', error);
     }
   }
 };
