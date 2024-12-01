@@ -1,11 +1,10 @@
 interface OrderSummaryProps {
   subtotal: number;
   shippingCost: number;
+  total?: number;
 }
 
-export const OrderSummary = ({ subtotal, shippingCost }: OrderSummaryProps) => {
-  const total = subtotal + shippingCost;
-
+export const OrderSummary = ({ subtotal, shippingCost, total = subtotal + shippingCost }: OrderSummaryProps) => {
   return (
     <div className="w-64 space-y-3 bg-white p-4 rounded-lg shadow-sm">
       <div className="flex justify-between text-sm">
