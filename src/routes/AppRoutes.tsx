@@ -165,12 +165,12 @@ export const AppRoutes = () => {
       } />
 
       {/* Checkout Routes - Mantidas fora do AppLayout */}
-      <Route path="/checkout" element={
+      <Route path="/checkout/*" element={
         <ProtectedRoute>
           <Checkout />
         </ProtectedRoute>
       }>
-        <Route index element={<Navigate to="confirmation" replace />} />
+        <Route index element={<Navigate to="confirmation" />} />
         <Route path="confirmation" element={<PedidoAmostra />} />
         <Route path="shipping" element={<Shipping />} />
         <Route path="payment" element={<Payment />} />
@@ -182,6 +182,9 @@ export const AppRoutes = () => {
           <Success />
         </ProtectedRoute>
       } />
+
+      {/* Catch all route */}
+      <Route path="*" element={<Error404 />} />
     </Routes>
   );
 };

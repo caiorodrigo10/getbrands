@@ -38,7 +38,7 @@ export function CartButton() {
       });
 
       console.log('[DEBUG] CartButton - Navigation attempt to /checkout/confirmation');
-      navigate("/checkout/confirmation", { replace: true });
+      navigate("/checkout/confirmation");
       console.log('[DEBUG] CartButton - Navigation completed');
     } catch (error) {
       console.error('[DEBUG] CartButton - Error during navigation:', error);
