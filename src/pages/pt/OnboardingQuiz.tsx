@@ -1,16 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { WelcomeStepPT } from "./steps/WelcomeStepPT";
 import { ProductCategoriesStepPT } from "./steps/ProductCategoriesStepPT";
 import { ProfileTypeStepPT } from "./steps/ProfileTypeStepPT";
 import { BrandStatusStepPT } from "./steps/BrandStatusStepPT";
 import { LaunchUrgencyStepPT } from "./steps/LaunchUrgencyStepPT";
 import { SignUpFormStepPT } from "./steps/SignUpFormStepPT";
-import { useAuth } from "@/contexts/AuthContext";
-import { trackOnboardingStarted, trackOnboardingStepCompleted } from "@/lib/analytics/onboarding";
 
 export const OnboardingQuizPT = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const { user } = useAuth();
   const [quizData, setQuizData] = useState({
     productCategories: [] as string[],
     profileType: "",
@@ -19,9 +16,6 @@ export const OnboardingQuizPT = () => {
   });
 
   const handleNext = () => {
-    if (user?.id) {
-      trackOnboardingStepCompleted(user.id, steps[currentStep].name, quizData);
-    }
     setCurrentStep((prev) => prev + 1);
   };
 
@@ -29,18 +23,10 @@ export const OnboardingQuizPT = () => {
     setCurrentStep((prev) => prev - 1);
   };
 
-  // Track onboarding start when component mounts
-  useEffect(() => {
-    if (user?.id) {
-      trackOnboardingStarted(user.id);
-    }
-  }, [user?.id]);
-
   const steps = [
     {
       component: <WelcomeStepPT onNext={handleNext} />,
       autoAdvance: true,
-      name: "Welcome"
     },
     {
       component: (
@@ -56,7 +42,6 @@ export const OnboardingQuizPT = () => {
         </div>
       ),
       autoAdvance: true,
-      name: "Product Categories"
     },
     {
       component: (
