@@ -18,11 +18,6 @@ const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Only render checkout if we're in a checkout route
-  if (!location.pathname.startsWith('/checkout')) {
-    return <Navigate to="/" replace />;
-  }
-
   const getCurrentStepIndex = () => {
     return steps.findIndex(step => location.pathname.includes(step.id));
   };
@@ -38,6 +33,16 @@ const Checkout = () => {
         navigate(prevStep.path);
       }
     }
+  };
+
+  // Determine which component to render based on the current path
+  const renderCheckoutStep = () => {
+    const path = location.pathname;
+    if (path.includes("/confirmation")) return <PedidoAmostra />;
+    if (path.includes("/shipping")) return <Shipping />;
+    if (path.includes("/payment")) return <Payment />;
+    if (path.includes("/points")) return <PedidoAmostra />;
+    return <Navigate to="/checkout/confirmation" replace />;
   };
 
   return (
@@ -81,13 +86,7 @@ const Checkout = () => {
 
           <div className="bg-card rounded-lg border border-border/50 shadow-sm p-4 md:p-6 lg:p-8">
             <CartProvider>
-              <Routes>
-                <Route path="confirmation" element={<PedidoAmostra />} />
-                <Route path="shipping" element={<Shipping />} />
-                <Route path="payment" element={<Payment />} />
-                <Route path="points" element={<PedidoAmostra />} />
-                <Route index element={<Navigate to="/checkout/confirmation" replace />} />
-              </Routes>
+              {renderCheckoutStep()}
             </CartProvider>
           </div>
         </div>

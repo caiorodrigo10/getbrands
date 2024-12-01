@@ -1,9 +1,9 @@
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { useEffect } from 'react';
+import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AppLayout } from "./AppLayout";
 import { MarketingRoutes } from "./MarketingRoutes";
 import { AdminRoutes } from "./AdminRoutes";
+import { CheckoutRoutes } from "./CheckoutRoutes";
 import Login from "@/pages/Login";
 import SignUp from "@/pages/SignUp";
 import SignUpPT from "@/pages/pt/SignUp";
@@ -19,8 +19,6 @@ import ProductDetails from "@/pages/ProductDetails";
 import ProductSelectedSuccess from "@/pages/products/ProductSelectedSuccess";
 import Documents from "@/pages/Documents";
 import SampleOrders from "@/pages/SampleOrders";
-import Checkout from "@/pages/checkout/Checkout";
-import Success from "@/pages/checkout/Success";
 import ProfitCalculator from "@/pages/ProfitCalculator";
 import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
@@ -29,12 +27,6 @@ import { OnboardingQuizPT } from "@/pages/pt/OnboardingQuiz";
 import ComecarPT from "@/pages/pt/ComecarPT";
 
 export const AppRoutes = () => {
-  const location = useLocation();
-  
-  useEffect(() => {
-    console.log('[DEBUG] AppRoutes - Current location:', location.pathname);
-  }, [location]);
-
   return (
     <Routes>
       {/* Root Route */}
@@ -135,35 +127,10 @@ export const AppRoutes = () => {
             <ProfitCalculator />
           </ProtectedRoute>
         } />
-
-        <Route path="/checkout/confirmation" element={
-          <ProtectedRoute>
-            <Checkout />
-          </ProtectedRoute>
-        } />
-        <Route path="/checkout/shipping" element={
-          <ProtectedRoute>
-            <Checkout />
-          </ProtectedRoute>
-        } />
-        <Route path="/checkout/payment" element={
-          <ProtectedRoute>
-            <Checkout />
-          </ProtectedRoute>
-        } />
-        <Route path="/checkout/points" element={
-          <ProtectedRoute>
-            <Checkout />
-          </ProtectedRoute>
-        } />
-
-        {/* Success page as a standalone route */}
-        <Route path="/checkout/success" element={
-          <ProtectedRoute>
-            <Success />
-          </ProtectedRoute>
-        } />
       </Route>
+
+      {/* Checkout Routes */}
+      {CheckoutRoutes}
 
       {/* Portuguese Routes */}
       <Route path="/pt/signup" element={<SignUpPT />} />
@@ -189,24 +156,8 @@ export const AppRoutes = () => {
         </ProtectedRoute>
       } />
 
-      {/* Standalone Checkout Routes */}
-      <Route path="/checkout/*" element={
-        <ProtectedRoute>
-          <Checkout />
-        </ProtectedRoute>
-      }>
-        <Route path="shipping" element={<Checkout />} />
-        <Route path="payment" element={<Checkout />} />
-        <Route path="confirmation" element={<Checkout />} />
-        <Route path="points" element={<Checkout />} />
-      </Route>
-
-      {/* Success page as a standalone route */}
-      <Route path="/checkout/success" element={
-        <ProtectedRoute>
-          <Success />
-        </ProtectedRoute>
-      } />
+      {/* Catch all route */}
+      <Route path="*" element={<Error404 />} />
     </Routes>
   );
 };
