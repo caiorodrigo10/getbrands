@@ -20,6 +20,8 @@ import Documents from "@/pages/Documents";
 import SampleOrders from "@/pages/SampleOrders";
 import Checkout from "@/pages/checkout/Checkout";
 import Success from "@/pages/checkout/Success";
+import Shipping from "@/pages/checkout/Shipping";
+import Payment from "@/pages/checkout/Payment";
 import ProfitCalculator from "@/pages/ProfitCalculator";
 import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
