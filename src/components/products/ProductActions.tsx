@@ -17,14 +17,13 @@ export const ProductActions = ({ productId, onSelectProduct }: ProductActionsPro
     try {
       const success = await handleRequestSample();
       if (success) {
-        // Use replace: true to prevent back navigation issues
-        navigate("/checkout/confirmation", { replace: true });
+        navigate("/checkout/confirmation");
       }
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to process your request. Please try again.",
+        description: "Failed to add sample to cart. Please try again.",
       });
     }
   };
