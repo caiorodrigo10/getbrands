@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AppLayout } from "./AppLayout";
 import { MarketingRoutes } from "./MarketingRoutes";
@@ -130,18 +130,14 @@ export const AppRoutes = () => {
         } />
       </Route>
 
-      {/* Standalone Checkout Routes */}
-      <Route path="/checkout/*" element={
+      {/* Portuguese Routes */}
+      <Route path="/pt/signup" element={<SignUpPT />} />
+      <Route path="/pt/onboarding" element={
         <ProtectedRoute>
-          <Checkout />
+          <OnboardingQuizPT />
         </ProtectedRoute>
       } />
-      
-      <Route path="/checkout/success" element={
-        <ProtectedRoute>
-          <Success />
-        </ProtectedRoute>
-      } />
+      <Route path="/comecarpt" element={<ComecarPT />} />
 
       {/* Marketing Routes */}
       {MarketingRoutes}
@@ -157,6 +153,28 @@ export const AppRoutes = () => {
           <AdminRoutes />
         </ProtectedRoute>
       } />
+
+      {/* Checkout Routes - Mantidas separadas e fora do AppLayout */}
+      <Route path="/checkout" element={
+        <ProtectedRoute>
+          <Checkout />
+        </ProtectedRoute>
+      }>
+        <Route index element={<Navigate to="confirmation" replace />} />
+        <Route path="confirmation" element={<Success />} />
+        <Route path="shipping" element={<Shipping />} />
+        <Route path="payment" element={<Payment />} />
+        <Route path="points" element={<Success />} />
+      </Route>
+
+      <Route path="/checkout/success" element={
+        <ProtectedRoute>
+          <Success />
+        </ProtectedRoute>
+      } />
+
+      {/* Catch all route */}
+      <Route path="*" element={<Error404 />} />
     </Routes>
   );
 };
