@@ -76,7 +76,7 @@ export function CRMTable() {
       <div className="rounded-md border">
         <Table>
           <UserTableHeader
-            onSelectAll={handleSelectAll}
+            onSelectAll={(checked: boolean) => handleSelectAll(checked)}
             allSelected={allSelected}
           />
           <TableBody>
@@ -85,7 +85,7 @@ export function CRMTable() {
                 key={user.id}
                 user={user}
                 isSelected={selectedUsers.includes(user.id)}
-                onSelect={(checked: boolean) => handleSelectUser(user.id, checked)}
+                onSelect={handleSelectUser}
                 onEdit={() => {}}
               />
             ))}

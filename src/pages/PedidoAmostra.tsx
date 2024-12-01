@@ -25,7 +25,7 @@ export default function PedidoAmostra() {
   const shippingCost = 4.50; // Fixed shipping cost
   const total = subtotal + shippingCost;
 
-  const handleContinue = () => {
+  const handleProceed = () => {
     if (items.length === 0) {
       toast({
         variant: "destructive",
@@ -87,7 +87,7 @@ export default function PedidoAmostra() {
             <ActionButtons
               isLoading={isLoading}
               onCancel={handleCancel}
-              onContinue={handleContinue}
+              onProceed={handleProceed}
             />
           </div>
         </Card>
