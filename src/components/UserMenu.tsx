@@ -28,6 +28,30 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   const location = useLocation();
   const { handleLogout } = useSessionManagement();
   const [isInAdminPanel, setIsInAdminPanel] = useState(location.pathname.startsWith('/admin'));
+  const isPortuguese = location.pathname.startsWith('/pt');
+
+  const getErrorMessage = (key: string) => {
+    const messages = {
+      sessionError: {
+        en: "Session error. Please try logging in again.",
+        pt: "Erro na sessão. Por favor, faça login novamente."
+      },
+      profileError: {
+        en: "Error loading profile data. Please refresh the page.",
+        pt: "Erro ao carregar dados do perfil. Por favor, atualize a página."
+      },
+      createError: {
+        en: "Error creating profile. Please try again.",
+        pt: "Erro ao criar perfil. Por favor, tente novamente."
+      },
+      networkError: {
+        en: "Network error. Please check your connection.",
+        pt: "Erro de conexão. Por favor, verifique sua internet."
+      }
+    };
+    
+    return messages[key][isPortuguese ? 'pt' : 'en'];
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -43,7 +67,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
         
         if (sessionError) {
           console.error('Session error:', sessionError);
-          toast.error("Erro na sessão. Por favor, faça login novamente.");
+          toast.error(getErrorMessage('sessionError'));
           navigate('/');
           return;
         }
@@ -62,7 +86,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           
         if (profileError && profileError.code !== 'PGRST116') { // Not found error code
           console.error('Error fetching profile:', profileError);
-          toast.error("Erro ao carregar dados do perfil. Por favor, atualize a página.");
+          toast.error(getErrorMessage('profileError'));
           return;
         }
 
@@ -75,7 +99,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
             .insert([{ 
               id: user.id, 
               email: user.email,
-              language: location.pathname.startsWith('/pt') ? 'pt' : 'en',
+              language: isPortuguese ? 'pt' : 'en',
               role: 'member'
             }])
             .select()
@@ -83,14 +107,14 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
             
           if (createError) {
             console.error('Error creating profile:', createError);
-            toast.error("Erro ao criar perfil. Por favor, tente novamente.");
+            toast.error(getErrorMessage('createError'));
           } else if (newProfile && isMounted) {
             setProfile(newProfile);
           }
         }
       } catch (error) {
         console.error('Error in profile fetch:', error);
-        toast.error("Erro de conexão. Por favor, verifique sua internet.");
+        toast.error(getErrorMessage('networkError'));
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -103,7 +127,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
     return () => {
       isMounted = false;
     };
-  }, [user, navigate, location.pathname]);
+  }, [user, navigate, location.pathname, isPortuguese]);
 
   if (!user) return null;
 
