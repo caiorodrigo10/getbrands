@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,13 +8,7 @@ import { ProfileTypeStep } from "./steps/ProfileTypeStep";
 import { BrandStatusStep } from "./steps/BrandStatusStep";
 import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { useAuth } from "@/contexts/AuthContext";
-
-type Step = {
-  component: React.ComponentType<any>;
-  props: Record<string, any>;
-  autoAdvance?: boolean;
-  name: string;
-};
+import { trackOnboardingStarted, trackOnboardingStepCompleted, trackOnboardingCompleted } from "@/lib/analytics/onboarding";
 
 export function OnboardingQuiz() {
   const navigate = useNavigate();
@@ -28,6 +22,9 @@ export function OnboardingQuiz() {
   });
 
   const handleNext = () => {
+    if (user?.id) {
+      trackOnboardingStepCompleted(user.id, steps[currentStep].name, quizData);
+    }
     setCurrentStep((prev) => prev + 1);
   };
 
@@ -55,6 +52,13 @@ export function OnboardingQuiz() {
 
       if (error) throw error;
 
+      trackOnboardingCompleted(user.id, {
+        product_interest: quizData.productCategories,
+        profile_type: quizData.profileType,
+        brand_status: quizData.brandStatus,
+        launch_urgency: quizData.launchUrgency
+      });
+
       toast.success("Profile updated successfully!");
       navigate("/start-here");
     } catch (error: any) {
@@ -63,76 +67,78 @@ export function OnboardingQuiz() {
     }
   };
 
-  const steps: Step[] = [
+  const steps = [
     {
-      component: WelcomeStep,
-      name: "Welcome",
-      props: {
-        onNext: handleNext,
-      },
-      autoAdvance: true,
+      component: <WelcomeStep onNext={handleNext} />,
+      name: "Welcome"
     },
     {
-      component: ProductCategoriesStep,
-      name: "Product Categories",
-      props: {
-        selected: quizData.productCategories,
-        onAnswer: (value: string[]) => {
-          setQuizData({ ...quizData, productCategories: value });
-        },
-        onNext: handleNext,
-        onBack: handleBack,
-      },
-      autoAdvance: false,
+      component: (
+        <ProductCategoriesStep
+          selected={quizData.productCategories}
+          onAnswer={(categories) =>
+            setQuizData({ ...quizData, productCategories: categories })
+          }
+          onNext={handleNext}
+          onBack={handleBack}
+        />
+      ),
+      name: "Product Categories"
     },
     {
-      component: ProfileTypeStep,
-      name: "Profile Type",
-      props: {
-        selected: quizData.profileType,
-        onAnswer: (value: string) => {
-          setQuizData({ ...quizData, profileType: value });
-          if (steps[2].autoAdvance) handleNext();
-        },
-        onNext: handleNext,
-        onBack: handleBack,
-      },
-      autoAdvance: true,
+      component: (
+        <ProfileTypeStep
+          selected={quizData.profileType}
+          onAnswer={(type) => {
+            setQuizData({ ...quizData, profileType: type });
+            handleNext();
+          }}
+          onNext={handleNext}
+          onBack={handleBack}
+        />
+      ),
+      name: "Profile Type"
     },
     {
-      component: BrandStatusStep,
-      name: "Brand Status",
-      props: {
-        selected: quizData.brandStatus,
-        onAnswer: (value: string) => {
-          setQuizData({ ...quizData, brandStatus: value });
-          if (steps[3].autoAdvance) handleNext();
-        },
-        onNext: handleNext,
-        onBack: handleBack,
-      },
-      autoAdvance: true,
+      component: (
+        <BrandStatusStep
+          selected={quizData.brandStatus}
+          onAnswer={(status) => {
+            setQuizData({ ...quizData, brandStatus: status });
+            handleNext();
+          }}
+          onNext={handleNext}
+          onBack={handleBack}
+        />
+      ),
+      name: "Brand Status"
     },
     {
-      component: LaunchUrgencyStep,
-      name: "Launch Urgency",
-      props: {
-        selected: quizData.launchUrgency,
-        onAnswer: (value: string) => {
-          setQuizData({ ...quizData, launchUrgency: value });
-        },
-        onComplete: handleComplete,
-        onBack: handleBack,
-      },
-      autoAdvance: false,
+      component: (
+        <LaunchUrgencyStep
+          selected={quizData.launchUrgency}
+          onAnswer={(urgency) => {
+            setQuizData({ ...quizData, launchUrgency: urgency });
+          }}
+          onComplete={handleComplete}
+          onBack={handleBack}
+        />
+      ),
+      name: "Launch Urgency"
     },
   ];
 
   const CurrentStepComponent = steps[currentStep].component;
 
+  useEffect(() => {
+    if (user?.id) {
+      trackOnboardingStarted(user.id);
+    }
+  }, [user?.id]);
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <CurrentStepComponent {...steps[currentStep].props} />
+      <CurrentStepComponent />
     </div>
   );
 }
