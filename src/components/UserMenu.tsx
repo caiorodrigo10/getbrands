@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -9,12 +9,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { supabase } from "@/integrations/supabase/client";
 import { UserInfo } from "./user-menu/UserInfo";
 import { MobileMenu } from "./user-menu/MobileMenu";
 import { MenuItems } from "./user-menu/MenuItems";
 import { useSessionManagement } from "@/hooks/useSessionManagement";
-import { toast } from "sonner";
+import { useProfileManagement } from "@/hooks/useProfileManagement";
+import { errorMessages } from "@/utils/errorMessages";
 
 interface UserMenuProps {
   isMobile: boolean;
@@ -22,8 +22,6 @@ interface UserMenuProps {
 
 const UserMenu = ({ isMobile }: UserMenuProps) => {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const { handleLogout } = useSessionManagement();
@@ -31,103 +29,14 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   const isPortuguese = location.pathname.startsWith('/pt');
 
   const getErrorMessage = (key: string) => {
-    const messages = {
-      sessionError: {
-        en: "Session error. Please try logging in again.",
-        pt: "Erro na sessão. Por favor, faça login novamente."
-      },
-      profileError: {
-        en: "Error loading profile data. Please refresh the page.",
-        pt: "Erro ao carregar dados do perfil. Por favor, atualize a página."
-      },
-      createError: {
-        en: "Error creating profile. Please try again.",
-        pt: "Erro ao criar perfil. Por favor, tente novamente."
-      },
-      networkError: {
-        en: "Network error. Please check your connection.",
-        pt: "Erro de conexão. Por favor, verifique sua internet."
-      }
-    };
-    
-    return messages[key][isPortuguese ? 'pt' : 'en'];
+    return errorMessages[key][isPortuguese ? 'pt' : 'en'];
   };
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchProfile = async () => {
-      if (!user) {
-        setIsLoading(false);
-        return;
-      }
-      
-      try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error('Session error:', sessionError);
-          toast.error(getErrorMessage('sessionError'));
-          navigate('/');
-          return;
-        }
-
-        if (!session) {
-          navigate('/');
-          return;
-        }
-
-        // First try to get existing profile
-        const { data: existingProfile, error: profileError } = await supabase
-          .from("profiles")
-          .select()
-          .eq("id", user.id)
-          .single();
-          
-        if (profileError && profileError.code !== 'PGRST116') { // Not found error code
-          console.error('Error fetching profile:', profileError);
-          toast.error(getErrorMessage('profileError'));
-          return;
-        }
-
-        if (existingProfile && isMounted) {
-          setProfile(existingProfile);
-        } else {
-          // Create new profile if none exists
-          const { data: newProfile, error: createError } = await supabase
-            .from('profiles')
-            .insert([{ 
-              id: user.id, 
-              email: user.email,
-              language: isPortuguese ? 'pt' : 'en',
-              role: 'member'
-            }])
-            .select()
-            .single();
-            
-          if (createError) {
-            console.error('Error creating profile:', createError);
-            toast.error(getErrorMessage('createError'));
-          } else if (newProfile && isMounted) {
-            setProfile(newProfile);
-          }
-        }
-      } catch (error) {
-        console.error('Error in profile fetch:', error);
-        toast.error(getErrorMessage('networkError'));
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchProfile();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [user, navigate, location.pathname, isPortuguese]);
+  const { profile, isLoading } = useProfileManagement({
+    user,
+    isPortuguese,
+    getErrorMessage,
+  });
 
   if (!user) return null;
 
