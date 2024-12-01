@@ -14,7 +14,7 @@ interface OrderListProps {
   onStatusChange: (orderId: string, status: string) => void;
   isSelected: (orderId: string) => boolean;
   onSelect: (orderId: string, checked: boolean) => void;
-  onSelectAll: (checked: boolean) => void;
+  onSelectAll: (checked: boolean, orders: any[]) => void;
   allSelected: boolean;
 }
 
