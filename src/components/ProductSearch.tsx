@@ -24,6 +24,7 @@ export const ProductSearch = ({ addToCart, onSelectProduct }: ProductSearchProps
   const { addItem } = useCart();
   const { toast } = useToast();
   const searchRef = useRef<HTMLDivElement>(null);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 
   const productsQuery = useQuery({
     queryKey: ["products"],
@@ -36,6 +37,7 @@ export const ProductSearch = ({ addToCart, onSelectProduct }: ProductSearchProps
     }
   });
 
+  // Handle click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -47,30 +49,21 @@ export const ProductSearch = ({ addToCart, onSelectProduct }: ProductSearchProps
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Handle loading and error states
-  if (productsQuery.isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (productsQuery.error) {
-    return <div>Error loading products</div>;
-  }
-
-  // Safely handle the products data with proper typing and null checks
-  const products = productsQuery.data?.data || [];
-
-  const filteredProducts = query 
-    ? products.filter(product =>
-        product.name.toLowerCase().includes(query.toLowerCase())
-      )
-    : [];
-
-  // Add tracking when search results update
+  // Filter products and track search
   useEffect(() => {
+    const products = productsQuery.data?.data || [];
+    const filtered = query 
+      ? products.filter(product =>
+          product.name.toLowerCase().includes(query.toLowerCase())
+        )
+      : [];
+    
+    setFilteredProducts(filtered);
+
     if (query) {
-      trackProductSearch(query, filteredProducts.length);
+      trackProductSearch(query, filtered.length);
     }
-  }, [query, filteredProducts.length]);
+  }, [query, productsQuery.data]);
 
   const handleSelect = async (product: Product) => {
     if (addToCart) {
@@ -94,6 +87,15 @@ export const ProductSearch = ({ addToCart, onSelectProduct }: ProductSearchProps
       setOpen(false);
     }
   };
+
+  // Handle loading and error states
+  if (productsQuery.isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (productsQuery.error) {
+    return <div>Error loading products</div>;
+  }
 
   return (
     <div ref={searchRef} className="relative w-full">
