@@ -7,16 +7,21 @@ interface QuizNavigationProps {
   backLabel?: string;
   isNextDisabled?: boolean;
   showBack?: boolean;
+  isOnboarding?: boolean;
 }
 
 export const QuizNavigation = ({
   onNext,
   onBack,
-  nextLabel = "Próximo",
-  backLabel = "Voltar",
+  nextLabel,
+  backLabel,
   isNextDisabled = false,
   showBack = true,
+  isOnboarding = false,
 }: QuizNavigationProps) => {
+  const defaultNextLabel = isOnboarding ? "Next" : "Próximo";
+  const defaultBackLabel = isOnboarding ? "Back" : "Voltar";
+
   return (
     <div className="flex justify-between mt-8">
       {showBack && onBack && (
@@ -25,7 +30,7 @@ export const QuizNavigation = ({
           onClick={onBack}
           className="w-32"
         >
-          {backLabel}
+          {backLabel || defaultBackLabel}
         </Button>
       )}
       <Button
@@ -33,7 +38,7 @@ export const QuizNavigation = ({
         disabled={isNextDisabled}
         className={`w-32 ${!showBack || !onBack ? 'ml-auto' : ''}`}
       >
-        {nextLabel}
+        {nextLabel || defaultNextLabel}
       </Button>
     </div>
   );
