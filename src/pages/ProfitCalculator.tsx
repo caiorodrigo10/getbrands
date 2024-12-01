@@ -1,119 +1,115 @@
 import { useState } from "react";
-import { ProductSearch } from "@/components/ProductSearch";
-import { ProfitCalculatorForm } from "@/components/profit-calculator/ProfitCalculatorForm";
-import { ProfitProjections } from "@/components/profit-calculator/ProfitProjections";
-import { Product } from "@/types/product";
-import { Card } from "@/components/ui/card";
-import { trackProfitCalculation, trackProfitCalculatorProductSelect } from "@/lib/analytics/events/profit-calculator";
-
-interface CalculationValues {
-  monthlySales: number;
-  growthRate: number;
-  costPrice: number;
-  sellingPrice: number;
-}
+import { NavigationMenu } from "@/components/NavigationMenu";
+import { ProductSearch } from "@/components/products/ProductSearch";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { formatCurrency } from "@/lib/utils";
+import type { Product } from "@/types/product";
 
 const ProfitCalculator = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [calculationValues, setCalculationValues] = useState<CalculationValues>({
-    monthlySales: 200,
-    growthRate: 15,
-    costPrice: 0,
-    sellingPrice: 0,
-  });
+  const [retailPrice, setRetailPrice] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>(1);
 
   const handleProductSelect = (product: Product) => {
     setSelectedProduct(product);
-    setCalculationValues(prev => ({
-      ...prev,
-      costPrice: product.from_price,
-      sellingPrice: product.srp,
-    }));
-    
-    trackProfitCalculatorProductSelect(product.id, product.name);
+    setRetailPrice(product.srp);
   };
 
-  const handleCalculate = (values: CalculationValues) => {
-    setCalculationValues(values);
-    
-    // Apenas rastreia o evento se houver um produto selecionado
-    if (selectedProduct) {
-      trackProfitCalculation({
-        productId: selectedProduct.id,
-        productName: selectedProduct.name,
-        ...values,
-        projectedAnnualProfit: calculateAnnualProfit(values),
-        averageMonthlyProfit: calculateMonthlyProfit(values)
-      });
-    }
+  const calculateProfit = () => {
+    if (!selectedProduct) return 0;
+    return (retailPrice - selectedProduct.from_price) * quantity;
   };
 
-  const calculateAnnualProfit = (values: CalculationValues) => {
-    let totalProfit = 0;
-    let currentSales = values.monthlySales;
-    
-    for (let month = 0; month < 12; month++) {
-      const monthlyRevenue = currentSales * values.sellingPrice;
-      const monthlyCost = currentSales * values.costPrice;
-      const monthlyProfit = monthlyRevenue - monthlyCost;
-      totalProfit += monthlyProfit;
-      
-      // Aplica a taxa de crescimento mensal
-      currentSales *= (1 + values.growthRate / 100);
-    }
-    
-    return totalProfit;
-  };
-
-  const calculateMonthlyProfit = (values: CalculationValues) => {
-    return calculateAnnualProfit(values) / 12;
+  const calculateMargin = () => {
+    if (!selectedProduct || retailPrice === 0) return 0;
+    return ((retailPrice - selectedProduct.from_price) / retailPrice) * 100;
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Profit Calculator</h1>
-      </div>
+    <div className="min-h-screen bg-background">
+      <NavigationMenu />
+      <main className="md:pl-64 flex-1">
+        <div className="container max-w-4xl mx-auto px-4 py-8">
+          <h1 className="text-2xl font-bold mb-6">Profit Calculator</h1>
+          
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Select Product</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ProductSearch onSelectProduct={handleProductSelect} />
+              </CardContent>
+            </Card>
 
-      <div className="space-y-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <h2 className="text-lg font-semibold mb-4">Select a Product</h2>
-          <ProductSearch 
-            onSelectProduct={handleProductSelect}
-            addToCart={false}
-          />
+            {selectedProduct && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Calculate Profit</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="cost">Cost Price</Label>
+                      <Input
+                        id="cost"
+                        type="text"
+                        value={formatCurrency(selectedProduct.from_price)}
+                        disabled
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="retail">Retail Price</Label>
+                      <Input
+                        id="retail"
+                        type="number"
+                        min={selectedProduct.from_price}
+                        value={retailPrice}
+                        onChange={(e) => setRetailPrice(Number(e.target.value))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="quantity">Quantity</Label>
+                      <Input
+                        id="quantity"
+                        type="number"
+                        min={1}
+                        value={quantity}
+                        onChange={(e) => setQuantity(Number(e.target.value))}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div>
+                        <Label>Profit per Unit</Label>
+                        <p className="text-2xl font-bold text-green-600">
+                          {formatCurrency(calculateProfit() / quantity)}
+                        </p>
+                      </div>
+                      <div>
+                        <Label>Profit Margin</Label>
+                        <p className="text-2xl font-bold text-green-600">
+                          {calculateMargin().toFixed(1)}%
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <Label>Total Profit</Label>
+                      <p className="text-3xl font-bold text-green-600">
+                        {formatCurrency(calculateProfit())}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </div>
-
-        {selectedProduct && (
-          <Card className="bg-white p-6">
-            <div className="flex items-center gap-6">
-              <img
-                src={selectedProduct.image_url || "/placeholder.svg"}
-                alt={selectedProduct.name}
-                className="w-24 h-24 object-cover rounded-lg"
-              />
-              <div>
-                <h2 className="text-2xl font-semibold text-gray-900">
-                  {selectedProduct.name}
-                </h2>
-                <p className="text-gray-500">
-                  Category: {selectedProduct.category}
-                </p>
-              </div>
-            </div>
-          </Card>
-        )}
-        
-        <ProfitCalculatorForm 
-          product={selectedProduct} 
-          onCalculate={handleCalculate}
-        />
-        
-        <ProfitProjections 
-          product={selectedProduct}
-          calculationValues={calculationValues}
-        />
-      </div>
+      </main>
     </div>
   );
 };
