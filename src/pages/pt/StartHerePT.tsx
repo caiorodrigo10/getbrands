@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Video } from "lucide-react";
 
 const StartHerePT = () => {
   const { user } = useAuth();
@@ -91,6 +91,15 @@ const StartHerePT = () => {
           >
             Explorar Catálogo de Produtos
             <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        </Link>
+        <Link to="/schedule-demo">
+          <Button 
+            className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white"
+            size="lg"
+          >
+            Agendar Reunião
+            <Video className="ml-2 h-5 w-5" />
           </Button>
         </Link>
       </div>
