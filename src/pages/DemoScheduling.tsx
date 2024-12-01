@@ -32,7 +32,7 @@ const DemoScheduling = () => {
           </p>
         </div>
 
-        <Card className="p-6">
+        <Card className="shadow-none border-0">
           <div className="aspect-[3/2] w-full">
             <iframe 
               src="https://api.avanttocrm.com/widget/group/5PcrL3brY1OUJyWdG1lw" 
