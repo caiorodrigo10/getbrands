@@ -129,7 +129,7 @@ export const AppRoutes = () => {
         } />
       </Route>
 
-      {/* Checkout Routes */}
+      {/* Checkout Routes - Outside AppLayout */}
       {CheckoutRoutes}
 
       {/* Portuguese Routes */}

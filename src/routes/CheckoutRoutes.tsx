@@ -5,35 +5,8 @@ import Success from "@/pages/checkout/Success";
 
 export const CheckoutRoutes = [
   <Route
-    key="checkout-confirmation"
-    path="/checkout/confirmation"
-    element={
-      <ProtectedRoute>
-        <Checkout />
-      </ProtectedRoute>
-    }
-  />,
-  <Route
-    key="checkout-shipping"
-    path="/checkout/shipping"
-    element={
-      <ProtectedRoute>
-        <Checkout />
-      </ProtectedRoute>
-    }
-  />,
-  <Route
-    key="checkout-payment"
-    path="/checkout/payment"
-    element={
-      <ProtectedRoute>
-        <Checkout />
-      </ProtectedRoute>
-    }
-  />,
-  <Route
-    key="checkout-points"
-    path="/checkout/points"
+    key="checkout"
+    path="/checkout/*"
     element={
       <ProtectedRoute>
         <Checkout />
@@ -48,5 +21,5 @@ export const CheckoutRoutes = [
         <Success />
       </ProtectedRoute>
     }
-  />,
+  />
 ];

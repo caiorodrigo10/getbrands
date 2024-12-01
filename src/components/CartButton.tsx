@@ -29,8 +29,8 @@ export function CartButton() {
       items_count: items.length
     });
 
-    // Navigate to checkout with replace to prevent back navigation issues
-    navigate("/checkout/confirmation", { replace: true });
+    // Navigate to checkout
+    navigate("/checkout/confirmation");
   };
 
   return (
