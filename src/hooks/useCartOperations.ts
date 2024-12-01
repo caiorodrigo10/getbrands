@@ -123,9 +123,22 @@ export const useCartOperations = (user: User | null) => {
 
       if (error) throw error;
 
+      // Update local state immediately after successful removal
       setItems((currentItems) => currentItems.filter((item) => item.id !== id));
+      
+      // Show success toast
+      toast({
+        title: "Item removed",
+        description: "The item has been removed from your cart.",
+      });
+      
     } catch (error) {
       console.error('Error removing item from cart:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to remove item from cart.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -152,8 +165,22 @@ export const useCartOperations = (user: User | null) => {
       if (error) throw error;
 
       setItems([]);
+      
+      if (!silent) {
+        toast({
+          title: "Cart cleared",
+          description: "All items have been removed from your cart.",
+        });
+      }
     } catch (error) {
       console.error('Error clearing cart:', error);
+      if (!silent) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to clear cart.",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
