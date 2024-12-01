@@ -1,5 +1,4 @@
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AppLayout } from "./AppLayout";
 import { MarketingRoutes } from "./MarketingRoutes";
@@ -19,25 +18,14 @@ import ProductDetails from "@/pages/ProductDetails";
 import ProductSelectedSuccess from "@/pages/products/ProductSelectedSuccess";
 import Documents from "@/pages/Documents";
 import SampleOrders from "@/pages/SampleOrders";
-import Checkout from "@/pages/checkout/Checkout";
-import Success from "@/pages/checkout/Success";
-import Shipping from "@/pages/checkout/Shipping";
-import Payment from "@/pages/checkout/Payment";
 import ProfitCalculator from "@/pages/ProfitCalculator";
 import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
 import OnboardingQuizPage from "@/pages/OnboardingQuiz";
 import { OnboardingQuizPT } from "@/pages/pt/OnboardingQuiz";
 import ComecarPT from "@/pages/pt/ComecarPT";
-import PedidoAmostra from "@/pages/PedidoAmostra";
 
 export const AppRoutes = () => {
-  const location = useLocation();
-  
-  useEffect(() => {
-    console.log('[DEBUG] AppRoutes - Current location:', location.pathname);
-  }, [location]);
-
   return (
     <Routes>
       <Route element={<AppLayout />}>
@@ -137,53 +125,34 @@ export const AppRoutes = () => {
             <ProfitCalculator />
           </ProtectedRoute>
         } />
+
+        {/* Portuguese Routes */}
+        <Route path="/pt/signup" element={<SignUpPT />} />
+        <Route path="/pt/onboarding" element={
+          <ProtectedRoute>
+            <OnboardingQuizPT />
+          </ProtectedRoute>
+        } />
+        <Route path="/comecarpt" element={<ComecarPT />} />
+
+        {/* Marketing Routes */}
+        {MarketingRoutes}
+        
+        {/* Public Routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/onboarding" element={<OnboardingQuizPage />} />
+        
+        {/* Admin Routes */}
+        <Route path="/admin/*" element={
+          <ProtectedRoute requiresAdmin>
+            <AdminRoutes />
+          </ProtectedRoute>
+        } />
+
+        {/* Catch all route */}
+        <Route path="*" element={<Error404 />} />
       </Route>
-
-      {/* Portuguese Routes */}
-      <Route path="/pt/signup" element={<SignUpPT />} />
-      <Route path="/pt/onboarding" element={
-        <ProtectedRoute>
-          <OnboardingQuizPT />
-        </ProtectedRoute>
-      } />
-      <Route path="/comecarpt" element={<ComecarPT />} />
-
-      {/* Marketing Routes */}
-      {MarketingRoutes}
-      
-      {/* Public Routes */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/onboarding" element={<OnboardingQuizPage />} />
-      
-      {/* Admin Routes */}
-      <Route path="/admin/*" element={
-        <ProtectedRoute requiresAdmin>
-          <AdminRoutes />
-        </ProtectedRoute>
-      } />
-
-      {/* Checkout Routes */}
-      <Route path="/checkout/*" element={
-        <ProtectedRoute>
-          <Checkout />
-        </ProtectedRoute>
-      }>
-        <Route index element={<Navigate to="confirmation" />} />
-        <Route path="confirmation" element={<PedidoAmostra />} />
-        <Route path="shipping" element={<Shipping />} />
-        <Route path="payment" element={<Payment />} />
-        <Route path="points" element={<PedidoAmostra />} />
-      </Route>
-
-      <Route path="/checkout/success" element={
-        <ProtectedRoute>
-          <Success />
-        </ProtectedRoute>
-      } />
-
-      {/* Catch all route */}
-      <Route path="*" element={<Error404 />} />
     </Routes>
   );
 };
