@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useOrderManagement = (orders: any[], totalOrders: number) => {
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
