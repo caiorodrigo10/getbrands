@@ -56,8 +56,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
         const { data, error } = await supabase
           .from("profiles")
           .select()
-          .eq("id", user.id)
-          .single();
+          .eq("id", user.id);
           
         if (error) {
           console.error('Error fetching profile:', error);
@@ -65,8 +64,25 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
           return;
         }
 
-        if (data && isMounted) {
-          setProfile(data);
+        if (data && data.length > 0 && isMounted) {
+          setProfile(data[0]);
+        } else {
+          // Se não encontrar o perfil, podemos criar um novo
+          const { data: newProfile, error: createError } = await supabase
+            .from("profiles")
+            .insert([{ id: user.id, email: user.email }])
+            .select()
+            .single();
+
+          if (createError) {
+            console.error('Error creating profile:', createError);
+            toast.error("Failed to create profile. Please try again.");
+            return;
+          }
+
+          if (newProfile && isMounted) {
+            setProfile(newProfile);
+          }
         }
       } catch (error) {
         console.error('Error in profile fetch:', error);
