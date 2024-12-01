@@ -1,7 +1,7 @@
 import { CartItem } from "@/types/cart";
 import { trackEvent } from "@/lib/analytics";
 
-export const trackAddToCart = (item: CartItem, source: string) => {
+export const trackAddToCart = (item: CartItem) => {
   trackEvent("Product Added to Cart", {
     product_id: item.id,
     product_name: item.name,
@@ -9,19 +9,15 @@ export const trackAddToCart = (item: CartItem, source: string) => {
     price: item.from_price,
     quantity: item.quantity,
     currency: "BRL",
-    source_page: source,
-    timestamp: new Date().toISOString(),
-    variants: item.variants || [],
-    total_value: item.from_price * item.quantity
+    total_value: item.from_price * item.quantity,
+    timestamp: new Date().toISOString()
   });
 };
 
 export const trackCheckoutStep = (
   step: number, 
   stepName: string,
-  items: CartItem[], 
-  shippingInfo?: any,
-  paymentMethod?: string
+  items: CartItem[]
 ) => {
   trackEvent("Checkout Step Viewed", {
     step_number: step,
@@ -35,8 +31,6 @@ export const trackCheckoutStep = (
     })),
     total_value: items.reduce((acc, item) => acc + (item.from_price * item.quantity), 0),
     currency: "BRL",
-    shipping_address: shippingInfo,
-    payment_method: paymentMethod,
     timestamp: new Date().toISOString()
   });
 };
