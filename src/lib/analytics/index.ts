@@ -1,20 +1,41 @@
 import { toast } from "sonner";
 
-const initializeAnalytics = () => {
-  if (typeof window === 'undefined') return false;
-  if (!window.analytics) {
-    return false;
-  }
-  return true;
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000; // 1 second
+
+const initializeAnalytics = (retryCount = 0): Promise<boolean> => {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined') {
+      resolve(false);
+      return;
+    }
+
+    if (window.analytics) {
+      resolve(true);
+      return;
+    }
+
+    if (retryCount >= MAX_RETRIES) {
+      console.warn('Failed to initialize analytics after maximum retries');
+      resolve(false);
+      return;
+    }
+
+    setTimeout(() => {
+      initializeAnalytics(retryCount + 1).then(resolve);
+    }, RETRY_DELAY);
+  });
 };
 
 export const waitForAnalytics = () => {
   return new Promise<void>((resolve, reject) => {
-    if (initializeAnalytics()) {
-      resolve();
-      return;
-    }
-    reject(new Error('Failed to initialize analytics'));
+    initializeAnalytics().then((initialized) => {
+      if (initialized) {
+        resolve();
+      } else {
+        reject(new Error('Failed to initialize analytics'));
+      }
+    });
   });
 };
 
@@ -93,7 +114,11 @@ export const trackPage = async (properties?: Record<string, any>) => {
   }
 };
 
-// Initialize analytics silently
-if (typeof window !== 'undefined') {
-  initializeAnalytics();
+// Add debug logging in development
+if (process.env.NODE_ENV === 'development') {
+  window.addEventListener('load', () => {
+    initializeAnalytics().then((initialized) => {
+      console.log(`[Analytics] Initialization ${initialized ? 'successful' : 'failed'}`);
+    });
+  });
 }
