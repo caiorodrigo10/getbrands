@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { trackCartView } from "@/lib/analytics/events";
 import {
   Tooltip,
@@ -13,39 +13,39 @@ import {
 export function CartButton() {
   const { items } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleCartClick = (e: React.MouseEvent) => {
+  const handleCartClick = async (e: React.MouseEvent) => {
     console.log('[DEBUG] CartButton - Click event triggered');
-    console.log('[DEBUG] CartButton - Event details:', { 
-      type: e.type,
-      defaultPrevented: e.defaultPrevented,
-      propagationStopped: e.isPropagationStopped(),
-      target: e.target,
-      currentTarget: e.currentTarget
-    });
+    console.log('[DEBUG] CartButton - Current location:', location.pathname);
+    console.log('[DEBUG] CartButton - Cart items:', items);
     
     e.preventDefault();
-    console.log('[DEBUG] CartButton - After preventDefault');
-    
     e.stopPropagation();
-    console.log('[DEBUG] CartButton - After stopPropagation');
-    
-    // Track cart view event
-    console.log('[DEBUG] CartButton - Tracking cart view with items:', items);
-    trackCartView({
-      items: items.map(item => ({
-        product_id: item.id,
-        product_name: item.name,
-        quantity: item.quantity,
-        price: item.from_price
-      })),
-      items_count: items.length
-    });
 
-    console.log('[DEBUG] CartButton - Attempting navigation to /checkout/confirmation');
-    // Navigate to checkout
-    navigate("/checkout/confirmation");
-    console.log('[DEBUG] CartButton - Navigation completed');
+    if (items.length === 0) {
+      console.log('[DEBUG] CartButton - Cart is empty, not navigating');
+      return;
+    }
+
+    try {
+      console.log('[DEBUG] CartButton - Tracking cart view before navigation');
+      await trackCartView({
+        items: items.map(item => ({
+          product_id: item.id,
+          product_name: item.name,
+          quantity: item.quantity,
+          price: item.from_price
+        })),
+        items_count: items.length
+      });
+
+      console.log('[DEBUG] CartButton - Navigation attempt to /checkout/confirmation');
+      navigate("/checkout/confirmation", { replace: true });
+      console.log('[DEBUG] CartButton - Navigation completed');
+    } catch (error) {
+      console.error('[DEBUG] CartButton - Error during navigation:', error);
+    }
   };
 
   return (
