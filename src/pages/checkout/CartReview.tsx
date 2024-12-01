@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { formatCurrency } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { trackCheckoutStep } from "@/lib/analytics/events";
+import { trackCheckoutStarted } from "@/lib/analytics/events";
 import { useEffect } from "react";
 
 const CartReview = () => {
@@ -11,12 +11,22 @@ const CartReview = () => {
   const { items } = useCart();
 
   useEffect(() => {
-    trackCheckoutStep(1, items);
+    const trackInitialStep = async () => {
+      if (items.length > 0) {
+        await trackCheckoutStarted({
+          items: items.map(item => ({
+            product_id: item.id,
+            product_name: item.name,
+            quantity: item.quantity || 1,
+            price: item.from_price
+          })),
+          items_count: items.length
+        });
+      }
+    };
+    
+    trackInitialStep();
   }, [items]);
-
-  const handleContinue = () => {
-    navigate("/checkout/shipping");
-  };
 
   return (
     <div className="space-y-4">
@@ -48,7 +58,7 @@ const CartReview = () => {
 
       <div className="fixed bottom-0 left-0 right-0 p-3 bg-background border-t sm:relative sm:border-0 sm:p-0 sm:bg-transparent">
         <Button
-          onClick={handleContinue}
+          onClick={() => navigate("/checkout/shipping")}
           className="w-full sm:w-auto h-9 sm:h-11 text-sm sm:text-base"
         >
           Continue to shipping

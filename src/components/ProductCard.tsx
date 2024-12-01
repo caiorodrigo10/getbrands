@@ -37,8 +37,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const handleCardClick = async () => {
     try {
       await trackProductView({
-        productId: product.id,
-        productName: product.name,
+        id: product.id,
+        name: product.name,
         category: product.category,
         price: product.from_price
       });

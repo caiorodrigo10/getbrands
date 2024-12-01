@@ -61,20 +61,28 @@ export const createOrder = async ({ user, items, total, shippingCost, orderId }:
   });
 
   // Track successful checkout
-  trackOrderCompleted(
+  await trackOrderCompleted({
     orderId,
-    items,
-    {
-      firstName: localStorage.getItem('firstName'),
-      lastName: localStorage.getItem('lastName'),
-      phone: formattedPhone,
-      address1: localStorage.getItem('shipping_address'),
-      city: localStorage.getItem('shipping_city'),
-      state: localStorage.getItem('shipping_state'),
-      zipCode: localStorage.getItem('shipping_zip'),
-    },
     total,
+    subtotal: items.reduce((sum, item) => sum + (item.from_price * (item.quantity || 1)), 0),
     shippingCost,
-    user.email
-  );
+    customerEmail: user.email,
+    customerName: `${localStorage.getItem('firstName')} ${localStorage.getItem('lastName')}`,
+    paymentMethod: 'credit_card',
+    shippingAddress: {
+      address1: localStorage.getItem('shipping_address') || '',
+      address2: localStorage.getItem('shipping_address2') || '',
+      city: localStorage.getItem('shipping_city') || '',
+      state: localStorage.getItem('shipping_state') || '',
+      zipCode: localStorage.getItem('shipping_zip') || '',
+      country: 'US'
+    },
+    products: items.map(item => ({
+      product_id: item.id,
+      product_name: item.name,
+      quantity: item.quantity || 1,
+      price: item.from_price,
+      category: item.category
+    }))
+  });
 };
