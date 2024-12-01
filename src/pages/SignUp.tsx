@@ -57,6 +57,19 @@ const SignUp = () => {
     setIsLoading(true);
 
     try {
+      // First check if user exists
+      const { data: existingUser } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', formData.email)
+        .single();
+
+      if (existingUser) {
+        toast.error("This email is already registered. Please try logging in instead.");
+        setIsLoading(false);
+        return;
+      }
+
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -116,6 +129,7 @@ const SignUp = () => {
         }
 
         navigate("/onboarding");
+        toast.success("Account created successfully! Please check your email to verify your account.");
       }
     } catch (error: any) {
       console.error("Error signing up:", error);
