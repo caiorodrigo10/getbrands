@@ -2,14 +2,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { trackEvent } from "@/lib/analytics";
 import { Skeleton } from "@/components/ui/skeleton";
-import ProjectSelectionDialog from "@/components/dialogs/ProjectSelectionDialog";
-import { ProductHeader } from "@/components/products/ProductHeader";
-import { ProductBenefits } from "@/components/products/ProductBenefits";
-import { ProductCalculator } from "@/components/products/ProductCalculator";
+import { ProductContent } from "@/components/products/details/ProductContent";
+import { ProductAnalytics } from "@/components/products/details/ProductAnalytics";
 import { ProductDetailsHeader } from "@/components/products/ProductDetailsHeader";
 
 const ProductDetails = () => {
@@ -34,7 +31,6 @@ const ProductDetails = () => {
     },
   });
 
-  // Get product images
   const { data: productImages } = useQuery({
     queryKey: ['product-images', id],
     queryFn: async () => {
@@ -49,33 +45,6 @@ const ProductDetails = () => {
     },
     enabled: !!id,
   });
-
-  useEffect(() => {
-    if (product) {
-      trackEvent("Product Viewed", {
-        product_id: product.id,
-        product_name: product.name,
-        product_category: product.category,
-        price_range: {
-          from: product.from_price,
-          srp: product.srp
-        },
-        profit_margin: product.srp - product.from_price,
-        is_new: product.is_new,
-        is_tiktok: product.is_tiktok,
-        description: product.description,
-        main_image_url: product.image_url,
-        gallery_images: productImages?.map(img => ({
-          url: img.image_url,
-          is_primary: img.is_primary,
-          position: img.position
-        })),
-        created_at: product.created_at,
-        updated_at: product.updated_at,
-        total_images: productImages?.length || 0
-      });
-    }
-  }, [product, productImages]);
 
   const handleSelectProduct = async () => {
     if (!user) {
@@ -156,15 +125,6 @@ const ProductDetails = () => {
 
       if (insertError) throw insertError;
 
-      // Track product selection event
-      trackEvent("Product Selected", {
-        product_id: id,
-        product_name: product?.name,
-        product_category: product?.category,
-        project_id: projectId,
-        project_name: currentProject.name
-      });
-
       navigate("/products/success", {
         state: {
           product: {
@@ -207,28 +167,19 @@ const ProductDetails = () => {
     <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pt-0 pb-4">
       <ProductDetailsHeader />
       
-      <ProductHeader 
-        product={product} 
-        onSelectProduct={handleSelectProduct}
+      <ProductAnalytics 
+        product={product}
+        productImages={productImages}
       />
       
-      <div className="mt-16">
-        <ProductBenefits product={product} />
-      </div>
-
-      <div className="mt-16">
-        <ProductCalculator product={product} />
-      </div>
-
-      {product && (
-        <ProjectSelectionDialog 
-          open={showProjectDialog}
-          onOpenChange={setShowProjectDialog}
-          projects={projects}
-          onConfirm={handleProjectSelection}
-          product={product}
-        />
-      )}
+      <ProductContent 
+        product={product}
+        showProjectDialog={showProjectDialog}
+        setShowProjectDialog={setShowProjectDialog}
+        handleProjectSelection={handleProjectSelection}
+        handleSelectProduct={handleSelectProduct}
+        projects={projects}
+      />
     </div>
   );
 };
