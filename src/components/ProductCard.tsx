@@ -36,16 +36,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   const handleCardClick = async () => {
     try {
-      await trackProductView({
-        id: product.id,
-        name: product.name,
-        category: product.category,
-        from_price: product.from_price
-      });
+      await trackProductView(product);
       navigate(`/catalog/${product.id}`);
     } catch (error) {
       console.error('Error tracking product view:', error);
-      // Still navigate even if tracking fails
       navigate(`/catalog/${product.id}`);
     }
   };
