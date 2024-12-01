@@ -11,7 +11,7 @@ const CartReview = () => {
   const { items } = useCart();
 
   useEffect(() => {
-    trackCheckoutStep(1, "Cart Review", items);
+    trackCheckoutStep(1, items);
   }, [items]);
 
   const handleContinue = () => {

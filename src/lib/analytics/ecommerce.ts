@@ -7,31 +7,19 @@ export const trackAddToCart = (item: CartItem) => {
     product_name: item.name,
     category: item.category,
     price: item.from_price,
-    quantity: item.quantity,
-    currency: "USD",
-    total_value: item.from_price * item.quantity,
-    timestamp: new Date().toISOString()
+    quantity: item.quantity
   });
 };
 
-export const trackCheckoutStep = (
-  step: number, 
-  stepName: string,
-  items: CartItem[]
-) => {
+export const trackCheckoutStep = (step: number, items: CartItem[]) => {
   trackEvent("Checkout Step Viewed", {
     step_number: step,
-    step_name: stepName,
     items: items.map(item => ({
       product_id: item.id,
       product_name: item.name,
       quantity: item.quantity,
-      price: item.from_price,
-      total: item.from_price * item.quantity
-    })),
-    total_value: items.reduce((acc, item) => acc + (item.from_price * item.quantity), 0),
-    currency: "USD",
-    timestamp: new Date().toISOString()
+      price: item.from_price
+    }))
   });
 };
 
@@ -49,14 +37,11 @@ export const trackCheckoutCompleted = (
     shipping_cost: shippingCost,
     customer_email: customerEmail,
     shipping_address: shippingInfo,
-    currency: "USD",
     products: items.map(item => ({
       product_id: item.id,
       product_name: item.name,
       quantity: item.quantity,
-      price: item.from_price,
-      total: item.from_price * item.quantity
-    })),
-    timestamp: new Date().toISOString()
+      price: item.from_price
+    }))
   });
 };
