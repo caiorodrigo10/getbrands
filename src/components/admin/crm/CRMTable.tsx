@@ -4,10 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { UserTableHeader } from "./components/UserTableHeader";
 import { UserTableRow } from "./components/UserTableRow";
-import { CRMUser } from "./types";
 import { useUserSelection } from "./hooks/useUserSelection";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 import { CRMSelectionBar } from "./CRMSelectionBar";
+import { CRMUser } from "./types";
 
 export function CRMTable() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
