@@ -7,6 +7,7 @@ interface ProductCategoriesStepProps {
   selected: string[];
   onAnswer: (categories: string[]) => void;
   onNext: () => void;
+  onBack?: () => void; // Added onBack as optional prop
 }
 
 const categories = [
@@ -45,7 +46,8 @@ const categories = [
 export const ProductCategoriesStep = ({ 
   selected, 
   onAnswer,
-  onNext 
+  onNext,
+  onBack 
 }: ProductCategoriesStepProps) => {
   const toggleCategory = (categoryId: string) => {
     const newSelected = selected.includes(categoryId)
@@ -104,8 +106,9 @@ export const ProductCategoriesStep = ({
 
       <QuizNavigation
         onNext={onNext}
+        onBack={onBack}
         isNextDisabled={selected.length === 0}
-        showBack={false}
+        showBack={!!onBack}
       />
     </div>
   );
