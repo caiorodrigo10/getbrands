@@ -27,6 +27,7 @@ import PackageQuizPage from "@/pages/PackageQuizPage";
 import OnboardingQuizPage from "@/pages/OnboardingQuiz";
 import { OnboardingQuizPT } from "@/pages/pt/OnboardingQuiz";
 import ComecarPT from "@/pages/pt/ComecarPT";
+import DemoScheduling from "@/pages/DemoScheduling";
 
 export const AppRoutes = () => {
   const location = useLocation();
@@ -135,6 +136,8 @@ export const AppRoutes = () => {
             <ProfitCalculator />
           </ProtectedRoute>
         } />
+
+        <Route path="/schedule-demo" element={<DemoScheduling />} />
 
         <Route path="*" element={<Error404 />} />
       </Route>

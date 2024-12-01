@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import UserMenu from "./UserMenu";
-import { Menu, LayoutDashboard, FolderGit2, Grid3X3, Package, Calculator, Package2, PlayCircle } from "lucide-react";
+import { Menu, LayoutDashboard, FolderGit2, Grid3X3, Package, Calculator, Package2, PlayCircle, Calendar } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useUserPermissions } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
@@ -51,6 +51,12 @@ export const NavigationMenu = () => {
       label: "Sample Orders", 
       path: "/sample-orders", 
       icon: Package2,
+      restricted: false
+    },
+    { 
+      label: "Schedule Demo", 
+      path: "/schedule-demo", 
+      icon: Calendar,
       restricted: false
     },
     ...(showStartHere ? [
