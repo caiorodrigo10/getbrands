@@ -14,8 +14,11 @@ export function CartButton() {
   const { items } = useCart();
   const navigate = useNavigate();
 
-  const handleCartClick = () => {
-    // Usando a nova estrutura de eventos
+  const handleCartClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Track cart view event
     trackCartView({
       items: items.map(item => ({
         product_id: item.id,
@@ -25,7 +28,9 @@ export function CartButton() {
       })),
       items_count: items.length
     });
-    navigate("/checkout/confirmation");
+
+    // Navigate to checkout with replace to prevent back navigation issues
+    navigate("/checkout/confirmation", { replace: true });
   };
 
   return (
