@@ -3,7 +3,6 @@ import CatalogHeader from "@/components/CatalogHeader";
 import CatalogFilters from "@/components/CatalogFilters";
 import ProductGrid from "@/components/ProductGrid";
 import CatalogPagination from "./CatalogPagination";
-import { CartButton } from "@/components/CartButton";
 import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
@@ -83,7 +82,6 @@ const CatalogLayout = () => {
         </div>
         <div className="flex items-center gap-4 w-full md:w-auto">
           <CatalogHeader />
-          <CartButton />
         </div>
       </div>
 

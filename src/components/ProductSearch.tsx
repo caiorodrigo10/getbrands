@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Command } from "cmdk";
 import { Search } from "lucide-react";
-import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { useToast } from "@/components/ui/use-toast";
@@ -14,14 +13,12 @@ interface ProductsResponse {
 }
 
 interface ProductSearchProps {
-  addToCart?: boolean;
   onSelectProduct?: (product: Product) => void;
 }
 
-export const ProductSearch = ({ addToCart, onSelectProduct }: ProductSearchProps) => {
+export const ProductSearch = ({ onSelectProduct }: ProductSearchProps) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const { addItem } = useCart();
   const { toast } = useToast();
   const searchRef = useRef<HTMLDivElement>(null);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -66,22 +63,6 @@ export const ProductSearch = ({ addToCart, onSelectProduct }: ProductSearchProps
   }, [query, productsQuery.data]);
 
   const handleSelect = async (product: Product) => {
-    if (addToCart) {
-      try {
-        await addItem(product);
-        toast({
-          title: "Success",
-          description: "Product added to cart",
-        });
-        setOpen(false);
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to add product to cart. Please try again.",
-        });
-      }
-    }
     if (onSelectProduct) {
       onSelectProduct(product);
       setOpen(false);

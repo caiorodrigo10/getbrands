@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useCart } from "@/contexts/CartContext";
 import { trackEvent } from "@/lib/analytics";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
@@ -8,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 
 export const useProductActions = (productId: string) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { addItem } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -25,15 +23,13 @@ export const useProductActions = (productId: string) => {
         
       if (error) throw error;
       
-      await addItem(product as Product);
-      
       // Track sample request event
       trackEvent("Sample Requested", {
         product_id: productId
       });
 
-      // Navigate to checkout after successful add
-      navigate("/checkout/confirmation", { replace: true });
+      // Navigate to catalog after successful request
+      navigate("/catalog", { replace: true });
       
       // Return true to indicate success
       return true;
@@ -42,7 +38,7 @@ export const useProductActions = (productId: string) => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to add sample to cart. Please try again.",
+        description: "Failed to request sample. Please try again.",
       });
       throw error;
     } finally {
