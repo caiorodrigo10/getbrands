@@ -49,13 +49,34 @@ export interface CheckoutEvent extends BaseEvent {
   orderId: string;
   total: number;
   shippingCost: number;
+  subtotal: number;
   customerEmail: string;
-  products: {
+  customerName?: string;
+  paymentMethod: string;
+  shippingAddress: {
+    address1: string;
+    address2?: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
+  billingAddress?: {
+    address1: string;
+    address2?: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
+  products: Array<{
     product_id: string;
     product_name: string;
     quantity: number;
     price: number;
-  }[];
+    category?: string;
+    image_url?: string;
+  }>;
 }
 
 // Eventos de Marketing
@@ -74,4 +95,3 @@ export interface PageEvent extends BaseEvent {
   referrer?: string;
   search?: string;
 }
-

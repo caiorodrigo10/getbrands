@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { createOrder } from "@/lib/utils/paymentUtils";
 import { PaymentFormButton } from "./payment/PaymentFormButton";
 import { useCreateSampleRequest } from "./payment/useCreateSampleRequest";
-import { trackCheckoutCompleted } from "@/lib/analytics/events";
+import { trackOrderCompleted, trackCheckoutStepCompleted } from "@/lib/analytics/events/checkout";
 
 interface PaymentFormProps {
   clientSecret: string;
@@ -44,6 +44,25 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         total
       });
 
+      const shippingAddress = {
+        address1: localStorage.getItem('shipping_address') || '',
+        address2: localStorage.getItem('shipping_address2') || '',
+        city: localStorage.getItem('shipping_city') || '',
+        state: localStorage.getItem('shipping_state') || '',
+        zipCode: localStorage.getItem('shipping_zip') || '',
+        country: 'US'
+      };
+
+      const useSameForBilling = localStorage.getItem('useSameForBilling') === 'true';
+      const billingAddress = useSameForBilling ? shippingAddress : {
+        address1: localStorage.getItem('billing_address') || '',
+        address2: localStorage.getItem('billing_address2') || '',
+        city: localStorage.getItem('billing_city') || '',
+        state: localStorage.getItem('billing_state') || '',
+        zipCode: localStorage.getItem('billing_zip') || '',
+        country: 'US'
+      };
+
       const { error: paymentError, paymentIntent } = await stripe.confirmPayment({
         elements,
         redirect: 'if_required',
@@ -54,10 +73,11 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
               email: user.email,
               phone: localStorage.getItem('phone') || undefined,
               address: {
-                line1: localStorage.getItem('shipping_address') || undefined,
-                city: localStorage.getItem('shipping_city') || undefined,
-                state: localStorage.getItem('shipping_state') || undefined,
-                postal_code: localStorage.getItem('shipping_zip') || undefined,
+                line1: billingAddress.address1,
+                line2: billingAddress.address2,
+                city: billingAddress.city,
+                state: billingAddress.state,
+                postal_code: billingAddress.zipCode,
                 country: 'US',
               },
             },
@@ -67,9 +87,6 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
       });
 
       if (paymentError) {
-        if (paymentError.type === 'validation_error' && paymentError.code === 'invalid_zip') {
-          throw new Error("Please verify that the ZIP code is in the correct format (e.g., 12345 or 12345-678)");
-        }
         throw paymentError;
       }
 
@@ -84,10 +101,32 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         orderId,
       });
 
-      // Usando a nova estrutura de eventos
-      await trackCheckoutCompleted({
+      // Track successful order completion
+      await trackOrderCompleted({
         orderId,
         total,
+        subtotal,
+        shippingCost,
+        customerEmail: user.email,
+        customerName: `${localStorage.getItem('firstName')} ${localStorage.getItem('lastName')}`,
+        paymentMethod: 'credit_card',
+        shippingAddress,
+        billingAddress: useSameForBilling ? undefined : billingAddress,
+        products: items.map(item => ({
+          product_id: item.id,
+          product_name: item.name,
+          quantity: item.quantity || 1,
+          price: item.from_price,
+          category: item.category,
+          image_url: item.image_url
+        }))
+      });
+
+      // Track payment step completion
+      await trackCheckoutStepCompleted('payment', {
+        orderId,
+        total,
+        subtotal,
         shippingCost,
         customerEmail: user.email,
         products: items.map(item => ({
