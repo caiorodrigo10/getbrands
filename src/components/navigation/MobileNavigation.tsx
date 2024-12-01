@@ -4,7 +4,9 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import UserMenu from "../UserMenu";
 import { ProjectPointsInfo } from "./ProjectPointsInfo";
+import { ScheduleDemoInfo } from "./ScheduleDemoInfo";
 import { MenuItem } from "./types";
+import { useUserPermissions } from "@/lib/permissions";
 
 interface MobileNavigationProps {
   menuItems: MenuItem[];
@@ -19,6 +21,8 @@ export const MobileNavigation = ({
   isOpen, 
   setIsOpen 
 }: MobileNavigationProps) => {
+  const { hasFullAccess, isMember, isSampler } = useUserPermissions();
+
   return (
     <>
       <header className="md:hidden fixed top-0 left-0 right-0 border-b border-gray-200 bg-[#fafafa] z-40">
@@ -47,6 +51,8 @@ export const MobileNavigation = ({
                     <nav className="flex-1 overflow-y-auto p-4">
                       {menuItems.map(item => renderMenuItem(item, true))}
                     </nav>
+                    {hasFullAccess && <ProjectPointsInfo />}
+                    {(isMember || isSampler) && <ScheduleDemoInfo />}
                     <div className="p-4 border-t border-gray-200">
                       <ProjectPointsInfo />
                     </div>
