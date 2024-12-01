@@ -52,7 +52,6 @@ const ProductDetails = () => {
 
   useEffect(() => {
     if (product) {
-      // Enhanced product view tracking with more details
       trackEvent("Product Viewed", {
         product_id: product.id,
         product_name: product.name,
