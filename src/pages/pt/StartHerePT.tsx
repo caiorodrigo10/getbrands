@@ -89,7 +89,7 @@ const StartHerePT = () => {
             className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white"
             size="lg"
           >
-            Explorar Catálogo de Produtos
+            Ver Catálogo
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </Link>
