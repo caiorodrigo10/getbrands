@@ -10,10 +10,18 @@ import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { useAuth } from "@/contexts/AuthContext";
 import { trackOnboardingStarted, trackOnboardingStepCompleted, trackOnboardingCompleted } from "@/lib/analytics/onboarding";
 
+interface StepProps {
+  onNext: () => void;
+  onBack?: () => void;
+  selected?: string | string[];
+  onAnswer?: (value: string | string[]) => void;
+  onComplete?: () => void;
+}
+
 type Step = {
   name: string;
-  component: React.ComponentType<any>;
-  props: Record<string, any>;
+  component: React.ComponentType<StepProps>;
+  props: StepProps;
 };
 
 export function OnboardingQuiz() {
