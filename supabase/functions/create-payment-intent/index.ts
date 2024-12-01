@@ -18,16 +18,16 @@ serve(async (req) => {
   }
 
   try {
-    const { amount, currency = 'usd', shipping_amount } = await req.json();
+    const { amount, shipping_amount } = await req.json();
 
-    console.log('Creating payment intent with:', { amount, currency, shipping_amount });
+    console.log('Creating payment intent with:', { amount, currency: 'usd', shipping_amount });
 
     // Calculate total amount including shipping
     const totalAmount = amount + (shipping_amount || 0);
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: totalAmount,
-      currency,
+      currency: 'usd',
       automatic_payment_methods: {
         enabled: true,
       },

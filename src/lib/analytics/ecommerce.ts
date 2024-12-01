@@ -8,7 +8,7 @@ export const trackAddToCart = (item: CartItem) => {
     category: item.category,
     price: item.from_price,
     quantity: item.quantity,
-    currency: "BRL",
+    currency: "USD",
     total_value: item.from_price * item.quantity,
     timestamp: new Date().toISOString()
   });
@@ -30,7 +30,7 @@ export const trackCheckoutStep = (
       total: item.from_price * item.quantity
     })),
     total_value: items.reduce((acc, item) => acc + (item.from_price * item.quantity), 0),
-    currency: "BRL",
+    currency: "USD",
     timestamp: new Date().toISOString()
   });
 };
@@ -49,7 +49,7 @@ export const trackCheckoutCompleted = (
     shipping_cost: shippingCost,
     customer_email: customerEmail,
     shipping_address: shippingInfo,
-    currency: "BRL",
+    currency: "USD",
     products: items.map(item => ({
       product_id: item.id,
       product_name: item.name,
