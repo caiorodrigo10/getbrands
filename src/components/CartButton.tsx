@@ -17,8 +17,6 @@ export function CartButton() {
 
   const handleCartClick = async () => {
     console.log('[DEBUG] CartButton - Click event triggered');
-    console.log('[DEBUG] CartButton - Current location:', location.pathname);
-    console.log('[DEBUG] CartButton - Cart items:', items);
     
     if (items.length === 0) {
       console.log('[DEBUG] CartButton - Cart is empty, not navigating');
@@ -26,7 +24,9 @@ export function CartButton() {
     }
 
     try {
-      console.log('[DEBUG] CartButton - Tracking cart view before navigation');
+      console.log('[DEBUG] CartButton - Current location:', location.pathname);
+      console.log('[DEBUG] CartButton - Cart items:', items);
+      
       await trackCartView({
         items: items.map(item => ({
           product_id: item.id,

@@ -40,7 +40,6 @@ export const AppRoutes = () => {
 
   return (
     <Routes>
-      {/* Root Route */}
       <Route element={<AppLayout />}>
         <Route path="/" element={
           <ProtectedRoute>
@@ -164,7 +163,7 @@ export const AppRoutes = () => {
         </ProtectedRoute>
       } />
 
-      {/* Checkout Routes - Mantidas fora do AppLayout */}
+      {/* Checkout Routes */}
       <Route path="/checkout/*" element={
         <ProtectedRoute>
           <Checkout />
