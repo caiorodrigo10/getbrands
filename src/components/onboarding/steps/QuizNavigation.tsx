@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useLocation } from "react-router-dom";
 
 interface QuizNavigationProps {
   onNext: () => void;
@@ -19,8 +20,12 @@ export const QuizNavigation = ({
   showBack = true,
   isOnboarding = false,
 }: QuizNavigationProps) => {
-  const defaultNextLabel = isOnboarding ? "Next" : "Próximo";
-  const defaultBackLabel = isOnboarding ? "Back" : "Voltar";
+  const location = useLocation();
+  const isOnboardingRoute = location.pathname === "/onboarding";
+  const shouldUseEnglish = isOnboardingRoute || isOnboarding;
+  
+  const defaultNextLabel = shouldUseEnglish ? "Next" : "Próximo";
+  const defaultBackLabel = shouldUseEnglish ? "Back" : "Voltar";
 
   return (
     <div className="flex justify-between mt-8">
