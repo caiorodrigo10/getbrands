@@ -4,7 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Product } from "@/types/product";
 import { CartItem } from "@/types/cart";
 import { User } from "@supabase/supabase-js";
-import { trackAddToCart } from "@/lib/analytics/ecommerce";
+import { trackAddToCart } from "@/lib/analytics/events";
 
 export const useCartOperations = (user: User | null) => {
   const [items, setItems] = useState<CartItem[]>([]);

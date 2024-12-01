@@ -28,7 +28,7 @@ export interface OnboardingEvent extends BaseEvent {
 // Eventos de Produto
 
 // Product Events
-export interface ProductEvent extends BaseEvent {
+export interface ProductEvent {
   productId: string;
   productName: string;
   category?: string;

@@ -84,3 +84,30 @@ export const trackProductFilter = async (filters: Record<string, any>, resultsCo
     }
   }
 };
+
+export const trackProductCalculatorUsage = async (product: Product, calculatedData: {
+  sellingPrice: number;
+  profit: number;
+  quantity: number;
+}) => {
+  try {
+    await waitForAnalytics();
+    window.analytics.track('Product Calculator Used', {
+      productId: product.id,
+      productName: product.name,
+      category: product.category,
+      fromPrice: product.from_price,
+      srp: product.srp,
+      sellingPrice: calculatedData.sellingPrice,
+      profit: calculatedData.profit,
+      quantity: calculatedData.quantity,
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV,
+      source: 'web_app'
+    });
+  } catch (error) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error tracking calculator usage:', error);
+    }
+  }
+};

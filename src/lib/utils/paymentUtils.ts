@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { formatPhoneForShopify } from "./phoneFormatter";
 import { createShopifyOrder } from "@/lib/shopify/createOrder";
-import { trackCheckoutCompleted } from "@/lib/analytics/ecommerce";
+import { trackOrderCompleted } from "@/lib/analytics/events";
 import type { CartItem } from "@/types/cart";
 
 interface CreateOrderParams {
@@ -61,7 +61,7 @@ export const createOrder = async ({ user, items, total, shippingCost, orderId }:
   });
 
   // Track successful checkout
-  trackCheckoutCompleted(
+  trackOrderCompleted(
     orderId,
     items,
     {
