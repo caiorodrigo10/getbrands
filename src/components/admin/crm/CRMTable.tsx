@@ -52,7 +52,7 @@ export function CRMTable() {
       <div className="rounded-md border">
         <Table>
           <UserTableHeader
-            onSelectAll={handleSelectAll}
+            onSelectAll={(checked: boolean) => handleSelectAll(checked)}
             allSelected={allSelected}
           />
           <TableBody>

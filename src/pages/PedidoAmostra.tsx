@@ -1,72 +1,97 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
-import { useShippingCalculation } from "@/hooks/useShippingCalculation";
-import { ProductSearch } from "@/components/ProductSearch";
+import { Card } from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
 import { ProductListItem } from "@/components/sample-order/ProductListItem";
 import { OrderSummary } from "@/components/sample-order/OrderSummary";
 import { ShippingCountrySelect } from "@/components/sample-order/ShippingCountrySelect";
 import { ActionButtons } from "@/components/sample-order/ActionButtons";
 
-const PedidoAmostra = () => {
+export default function PedidoAmostra() {
   const navigate = useNavigate();
-  const [selectedCountry] = useState("USA");
-  const { items, updateQuantity, removeItem } = useCart();
+  const { items, updateQuantity, removeItem, clearCart } = useCart();
+  const { toast } = useToast();
+  const [selectedCountry, setSelectedCountry] = useState("US");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  
-  const { data: shippingCost, isError } = useShippingCalculation(
-    selectedCountry,
-    totalItems
-  );
+  useEffect(() => {
+    if (items.length === 0) {
+      navigate("/catalog");
+    }
+  }, [items.length, navigate]);
 
-  const handleQuantityChange = (itemId: string, newQuantity: number) => {
-    updateQuantity(itemId, Math.max(1, newQuantity));
+  const subtotal = items.reduce((sum, item) => sum + (item.from_price * (item.quantity || 1)), 0);
+  const shippingCost = 4.50; // Fixed shipping cost
+  const total = subtotal + shippingCost;
+
+  const handleContinue = () => {
+    if (items.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "Cart is empty",
+        description: "Please add items to your cart before proceeding.",
+      });
+      return;
+    }
+
+    navigate("/checkout/shipping");
   };
 
-  const calculateSubtotal = () => {
-    return items.reduce((total, item) => total + (item.from_price * item.quantity), 0);
-  };
-
-  const handleProceedToShipping = () => {
-    if (selectedCountry && items.length > 0) {
-      navigate("/checkout/shipping");
+  const handleCancel = async () => {
+    setIsLoading(true);
+    try {
+      await clearCart();
+      navigate("/catalog");
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to clear cart. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const subtotal = calculateSubtotal();
-
   return (
-    <div className="max-w-4xl mx-auto px-0 sm:px-4 space-y-6">
-      <div className="flex-1">
-        <ProductSearch addToCart />
-      </div>
+    <div className="container max-w-4xl py-8">
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-2xl font-semibold mb-4">Sample Order</h1>
+          <Card className="p-6">
+            <div className="space-y-6">
+              {items.map((item) => (
+                <ProductListItem
+                  key={item.id}
+                  item={item}
+                  onUpdateQuantity={updateQuantity}
+                  onRemove={removeItem}
+                />
+              ))}
+            </div>
+          </Card>
+        </div>
 
-      <div className="space-y-4 mb-6">
-        {items.map((item) => (
-          <ProductListItem
-            key={item.id}
-            item={item}
-            onQuantityChange={handleQuantityChange}
-            onRemove={removeItem}
-          />
-        ))}
+        <Card className="p-6">
+          <div className="space-y-6">
+            <ShippingCountrySelect
+              selectedCountry={selectedCountry}
+              onCountryChange={setSelectedCountry}
+            />
+            <OrderSummary
+              subtotal={subtotal}
+              shippingCost={shippingCost}
+              total={total}
+            />
+            <ActionButtons
+              isLoading={isLoading}
+              onCancel={handleCancel}
+              onContinue={handleContinue}
+            />
+          </div>
+        </Card>
       </div>
-
-      <div className="flex justify-between items-start gap-6">
-        <ShippingCountrySelect selectedCountry={selectedCountry} />
-        <OrderSummary 
-          subtotal={subtotal}
-          shippingCost={shippingCost || 0}
-        />
-      </div>
-
-      <ActionButtons
-        onProceed={handleProceedToShipping}
-        disabled={!selectedCountry || items.length === 0}
-      />
     </div>
   );
-};
-
-export default PedidoAmostra;
+}
