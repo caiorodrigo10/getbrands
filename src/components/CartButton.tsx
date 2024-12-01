@@ -15,14 +15,11 @@ export function CartButton() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleCartClick = async (e: React.MouseEvent) => {
+  const handleCartClick = async () => {
     console.log('[DEBUG] CartButton - Click event triggered');
     console.log('[DEBUG] CartButton - Current location:', location.pathname);
     console.log('[DEBUG] CartButton - Cart items:', items);
     
-    e.preventDefault();
-    e.stopPropagation();
-
     if (items.length === 0) {
       console.log('[DEBUG] CartButton - Cart is empty, not navigating');
       return;
