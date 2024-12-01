@@ -136,7 +136,33 @@ export const AppRoutes = () => {
           </ProtectedRoute>
         } />
 
-        <Route path="*" element={<Error404 />} />
+        <Route path="/checkout/confirmation" element={
+          <ProtectedRoute>
+            <Checkout />
+          </ProtectedRoute>
+        } />
+        <Route path="/checkout/shipping" element={
+          <ProtectedRoute>
+            <Checkout />
+          </ProtectedRoute>
+        } />
+        <Route path="/checkout/payment" element={
+          <ProtectedRoute>
+            <Checkout />
+          </ProtectedRoute>
+        } />
+        <Route path="/checkout/points" element={
+          <ProtectedRoute>
+            <Checkout />
+          </ProtectedRoute>
+        } />
+
+        {/* Success page as a standalone route */}
+        <Route path="/checkout/success" element={
+          <ProtectedRoute>
+            <Success />
+          </ProtectedRoute>
+        } />
       </Route>
 
       {/* Portuguese Routes */}
