@@ -59,7 +59,7 @@ const StartHerePT = () => {
       
       <h2 className="text-2xl font-semibold mb-4">Começando</h2>
       <p className="text-gray-600 mb-6">
-        Bem-vindo! Assista ao nosso vídeo de introdução rápida para aprender como aproveitar ao máximo nossa plataforma e começar a criar produtos incríveis.
+        Assista ao nosso vídeo de introdução e aprenda como criar produtos incríveis em nossa plataforma.
       </p>
       
       <div className="mb-8 rounded-xl overflow-hidden">
