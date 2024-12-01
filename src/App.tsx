@@ -8,7 +8,7 @@ import { CartProvider } from "./contexts/CartContext";
 import { AppRoutes } from "./routes/AppRoutes";
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { debugAnalytics } from "./lib/analytics/debug";
 import { trackPage } from "./lib/analytics";
 
@@ -27,21 +27,32 @@ const queryClient = new QueryClient({
 // Component to handle route changes
 const RouteTracker = () => {
   const location = useLocation();
+  const lastTrackedPath = useRef(location.pathname);
 
   useEffect(() => {
-    trackPage({
-      path: location.pathname,
-      search: location.search,
-      url: window.location.href
-    });
+    // Só dispara o evento se o path mudou
+    if (lastTrackedPath.current !== location.pathname) {
+      trackPage({
+        path: location.pathname,
+        search: location.search,
+        url: window.location.href
+      });
+      lastTrackedPath.current = location.pathname;
+    }
   }, [location]);
 
   return null;
 };
 
 const App = () => {
+  // Usar useRef para garantir que debugAnalytics só é chamado uma vez
+  const analyticsInitialized = useRef(false);
+
   useEffect(() => {
-    debugAnalytics();
+    if (!analyticsInitialized.current) {
+      debugAnalytics();
+      analyticsInitialized.current = true;
+    }
   }, []);
 
   return (
