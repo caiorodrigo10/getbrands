@@ -1,15 +1,35 @@
 import { Route } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
-import Checkout from "@/pages/checkout/Checkout";
+import CartReview from "@/pages/checkout/CartReview";
+import Shipping from "@/pages/checkout/Shipping";
+import Payment from "@/pages/checkout/Payment";
 import Success from "@/pages/checkout/Success";
 
 export const CheckoutRoutes = [
   <Route
     key="checkout"
-    path="/checkout/*"
+    path="/checkout"
     element={
       <ProtectedRoute>
-        <Checkout />
+        <CartReview />
+      </ProtectedRoute>
+    }
+  />,
+  <Route
+    key="checkout-shipping"
+    path="/checkout/shipping"
+    element={
+      <ProtectedRoute>
+        <Shipping />
+      </ProtectedRoute>
+    }
+  />,
+  <Route
+    key="checkout-payment"
+    path="/checkout/payment"
+    element={
+      <ProtectedRoute>
+        <Payment />
       </ProtectedRoute>
     }
   />,
