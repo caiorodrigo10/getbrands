@@ -1,45 +1,50 @@
-import {
-  Table,
-  TableBody,
-} from "@/components/ui/table";
-import { UserProfileEditModal } from "./UserProfileEditModal";
-import { CRMSelectionBar } from "./CRMSelectionBar";
-import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
+import React, { useState } from 'react';
+import { Table, TableBody } from "@/components/ui/table";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { UserTableHeader } from "./components/UserTableHeader";
 import { UserTableRow } from "./components/UserTableRow";
-import { useUserSelection } from "./hooks/useUserSelection";
 import { CRMUser } from "./types";
+import { useUserSelection } from "./hooks/useUserSelection";
+import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
+import { SelectionBar } from "./SelectionBar";
 
-interface CRMTableProps {
-  users: CRMUser[];
-  onUserUpdated: () => void;
-  totalUsers: number;
-}
+export function CRMTable() {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-export const CRMTable = ({ users, onUserUpdated, totalUsers }: CRMTableProps) => {
-  const [selectedUser, setSelectedUser] = useState<CRMUser | null>(null);
-  
+  const { data: users = [], refetch } = useQuery({
+    queryKey: ['crm-users'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('crm_view')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data as CRMUser[];
+    },
+  });
+
   const {
     selectedUsers,
     selectAllPages,
-    showDeleteDialog,
-    setShowDeleteDialog,
     handleSelectUser,
     handleSelectAll,
     handleSelectAllPages,
     handleDeleteSelected
-  } = useUserSelection(users, onUserUpdated, totalUsers);
+  } = useUserSelection(users, refetch, users.length);
+
+  const allSelected = users.length > 0 && selectedUsers.length === users.length;
 
   return (
-    <>
+    <div className="space-y-4">
       {selectedUsers.length > 0 && (
-        <CRMSelectionBar
-          selectedCount={selectAllPages ? totalUsers : selectedUsers.length}
-          totalCount={totalUsers}
+        <SelectionBar
+          selectedCount={selectedUsers.length}
+          totalCount={users.length}
           selectAllPages={selectAllPages}
           onSelectAllPages={handleSelectAllPages}
-          onDeleteClick={() => setShowDeleteDialog(true)}
-          usersInPage={users.length}
+          onDelete={() => setShowDeleteDialog(true)}
         />
       )}
 
@@ -47,37 +52,27 @@ export const CRMTable = ({ users, onUserUpdated, totalUsers }: CRMTableProps) =>
         <Table>
           <UserTableHeader
             onSelectAll={handleSelectAll}
-            allSelected={selectedUsers.length === users.length || selectAllPages}
+            allSelected={allSelected}
           />
           <TableBody>
             {users.map((user) => (
               <UserTableRow
                 key={user.id}
                 user={user}
-                isSelected={selectedUsers.includes(user.id) || selectAllPages}
-                onSelect={handleSelectUser}
-                onEdit={setSelectedUser}
+                selected={selectedUsers.includes(user.id)}
+                onSelect={(checked) => handleSelectUser(user.id, checked)}
               />
             ))}
           </TableBody>
         </Table>
       </div>
 
-      {selectedUser && (
-        <UserProfileEditModal
-          isOpen={!!selectedUser}
-          onClose={() => setSelectedUser(null)}
-          user={selectedUser}
-          onUserUpdated={onUserUpdated}
-        />
-      )}
-
       <DeleteConfirmationDialog
-        open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
+        isOpen={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
         onConfirm={handleDeleteSelected}
-        selectAllPages={selectAllPages}
+        count={selectedUsers.length}
       />
-    </>
+    </div>
   );
-};
+}
