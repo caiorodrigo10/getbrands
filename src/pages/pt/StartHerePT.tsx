@@ -95,7 +95,7 @@ const StartHerePT = () => {
         </Link>
         <Link to="/schedule-demo">
           <Button 
-            className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white"
+            className="w-full border-2 border-[#f0562e] text-[#f0562e] hover:bg-[#f0562e]/10 bg-transparent"
             size="lg"
           >
             Agendar Reunião
