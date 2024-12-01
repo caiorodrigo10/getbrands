@@ -3,7 +3,6 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import { AppLayout } from "./AppLayout";
 import { MarketingRoutes } from "./MarketingRoutes";
 import { AdminRoutes } from "./AdminRoutes";
-import { CheckoutRoutes } from "./CheckoutRoutes";
 import Login from "@/pages/Login";
 import SignUp from "@/pages/SignUp";
 import SignUpPT from "@/pages/pt/SignUp";
@@ -19,6 +18,8 @@ import ProductDetails from "@/pages/ProductDetails";
 import ProductSelectedSuccess from "@/pages/products/ProductSelectedSuccess";
 import Documents from "@/pages/Documents";
 import SampleOrders from "@/pages/SampleOrders";
+import Checkout from "@/pages/checkout/Checkout";
+import Success from "@/pages/checkout/Success";
 import ProfitCalculator from "@/pages/ProfitCalculator";
 import Error404 from "@/pages/Error404";
 import PackageQuizPage from "@/pages/PackageQuizPage";
@@ -129,17 +130,18 @@ export const AppRoutes = () => {
         } />
       </Route>
 
-      {/* Checkout Routes - Outside AppLayout */}
-      {CheckoutRoutes}
-
-      {/* Portuguese Routes */}
-      <Route path="/pt/signup" element={<SignUpPT />} />
-      <Route path="/pt/onboarding" element={
+      {/* Standalone Checkout Routes */}
+      <Route path="/checkout/*" element={
         <ProtectedRoute>
-          <OnboardingQuizPT />
+          <Checkout />
         </ProtectedRoute>
       } />
-      <Route path="/comecarpt" element={<ComecarPT />} />
+      
+      <Route path="/checkout/success" element={
+        <ProtectedRoute>
+          <Success />
+        </ProtectedRoute>
+      } />
 
       {/* Marketing Routes */}
       {MarketingRoutes}
@@ -155,9 +157,6 @@ export const AppRoutes = () => {
           <AdminRoutes />
         </ProtectedRoute>
       } />
-
-      {/* Catch all route */}
-      <Route path="*" element={<Error404 />} />
     </Routes>
   );
 };
