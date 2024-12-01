@@ -4,10 +4,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Coins, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useUserPermissions } from "@/lib/permissions";
+import { DemoCallInfo } from "./DemoCallInfo";
 
 export const ProjectPointsInfo = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { isMember, isSampler, hasFullAccess } = useUserPermissions();
 
   const { data: totalPoints } = useQuery({
     queryKey: ["total-project-points", user?.id],
@@ -26,8 +29,12 @@ export const ProjectPointsInfo = () => {
         return total + availablePoints;
       }, 0);
     },
-    enabled: !!user,
+    enabled: !!user && hasFullAccess,
   });
+
+  if (isMember || isSampler) {
+    return <DemoCallInfo />;
+  }
 
   if (!totalPoints) return null;
 
