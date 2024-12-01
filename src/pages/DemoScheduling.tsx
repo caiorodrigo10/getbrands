@@ -23,7 +23,7 @@ const DemoScheduling = () => {
   }, []);
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="py-8 space-y-6">
       <div className="max-w-3xl mx-auto space-y-6">
         <div className="text-center space-y-4">
           <h1 className="text-3xl font-bold">Schedule a Demo</h1>
