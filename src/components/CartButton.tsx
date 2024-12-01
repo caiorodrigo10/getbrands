@@ -15,10 +15,23 @@ export function CartButton() {
   const navigate = useNavigate();
 
   const handleCartClick = (e: React.MouseEvent) => {
+    console.log('[DEBUG] CartButton - Click event triggered');
+    console.log('[DEBUG] CartButton - Event details:', { 
+      type: e.type,
+      defaultPrevented: e.defaultPrevented,
+      propagationStopped: e.isPropagationStopped(),
+      target: e.target,
+      currentTarget: e.currentTarget
+    });
+    
     e.preventDefault();
+    console.log('[DEBUG] CartButton - After preventDefault');
+    
     e.stopPropagation();
+    console.log('[DEBUG] CartButton - After stopPropagation');
     
     // Track cart view event
+    console.log('[DEBUG] CartButton - Tracking cart view with items:', items);
     trackCartView({
       items: items.map(item => ({
         product_id: item.id,
@@ -29,8 +42,10 @@ export function CartButton() {
       items_count: items.length
     });
 
+    console.log('[DEBUG] CartButton - Attempting navigation to /checkout/confirmation');
     // Navigate to checkout
     navigate("/checkout/confirmation");
+    console.log('[DEBUG] CartButton - Navigation completed');
   };
 
   return (
