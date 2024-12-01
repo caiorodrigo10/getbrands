@@ -24,7 +24,14 @@ const CartReview = () => {
           shippingCost: 4.50,
           subtotal: items.reduce((sum, item) => sum + (item.from_price * (item.quantity || 1)), 0),
           customerEmail: '',  // Will be filled later in the checkout process
-          paymentMethod: 'credit_card'
+          paymentMethod: 'credit_card',
+          shippingAddress: {
+            address1: '',
+            city: '',
+            state: '',
+            zipCode: '',
+            country: 'US'
+          }
         });
       }
     };
