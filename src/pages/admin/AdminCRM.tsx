@@ -59,18 +59,6 @@ const AdminCRM = () => {
     },
   });
 
-  const filteredUsers = usersData?.users.filter((user) => {
-    if (!searchTerm) return true;
-    
-    const searchLower = searchTerm.toLowerCase();
-    const fullName = `${user.first_name || ""} ${user.last_name || ""}`.toLowerCase();
-    return (
-      fullName.includes(searchLower) ||
-      (user.email?.toLowerCase().includes(searchLower)) ||
-      (user.phone?.toLowerCase().includes(searchLower))
-    );
-  });
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -104,11 +92,7 @@ const AdminCRM = () => {
         </Button>
       </div>
 
-      <CRMTable 
-        users={filteredUsers || []} 
-        onUserUpdated={refetch}
-        totalUsers={usersData?.totalUsers || 0}
-      />
+      <CRMTable />
 
       {usersData?.totalPages && usersData.totalPages > 1 && (
         <div className="flex justify-center mt-6">

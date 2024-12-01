@@ -61,7 +61,7 @@ export function CRMTable() {
                 key={user.id}
                 user={user}
                 isSelected={selectedUsers.includes(user.id)}
-                onSelect={(checked) => handleSelectUser(user.id, checked)}
+                onSelect={(checked: boolean) => handleSelectUser(user.id, checked)}
                 onEdit={() => {}}
               />
             ))}
