@@ -89,21 +89,6 @@ const SignUp = () => {
       if (signUpError) throw signUpError;
 
       if (data?.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: data.user.id,
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            email: formData.email,
-            phone: formData.phone,
-            role: 'member',
-            language: 'en',
-            updated_at: new Date().toISOString()
-          });
-
-        if (profileError) throw profileError;
-
         // Track signup event in Segment
         if (window.analytics) {
           window.analytics.identify(data.user.id, {
