@@ -7,8 +7,8 @@ export const BrandBuildingSection = () => {
         <div className="flex flex-col lg:flex-row items-center gap-12">
           <div className="flex-1">
             <img 
-              src="https://content.app-sources.com/s/97257455971736356/uploads/Images/Brand_Building-7282327.jpg"
-              alt="Brand Building"
+              src="/lovable-uploads/c3c2f4ff-e9ee-44ef-a00c-93f8e6913fcf.png"
+              alt="Brand Building Professional"
               className="rounded-lg shadow-xl"
             />
           </div>
