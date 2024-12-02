@@ -115,7 +115,7 @@ export const CreativeSection = () => {
         </div>
       </section>
 
-      <section className="py-24 bg-[#F2FCE2]">
+      <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <div className="w-full aspect-square relative order-last md:order-first">
