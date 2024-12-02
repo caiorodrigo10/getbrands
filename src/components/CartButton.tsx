@@ -14,9 +14,12 @@ export function CartButton() {
   const { items } = useCart();
   const navigate = useNavigate();
 
+  // Calculate total quantity considering the quantity of each item
+  const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+
   const handleCartClick = () => {
     trackEvent("Cart Viewed", {
-      items_count: items.length,
+      items_count: totalQuantity,
       items: items.map(item => ({
         product_id: item.id,
         product_name: item.name,
@@ -38,9 +41,9 @@ export function CartButton() {
             onClick={handleCartClick}
           >
             <ShoppingCart className="h-5 w-5" />
-            {items.length > 0 && (
+            {totalQuantity > 0 && (
               <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {items.length}
+                {totalQuantity}
               </span>
             )}
           </Button>
@@ -52,3 +55,5 @@ export function CartButton() {
     </TooltipProvider>
   );
 }
+
+export default CartButton;

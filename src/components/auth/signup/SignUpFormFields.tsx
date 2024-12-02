@@ -29,7 +29,7 @@ export const SignUpFormFields = ({ formData, errors, setFormData }: SignUpFormFi
             onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
             required
             className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
-            placeholder="Nome"
+            placeholder="First Name"
           />
         </div>
         <div>
@@ -40,7 +40,7 @@ export const SignUpFormFields = ({ formData, errors, setFormData }: SignUpFormFi
             onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
             required
             className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
-            placeholder="Sobrenome"
+            placeholder="Last Name"
           />
         </div>
       </div>
@@ -52,7 +52,7 @@ export const SignUpFormFields = ({ formData, errors, setFormData }: SignUpFormFi
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           required
           className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20"
-          placeholder="seu@email.com"
+          placeholder="your@email.com"
         />
       </div>
       <div>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -9,12 +9,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { supabase } from "@/integrations/supabase/client";
 import { UserInfo } from "./user-menu/UserInfo";
 import { MobileMenu } from "./user-menu/MobileMenu";
 import { MenuItems } from "./user-menu/MenuItems";
 import { useSessionManagement } from "@/hooks/useSessionManagement";
-import { toast } from "sonner";
+import { useProfileManagement } from "@/hooks/useProfileManagement";
+import { errorMessages } from "@/utils/errorMessages";
 
 interface UserMenuProps {
   isMobile: boolean;
@@ -22,68 +22,21 @@ interface UserMenuProps {
 
 const UserMenu = ({ isMobile }: UserMenuProps) => {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const { handleLogout } = useSessionManagement();
   const [isInAdminPanel, setIsInAdminPanel] = useState(location.pathname.startsWith('/admin'));
+  const isPortuguese = location.pathname.startsWith('/pt');
 
-  useEffect(() => {
-    let isMounted = true;
+  const getErrorMessage = (key: string) => {
+    return errorMessages[key][isPortuguese ? 'pt' : 'en'];
+  };
 
-    const fetchProfile = async () => {
-      if (!user) {
-        setIsLoading(false);
-        return;
-      }
-      
-      try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error('Session error:', sessionError);
-          toast.error("Session error. Please try logging in again.");
-          navigate('/');
-          return;
-        }
-
-        if (!session) {
-          navigate('/');
-          return;
-        }
-
-        const { data, error } = await supabase
-          .from("profiles")
-          .select()
-          .eq("id", user.id)
-          .single();
-          
-        if (error) {
-          console.error('Error fetching profile:', error);
-          toast.error("Failed to load profile data. Please refresh the page.");
-          return;
-        }
-
-        if (data && isMounted) {
-          setProfile(data);
-        }
-      } catch (error) {
-        console.error('Error in profile fetch:', error);
-        toast.error("Network error. Please check your connection.");
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchProfile();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [user, navigate]);
+  const { profile, isLoading } = useProfileManagement({
+    user,
+    isPortuguese,
+    getErrorMessage,
+  });
 
   if (!user) return null;
 

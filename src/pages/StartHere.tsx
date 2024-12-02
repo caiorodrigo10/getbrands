@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Video } from "lucide-react";
 
 const StartHere = () => {
   const { user } = useAuth();
@@ -41,7 +41,7 @@ const StartHere = () => {
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto py-12 px-4">
+      <div className="max-w-3xl mx-auto py-12 px-6">
         <h1 className="text-2xl md:text-4xl font-bold mb-8">Loading...</h1>
       </div>
     );
@@ -52,7 +52,7 @@ const StartHere = () => {
     : "Welcome to GetBrands!";
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4">
+    <div className="max-w-3xl mx-auto py-12 px-6">
       <h1 className="text-2xl md:text-4xl font-bold mb-8">
         {welcomeMessage}
       </h1>
@@ -91,6 +91,15 @@ const StartHere = () => {
           >
             Explore Product Catalog
             <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        </Link>
+        <Link to="/schedule-demo">
+          <Button 
+            className="w-full border-2 border-[#f0562e] text-[#f0562e] hover:bg-[#f0562e]/10 bg-transparent"
+            size="lg"
+          >
+            Schedule Meeting
+            <Video className="ml-2 h-5 w-5" />
           </Button>
         </Link>
       </div>

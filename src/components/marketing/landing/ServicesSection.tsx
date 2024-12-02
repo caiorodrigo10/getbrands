@@ -26,8 +26,13 @@ export const ServicesSection = () => {
             </Button>
           </div>
 
-          <div className="relative aspect-square bg-gray-200 rounded-2xl">
-            <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent rounded-2xl" />
+          <div className="relative aspect-square rounded-2xl overflow-hidden">
+            <img 
+              src="/lovable-uploads/f410f3b7-9ef1-48ff-9b92-dfd4ea489f48.png"
+              alt="Private label cosmetic bottles and packaging"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent" />
           </div>
         </div>
       </div>

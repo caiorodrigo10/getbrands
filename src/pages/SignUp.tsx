@@ -57,6 +57,22 @@ const SignUp = () => {
     setIsLoading(true);
 
     try {
+      // First check if user exists
+      const { data: existingProfiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', formData.email);
+
+      if (profileError) {
+        throw profileError;
+      }
+
+      if (existingProfiles && existingProfiles.length > 0) {
+        toast.error("This email is already registered. Please try logging in instead.");
+        setIsLoading(false);
+        return;
+      }
+
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -70,30 +86,9 @@ const SignUp = () => {
         },
       });
 
-      if (signUpError) {
-        if (signUpError.message.includes("User already registered")) {
-          toast.error("This email is already registered. Please try logging in instead.");
-          return;
-        }
-        throw signUpError;
-      }
+      if (signUpError) throw signUpError;
 
       if (data?.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: data.user.id,
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            email: formData.email,
-            phone: formData.phone,
-            role: 'member',
-            language: 'en',
-            updated_at: new Date().toISOString()
-          });
-
-        if (profileError) throw profileError;
-
         // Track signup event in Segment
         if (window.analytics) {
           window.analytics.identify(data.user.id, {
@@ -119,7 +114,11 @@ const SignUp = () => {
       }
     } catch (error: any) {
       console.error("Error signing up:", error);
-      toast.error(error.message || "Failed to create account. Please try again.");
+      if (error.message.includes("User already registered")) {
+        toast.error("This email is already registered. Please try logging in instead.");
+      } else {
+        toast.error(error.message || "Failed to create account. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }

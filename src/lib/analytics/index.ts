@@ -88,9 +88,19 @@ export const trackPage = async (properties?: Record<string, any>) => {
   try {
     await waitForAnalytics();
     
+    // Define um nome específico para páginas especiais
+    let pageName = "Page Viewed";
+    const path = properties?.path || window.location.pathname;
+    
+    if (path === "/") {
+      pageName = "Homepage Viewed";
+    } else if (path === "/comecarpt") {
+      pageName = "Portuguese Start Page Viewed";
+    }
+    
     const pageProperties = {
       url: formatUrl(window.location.href),
-      path: window.location.pathname,
+      path: path,
       referrer: document.referrer,
       title: document.title,
       search: window.location.search,
@@ -101,8 +111,8 @@ export const trackPage = async (properties?: Record<string, any>) => {
       ...(properties?.url ? { url: formatUrl(properties.url) } : {})
     };
 
-    window.analytics.page("Page Viewed", pageProperties);
-    console.log('Page view:', pageProperties);
+    window.analytics.page(pageName, pageProperties);
+    console.log('Page view:', { pageName, properties: pageProperties });
   } catch (error) {
     console.error('Error tracking page view:', error);
     toast.error('Analytics Error: Failed to track page view');

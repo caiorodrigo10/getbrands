@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Video } from "lucide-react";
 
 const StartHerePT = () => {
   const { user } = useAuth();
@@ -41,7 +41,7 @@ const StartHerePT = () => {
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto py-12 px-4">
+      <div className="max-w-3xl mx-auto py-12 px-6">
         <h1 className="text-2xl md:text-4xl font-bold mb-8">Carregando...</h1>
       </div>
     );
@@ -52,14 +52,14 @@ const StartHerePT = () => {
     : "Bem-vindo à GetBrands!";
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4">
+    <div className="max-w-3xl mx-auto py-12 px-6">
       <h1 className="text-2xl md:text-4xl font-bold mb-8">
         {welcomeMessage}
       </h1>
       
       <h2 className="text-2xl font-semibold mb-4">Começando</h2>
       <p className="text-gray-600 mb-6">
-        Bem-vindo! Assista ao nosso vídeo de introdução rápida para aprender como aproveitar ao máximo nossa plataforma e começar a criar produtos incríveis.
+        Assista ao nosso vídeo de introdução e aprenda como criar produtos incríveis em nossa plataforma.
       </p>
       
       <div className="mb-8 rounded-xl overflow-hidden">
@@ -89,8 +89,17 @@ const StartHerePT = () => {
             className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white"
             size="lg"
           >
-            Explorar Catálogo de Produtos
+            Ver Catálogo
             <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        </Link>
+        <Link to="/schedule-demo">
+          <Button 
+            className="w-full border-2 border-[#f0562e] text-[#f0562e] hover:bg-[#f0562e]/10 bg-transparent"
+            size="lg"
+          >
+            Agendar Reunião
+            <Video className="ml-2 h-5 w-5" />
           </Button>
         </Link>
       </div>

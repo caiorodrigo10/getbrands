@@ -23,21 +23,6 @@ export const debugAnalytics = () => {
     // Enable debug mode in all environments
     window.analytics.debug();
 
-    // Test page tracking
-    try {
-      window.analytics.page("Debug Page", {
-        title: document.title,
-        url: window.location.href,
-        path: window.location.pathname,
-        referrer: document.referrer,
-        debug: true,
-        source: 'web_app'
-      });
-      console.log('✅ Page tracking test successful');
-    } catch (error) {
-      console.error('❌ Page tracking test failed:', error);
-    }
-
     // Test event tracking
     try {
       window.analytics.track("Debug Event", {
