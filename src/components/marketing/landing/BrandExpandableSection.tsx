@@ -74,8 +74,12 @@ export const BrandExpandableSection = () => {
             ))}
           </div>
           
-          <div className="bg-gray-100 rounded-lg aspect-square flex items-center justify-center order-first md:order-last">
-            <p className="text-gray-400">Image placeholder</p>
+          <div className="relative h-full aspect-square rounded-lg overflow-hidden order-first md:order-last">
+            <img 
+              src="/lovable-uploads/0fd7a9f9-759b-4f9e-a22c-ceae2fbe98e9.png"
+              alt="Warehouse logistics with pallet jack"
+              className="w-full h-full object-cover"
+            />
           </div>
         </div>
       </div>
