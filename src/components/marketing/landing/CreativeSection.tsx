@@ -18,7 +18,7 @@ export const CreativeSection = () => {
 
   return (
     <>
-      <section className="py-32 bg-[#F2FCE2]">
+      <section className="py-32 bg-[#fef5fe]">
         <div className="container mx-auto px-8">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 leading-tight">
