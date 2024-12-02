@@ -28,8 +28,8 @@ export const ServicesSection = () => {
 
           <div className="relative aspect-square rounded-2xl overflow-hidden">
             <img 
-              src="https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7"
-              alt="Software development visualization"
+              src="https://images.unsplash.com/photo-1556760544-74068565f05c"
+              alt="Private label supplements and wellness products"
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent" />
