@@ -13,7 +13,7 @@ import { PaymentForm } from "@/components/checkout/PaymentForm";
 import PaymentSummary from "@/components/checkout/PaymentSummary";
 import { calculateOrderSubtotal } from "@/lib/orderCalculations";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const Payment = () => {
   const { items } = useCart();
@@ -140,6 +140,15 @@ const Payment = () => {
     clientSecret,
     appearance: {
       theme: 'stripe',
+      variables: {
+        colorPrimary: '#0F172A',
+        colorBackground: '#ffffff',
+        colorText: '#1e293b',
+        colorDanger: '#ef4444',
+        fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+        spacingUnit: '4px',
+        borderRadius: '6px',
+      },
     },
   };
 
