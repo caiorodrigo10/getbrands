@@ -53,7 +53,12 @@ const Payment = () => {
             })),
             subtotal: subtotal,
             total: total,
-            discountAmount: discountAmount
+            discountAmount: discountAmount,
+            metadata: {
+              discount_amount: discountAmount,
+              original_amount: subtotal + shippingCost,
+              shipping_cost: shippingCost
+            }
           },
         });
 
@@ -126,14 +131,16 @@ const Payment = () => {
               </Button>
             </div>
           </div>
-          <Elements stripe={stripePromise} options={options}>
-            <PaymentForm 
-              clientSecret={clientSecret} 
-              total={total} 
-              shippingCost={shippingCost}
-              discountAmount={discountAmount}
-            />
-          </Elements>
+          {clientSecret && (
+            <Elements stripe={stripePromise} options={options}>
+              <PaymentForm 
+                clientSecret={clientSecret} 
+                total={total} 
+                shippingCost={shippingCost}
+                discountAmount={discountAmount}
+              />
+            </Elements>
+          )}
         </CardContent>
       </Card>
     </div>

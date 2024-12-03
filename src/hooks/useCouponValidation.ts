@@ -4,7 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 
 interface Coupon {
   code: string;
-  discount_type: 'fixed' | 'percentage';
+  discount_type: "fixed" | "percentage";
   discount_value: number;
   valid_from: string | null;
   valid_until: string | null;
@@ -66,7 +66,7 @@ export const useCouponValidation = (subtotal: number) => {
         return;
       }
 
-      const discount = calculateDiscount(couponData);
+      const discount = calculateDiscount(couponData as Coupon);
       setDiscountAmount(discount);
       toast({
         description: "Coupon applied successfully!",

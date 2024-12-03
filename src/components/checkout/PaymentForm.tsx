@@ -30,13 +30,39 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!stripe || !elements) {
+    if (!stripe || !elements || !user) {
       return;
     }
 
     setIsLoading(true);
 
     try {
+      // Create sample request first
+      const { data: sampleRequest, error: sampleRequestError } = await supabase
+        .from('sample_requests')
+        .insert({
+          user_id: user.id,
+          status: 'pending',
+          shipping_address: localStorage.getItem('shipping_address'),
+          shipping_city: localStorage.getItem('shipping_city'),
+          shipping_state: localStorage.getItem('shipping_state'),
+          shipping_zip: localStorage.getItem('shipping_zip'),
+          billing_address: localStorage.getItem('billing_address') || localStorage.getItem('shipping_address'),
+          billing_city: localStorage.getItem('billing_city') || localStorage.getItem('shipping_city'),
+          billing_state: localStorage.getItem('billing_state') || localStorage.getItem('shipping_state'),
+          billing_zip: localStorage.getItem('billing_zip') || localStorage.getItem('shipping_zip'),
+          first_name: localStorage.getItem('firstName'),
+          last_name: localStorage.getItem('lastName'),
+          payment_method: 'credit_card',
+          shipping_cost: shippingCost,
+          subtotal: total + discountAmount - shippingCost,
+          total: total
+        })
+        .select()
+        .single();
+
+      if (sampleRequestError) throw sampleRequestError;
+
       // Get current session before payment
       const { data: { session } } = await supabase.auth.getSession();
       const accessToken = session?.access_token;
@@ -44,7 +70,7 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
       const { error: paymentError } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/checkout/success?token=${accessToken}`,
+          return_url: `${window.location.origin}/checkout/success?token=${accessToken}&order_id=${sampleRequest.id}`,
         },
       });
 
@@ -57,13 +83,12 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
         return;
       }
 
-      // If we get here, it means the user closed the modal or there was a redirect
-      // The actual success/failure will be handled by the return_url
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error processing payment:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to process payment",
+        description: error.message || "Failed to process payment",
       });
     } finally {
       setIsLoading(false);

@@ -12,27 +12,22 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { amount, currency = 'usd', shipping_amount, items, subtotal, total, discountAmount } = await req.json();
+    const { amount, currency = 'usd', shipping_amount, items, subtotal, total, discountAmount, metadata } = await req.json();
 
-    console.log('Creating payment intent with:', { amount, currency, shipping_amount, subtotal, total, discountAmount });
+    console.log('Creating payment intent with:', { amount, currency, shipping_amount, subtotal, total, discountAmount, metadata });
 
     // Convert amount to cents and ensure it's at least 1
     const amountInCents = Math.max(Math.round(amount * 100), 1);
-    const shippingAmountInCents = Math.round((shipping_amount || 0) * 100);
 
-    // Calculate total amount including shipping
-    const totalAmountInCents = Math.max(amountInCents + shippingAmountInCents, 1);
-
-    console.log('Amount in cents:', totalAmountInCents);
+    console.log('Amount in cents:', amountInCents);
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: totalAmountInCents,
+      amount: amountInCents,
       currency,
       automatic_payment_methods: {
         enabled: true,
@@ -41,6 +36,7 @@ serve(async (req) => {
         shipping_amount: shipping_amount || 0,
         subtotal: subtotal || 0,
         discount_amount: discountAmount || 0,
+        original_amount: metadata?.original_amount || 0,
       }
     });
 
