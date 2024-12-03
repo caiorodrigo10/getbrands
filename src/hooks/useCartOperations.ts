@@ -15,7 +15,7 @@ export const useCartOperations = (user: User | null) => {
     
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data: cartItems, error: cartError } = await supabase
         .from('cart_items')
         .select(`
           product_id,
@@ -23,16 +23,23 @@ export const useCartOperations = (user: User | null) => {
         `)
         .eq('user_id', user.id);
 
-      if (error) throw error;
+      if (cartError) throw cartError;
 
-      const cartItems = data.map(item => ({
-        ...item.products,
-        quantity: 1
-      })) as CartItem[];
+      if (cartItems) {
+        const formattedItems = cartItems.map(item => ({
+          ...item.products,
+          quantity: 1
+        })) as CartItem[];
 
-      setItems(cartItems);
+        setItems(formattedItems);
+      }
     } catch (error) {
       console.error('Error loading cart items:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load cart items. Please try again.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -42,34 +49,52 @@ export const useCartOperations = (user: User | null) => {
     if (!user?.id) return;
 
     try {
-      // Check if item already exists in cart
-      const existingItem = items.find(i => i.id === item.id);
-      
-      if (existingItem) {
-        // If item exists, update quantity instead of inserting
-        await updateQuantity(item.id, (existingItem.quantity || 1) + 1);
+      // First check if the item already exists in the database
+      const { data: existingCartItem, error: checkError } = await supabase
+        .from('cart_items')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('product_id', item.id)
+        .maybeSingle();
+
+      if (checkError) throw checkError;
+
+      if (existingCartItem) {
+        // If item exists in database, update local state
+        const existingItem = items.find(i => i.id === item.id);
+        if (existingItem) {
+          await updateQuantity(item.id, (existingItem.quantity || 1) + 1);
+        } else {
+          // If item exists in database but not in state, add it to state
+          setItems(prev => [...prev, { ...item, quantity: 1 }]);
+        }
         return;
       }
 
       // If item doesn't exist, insert new cart item
-      const { error } = await supabase
+      const { error: insertError } = await supabase
         .from('cart_items')
         .insert({
           user_id: user.id,
           product_id: item.id
         });
 
-      if (error) {
+      if (insertError) {
         // If error is not duplicate key error, throw it
-        if (error.code !== '23505') {
-          throw error;
+        if (insertError.code !== '23505') {
+          throw insertError;
         }
       }
 
       setItems(prev => [...prev, { ...item, quantity: 1 }]);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding item to cart:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to add item to cart",
+      });
       throw error;
     }
   };
@@ -88,8 +113,13 @@ export const useCartOperations = (user: User | null) => {
 
       setItems(prev => prev.filter(item => item.id !== itemId));
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error removing item from cart:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to remove item from cart",
+      });
       throw error;
     }
   };
@@ -101,9 +131,6 @@ export const useCartOperations = (user: User | null) => {
         item.id === itemId ? { ...item, quantity } : item
       )
     );
-
-    // No need to update database as we only store the item reference
-    // Quantity is managed in the frontend state
   };
 
   const clearCart = async (silent: boolean = false) => {
@@ -125,13 +152,13 @@ export const useCartOperations = (user: User | null) => {
           description: "All items have been removed from your cart."
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error clearing cart:', error);
       if (!silent) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Failed to clear cart"
+          description: error.message || "Failed to clear cart",
         });
       }
       throw error;
