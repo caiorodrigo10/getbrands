@@ -8,10 +8,11 @@ import { Video } from "lucide-react";
 interface ProductActionsProps {
   productId: string;
   onSelectProduct: () => void;
+  showNotification?: boolean;
 }
 
-export const ProductActions = ({ productId, onSelectProduct }: ProductActionsProps) => {
-  const { isLoading, handleRequestSample } = useProductActions(productId);
+export const ProductActions = ({ productId, onSelectProduct, showNotification = true }: ProductActionsProps) => {
+  const { isLoading, handleRequestSample } = useProductActions(productId, showNotification);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { hasFullAccess, isMember, isSampler } = useUserPermissions();
