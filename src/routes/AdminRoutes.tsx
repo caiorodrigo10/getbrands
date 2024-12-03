@@ -1,5 +1,5 @@
 import { Route } from "react-router-dom";
-import AdminLayout from "./AdminLayout";
+import { AdminLayout } from "./AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminCatalog from "@/pages/admin/AdminCatalog";
 import AdminProductCreate from "@/pages/admin/AdminProductCreate";
@@ -12,7 +12,7 @@ import ProjectProductEdit from "@/pages/admin/ProjectProductEdit";
 import AdminBulkActions from "@/pages/admin/AdminBulkActions";
 import AdminCoupons from "@/pages/admin/AdminCoupons";
 
-const AdminRoutes = () => {
+export const AdminRoutes = () => {
   return (
     <Route path="/admin" element={<AdminLayout />}>
       <Route index element={<AdminDashboard />} />
