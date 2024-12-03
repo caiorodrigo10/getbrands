@@ -20,8 +20,9 @@ export const ProductActions = ({ productId, onSelectProduct }: ProductActionsPro
     try {
       const success = await handleRequestSample();
       if (success) {
-        // Use replace: true to prevent back navigation issues
-        navigate("/checkout/confirmation", { replace: true });
+        // Wait a moment to ensure the cart is updated
+        await new Promise(resolve => setTimeout(resolve, 500));
+        navigate("/checkout/confirmation");
       }
     } catch (error) {
       toast({
