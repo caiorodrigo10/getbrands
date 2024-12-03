@@ -5,24 +5,19 @@ import { Elements } from "@stripe/react-stripe-js";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useShippingCalculation } from "@/hooks/useShippingCalculation";
 import { PaymentForm } from "@/components/checkout/PaymentForm";
 import PaymentSummary from "@/components/checkout/PaymentSummary";
-import { calculateOrderSubtotal } from "@/lib/orderCalculations";
+import { useCouponValidation } from "@/hooks/useCouponValidation";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const Payment = () => {
   const { items } = useCart();
-  const { toast } = useToast();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [selectedCountry] = useState("USA");
-  const [couponCode, setCouponCode] = useState("");
-  const [discountAmount, setDiscountAmount] = useState(0);
-  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
   
   const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
   
@@ -32,63 +27,16 @@ const Payment = () => {
   );
 
   const subtotal = items.reduce((sum, item) => sum + (item.from_price * (item.quantity || 1)), 0);
-  const total = Math.max(subtotal + (shippingCost || 0) - discountAmount, 0.01); // Ensure minimum amount of 0.01
+  
+  const {
+    couponCode,
+    setCouponCode,
+    discountAmount,
+    isValidatingCoupon,
+    validateCoupon
+  } = useCouponValidation(subtotal);
 
-  const validateCoupon = async () => {
-    if (!couponCode.trim()) {
-      toast({
-        description: "Please enter a coupon code",
-      });
-      return;
-    }
-
-    setIsValidatingCoupon(true);
-    try {
-      const { data: couponData, error } = await supabase
-        .from('coupons')
-        .select('*')
-        .eq('code', couponCode.toUpperCase())
-        .eq('is_active', true)
-        .single();
-
-      if (error || !couponData) {
-        toast({
-          variant: "destructive",
-          description: "Invalid coupon code",
-        });
-        setDiscountAmount(0);
-        return;
-      }
-
-      const now = new Date();
-      const validFrom = couponData.valid_from ? new Date(couponData.valid_from) : null;
-      const validUntil = couponData.valid_until ? new Date(couponData.valid_until) : null;
-
-      if (
-        (validFrom && now < validFrom) || 
-        (validUntil && now > validUntil)
-      ) {
-        toast({
-          variant: "destructive",
-          description: "This coupon has expired or is not yet valid",
-        });
-        setDiscountAmount(0);
-        return;
-      }
-
-      setDiscountAmount(Number(couponData.discount_amount));
-      toast({
-        description: "Coupon applied successfully!",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        description: "Error validating coupon",
-      });
-    } finally {
-      setIsValidatingCoupon(false);
-    }
-  };
+  const total = Math.max(subtotal + (shippingCost || 0) - discountAmount, 0.01);
 
   useEffect(() => {
     const createPaymentIntent = async () => {
@@ -115,18 +63,13 @@ const Payment = () => {
         setClientSecret(data.clientSecret);
       } catch (error) {
         console.error('Payment error:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "There was a problem setting up the payment. Please try again.",
-        });
       }
     };
 
     if (items.length > 0 && !isLoadingShipping) {
       createPaymentIntent();
     }
-  }, [items, toast, isLoadingShipping, total, shippingCost, subtotal, discountAmount]);
+  }, [items, isLoadingShipping, total, shippingCost, subtotal, discountAmount]);
 
   if (!clientSecret || isLoadingShipping) {
     return (
