@@ -15,7 +15,7 @@ export function CartButton() {
   const { items, loadCartItems } = useCart();
   const navigate = useNavigate();
 
-  // Recarrega os itens do carrinho quando o componente é montado
+  // Load cart items when component mounts
   useEffect(() => {
     loadCartItems();
   }, [loadCartItems]);
@@ -23,17 +23,25 @@ export function CartButton() {
   // Calculate total quantity considering the quantity of each item
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  const handleCartClick = () => {
-    trackEvent("Cart Viewed", {
-      items_count: totalQuantity,
-      items: items.map(item => ({
-        product_id: item.id,
-        product_name: item.name,
-        quantity: item.quantity,
-        price: item.from_price
-      }))
-    });
-    navigate("/checkout/confirmation");
+  const handleCartClick = async () => {
+    try {
+      // Ensure cart items are loaded before navigation
+      await loadCartItems();
+      
+      trackEvent("Cart Viewed", {
+        items_count: totalQuantity,
+        items: items.map(item => ({
+          product_id: item.id,
+          product_name: item.name,
+          quantity: item.quantity,
+          price: item.from_price
+        }))
+      });
+
+      navigate("/checkout/confirmation");
+    } catch (error) {
+      console.error("Error loading cart items:", error);
+    }
   };
 
   return (
