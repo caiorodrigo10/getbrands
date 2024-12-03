@@ -11,19 +11,32 @@ export const useUserPermissions = () => {
     queryKey: ["user-profile", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const { data } = await supabase
+      
+      console.log("Fetching user profile for ID:", user.id); // Debug log
+      
+      const { data, error } = await supabase
         .from("profiles")
         .select("role")
         .eq("id", user.id)
         .single();
+      
+      if (error) {
+        console.error("Error fetching user profile:", error); // Debug log
+        return null;
+      }
+      
+      console.log("User profile data:", data); // Debug log
       return data;
     },
     enabled: !!user?.id,
+    staleTime: 0, // Desabilita o cache para sempre pegar o papel mais recente
   });
 
   const isAdmin = profile?.role === 'admin';
   const isMember = profile?.role === 'member';
   const isSampler = profile?.role === 'sampler';
+
+  console.log("User permissions:", { isAdmin, isMember, isSampler, role: profile?.role }); // Debug log
 
   const hasFullAccess = isAdmin;
   const hasLimitedAccess = isMember || isSampler;
