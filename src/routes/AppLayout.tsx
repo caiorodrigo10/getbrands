@@ -4,7 +4,12 @@ import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 
 export const AppLayout = () => {
   const location = useLocation();
-  useOnboardingStatus();
+  
+  // Só usar useOnboardingStatus se não estiver em rotas específicas
+  const excludedPaths = ['/login', '/signup', '/onboarding', '/catalog', '/products'];
+  if (!excludedPaths.some(path => location.pathname.startsWith(path))) {
+    useOnboardingStatus();
+  }
 
   // Don't show navigation menu for onboarding and auth pages
   const hideNav = ['/login', '/signup', '/onboarding'].includes(location.pathname);
