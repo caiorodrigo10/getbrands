@@ -28,7 +28,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   return (
     <CartContext.Provider
-      value={{ items, addItem, removeItem, updateQuantity, clearCart, isLoading }}
+      value={{ 
+        items, 
+        addItem, 
+        removeItem, 
+        updateQuantity, 
+        clearCart, 
+        isLoading,
+        loadCartItems 
+      }}
     >
       {children}
     </CartContext.Provider>
