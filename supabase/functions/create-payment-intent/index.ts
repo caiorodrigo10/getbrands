@@ -14,12 +14,13 @@ const corsHeaders = {
 const MINIMUM_CHARGE_AMOUNT = 50; // 50 cents minimum
 
 serve(async (req) => {
+  // Handle CORS
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { amount, currency = 'usd', shipping_amount, items, subtotal, total, discountAmount, metadata } = await req.json();
+    const { amount, currency = 'usd', shipping_amount, items, subtotal, total, discountAmount, metadata, couponCode } = await req.json();
 
     console.log('Creating payment intent with:', { 
       amount, 
@@ -27,7 +28,8 @@ serve(async (req) => {
       shipping_amount, 
       subtotal, 
       total, 
-      discountAmount, 
+      discountAmount,
+      couponCode,
       metadata 
     });
 
@@ -45,7 +47,8 @@ serve(async (req) => {
       originalAmount: amount,
       discountAmount: discountAmount || 0,
       finalAmountInCents: finalAmount,
-      minimumCharge: MINIMUM_CHARGE_AMOUNT
+      minimumCharge: MINIMUM_CHARGE_AMOUNT,
+      couponApplied: !!couponCode
     });
 
     const paymentIntent = await stripe.paymentIntents.create({
@@ -59,7 +62,8 @@ serve(async (req) => {
         subtotal: subtotal || 0,
         discount_amount: discountAmount || 0,
         original_amount: metadata?.original_amount || 0,
-        final_amount: finalAmount / 100, // Store the actual charged amount
+        final_amount: finalAmount / 100,
+        coupon_code: couponCode || null
       }
     });
 
