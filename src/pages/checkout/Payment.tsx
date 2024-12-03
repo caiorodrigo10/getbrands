@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useShippingCalculation } from "@/hooks/useShippingCalculation";
-import PaymentForm from "@/components/checkout/PaymentForm";
+import { PaymentForm } from "@/components/checkout/PaymentForm";
 import PaymentSummary from "@/components/checkout/PaymentSummary";
 import { calculateOrderSubtotal } from "@/lib/orderCalculations";
 

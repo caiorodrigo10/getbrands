@@ -9,13 +9,13 @@ interface CreateSampleRequestParams {
   product_id: string;
   user_id: string;
   quantity: number;
-  discount_amount?: number; // Add this property
+  discount_amount?: number;
 }
 
 interface CreateOrderParams {
   user_id: string;
   total: number;
-  discount_amount?: number; // Add this property
+  discount_amount?: number;
 }
 
 export const PaymentForm = () => {
@@ -32,7 +32,7 @@ export const PaymentForm = () => {
       const orderData: CreateOrderParams = {
         user_id: user?.id || "",
         total: 100, // Example total
-        discount_amount: discountAmount, // Use snake_case
+        discount_amount: discountAmount,
       };
       
       // Logic to create order with supabase here
