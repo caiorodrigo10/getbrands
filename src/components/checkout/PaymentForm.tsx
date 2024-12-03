@@ -12,9 +12,10 @@ interface PaymentFormProps {
   clientSecret: string;
   total: number;
   shippingCost: number;
+  discountAmount?: number;
 }
 
-const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) => {
+const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount = 0 }: PaymentFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -50,7 +51,8 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         items,
         shippingCost,
         subtotal,
-        total
+        total,
+        discountAmount
       });
 
       // Then confirm the payment
@@ -94,6 +96,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
           total,
           shippingCost,
           orderId,
+          discountAmount
         });
       } catch (orderError: any) {
         console.error('Error creating Shopify order:', orderError);

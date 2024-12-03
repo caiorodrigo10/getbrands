@@ -21,7 +21,7 @@ const Payment = () => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [selectedCountry] = useState("USA");
   const [couponCode, setCouponCode] = useState("");
-  const [discount, setDiscount] = useState(0);
+  const [discountAmount, setDiscountAmount] = useState(0);
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
   
   const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
@@ -32,7 +32,7 @@ const Payment = () => {
   );
 
   const subtotal = items.reduce((sum, item) => sum + (item.from_price * (item.quantity || 1)), 0);
-  const total = subtotal + (shippingCost || 0) - discount;
+  const total = subtotal + (shippingCost || 0) - discountAmount;
 
   const validateCoupon = async () => {
     if (!couponCode.trim()) {
@@ -44,24 +44,39 @@ const Payment = () => {
 
     setIsValidatingCoupon(true);
     try {
-      // Here you would typically validate the coupon against your database
-      // For now, we'll use a simple example
-      const { data, error } = await supabase
+      const { data: couponData, error } = await supabase
         .from('coupons')
-        .select('discount_amount')
+        .select('*')
         .eq('code', couponCode.toUpperCase())
+        .eq('is_active', true)
         .single();
 
-      if (error || !data) {
+      if (error || !couponData) {
         toast({
           variant: "destructive",
           description: "Invalid coupon code",
         });
-        setDiscount(0);
+        setDiscountAmount(0);
         return;
       }
 
-      setDiscount(data.discount_amount);
+      const now = new Date();
+      const validFrom = couponData.valid_from ? new Date(couponData.valid_from) : null;
+      const validUntil = couponData.valid_until ? new Date(couponData.valid_until) : null;
+
+      if (
+        (validFrom && now < validFrom) || 
+        (validUntil && now > validUntil)
+      ) {
+        toast({
+          variant: "destructive",
+          description: "This coupon has expired or is not yet valid",
+        });
+        setDiscountAmount(0);
+        return;
+      }
+
+      setDiscountAmount(Number(couponData.discount_amount));
       toast({
         description: "Coupon applied successfully!",
       });
@@ -90,7 +105,7 @@ const Payment = () => {
             })),
             subtotal: subtotal,
             total: total,
-            discount: discount
+            discountAmount: discountAmount
           },
         });
 
@@ -111,7 +126,7 @@ const Payment = () => {
     if (items.length > 0 && !isLoadingShipping) {
       createPaymentIntent();
     }
-  }, [items, toast, isLoadingShipping, total, shippingCost, subtotal, discount]);
+  }, [items, toast, isLoadingShipping, total, shippingCost, subtotal, discountAmount]);
 
   if (!clientSecret || isLoadingShipping) {
     return (
@@ -141,7 +156,7 @@ const Payment = () => {
               subtotal={subtotal}
               shippingCost={shippingCost}
               total={total}
-              discount={discount}
+              discount={discountAmount}
             />
             <div className="mt-4 flex gap-2">
               <Input
@@ -164,7 +179,7 @@ const Payment = () => {
               clientSecret={clientSecret} 
               total={total} 
               shippingCost={shippingCost}
-              discount={discount}
+              discountAmount={discountAmount}
             />
           </Elements>
         </CardContent>

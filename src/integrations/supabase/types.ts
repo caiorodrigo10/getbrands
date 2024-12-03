@@ -223,6 +223,39 @@ export type Database = {
           },
         ]
       }
+      coupons: {
+        Row: {
+          code: string
+          created_at: string | null
+          discount_amount: number
+          id: string
+          is_active: boolean | null
+          updated_at: string | null
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          discount_amount: number
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          discount_amount?: number
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
       documents: {
         Row: {
           created_at: string
