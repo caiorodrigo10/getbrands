@@ -29,8 +29,8 @@ export function CartButton() {
       }))
     });
 
-    // Navigate directly since items are already loaded
-    navigate("/checkout/confirmation");
+    // Navigate to payment page
+    navigate("/checkout/payment");
   };
 
   return (
