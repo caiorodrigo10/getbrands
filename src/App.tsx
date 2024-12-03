@@ -31,11 +31,8 @@ const RouteTracker = () => {
   useEffect(() => {
     // Só dispara o evento se o path mudou
     if (lastTrackedPath.current !== location.pathname) {
-      trackPage({
-        path: location.pathname,
-        search: location.search,
-        url: window.location.href
-      });
+      // Agora o trackPage já inclui todos os dados necessários
+      trackPage();
       lastTrackedPath.current = location.pathname;
     }
   }, [location]);
