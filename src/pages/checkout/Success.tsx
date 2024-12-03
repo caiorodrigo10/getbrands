@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { OrderConfirmationCard } from "@/components/checkout/success/OrderConfirmationCard";
 import { CustomerInformation } from "@/components/checkout/success/CustomerInformation";
 import { OrderSummaryDetails } from "@/components/checkout/success/OrderSummaryDetails";
@@ -12,12 +11,12 @@ const Success = () => {
   const orderDetails = location.state?.orderDetails;
 
   useEffect(() => {
-    if (!orderDetails) {
+    if (!orderDetails?.id) {
       navigate('/catalog');
     }
   }, [orderDetails, navigate]);
 
-  if (!orderDetails) {
+  if (!orderDetails?.id) {
     return null;
   }
 

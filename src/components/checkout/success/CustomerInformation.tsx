@@ -10,6 +10,10 @@ interface CustomerInformationProps {
 }
 
 export const CustomerInformation = ({ orderDetails }: CustomerInformationProps) => {
+  if (!orderDetails) {
+    return null;
+  }
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <div>

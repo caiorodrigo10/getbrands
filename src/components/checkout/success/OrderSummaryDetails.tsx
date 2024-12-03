@@ -21,11 +21,15 @@ interface OrderSummaryDetailsProps {
 }
 
 export const OrderSummaryDetails = ({ orderDetails }: OrderSummaryDetailsProps) => {
+  if (!orderDetails || !orderDetails.id) {
+    return null;
+  }
+
   return (
     <div>
       <h4 className="font-medium mb-4">Order Summary</h4>
       <div className="space-y-4">
-        {orderDetails.products.map((item) => (
+        {orderDetails.products?.map((item) => (
           <div key={item.product.id} className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg">
             <div className="h-16 w-16 rounded-md overflow-hidden flex-shrink-0">
               <img
@@ -65,7 +69,7 @@ export const OrderSummaryDetails = ({ orderDetails }: OrderSummaryDetailsProps) 
       <div className="flex justify-between items-center pt-6 border-t mt-6">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Package className="h-4 w-4" />
-          <span>Order #{orderDetails.id.slice(0, 6)}</span>
+          <span>Order #{orderDetails?.id?.slice(0, 6) || 'N/A'}</span>
         </div>
       </div>
     </div>
