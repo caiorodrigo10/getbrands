@@ -6,7 +6,7 @@ export const AdminLayout = () => {
     <div className="min-h-screen bg-background">
       <AdminNavigationMenu />
       <main className="md:pl-64 w-full">
-        <div className="max-w-[1200px] mx-auto px-4 py-6">
+        <div className="max-w-[1200px] mx-auto px-4 py-6 mt-16 md:mt-0">
           <Outlet />
         </div>
       </main>
