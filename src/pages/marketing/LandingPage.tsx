@@ -3,7 +3,6 @@ import { ServicesSection } from "@/components/marketing/landing/ServicesSection"
 import { WhyChooseSection } from "@/components/marketing/landing/WhyChooseSection";
 import { SuccessMetrics } from "@/components/marketing/landing/SuccessMetrics";
 import { BrandBuildingSection } from "@/components/marketing/landing/BrandBuildingSection";
-import { TestimonialsSection } from "@/components/marketing/landing/TestimonialsSection";
 import { ProductCategoriesSection } from "@/components/marketing/landing/ProductCategoriesSection";
 import { CreativeSection } from "@/components/marketing/landing/CreativeSection";
 import { BrandExpandableSection } from "@/components/marketing/landing/BrandExpandableSection";
@@ -20,7 +19,6 @@ const LandingPage = () => {
       <BrandBuildingSection />
       <ProductCategoriesSection />
       <WhyChooseSection />
-      <TestimonialsSection />
       <Footer />
     </div>
   );
