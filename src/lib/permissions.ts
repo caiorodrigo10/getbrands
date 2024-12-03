@@ -10,20 +10,42 @@ export const useUserPermissions = () => {
   const { data: profile } = useQuery({
     queryKey: ["user-profile", user?.id],
     queryFn: async () => {
-      if (!user?.id) return null;
-      const { data } = await supabase
+      if (!user?.id) {
+        console.log("[DEBUG] No user ID found");
+        return null;
+      }
+      
+      console.log("[DEBUG] Fetching profile for user ID:", user.id);
+      
+      const { data, error } = await supabase
         .from("profiles")
-        .select("role")
+        .select("*")  // Selecting all fields to see complete profile data
         .eq("id", user.id)
         .single();
+      
+      if (error) {
+        console.error("[DEBUG] Error fetching profile:", error);
+        return null;
+      }
+      
+      console.log("[DEBUG] Complete profile data:", data);
       return data;
     },
     enabled: !!user?.id,
+    staleTime: 0, // Disable cache to always get the latest role
   });
 
   const isAdmin = profile?.role === 'admin';
   const isMember = profile?.role === 'member';
   const isSampler = profile?.role === 'sampler';
+
+  console.log("[DEBUG] User role and permissions:", { 
+    role: profile?.role,
+    isAdmin,
+    isMember,
+    isSampler,
+    profile: profile || 'No profile found'
+  });
 
   const hasFullAccess = isAdmin;
   const hasLimitedAccess = isMember || isSampler;

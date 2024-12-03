@@ -21,14 +21,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (user?.id) {
       loadCartItems();
     } else {
-      // Clear items silently when user is not authenticated
       items.length > 0 && clearCart(true);
     }
   }, [user?.id]); 
 
   return (
     <CartContext.Provider
-      value={{ items, addItem, removeItem, updateQuantity, clearCart, isLoading }}
+      value={{ 
+        items, 
+        addItem, 
+        removeItem, 
+        updateQuantity, 
+        clearCart, 
+        isLoading,
+        loadCartItems 
+      }}
     >
       {children}
     </CartContext.Provider>

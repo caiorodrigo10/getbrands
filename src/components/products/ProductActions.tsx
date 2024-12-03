@@ -8,10 +8,11 @@ import { Video } from "lucide-react";
 interface ProductActionsProps {
   productId: string;
   onSelectProduct: () => void;
+  showNotification?: boolean;
 }
 
-export const ProductActions = ({ productId, onSelectProduct }: ProductActionsProps) => {
-  const { isLoading, handleRequestSample } = useProductActions(productId);
+export const ProductActions = ({ productId, onSelectProduct, showNotification = true }: ProductActionsProps) => {
+  const { isLoading, handleRequestSample } = useProductActions(productId, showNotification);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { hasFullAccess, isMember, isSampler } = useUserPermissions();
@@ -20,10 +21,13 @@ export const ProductActions = ({ productId, onSelectProduct }: ProductActionsPro
     try {
       const success = await handleRequestSample();
       if (success) {
-        // Use replace: true to prevent back navigation issues
-        navigate("/checkout/confirmation", { replace: true });
+        // Add a small delay to ensure cart state is updated
+        setTimeout(() => {
+          navigate("/checkout/confirmation", { replace: true });
+        }, 800);
       }
     } catch (error) {
+      console.error('Error requesting sample:', error);
       toast({
         variant: "destructive",
         title: "Error",

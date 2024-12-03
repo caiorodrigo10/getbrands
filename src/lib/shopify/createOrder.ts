@@ -29,23 +29,13 @@ export async function createShopifyOrder({
   shippingAddress,
   lineItems
 }: CreateOrderParams) {
+  console.log('Creating Shopify order:', {
+    orderId,
+    customerEmail: customer.email,
+    itemCount: lineItems.length
+  });
+
   try {
-    // Get the sample request to access the saved shipping cost
-    const { data: sampleRequest, error: sampleRequestError } = await supabase
-      .from('sample_requests')
-      .select('shipping_cost')
-      .eq('id', orderId)
-      .single();
-
-    if (sampleRequestError) throw sampleRequestError;
-
-    // Filter out any line items that don't have a valid Shopify variant ID
-    const validLineItems = lineItems.filter(item => item.variant_id);
-
-    if (validLineItems.length === 0) {
-      throw new Error("No valid Shopify variants found for the products in the order");
-    }
-
     const { data, error } = await supabase.functions.invoke('shopify-create-order', {
       body: {
         orderData: {
@@ -63,32 +53,25 @@ export async function createShopifyOrder({
             last_name: customer.last_name,
             country: "US"
           },
-          line_items: validLineItems,
+          line_items: lineItems,
           financial_status: "paid",
-          shipping_lines: [{
-            title: "Standard Shipping",
-            price: sampleRequest.shipping_cost.toFixed(2),
-            code: "STANDARD",
-            source: "Lovable System"
-          }]
         }
       }
     });
 
-    if (error) throw error;
-
-    // Update the sample request with the Shopify order ID
-    if (data?.shopifyOrder?.id) {
-      await supabase
-        .from('sample_requests')
-        .update({ shopify_order_id: data.shopifyOrder.id })
-        .eq('id', orderId);
+    if (error) {
+      console.error('Error creating Shopify order:', error);
+      throw error;
     }
 
-    return data.shopifyOrder;
+    console.log('Shopify order created successfully:', {
+      orderId: data?.shopifyOrder?.id,
+      orderNumber: data?.shopifyOrder?.order_number
+    });
 
+    return data?.shopifyOrder;
   } catch (error) {
-    console.error('Error creating Shopify order:', error);
+    console.error('Failed to create Shopify order:', error);
     throw error;
   }
 }

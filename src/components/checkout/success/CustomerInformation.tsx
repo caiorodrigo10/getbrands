@@ -1,34 +1,34 @@
 interface CustomerInformationProps {
   orderDetails: {
-    customer: {
-      firstName: string;
-      lastName: string;
-    };
-    shippingAddress: {
-      address: string;
-      city: string;
-      state: string;
-      zip: string;
-    };
+    first_name: string;
+    last_name: string;
+    shipping_address: string;
+    shipping_city: string;
+    shipping_state: string;
+    shipping_zip: string;
   };
 }
 
 export const CustomerInformation = ({ orderDetails }: CustomerInformationProps) => {
+  if (!orderDetails) {
+    return null;
+  }
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <div>
         <h4 className="font-medium mb-2">Customer Information</h4>
         <p className="text-sm text-muted-foreground">
-          {orderDetails.customer.firstName} {orderDetails.customer.lastName}
+          {orderDetails.first_name} {orderDetails.last_name}
         </p>
       </div>
       <div>
         <h4 className="font-medium mb-2">Shipping Address</h4>
         <div className="text-sm text-muted-foreground">
-          <p>{orderDetails.shippingAddress.address}</p>
+          <p>{orderDetails.shipping_address}</p>
           <p>
-            {orderDetails.shippingAddress.city}, {orderDetails.shippingAddress.state}{" "}
-            {orderDetails.shippingAddress.zip}
+            {orderDetails.shipping_city}, {orderDetails.shipping_state}{" "}
+            {orderDetails.shipping_zip}
           </p>
         </div>
       </div>

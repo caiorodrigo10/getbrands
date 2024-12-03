@@ -10,8 +10,9 @@ import AdminProjects from "@/pages/admin/AdminProjects";
 import AdminProjectManage from "@/pages/admin/AdminProjectManage";
 import ProjectProductEdit from "@/pages/admin/ProjectProductEdit";
 import AdminBulkActions from "@/pages/admin/AdminBulkActions";
+import AdminCoupons from "@/pages/admin/AdminCoupons";
 
-export const AdminRoutes = () => {
+const AdminRoutes = () => {
   return (
     <Routes>
       <Route element={<AdminLayout />}>
@@ -23,9 +24,12 @@ export const AdminRoutes = () => {
         <Route path="orders" element={<AdminOrders />} />
         <Route path="projects" element={<AdminProjects />} />
         <Route path="projects/:id" element={<AdminProjectManage />} />
-        <Route path="projects/:id/products/:productId" element={<ProjectProductEdit />} />
+        <Route path="projects/:projectId/products/:productId" element={<ProjectProductEdit />} />
         <Route path="bulk-actions" element={<AdminBulkActions />} />
+        <Route path="coupons" element={<AdminCoupons />} />
       </Route>
     </Routes>
   );
 };
+
+export default AdminRoutes;

@@ -5,9 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { useToast } from "@/components/ui/use-toast";
 
-export const useProductActions = (productId: string) => {
+export const useProductActions = (productId: string, showNotification: boolean = true) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { addItem } = useCart();
+  const { addItem, loadCartItems } = useCart();
   const { toast } = useToast();
 
   const handleRequestSample = async () => {
@@ -24,21 +24,33 @@ export const useProductActions = (productId: string) => {
       if (error) throw error;
       
       await addItem(product as Product);
+      await loadCartItems(); // Reload cart items after adding
       
       // Track sample request event
       trackEvent("Sample Requested", {
         product_id: productId
       });
 
+      // Only show toast if showNotification is true
+      if (showNotification) {
+        toast({
+          title: "Item added to cart",
+          description: `${product.name} has been added to your cart.`
+        });
+      }
+
       // Return true to indicate success
       return true;
     } catch (error) {
       console.error('Error requesting sample:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to add sample to cart. Please try again.",
-      });
+      // Only show error toast if showNotification is true
+      if (showNotification) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to add sample to cart. Please try again.",
+        });
+      }
       throw error;
     } finally {
       setIsLoading(false);

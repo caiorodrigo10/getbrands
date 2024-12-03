@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AppLayout } from "./AppLayout";
 import { MarketingRoutes } from "./MarketingRoutes";
-import { AdminRoutes } from "./AdminRoutes";
+import AdminRoutes from "./AdminRoutes";
 import Login from "@/pages/Login";
 import SignUp from "@/pages/SignUp";
 import SignUpPT from "@/pages/pt/SignUp";

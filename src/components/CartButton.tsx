@@ -18,6 +18,7 @@ export function CartButton() {
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleCartClick = () => {
+    // Track event before navigation
     trackEvent("Cart Viewed", {
       items_count: totalQuantity,
       items: items.map(item => ({
@@ -27,7 +28,9 @@ export function CartButton() {
         price: item.from_price
       }))
     });
-    navigate("/checkout/confirmation");
+
+    // Navigate to payment page
+    navigate("/checkout/payment");
   };
 
   return (

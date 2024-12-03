@@ -19,7 +19,7 @@ export const useOnboardingStatus = () => {
         console.log('[DEBUG] useOnboardingStatus - Checking status for user:', user.id);
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('onboarding_completed')
+          .select('onboarding_completed, role')
           .eq('id', user.id)
           .single();
 
@@ -30,8 +30,8 @@ export const useOnboardingStatus = () => {
 
         console.log('[DEBUG] useOnboardingStatus - Profile:', profile, 'Current path:', window.location.pathname);
         
-        // Não fazer nada se o usuário já completou o onboarding
-        if (profile?.onboarding_completed) return;
+        // Não fazer nada se o usuário já completou o onboarding ou é admin
+        if (profile?.onboarding_completed || profile?.role === 'admin') return;
 
         // Lista de rotas que não devem redirecionar para onboarding
         const excludedPaths = [
