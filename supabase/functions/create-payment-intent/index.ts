@@ -11,6 +11,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+const MINIMUM_CHARGE_AMOUNT = 50; // 50 cents minimum
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -30,12 +32,20 @@ serve(async (req) => {
     });
 
     // Calculate final amount after discount
-    const finalAmount = Math.max(Math.round((amount - (discountAmount || 0)) * 100), 1);
+    let finalAmount = Math.max(Math.round((amount - (discountAmount || 0)) * 100), MINIMUM_CHARGE_AMOUNT);
+
+    // If the amount would be less than minimum, adjust discount to maintain minimum charge
+    if (finalAmount < MINIMUM_CHARGE_AMOUNT) {
+      const maxAllowableDiscount = amount * 100 - MINIMUM_CHARGE_AMOUNT;
+      finalAmount = MINIMUM_CHARGE_AMOUNT;
+      console.log(`Adjusted discount to maintain minimum charge. Original discount: ${discountAmount}, Max allowable: ${maxAllowableDiscount/100}`);
+    }
 
     console.log('Payment calculation:', {
       originalAmount: amount,
       discountAmount: discountAmount || 0,
-      finalAmountInCents: finalAmount
+      finalAmountInCents: finalAmount,
+      minimumCharge: MINIMUM_CHARGE_AMOUNT
     });
 
     const paymentIntent = await stripe.paymentIntents.create({
@@ -49,6 +59,7 @@ serve(async (req) => {
         subtotal: subtotal || 0,
         discount_amount: discountAmount || 0,
         original_amount: metadata?.original_amount || 0,
+        final_amount: finalAmount / 100, // Store the actual charged amount
       }
     });
 
