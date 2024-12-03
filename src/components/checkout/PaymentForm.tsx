@@ -25,7 +25,7 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
   const [isLoading, setIsLoading] = useState(false);
   const stripe = useStripe();
   const elements = useElements();
-  const { clearCart } = useCart();
+  const { clearCart, items } = useCart();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,11 +69,26 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
 
       if (sampleRequestError) throw sampleRequestError;
 
+      // Insert sample request products
+      const { error: productsError } = await supabase
+        .from('sample_request_products')
+        .insert(
+          items.map(item => ({
+            sample_request_id: sampleRequest.id,
+            product_id: item.id,
+            quantity: item.quantity || 1,
+            unit_price: item.from_price
+          }))
+        );
+
+      if (productsError) throw productsError;
+
       const { error: paymentError } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/checkout/success?token=${session.access_token}&order_id=${sampleRequest.id}`,
+          return_url: `${window.location.origin}/checkout/success`,
         },
+        redirect: 'if_required',
       });
 
       if (paymentError) {
@@ -84,6 +99,40 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
         });
         return;
       }
+
+      // If we get here, payment was successful
+      await clearCart();
+      
+      // Navigate to success page with order details
+      navigate('/checkout/success', {
+        state: {
+          orderId: sampleRequest.id,
+          orderDetails: {
+            customer: {
+              firstName: localStorage.getItem('firstName'),
+              lastName: localStorage.getItem('lastName')
+            },
+            shippingAddress: {
+              address: localStorage.getItem('shipping_address'),
+              city: localStorage.getItem('shipping_city'),
+              state: localStorage.getItem('shipping_state'),
+              zip: localStorage.getItem('shipping_zip')
+            },
+            products: items.map(item => ({
+              product: {
+                id: item.id,
+                name: item.name,
+                image_url: item.image_url,
+                from_price: item.from_price
+              }
+            })),
+            subtotal: total + discountAmount - shippingCost,
+            shippingCost: shippingCost,
+            amount: total
+          }
+        },
+        replace: true
+      });
 
     } catch (error: any) {
       console.error('Error processing payment:', error);
