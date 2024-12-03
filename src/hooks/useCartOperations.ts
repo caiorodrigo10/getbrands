@@ -22,24 +22,20 @@ export const useCartOperations = (user: User | null) => {
       const { data: cartItems, error } = await supabase
         .from('cart_items')
         .select(`
-          product_id,
-          products (
-            id,
-            category,
-            name,
-            description,
-            image_url,
-            from_price,
-            srp,
-            is_new,
-            is_tiktok,
-            created_at,
-            updated_at
-          )
+          *,
+          products (*)
         `)
         .eq('user_id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading cart items:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load cart items. Please try again.",
+        });
+        return;
+      }
 
       const formattedItems = cartItems?.map((item) => ({
         ...item.products,
@@ -49,6 +45,11 @@ export const useCartOperations = (user: User | null) => {
       setItems(formattedItems);
     } catch (error) {
       console.error('Error loading cart items:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load cart items. Please try again.",
+      });
     } finally {
       setIsLoading(false);
     }
