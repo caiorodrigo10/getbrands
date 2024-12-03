@@ -9,39 +9,28 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useEffect } from "react";
 
 export function CartButton() {
-  const { items, loadCartItems } = useCart();
+  const { items } = useCart();
   const navigate = useNavigate();
-
-  // Load cart items when component mounts
-  useEffect(() => {
-    loadCartItems();
-  }, [loadCartItems]);
 
   // Calculate total quantity considering the quantity of each item
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  const handleCartClick = async () => {
-    try {
-      // Ensure cart items are loaded before navigation
-      await loadCartItems();
-      
-      trackEvent("Cart Viewed", {
-        items_count: totalQuantity,
-        items: items.map(item => ({
-          product_id: item.id,
-          product_name: item.name,
-          quantity: item.quantity,
-          price: item.from_price
-        }))
-      });
+  const handleCartClick = () => {
+    // Track event before navigation
+    trackEvent("Cart Viewed", {
+      items_count: totalQuantity,
+      items: items.map(item => ({
+        product_id: item.id,
+        product_name: item.name,
+        quantity: item.quantity,
+        price: item.from_price
+      }))
+    });
 
-      navigate("/checkout/confirmation");
-    } catch (error) {
-      console.error("Error loading cart items:", error);
-    }
+    // Navigate directly since items are already loaded
+    navigate("/checkout/confirmation");
   };
 
   return (

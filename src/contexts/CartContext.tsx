@@ -17,11 +17,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     clearCart,
   } = useCartOperations(user);
 
+  // Carregar itens do carrinho assim que o usuário estiver autenticado
   useEffect(() => {
     if (user?.id) {
+      // Carregar imediatamente quando o usuário estiver disponível
       loadCartItems();
     } else {
-      // Clear items silently when user is not authenticated
+      // Limpar itens silenciosamente quando o usuário não estiver autenticado
       items.length > 0 && clearCart(true);
     }
   }, [user?.id]); 
