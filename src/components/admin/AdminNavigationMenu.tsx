@@ -1,9 +1,16 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { UserAvatar } from "@/components/user-menu/UserAvatar";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { 
   LayoutDashboard, 
   Package2, 
@@ -11,8 +18,12 @@ import {
   ShoppingCart, 
   FolderKanban,
   Upload,
-  Ticket
+  Ticket,
+  User,
+  LogOut,
+  Settings
 } from "lucide-react";
+import { useSessionManagement } from "@/hooks/useSessionManagement";
 
 const menuItems = [
   {
@@ -55,7 +66,10 @@ const menuItems = [
 
 export const AdminNavigationMenu = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useAuth();
+  const { handleLogout } = useSessionManagement();
+  const [isInAdminPanel, setIsInAdminPanel] = useState(true);
 
   const { data: profile } = useQuery({
     queryKey: ["admin-profile", user?.id],
@@ -76,6 +90,15 @@ export const AdminNavigationMenu = () => {
   const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : "";
   const userEmail = user?.email || "";
   const userAvatar = profile?.avatar_url;
+
+  const handleAdminNavigation = () => {
+    if (isInAdminPanel) {
+      navigate('/dashboard');
+    } else {
+      navigate('/admin');
+    }
+    setIsInAdminPanel(!isInAdminPanel);
+  };
 
   return (
     <div className="fixed left-0 top-0 w-64 h-screen bg-white border-r border-gray-200 z-50">
@@ -115,13 +138,39 @@ export const AdminNavigationMenu = () => {
         </nav>
 
         <div className="p-4 border-t border-gray-200">
-          <div className="flex items-center gap-3 px-3 py-2">
-            <UserAvatar userAvatar={userAvatar} userName={userName} />
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-black">{userName}</span>
-              <span className="text-xs text-gray-600">{userEmail}</span>
-            </div>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                className="w-full flex items-center gap-3 px-3 py-2 hover:bg-[#fff4fc] hover:text-black"
+              >
+                <UserAvatar userAvatar={userAvatar} userName={userName} />
+                <div className="flex flex-col items-start">
+                  <span className="text-sm font-medium text-black">{userName}</span>
+                  <span className="text-xs text-gray-600">{userEmail}</span>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end">
+              <Link to="/profile">
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>My Profile</span>
+                </DropdownMenuItem>
+              </Link>
+              <DropdownMenuItem onClick={handleAdminNavigation}>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>{isInAdminPanel ? "View as User" : "View as Admin"}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                onClick={handleLogout}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Logout</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>
