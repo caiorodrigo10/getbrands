@@ -28,7 +28,7 @@ export const useAuthWithPermissions = () => {
   const isSampler = profile?.role === "sampler";
   const hasFullAccess = isAdmin;
   const hasLimitedAccess = isMember || isSampler;
-  const isAuthenticated = !!user;
+  const isAuthenticated = !!profile;
 
   return {
     profile,

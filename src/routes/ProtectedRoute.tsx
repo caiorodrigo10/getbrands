@@ -14,12 +14,14 @@ export const ProtectedRoute = ({
   requiresAdmin = false,
 }: ProtectedRouteProps) => {
   const { 
-    isAuthenticated, 
     isLoading,
-    hasFullAccess,
+    isAdmin,
+    profile
   } = useAuthWithPermissions();
   
   const location = useLocation();
+  const isAuthenticated = !!profile;
+  const hasFullAccess = isAdmin;
 
   console.log('[DEBUG] ProtectedRoute - Path:', location.pathname, 'Auth:', isAuthenticated, 'Loading:', isLoading, 'Admin:', hasFullAccess);
 

@@ -1,5 +1,5 @@
 import { Route } from "react-router-dom";
-import { AdminLayout } from "./AdminLayout";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminCatalog from "@/pages/admin/AdminCatalog";
 import AdminProductCreate from "@/pages/admin/AdminProductCreate";
