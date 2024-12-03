@@ -32,7 +32,7 @@ const Payment = () => {
   );
 
   const subtotal = items.reduce((sum, item) => sum + (item.from_price * (item.quantity || 1)), 0);
-  const total = subtotal + (shippingCost || 0) - discountAmount;
+  const total = Math.max(subtotal + (shippingCost || 0) - discountAmount, 0.01); // Ensure minimum amount of 0.01
 
   const validateCoupon = async () => {
     if (!couponCode.trim()) {
@@ -95,9 +95,9 @@ const Payment = () => {
       try {
         const { data, error } = await supabase.functions.invoke('create-payment-intent', {
           body: { 
-            amount: Math.round(total * 100),
+            amount: total,
             currency: 'usd',
-            shipping_amount: Math.round(shippingCost * 100),
+            shipping_amount: shippingCost,
             items: items.map(item => ({
               product_id: item.id,
               quantity: item.quantity || 1,
