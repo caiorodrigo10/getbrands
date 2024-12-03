@@ -1,5 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { UserAvatar } from "@/components/user-menu/UserAvatar";
 import { 
   LayoutDashboard, 
   Package2, 
@@ -51,6 +55,27 @@ const menuItems = [
 
 export const AdminNavigationMenu = () => {
   const location = useLocation();
+  const { user } = useAuth();
+
+  const { data: profile } = useQuery({
+    queryKey: ["admin-profile", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : "";
+  const userEmail = user?.email || "";
+  const userAvatar = profile?.avatar_url;
 
   return (
     <div className="fixed left-0 top-0 w-64 h-screen bg-white border-r border-gray-200 z-50">
@@ -88,6 +113,16 @@ export const AdminNavigationMenu = () => {
             );
           })}
         </nav>
+
+        <div className="p-4 border-t border-gray-200">
+          <div className="flex items-center gap-3 px-3 py-2">
+            <UserAvatar userAvatar={userAvatar} userName={userName} />
+            <div className="flex flex-col">
+              <span className="text-sm font-medium text-black">{userName}</span>
+              <span className="text-xs text-gray-600">{userEmail}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
