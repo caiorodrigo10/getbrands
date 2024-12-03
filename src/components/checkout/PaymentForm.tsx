@@ -108,6 +108,7 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
         state: {
           orderId: sampleRequest.id,
           orderDetails: {
+            id: sampleRequest.id,
             customer: {
               firstName: localStorage.getItem('firstName'),
               lastName: localStorage.getItem('lastName')
@@ -124,7 +125,8 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
                 name: item.name,
                 image_url: item.image_url,
                 from_price: item.from_price
-              }
+              },
+              quantity: item.quantity
             })),
             subtotal: total + discountAmount - shippingCost,
             shippingCost: shippingCost,
