@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, useEffect, ReactNode } from "react";
 import { CartOperations } from "@/types/cart";
 import { useAuth } from "./AuthContext";
 import { useCartOperations } from "@/hooks/useCartOperations";
@@ -17,16 +17,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
     clearCart,
   } = useCartOperations(user);
 
+  useEffect(() => {
+    if (user?.id) {
+      loadCartItems();
+    } else {
+      items.length > 0 && clearCart(true);
+    }
+  }, [user?.id]); 
+
   return (
     <CartContext.Provider
-      value={{
-        items,
-        addItem,
-        removeItem,
-        updateQuantity,
-        clearCart,
+      value={{ 
+        items, 
+        addItem, 
+        removeItem, 
+        updateQuantity, 
+        clearCart, 
         isLoading,
-        loadCartItems
+        loadCartItems 
       }}
     >
       {children}

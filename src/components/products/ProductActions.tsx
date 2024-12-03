@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { useUserPermissions } from "@/lib/permissions";
 import { Video } from "lucide-react";
-import { useCart } from "@/contexts/CartContext";
 
 interface ProductActionsProps {
   productId: string;
@@ -16,17 +15,13 @@ export const ProductActions = ({ productId, onSelectProduct }: ProductActionsPro
   const navigate = useNavigate();
   const { toast } = useToast();
   const { hasFullAccess, isMember, isSampler } = useUserPermissions();
-  const { loadCartItems } = useCart();
 
   const handleOrderSample = async () => {
     try {
       const success = await handleRequestSample();
       if (success) {
-        // Recarrega os itens do carrinho antes de navegar
-        await loadCartItems();
-        // Aguarda um momento para garantir que o estado do carrinho foi atualizado
-        await new Promise(resolve => setTimeout(resolve, 800));
-        navigate("/checkout/confirmation");
+        // Use replace: true to prevent back navigation issues
+        navigate("/checkout/confirmation", { replace: true });
       }
     } catch (error) {
       toast({

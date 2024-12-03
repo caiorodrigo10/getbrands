@@ -97,8 +97,10 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
         return;
       }
 
+      // Silently clear cart without showing notification
       await clearCart(true);
       
+      // Navigate to success page with order details
       navigate('/checkout/success', {
         state: {
           orderId: sampleRequest.id,

@@ -1,9 +1,8 @@
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import type { CartItem } from "@/types/cart";
 import type { User } from "@supabase/supabase-js";
-import type { Product } from "@/types/product";
-import { supabase } from "@/integrations/supabase/client";
 
 export const useCartOperations = (user: User | null) => {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -15,87 +14,61 @@ export const useCartOperations = (user: User | null) => {
     
     setIsLoading(true);
     try {
-      const { data: cartItems, error: cartError } = await supabase
+      const { data, error } = await supabase
         .from('cart_items')
         .select(`
           product_id,
-          products (*)
+          products (
+            id,
+            name,
+            description,
+            image_url,
+            from_price
+          )
         `)
         .eq('user_id', user.id);
 
-      if (cartError) throw cartError;
+      if (error) throw error;
 
-      if (cartItems) {
-        const formattedItems = cartItems.map(item => ({
-          ...item.products,
-          quantity: 1
-        })) as CartItem[];
+      const cartItems = data.map(item => ({
+        id: item.product_id,
+        ...item.products,
+        quantity: 1
+      }));
 
-        setItems(formattedItems);
-      }
+      setItems(cartItems);
     } catch (error) {
       console.error('Error loading cart items:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to load cart items. Please try again.",
-      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const addItem = async (item: Product) => {
+  const addItem = async (item: CartItem) => {
     if (!user?.id) return;
 
     try {
-      // First check if the item already exists in the database
-      const { data: existingCartItem, error: checkError } = await supabase
-        .from('cart_items')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('product_id', item.id)
-        .maybeSingle();
-
-      if (checkError) throw checkError;
-
-      if (existingCartItem) {
-        // If item exists in database, update local state
-        const existingItem = items.find(i => i.id === item.id);
-        if (existingItem) {
-          await updateQuantity(item.id, (existingItem.quantity || 1) + 1);
-        } else {
-          // If item exists in database but not in state, add it to state
-          setItems(prev => [...prev, { ...item, quantity: 1 }]);
-        }
-        return;
-      }
-
-      // If item doesn't exist, insert new cart item
-      const { error: insertError } = await supabase
+      const { error } = await supabase
         .from('cart_items')
         .insert({
           user_id: user.id,
           product_id: item.id
         });
 
-      if (insertError) {
-        // If error is not duplicate key error, throw it
-        if (insertError.code !== '23505') {
-          throw insertError;
-        }
-      }
+      if (error) throw error;
 
-      setItems(prev => [...prev, { ...item, quantity: 1 }]);
-      
-    } catch (error: any) {
+      setItems(prev => [...prev, item]);
+      toast({
+        title: "Item added to cart",
+        description: `${item.name} has been added to your cart.`
+      });
+    } catch (error) {
       console.error('Error adding item to cart:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Failed to add item to cart",
+        description: "Failed to add item to cart"
       });
-      throw error;
     }
   };
 
@@ -112,20 +85,21 @@ export const useCartOperations = (user: User | null) => {
       if (error) throw error;
 
       setItems(prev => prev.filter(item => item.id !== itemId));
-      
-    } catch (error: any) {
+      toast({
+        title: "Item removed",
+        description: "Item has been removed from your cart."
+      });
+    } catch (error) {
       console.error('Error removing item from cart:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Failed to remove item from cart",
+        description: "Failed to remove item from cart"
       });
-      throw error;
     }
   };
 
-  const updateQuantity = async (itemId: string, quantity: number) => {
-    // Update local state immediately for better UX
+  const updateQuantity = (itemId: string, quantity: number) => {
     setItems(prev =>
       prev.map(item =>
         item.id === itemId ? { ...item, quantity } : item
@@ -152,16 +126,15 @@ export const useCartOperations = (user: User | null) => {
           description: "All items have been removed from your cart."
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error clearing cart:', error);
       if (!silent) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: error.message || "Failed to clear cart",
+          description: "Failed to clear cart"
         });
       }
-      throw error;
     }
   };
 
