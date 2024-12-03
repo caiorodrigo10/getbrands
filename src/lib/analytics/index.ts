@@ -96,6 +96,8 @@ export const trackPage = async (properties?: Record<string, any>) => {
       pageName = "Homepage Viewed";
     } else if (path === "/comecarpt") {
       pageName = "Portuguese Start Page Viewed";
+    } else if (path === "/catalog" || path.startsWith("/catalog/")) {
+      pageName = "Catalog Viewed";
     }
     
     const pageProperties = {
