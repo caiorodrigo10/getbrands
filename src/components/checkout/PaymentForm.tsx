@@ -37,10 +37,14 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
     setIsLoading(true);
 
     try {
+      // Get current session before payment
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
+
       const { error: paymentError } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/checkout/success`,
+          return_url: `${window.location.origin}/checkout/success?token=${accessToken}`,
         },
       });
 
