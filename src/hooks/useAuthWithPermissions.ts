@@ -20,12 +20,24 @@ export const useAuthWithPermissions = () => {
       return data;
     },
     enabled: !!user?.id,
-    gcTime: 1000 * 60 * 60 * 24, // 24 hours instead of cacheTime
+    gcTime: 1000 * 60 * 60 * 24, // 24 hours
   });
+
+  const isAdmin = profile?.role === "admin";
+  const isMember = profile?.role === "member";
+  const isSampler = profile?.role === "sampler";
+  const hasFullAccess = isAdmin;
+  const hasLimitedAccess = isMember || isSampler;
+  const isAuthenticated = !!user;
 
   return {
     profile,
     isLoading,
-    isAdmin: profile?.role === "admin",
+    isAdmin,
+    isMember,
+    isSampler,
+    hasFullAccess,
+    hasLimitedAccess,
+    isAuthenticated
   };
 };

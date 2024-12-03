@@ -18,11 +18,16 @@ interface CreateOrderParams {
   discount_amount?: number;
 }
 
-export const PaymentForm = () => {
+interface PaymentFormProps {
+  clientSecret: string;
+  total: number;
+  shippingCost: number;
+  discountAmount: number;
+}
+
+export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount }: PaymentFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-
-  const [discountAmount, setDiscountAmount] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,7 +36,7 @@ export const PaymentForm = () => {
     try {
       const orderData: CreateOrderParams = {
         user_id: user?.id || "",
-        total: 100, // Example total
+        total: total,
         discount_amount: discountAmount,
       };
       
