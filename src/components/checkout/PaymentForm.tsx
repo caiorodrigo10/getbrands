@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
+import { createOrder } from "@/lib/utils/paymentUtils";
 import {
   PaymentElement,
   useStripe,
@@ -42,6 +43,7 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
         throw new Error("No active session found");
       }
 
+      // Create sample request first
       const { data: sampleRequest, error: sampleRequestError } = await supabase
         .from('sample_requests')
         .insert({
@@ -67,6 +69,7 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
 
       if (sampleRequestError) throw sampleRequestError;
 
+      // Insert sample request products
       const { error: productsError } = await supabase
         .from('sample_request_products')
         .insert(
@@ -80,6 +83,7 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
 
       if (productsError) throw productsError;
 
+      // Confirm payment with Stripe
       const { error: paymentError } = await stripe.confirmPayment({
         elements,
         confirmParams: {
@@ -95,6 +99,24 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
           description: paymentError.message || "An error occurred during payment",
         });
         return;
+      }
+
+      // Create Shopify order
+      try {
+        await createOrder({
+          user,
+          items,
+          total,
+          shippingCost,
+          orderId: sampleRequest.id
+        });
+      } catch (shopifyError: any) {
+        console.error('Error creating Shopify order:', shopifyError);
+        toast({
+          variant: "destructive",
+          title: "Warning",
+          description: "Order processed but there was an issue syncing with our inventory system. Our team will handle this manually.",
+        });
       }
 
       // Silently clear cart without showing notification

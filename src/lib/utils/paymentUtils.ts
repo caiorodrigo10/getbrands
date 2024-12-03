@@ -16,6 +16,14 @@ interface CreateOrderParams {
 }
 
 export const createOrder = async ({ user, items, total, shippingCost, orderId }: CreateOrderParams) => {
+  console.log('Creating order with params:', { 
+    userId: user.id,
+    itemCount: items.length,
+    total,
+    shippingCost,
+    orderId 
+  });
+
   // Get Shopify variant IDs for the products
   const { data: shopifyProducts, error: shopifyError } = await supabase
     .from('shopify_products')
@@ -52,7 +60,7 @@ export const createOrder = async ({ user, items, total, shippingCost, orderId }:
   }
 
   // Create order in Shopify
-  await createShopifyOrder({
+  const shopifyOrder = await createShopifyOrder({
     orderId,
     customer: {
       first_name: localStorage.getItem('firstName') || '',
@@ -75,6 +83,20 @@ export const createOrder = async ({ user, items, total, shippingCost, orderId }:
     })).filter(item => item.variant_id) // Only include items with valid variant IDs
   });
 
+  console.log('Shopify order created:', shopifyOrder);
+
+  // Update sample request with Shopify order ID
+  if (shopifyOrder?.id) {
+    const { error: updateError } = await supabase
+      .from('sample_requests')
+      .update({ shopify_order_id: shopifyOrder.id.toString() })
+      .eq('id', orderId);
+
+    if (updateError) {
+      console.error('Error updating sample request with Shopify order ID:', updateError);
+    }
+  }
+
   // Track successful checkout
   trackCheckoutCompleted(
     orderId,
@@ -92,4 +114,6 @@ export const createOrder = async ({ user, items, total, shippingCost, orderId }:
     shippingCost,
     user.email
   );
+
+  return shopifyOrder;
 };
