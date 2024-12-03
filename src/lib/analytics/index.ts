@@ -91,14 +91,41 @@ export const trackPage = async (properties?: Record<string, any>) => {
     const path = properties?.path || window.location.pathname;
     
     // Define o nome do evento baseado no path
-    let pageName = "Page Viewed";
+    let pageName = "";
+    
+    // Mapeamento de rotas para eventos específicos
     if (path === "/") {
       pageName = "Homepage Viewed";
     } else if (path === "/comecarpt") {
       pageName = "Portuguese Start Page Viewed";
     } else if (path === "/catalog" || path.startsWith("/catalog/")) {
       pageName = "Catalog Viewed";
+    } else if (path === "/dashboard") {
+      pageName = "Dashboard Viewed";
+    } else if (path === "/projects") {
+      pageName = "Projects List Viewed";
+    } else if (path.startsWith("/projects/")) {
+      pageName = "Project Details Viewed";
+    } else if (path === "/profile") {
+      pageName = "Profile Viewed";
+    } else if (path === "/sample-orders") {
+      pageName = "Sample Orders Viewed";
+    } else if (path === "/profit-calculator") {
+      pageName = "Profit Calculator Viewed";
+    } else if (path === "/start-here") {
+      pageName = "Start Here Viewed";
+    } else if (path === "/login") {
+      pageName = "Login Page Viewed";
+    } else if (path === "/signup") {
+      pageName = "Signup Page Viewed";
+    } else if (path.startsWith("/checkout")) {
+      pageName = "Checkout Page Viewed";
+    } else {
+      // Se não houver mapeamento específico, usa o path como nome do evento
+      pageName = `${path.substring(1).replace(/\//g, " ").replace(/-/g, " ")} Viewed`.trim();
     }
+    
+    if (!pageName) return; // Não envia evento se não tiver nome definido
     
     const pageProperties = {
       url: formatUrl(window.location.href),
@@ -113,7 +140,6 @@ export const trackPage = async (properties?: Record<string, any>) => {
       ...(properties?.url ? { url: formatUrl(properties.url) } : {})
     };
 
-    // Agora enviamos apenas um evento por página
     window.analytics.page(pageName, pageProperties);
     console.log('Page view:', { pageName, properties: pageProperties });
   } catch (error) {
