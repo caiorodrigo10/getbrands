@@ -20,6 +20,7 @@ const Payment = () => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [selectedCountry] = useState("USA");
   const { toast } = useToast();
+  const [isCreatingPaymentIntent, setIsCreatingPaymentIntent] = useState(false);
   
   const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
   
@@ -43,7 +44,11 @@ const Payment = () => {
 
   useEffect(() => {
     const createPaymentIntent = async () => {
+      if (isCreatingPaymentIntent) return;
+      
       try {
+        setIsCreatingPaymentIntent(true);
+        
         console.log('Creating payment intent with:', {
           amount: total,
           shipping_amount: shippingCost,
@@ -53,7 +58,7 @@ const Payment = () => {
 
         const { data, error } = await supabase.functions.invoke('create-payment-intent', {
           body: { 
-            amount: total, // This is the final amount after discount
+            amount: total,
             currency: 'usd',
             shipping_amount: shippingCost,
             items: items.map(item => ({
@@ -101,10 +106,12 @@ const Payment = () => {
           title: "Error",
           description: "Failed to setup payment. Please try again.",
         });
+      } finally {
+        setIsCreatingPaymentIntent(false);
       }
     };
 
-    if (items.length > 0 && !isLoadingShipping) {
+    if (items.length > 0 && !isLoadingShipping && !clientSecret) {
       createPaymentIntent();
     }
   }, [items, isLoadingShipping, total, shippingCost, subtotal, discountAmount, toast]);
