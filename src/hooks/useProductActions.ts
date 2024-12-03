@@ -3,12 +3,10 @@ import { useCart } from "@/contexts/CartContext";
 import { trackEvent } from "@/lib/analytics";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
-import { useToast } from "@/components/ui/use-toast";
 
-export const useProductActions = (productId: string, showNotification: boolean = true) => {
+export const useProductActions = (productId: string) => {
   const [isLoading, setIsLoading] = useState(false);
   const { addItem, loadCartItems } = useCart();
-  const { toast } = useToast();
 
   const handleRequestSample = async () => {
     try {
@@ -31,26 +29,10 @@ export const useProductActions = (productId: string, showNotification: boolean =
         product_id: productId
       });
 
-      // Only show toast if showNotification is true
-      if (showNotification) {
-        toast({
-          title: "Item added to cart",
-          description: `${product.name} has been added to your cart.`
-        });
-      }
-
       // Return true to indicate success
       return true;
     } catch (error) {
       console.error('Error requesting sample:', error);
-      // Only show error toast if showNotification is true
-      if (showNotification) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to add sample to cart. Please try again.",
-        });
-      }
       throw error;
     } finally {
       setIsLoading(false);

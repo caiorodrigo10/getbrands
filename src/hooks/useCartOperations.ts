@@ -33,7 +33,8 @@ export const useCartOperations = (user: User | null) => {
       const cartItems = data.map(item => ({
         id: item.product_id,
         ...item.products,
-        quantity: 1
+        quantity: 1,
+        price: Number(item.products.from_price) || 0
       }));
 
       setItems(cartItems);
@@ -57,11 +58,13 @@ export const useCartOperations = (user: User | null) => {
 
       if (error) throw error;
 
-      setItems(prev => [...prev, item]);
-      toast({
-        title: "Item added to cart",
-        description: `${item.name} has been added to your cart.`
-      });
+      const itemWithPrice = {
+        ...item,
+        price: Number(item.price) || 0,
+        quantity: 1
+      };
+
+      setItems(prev => [...prev, itemWithPrice]);
     } catch (error) {
       console.error('Error adding item to cart:', error);
       toast({
