@@ -1,5 +1,3 @@
-import { toast } from "sonner";
-
 let analyticsInitialized = false;
 
 const initializeAnalytics = () => {
@@ -7,8 +5,6 @@ const initializeAnalytics = () => {
   if (!window.analytics) return false;
   
   analyticsInitialized = true;
-  window.analytics.debug();
-  console.log('✅ Segment analytics initialized with write key:', window.analytics._writeKey);
   return true;
 };
 
@@ -58,7 +54,6 @@ export const identifyUser = async (userId: string, traits?: Record<string, any>)
     };
 
     window.analytics.identify(userId, identifyTraits);
-    console.log('Identify call successful:', { userId, traits: identifyTraits });
   } catch (error) {
     console.error('Error in identify call:', error);
     toast.error('Analytics Error: Failed to identify user');
@@ -77,7 +72,6 @@ export const trackEvent = async (eventName: string, properties?: Record<string, 
     };
 
     window.analytics.track(eventName, eventProperties);
-    console.log('Track event:', { eventName, properties: eventProperties });
   } catch (error) {
     console.error('Error tracking event:', error);
     toast.error(`Analytics Error: Failed to track ${eventName}`);
@@ -88,15 +82,44 @@ export const trackPage = async (properties?: Record<string, any>) => {
   try {
     await waitForAnalytics();
     
-    // Define um nome específico para páginas especiais
-    let pageName = "Page Viewed";
     const path = properties?.path || window.location.pathname;
     
+    // Define o nome do evento baseado no path
+    let pageName = "";
+    
+    // Mapeamento de rotas para eventos específicos
     if (path === "/") {
       pageName = "Homepage Viewed";
     } else if (path === "/comecarpt") {
       pageName = "Portuguese Start Page Viewed";
+    } else if (path === "/catalog" || path.startsWith("/catalog/")) {
+      pageName = "Catalog Viewed";
+    } else if (path === "/dashboard") {
+      pageName = "Dashboard Viewed";
+    } else if (path === "/projects") {
+      pageName = "Projects List Viewed";
+    } else if (path.startsWith("/projects/")) {
+      pageName = "Project Details Viewed";
+    } else if (path === "/profile") {
+      pageName = "Profile Viewed";
+    } else if (path === "/sample-orders") {
+      pageName = "Sample Orders Viewed";
+    } else if (path === "/profit-calculator") {
+      pageName = "Profit Calculator Viewed";
+    } else if (path === "/start-here") {
+      pageName = "Start Here Viewed";
+    } else if (path === "/login") {
+      pageName = "Login Page Viewed";
+    } else if (path === "/signup") {
+      pageName = "Signup Page Viewed";
+    } else if (path.startsWith("/checkout")) {
+      pageName = "Checkout Page Viewed";
+    } else {
+      // Se não houver mapeamento específico, usa o path como nome do evento
+      pageName = `${path.substring(1).replace(/\//g, " ").replace(/-/g, " ")} Viewed`.trim();
     }
+    
+    if (!pageName) return; // Não envia evento se não tiver nome definido
     
     const pageProperties = {
       url: formatUrl(window.location.href),
@@ -112,7 +135,6 @@ export const trackPage = async (properties?: Record<string, any>) => {
     };
 
     window.analytics.page(pageName, pageProperties);
-    console.log('Page view:', { pageName, properties: pageProperties });
   } catch (error) {
     console.error('Error tracking page view:', error);
     toast.error('Analytics Error: Failed to track page view');

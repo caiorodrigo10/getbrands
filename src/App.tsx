@@ -9,7 +9,6 @@ import { AppRoutes } from "./routes/AppRoutes";
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useRef } from "react";
-import { debugAnalytics } from "./lib/analytics/debug";
 import { trackPage } from "./lib/analytics";
 
 const queryClient = new QueryClient({
@@ -32,11 +31,8 @@ const RouteTracker = () => {
   useEffect(() => {
     // Só dispara o evento se o path mudou
     if (lastTrackedPath.current !== location.pathname) {
-      trackPage({
-        path: location.pathname,
-        search: location.search,
-        url: window.location.href
-      });
+      // Agora o trackPage já inclui todos os dados necessários
+      trackPage();
       lastTrackedPath.current = location.pathname;
     }
   }, [location]);
@@ -45,16 +41,6 @@ const RouteTracker = () => {
 };
 
 const App = () => {
-  // Usar useRef para garantir que debugAnalytics só é chamado uma vez
-  const analyticsInitialized = useRef(false);
-
-  useEffect(() => {
-    if (!analyticsInitialized.current) {
-      debugAnalytics();
-      analyticsInitialized.current = true;
-    }
-  }, []);
-
   return (
     <SessionContextProvider 
       supabaseClient={supabase} 
