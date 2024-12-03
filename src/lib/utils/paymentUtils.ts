@@ -22,12 +22,27 @@ export const createOrder = async ({ user, items, total, shippingCost, orderId }:
     .select('shopify_variant_id, product_id')
     .in('product_id', items.map(item => item.id));
 
-  if (shopifyError) throw shopifyError;
+  if (shopifyError) {
+    console.error('Error fetching Shopify products:', shopifyError);
+    throw new Error('Failed to fetch Shopify product mappings');
+  }
+
+  if (!shopifyProducts || shopifyProducts.length === 0) {
+    console.error('No Shopify products found for:', items.map(item => item.id));
+    throw new Error('Products are not properly configured in Shopify. Please contact support.');
+  }
 
   // Create a map of our product IDs to Shopify variant IDs
   const variantMap = new Map(
     shopifyProducts?.map(sp => [sp.product_id, sp.shopify_variant_id]) || []
   );
+
+  // Validate that all products have Shopify variants
+  const productsWithoutVariants = items.filter(item => !variantMap.get(item.id));
+  if (productsWithoutVariants.length > 0) {
+    console.error('Products missing Shopify variants:', productsWithoutVariants);
+    throw new Error(`Some products are not properly configured in Shopify (${productsWithoutVariants.length} items). Please contact support.`);
+  }
 
   const phone = localStorage.getItem('phone') || '';
   const formattedPhone = formatPhoneForShopify(phone);
@@ -57,7 +72,7 @@ export const createOrder = async ({ user, items, total, shippingCost, orderId }:
       variant_id: variantMap.get(item.id) || '',
       quantity: item.quantity || 1,
       price: item.from_price
-    }))
+    })).filter(item => item.variant_id) // Only include items with valid variant IDs
   });
 
   // Track successful checkout
