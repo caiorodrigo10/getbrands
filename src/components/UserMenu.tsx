@@ -15,8 +15,6 @@ import { MenuItems } from "./user-menu/MenuItems";
 import { useSessionManagement } from "@/hooks/useSessionManagement";
 import { useProfileManagement } from "@/hooks/useProfileManagement";
 import { errorMessages } from "@/utils/errorMessages";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
 interface UserMenuProps {
   isMobile: boolean;
@@ -34,20 +32,10 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
     return errorMessages[key][isPortuguese ? 'pt' : 'en'];
   };
 
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ["profile", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user?.id,
+  const { profile, isLoading } = useProfileManagement({
+    user,
+    isPortuguese,
+    getErrorMessage,
   });
 
   if (!user) return null;
