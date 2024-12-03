@@ -37,6 +37,12 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
     setIsLoading(true);
 
     try {
+      // Get current session before creating sample request
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("No active session found");
+      }
+
       // Create sample request first
       const { data: sampleRequest, error: sampleRequestError } = await supabase
         .from('sample_requests')
@@ -63,14 +69,10 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
 
       if (sampleRequestError) throw sampleRequestError;
 
-      // Get current session before payment
-      const { data: { session } } = await supabase.auth.getSession();
-      const accessToken = session?.access_token;
-
       const { error: paymentError } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/checkout/success?token=${accessToken}&order_id=${sampleRequest.id}`,
+          return_url: `${window.location.origin}/checkout/success?token=${session.access_token}&order_id=${sampleRequest.id}`,
         },
       });
 
