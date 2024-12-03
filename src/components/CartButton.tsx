@@ -29,8 +29,8 @@ export function CartButton() {
       }))
     });
 
-    // Navigate to payment page
-    navigate("/checkout/payment");
+    // Navigate to confirmation page
+    navigate("/checkout/confirmation");
   };
 
   return (

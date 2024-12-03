@@ -33,6 +33,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [sessionChecked, setSessionChecked] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -47,8 +48,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .single();
 
       if (error) throw error;
-
-      console.log("[DEBUG] AuthContext - Current profile:", profile);
 
       if (profile) {
         // Retry analytics identification if it fails
@@ -92,6 +91,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Error in handleAuthChange:', error);
     } finally {
       setIsLoading(false);
+      setSessionChecked(true);
     }
   };
 
@@ -100,16 +100,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     const initSession = async () => {
       try {
+        setIsLoading(true);
         const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) throw error;
+        
+        if (error) {
+          console.error('Session error:', error);
+          throw error;
+        }
         
         if (mounted) {
-          await handleAuthChange(session);
+          if (session?.user) {
+            setUser(session.user);
+            setIsAuthenticated(true);
+            identifyUserInAnalytics(session);
+          }
+          setSessionChecked(true);
+          setIsLoading(false);
         }
       } catch (error) {
         console.error('Session error:', error);
         if (mounted) {
           setIsLoading(false);
+          setSessionChecked(true);
         }
       }
     };
@@ -118,7 +130,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (mounted) {
-        await handleAuthChange(session);
+        if (session?.user) {
+          setUser(session.user);
+          setIsAuthenticated(true);
+          identifyUserInAnalytics(session);
+        } else {
+          setUser(null);
+          setIsAuthenticated(false);
+          clearGleapIdentity();
+        }
+        setSessionChecked(true);
+        setIsLoading(false);
       }
     });
 
@@ -174,8 +196,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // Não renderiza nada até a primeira verificação de sessão ser concluída
+  if (!sessionChecked) {
+    return <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>;
+  }
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, isAuthenticated, signOut, login }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isLoading, 
+      isAuthenticated, 
+      signOut, 
+      login 
+    }}>
       {children}
     </AuthContext.Provider>
   );
