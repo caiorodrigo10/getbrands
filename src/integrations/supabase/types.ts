@@ -227,7 +227,8 @@ export type Database = {
         Row: {
           code: string
           created_at: string | null
-          discount_amount: number
+          discount_type: string
+          discount_value: number
           id: string
           is_active: boolean | null
           updated_at: string | null
@@ -237,7 +238,8 @@ export type Database = {
         Insert: {
           code: string
           created_at?: string | null
-          discount_amount: number
+          discount_type?: string
+          discount_value: number
           id?: string
           is_active?: boolean | null
           updated_at?: string | null
@@ -247,7 +249,8 @@ export type Database = {
         Update: {
           code?: string
           created_at?: string | null
-          discount_amount?: number
+          discount_type?: string
+          discount_value?: number
           id?: string
           is_active?: boolean | null
           updated_at?: string | null

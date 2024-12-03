@@ -4,10 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const CouponForm = ({ onCouponCreated }: { onCouponCreated: () => void }) => {
   const [code, setCode] = useState("");
-  const [discountAmount, setDiscountAmount] = useState("");
+  const [discountValue, setDiscountValue] = useState("");
+  const [discountType, setDiscountType] = useState<"fixed" | "percentage">("fixed");
   const [validUntil, setValidUntil] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -17,12 +19,18 @@ export const CouponForm = ({ onCouponCreated }: { onCouponCreated: () => void })
     setIsLoading(true);
 
     try {
+      // Validate percentage is between 0 and 100
+      if (discountType === "percentage" && (Number(discountValue) < 0 || Number(discountValue) > 100)) {
+        throw new Error("Percentage must be between 0 and 100");
+      }
+
       const { error } = await supabase
         .from('coupons')
         .insert([
           {
             code: code.toUpperCase(),
-            discount_amount: Number(discountAmount),
+            discount_value: Number(discountValue),
+            discount_type: discountType,
             valid_until: validUntil ? new Date(validUntil).toISOString() : null,
             is_active: true
           }
@@ -37,16 +45,16 @@ export const CouponForm = ({ onCouponCreated }: { onCouponCreated: () => void })
 
       // Reset form
       setCode("");
-      setDiscountAmount("");
+      setDiscountValue("");
       setValidUntil("");
       
       // Reload coupons
       onCouponCreated();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to create coupon",
+        description: error.message || "Failed to create coupon",
       });
     } finally {
       setIsLoading(false);
@@ -72,15 +80,34 @@ export const CouponForm = ({ onCouponCreated }: { onCouponCreated: () => void })
           </div>
           
           <div>
-            <label className="block text-sm font-medium mb-1">Discount Amount ($)</label>
+            <label className="block text-sm font-medium mb-1">Discount Type</label>
+            <Select
+              value={discountType}
+              onValueChange={(value: "fixed" | "percentage") => setDiscountType(value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select discount type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="fixed">Fixed Amount ($)</SelectItem>
+                <SelectItem value="percentage">Percentage (%)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {discountType === "fixed" ? "Discount Amount ($)" : "Discount Percentage (%)"}
+            </label>
             <Input
               type="number"
-              value={discountAmount}
-              onChange={(e) => setDiscountAmount(e.target.value)}
-              placeholder="50"
+              value={discountValue}
+              onChange={(e) => setDiscountValue(e.target.value)}
+              placeholder={discountType === "fixed" ? "50" : "10"}
               required
               min="0"
-              step="0.01"
+              max={discountType === "percentage" ? "100" : undefined}
+              step={discountType === "fixed" ? "0.01" : "1"}
             />
           </div>
           

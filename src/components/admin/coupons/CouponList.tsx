@@ -7,7 +7,8 @@ import { useToast } from "@/components/ui/use-toast";
 interface Coupon {
   id: string;
   code: string;
-  discount_amount: number;
+  discount_value: number;
+  discount_type: 'fixed' | 'percentage';
   valid_until: string | null;
   is_active: boolean;
 }
@@ -44,6 +45,13 @@ export const CouponList = ({ coupons, onCouponUpdated }: CouponListProps) => {
     }
   };
 
+  const formatDiscount = (value: number, type: 'fixed' | 'percentage') => {
+    if (type === 'fixed') {
+      return `$${value}`;
+    }
+    return `${value}%`;
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -56,6 +64,7 @@ export const CouponList = ({ coupons, onCouponUpdated }: CouponListProps) => {
               <tr className="border-b">
                 <th className="text-left p-2">Code</th>
                 <th className="text-left p-2">Discount</th>
+                <th className="text-left p-2">Type</th>
                 <th className="text-left p-2">Valid Until</th>
                 <th className="text-left p-2">Status</th>
                 <th className="text-left p-2">Actions</th>
@@ -65,7 +74,8 @@ export const CouponList = ({ coupons, onCouponUpdated }: CouponListProps) => {
               {coupons.map((coupon) => (
                 <tr key={coupon.id} className="border-b">
                   <td className="p-2">{coupon.code}</td>
-                  <td className="p-2">${coupon.discount_amount}</td>
+                  <td className="p-2">{formatDiscount(coupon.discount_value, coupon.discount_type)}</td>
+                  <td className="p-2 capitalize">{coupon.discount_type}</td>
                   <td className="p-2">
                     {coupon.valid_until 
                       ? format(new Date(coupon.valid_until), 'PPP')
