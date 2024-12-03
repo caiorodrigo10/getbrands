@@ -30,7 +30,7 @@ export const ProtectedRoute = ({
   }
 
   // Se não estiver autenticado e a rota requer autenticação
-  if (!isAuthenticated && requiresAuth && !location.pathname.startsWith('/login')) {
+  if (!isAuthenticated && requiresAuth) {
     console.log('[DEBUG] ProtectedRoute - Redirecting to login');
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
@@ -41,11 +41,12 @@ export const ProtectedRoute = ({
     return <Navigate to="/catalog" replace />;
   }
 
-  // Se é uma rota restrita e não tem acesso completo (não admin)
+  // Se é uma rota restrita e não tem acesso completo
   if (isRestrictedRoute(location.pathname) && !hasFullAccess && !requiresAdmin) {
     console.log('[DEBUG] ProtectedRoute - Restricted route');
     return <Navigate to="/start-here" replace />;
   }
 
+  // Se chegou aqui, renderiza o conteúdo normalmente
   return <>{children}</>;
 };
