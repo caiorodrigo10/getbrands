@@ -1,5 +1,3 @@
-import { toast } from "sonner";
-
 let analyticsInitialized = false;
 
 const initializeAnalytics = () => {
@@ -7,8 +5,6 @@ const initializeAnalytics = () => {
   if (!window.analytics) return false;
   
   analyticsInitialized = true;
-  window.analytics.debug();
-  console.log('✅ Segment analytics initialized with write key:', window.analytics._writeKey);
   return true;
 };
 
@@ -58,7 +54,6 @@ export const identifyUser = async (userId: string, traits?: Record<string, any>)
     };
 
     window.analytics.identify(userId, identifyTraits);
-    console.log('Identify call successful:', { userId, traits: identifyTraits });
   } catch (error) {
     console.error('Error in identify call:', error);
     toast.error('Analytics Error: Failed to identify user');
@@ -77,7 +72,6 @@ export const trackEvent = async (eventName: string, properties?: Record<string, 
     };
 
     window.analytics.track(eventName, eventProperties);
-    console.log('Track event:', { eventName, properties: eventProperties });
   } catch (error) {
     console.error('Error tracking event:', error);
     toast.error(`Analytics Error: Failed to track ${eventName}`);
@@ -141,7 +135,6 @@ export const trackPage = async (properties?: Record<string, any>) => {
     };
 
     window.analytics.page(pageName, pageProperties);
-    console.log('Page view:', { pageName, properties: pageProperties });
   } catch (error) {
     console.error('Error tracking page view:', error);
     toast.error('Analytics Error: Failed to track page view');

@@ -9,7 +9,6 @@ import { AppRoutes } from "./routes/AppRoutes";
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useRef } from "react";
-import { debugAnalytics } from "./lib/analytics/debug";
 import { trackPage } from "./lib/analytics";
 
 const queryClient = new QueryClient({
@@ -45,16 +44,6 @@ const RouteTracker = () => {
 };
 
 const App = () => {
-  // Usar useRef para garantir que debugAnalytics só é chamado uma vez
-  const analyticsInitialized = useRef(false);
-
-  useEffect(() => {
-    if (!analyticsInitialized.current) {
-      debugAnalytics();
-      analyticsInitialized.current = true;
-    }
-  }, []);
-
   return (
     <SessionContextProvider 
       supabaseClient={supabase} 
