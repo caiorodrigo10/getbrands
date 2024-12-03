@@ -72,6 +72,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         throw paymentError;
       }
 
+      let shopifyError = false;
       try {
         await createOrder({
           user: {
@@ -84,18 +85,16 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
           orderId,
         });
       } catch (orderError: any) {
-        // If there's an error with Shopify order creation, we should still allow the order to complete
-        // but notify the admin about the issue
         console.error('Error creating Shopify order:', orderError);
-        toast({
-          variant: "destructive",
-          title: "Order Processing Notice",
-          description: "Your order has been placed but there may be a slight delay in processing. Our team has been notified.",
-        });
+        shopifyError = true;
       }
 
       clearCart();
-      navigate(`/checkout/success?order_id=${orderId}&payment_intent=${paymentIntent?.id}`);
+      
+      // Redirect to success page with additional parameter if there was a Shopify error
+      navigate(
+        `/checkout/success?order_id=${orderId}&payment_intent=${paymentIntent?.id}${shopifyError ? '&shopify_error=true' : ''}`
+      );
 
     } catch (error: any) {
       console.error("Payment error:", error);

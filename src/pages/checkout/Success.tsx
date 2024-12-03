@@ -3,9 +3,9 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu } from "@/components/NavigationMenu";
+import { useToast } from "@/components/ui/use-toast";
 import Confetti from "react-confetti";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 import { OrderConfirmationCard } from "@/components/checkout/success/OrderConfirmationCard";
 import { CustomerInformation } from "@/components/checkout/success/CustomerInformation";
 import { OrderSummaryDetails } from "@/components/checkout/success/OrderSummaryDetails";
@@ -19,6 +19,18 @@ const Success = () => {
   const { toast } = useToast();
   const orderId = searchParams.get("order_id");
   const paymentIntentId = searchParams.get("payment_intent");
+  const hasShopifyError = searchParams.get("shopify_error") === "true";
+
+  useEffect(() => {
+    if (hasShopifyError) {
+      toast({
+        variant: "destructive",
+        title: "Order Processing Notice",
+        description: "Your payment was successful, but there may be a slight delay in processing your order. Our team has been notified and will handle this shortly.",
+        duration: 10000, // Show for 10 seconds
+      });
+    }
+  }, [hasShopifyError, toast]);
 
   useEffect(() => {
     const getOrderDetails = async () => {
