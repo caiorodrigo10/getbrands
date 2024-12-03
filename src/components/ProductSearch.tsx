@@ -55,7 +55,6 @@ export const ProductSearch = ({ addToCart, onSelectProduct }: ProductSearchProps
     return <div>Error loading products</div>;
   }
 
-  // Safely handle the products data with proper typing and null checks
   const products = productsQuery.data?.data || [];
 
   const filteredProducts = query 
@@ -68,10 +67,6 @@ export const ProductSearch = ({ addToCart, onSelectProduct }: ProductSearchProps
     if (addToCart) {
       try {
         await addItem(product);
-        toast({
-          title: "Success",
-          description: "Product added to cart",
-        });
         setOpen(false);
       } catch (error) {
         toast({
