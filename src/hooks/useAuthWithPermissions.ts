@@ -16,8 +16,6 @@ export const useAuthWithPermissions = () => {
         return null;
       }
       
-      console.log("[DEBUG] Fetching profile for user ID:", user.id);
-      
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -30,18 +28,12 @@ export const useAuthWithPermissions = () => {
       }
       
       console.log("[DEBUG] Complete profile data:", data);
-      console.log("[DEBUG] Current role:", data?.role);
-      
-      // Adicionar verificação específica para o email do admin
-      if (data?.email === 'caio@avanttocrm.com' && data?.role !== 'admin') {
-        console.warn("[DEBUG] Warning: Admin user has incorrect role:", data?.role);
-      }
-
       return data;
     },
-    enabled: !!user?.id,
-    staleTime: 0, // Desabilitar cache para sempre obter o papel mais recente
-    refetchOnWindowFocus: false, // Evitar refetch automático ao focar a janela
+    enabled: !!user?.id && isAuthenticated,
+    staleTime: 30000, // Cache por 30 segundos
+    cacheTime: 1000 * 60 * 5, // Manter no cache por 5 minutos
+    refetchOnWindowFocus: false, // Não refetch ao focar janela
   });
 
   const isAdmin = profile?.role === 'admin';
@@ -68,6 +60,7 @@ export const useAuthWithPermissions = () => {
     isSampler,
     hasFullAccess,
     hasLimitedAccess,
+    profile
   };
 };
 
