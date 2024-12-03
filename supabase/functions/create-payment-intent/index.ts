@@ -29,13 +29,16 @@ serve(async (req) => {
       metadata 
     });
 
+    // Ensure we're using the discounted total amount
     // Convert amount to cents and ensure it's at least 1
-    const amountInCents = Math.max(Math.round(amount * 100), 1);
+    const finalAmount = Math.max(Math.round((amount) * 100), 1);
 
-    console.log('Final amount in cents (after discount):', amountInCents);
+    console.log('Final amount in cents (after discount):', finalAmount);
+    console.log('Original amount:', amount);
+    console.log('Discount amount:', discountAmount);
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amountInCents,
+      amount: finalAmount,
       currency,
       automatic_payment_methods: {
         enabled: true,
@@ -49,6 +52,7 @@ serve(async (req) => {
     });
 
     console.log('Payment intent created:', paymentIntent.id);
+    console.log('Amount to be charged:', paymentIntent.amount);
 
     return new Response(
       JSON.stringify({ clientSecret: paymentIntent.client_secret }),
