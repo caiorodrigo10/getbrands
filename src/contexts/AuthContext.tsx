@@ -36,7 +36,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Função separada para identificar usuário nos serviços de analytics
   const identifyUserInAnalytics = async (session: any) => {
     if (!session?.user) return;
     
@@ -48,6 +47,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .single();
 
       if (error) throw error;
+
+      console.log("[DEBUG] AuthContext - Current profile:", profile);
 
       if (profile) {
         // Retry analytics identification if it fails
@@ -75,6 +76,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const handleAuthChange = async (session: any) => {
+    console.log("[DEBUG] AuthContext - Auth state changed:", session?.user?.email);
     try {
       if (session?.user) {
         setUser(session.user);
