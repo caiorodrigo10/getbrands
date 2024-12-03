@@ -37,13 +37,11 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
     setIsLoading(true);
 
     try {
-      // Get current session before creating sample request
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error("No active session found");
       }
 
-      // Create sample request first
       const { data: sampleRequest, error: sampleRequestError } = await supabase
         .from('sample_requests')
         .insert({
@@ -61,7 +59,7 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
           last_name: localStorage.getItem('lastName'),
           payment_method: 'credit_card',
           shipping_cost: shippingCost,
-          subtotal: total + discountAmount - shippingCost,
+          subtotal: total - shippingCost,
           total: total
         })
         .select()
@@ -69,7 +67,6 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
 
       if (sampleRequestError) throw sampleRequestError;
 
-      // Insert sample request products
       const { error: productsError } = await supabase
         .from('sample_request_products')
         .insert(
@@ -100,8 +97,8 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
         return;
       }
 
-      // If we get here, payment was successful
-      await clearCart();
+      // Silently clear cart without showing notification
+      await clearCart(true);
       
       // Navigate to success page with order details
       navigate('/checkout/success', {
@@ -109,16 +106,12 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
           orderId: sampleRequest.id,
           orderDetails: {
             id: sampleRequest.id,
-            customer: {
-              firstName: localStorage.getItem('firstName'),
-              lastName: localStorage.getItem('lastName')
-            },
-            shippingAddress: {
-              address: localStorage.getItem('shipping_address'),
-              city: localStorage.getItem('shipping_city'),
-              state: localStorage.getItem('shipping_state'),
-              zip: localStorage.getItem('shipping_zip')
-            },
+            first_name: localStorage.getItem('firstName'),
+            last_name: localStorage.getItem('lastName'),
+            shipping_address: localStorage.getItem('shipping_address'),
+            shipping_city: localStorage.getItem('shipping_city'),
+            shipping_state: localStorage.getItem('shipping_state'),
+            shipping_zip: localStorage.getItem('shipping_zip'),
             products: items.map(item => ({
               product: {
                 id: item.id,
@@ -126,11 +119,12 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
                 image_url: item.image_url,
                 from_price: item.from_price
               },
-              quantity: item.quantity
+              quantity: item.quantity || 1,
+              unit_price: item.from_price
             })),
-            subtotal: total + discountAmount - shippingCost,
-            shippingCost: shippingCost,
-            amount: total
+            subtotal: total - shippingCost,
+            shipping_cost: shippingCost,
+            total: total
           }
         },
         replace: true
