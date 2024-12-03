@@ -88,10 +88,10 @@ export const trackPage = async (properties?: Record<string, any>) => {
   try {
     await waitForAnalytics();
     
-    // Define um nome específico para páginas especiais
-    let pageName = "Page Viewed";
     const path = properties?.path || window.location.pathname;
     
+    // Define o nome do evento baseado no path
+    let pageName = "Page Viewed";
     if (path === "/") {
       pageName = "Homepage Viewed";
     } else if (path === "/comecarpt") {
@@ -111,6 +111,7 @@ export const trackPage = async (properties?: Record<string, any>) => {
       ...(properties?.url ? { url: formatUrl(properties.url) } : {})
     };
 
+    // Agora enviamos apenas um evento por página
     window.analytics.page(pageName, pageProperties);
     console.log('Page view:', { pageName, properties: pageProperties });
   } catch (error) {
