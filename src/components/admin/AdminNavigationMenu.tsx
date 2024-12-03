@@ -53,7 +53,7 @@ export const AdminNavigationMenu = () => {
   const location = useLocation();
 
   return (
-    <div className="fixed left-0 top-0 w-64 h-screen bg-white border-r border-gray-200">
+    <div className="fixed left-0 top-0 w-64 h-screen bg-white border-r border-gray-200 z-50">
       <div className="flex flex-col h-full">
         <div className="p-6">
           <Link to="/admin">
