@@ -3,6 +3,8 @@ import { loadStripe } from "@stripe/stripe-js";
 import type { StripeElementsOptions } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +20,10 @@ const Payment = () => {
   const { toast } = useToast();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [selectedCountry] = useState("USA");
+  const [couponCode, setCouponCode] = useState("");
+  const [discount, setDiscount] = useState(0);
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+  
   const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
   
   const { data: shippingCost = 0, isLoading: isLoadingShipping } = useShippingCalculation(
@@ -26,7 +32,48 @@ const Payment = () => {
   );
 
   const subtotal = items.reduce((sum, item) => sum + (item.from_price * (item.quantity || 1)), 0);
-  const total = subtotal + (shippingCost || 0);
+  const total = subtotal + (shippingCost || 0) - discount;
+
+  const validateCoupon = async () => {
+    if (!couponCode.trim()) {
+      toast({
+        description: "Please enter a coupon code",
+      });
+      return;
+    }
+
+    setIsValidatingCoupon(true);
+    try {
+      // Here you would typically validate the coupon against your database
+      // For now, we'll use a simple example
+      const { data, error } = await supabase
+        .from('coupons')
+        .select('discount_amount')
+        .eq('code', couponCode.toUpperCase())
+        .single();
+
+      if (error || !data) {
+        toast({
+          variant: "destructive",
+          description: "Invalid coupon code",
+        });
+        setDiscount(0);
+        return;
+      }
+
+      setDiscount(data.discount_amount);
+      toast({
+        description: "Coupon applied successfully!",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "Error validating coupon",
+      });
+    } finally {
+      setIsValidatingCoupon(false);
+    }
+  };
 
   useEffect(() => {
     const createPaymentIntent = async () => {
@@ -42,7 +89,8 @@ const Payment = () => {
               unit_price: item.from_price
             })),
             subtotal: subtotal,
-            total: total
+            total: total,
+            discount: discount
           },
         });
 
@@ -63,7 +111,7 @@ const Payment = () => {
     if (items.length > 0 && !isLoadingShipping) {
       createPaymentIntent();
     }
-  }, [items, toast, isLoadingShipping, total, shippingCost, subtotal]);
+  }, [items, toast, isLoadingShipping, total, shippingCost, subtotal, discount]);
 
   if (!clientSecret || isLoadingShipping) {
     return (
@@ -88,16 +136,35 @@ const Payment = () => {
           <CardDescription>Enter your payment details below</CardDescription>
         </CardHeader>
         <CardContent>
-          <PaymentSummary 
-            subtotal={subtotal}
-            shippingCost={shippingCost}
-            total={total}
-          />
+          <div className="mb-6">
+            <PaymentSummary 
+              subtotal={subtotal}
+              shippingCost={shippingCost}
+              total={total}
+              discount={discount}
+            />
+            <div className="mt-4 flex gap-2">
+              <Input
+                placeholder="Enter coupon code"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                className="uppercase"
+              />
+              <Button 
+                onClick={validateCoupon}
+                disabled={isValidatingCoupon || !couponCode.trim()}
+                variant="outline"
+              >
+                {isValidatingCoupon ? "Validating..." : "Apply"}
+              </Button>
+            </div>
+          </div>
           <Elements stripe={stripePromise} options={options}>
             <PaymentForm 
               clientSecret={clientSecret} 
               total={total} 
               shippingCost={shippingCost}
+              discount={discount}
             />
           </Elements>
         </CardContent>
