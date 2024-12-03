@@ -43,11 +43,14 @@ export const useProductActions = (productId: string, showNotification: boolean =
       return true;
     } catch (error) {
       console.error('Error requesting sample:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to add sample to cart. Please try again.",
-      });
+      // Only show error toast if showNotification is true
+      if (showNotification) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to add sample to cart. Please try again.",
+        });
+      }
       throw error;
     } finally {
       setIsLoading(false);
