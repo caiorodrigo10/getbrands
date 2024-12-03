@@ -9,6 +9,7 @@ import {
   Upload,
   Ticket
 } from "lucide-react";
+import UserMenu from "../UserMenu";
 
 const menuItems = [
   {
@@ -88,6 +89,10 @@ export const AdminNavigationMenu = () => {
             );
           })}
         </nav>
+
+        <div className="p-4 border-t border-gray-200">
+          <UserMenu isMobile={false} />
+        </div>
       </div>
     </div>
   );
