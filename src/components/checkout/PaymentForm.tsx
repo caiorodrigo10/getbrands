@@ -61,7 +61,7 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
         type="number"
         placeholder="Discount Amount"
         value={discountAmount || ""}
-        onChange={(e) => setDiscountAmount(Number(e.target.value))}
+        readOnly
       />
       <Button type="submit" disabled={isLoading}>
         {isLoading ? "Processing..." : "Submit Payment"}
