@@ -65,7 +65,7 @@ export const AdminUserMenu = ({
                 className="w-full justify-start"
               >
                 <User className="h-4 w-4" />
-                <span className="ml-2">Meu Perfil</span>
+                <span className="ml-2">My Profile</span>
               </Button>
             </Link>
             <Button
