@@ -21,8 +21,15 @@ export const useProductActions = (productId: string) => {
         .eq('id', productId)
         .single();
         
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       
+      if (!product) {
+        throw new Error('Product not found');
+      }
+
+      // Add to cart
       await addItem(product as Product);
       
       // Track sample request event
@@ -30,16 +37,15 @@ export const useProductActions = (productId: string) => {
         product_id: productId
       });
 
-      // Return true to indicate success
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error requesting sample:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to add sample to cart. Please try again.",
+        description: error.message || "Failed to add sample to cart. Please try again.",
       });
-      throw error;
+      return false;
     } finally {
       setIsLoading(false);
     }
