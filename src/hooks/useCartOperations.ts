@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import type { CartItem } from "@/types/cart";
 import type { User } from "@supabase/supabase-js";
 import type { Product } from "@/types/product";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useCartOperations = (user: User | null) => {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -42,6 +42,16 @@ export const useCartOperations = (user: User | null) => {
     if (!user?.id) return;
 
     try {
+      // Check if item already exists in cart
+      const existingItem = items.find(i => i.id === item.id);
+      
+      if (existingItem) {
+        // If item exists, update quantity instead of inserting
+        await updateQuantity(item.id, (existingItem.quantity || 1) + 1);
+        return;
+      }
+
+      // If item doesn't exist, insert new cart item
       const { error } = await supabase
         .from('cart_items')
         .insert({
@@ -49,7 +59,12 @@ export const useCartOperations = (user: User | null) => {
           product_id: item.id
         });
 
-      if (error) throw error;
+      if (error) {
+        // If error is not duplicate key error, throw it
+        if (error.code !== '23505') {
+          throw error;
+        }
+      }
 
       setItems(prev => [...prev, { ...item, quantity: 1 }]);
       
@@ -80,11 +95,15 @@ export const useCartOperations = (user: User | null) => {
   };
 
   const updateQuantity = async (itemId: string, quantity: number) => {
+    // Update local state immediately for better UX
     setItems(prev =>
       prev.map(item =>
         item.id === itemId ? { ...item, quantity } : item
       )
     );
+
+    // No need to update database as we only store the item reference
+    // Quantity is managed in the frontend state
   };
 
   const clearCart = async (silent: boolean = false) => {
