@@ -53,29 +53,43 @@ export const AdminNavigationMenu = () => {
   const location = useLocation();
 
   return (
-    <nav className="space-y-1">
-      {menuItems.map((item) => {
-        const isActive = item.exact 
-          ? location.pathname === item.href
-          : location.pathname.startsWith(item.href);
-
-        return (
-          <Link
-            key={item.href}
-            to={item.href}
-            className={cn(
-              "flex items-center px-4 py-2 text-sm font-medium rounded-md",
-              isActive
-                ? "bg-gray-100 text-gray-900"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            )}
-          >
-            <item.icon className="mr-3 h-5 w-5" />
-            {item.title}
+    <div className="fixed left-0 top-0 w-64 h-screen bg-white border-r border-gray-200">
+      <div className="flex flex-col h-full">
+        <div className="p-6">
+          <Link to="/admin">
+            <img 
+              src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
+              alt="Logo"
+              className="h-12 w-auto"
+            />
           </Link>
-        );
-      })}
-    </nav>
+        </div>
+
+        <nav className="flex-1 px-4 space-y-1">
+          {menuItems.map((item) => {
+            const isActive = item.exact 
+              ? location.pathname === item.href
+              : location.pathname.startsWith(item.href);
+
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={cn(
+                  "flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  isActive
+                    ? "bg-[#fff4fc] text-black"
+                    : "text-gray-600 hover:bg-[#fff4fc] hover:text-black"
+                )}
+              >
+                <item.icon className="mr-3 h-5 w-5" />
+                {item.title}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+    </div>
   );
 };
 
