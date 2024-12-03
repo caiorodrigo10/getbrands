@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import type { CartItem } from "@/types/cart";
 import type { User } from "@supabase/supabase-js";
+import type { Product } from "@/types/product";
 
 export const useCartOperations = (user: User | null) => {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -18,23 +19,16 @@ export const useCartOperations = (user: User | null) => {
         .from('cart_items')
         .select(`
           product_id,
-          products (
-            id,
-            name,
-            description,
-            image_url,
-            from_price
-          )
+          products (*)
         `)
         .eq('user_id', user.id);
 
       if (error) throw error;
 
       const cartItems = data.map(item => ({
-        id: item.product_id,
         ...item.products,
         quantity: 1
-      }));
+      })) as CartItem[];
 
       setItems(cartItems);
     } catch (error) {
@@ -44,7 +38,7 @@ export const useCartOperations = (user: User | null) => {
     }
   };
 
-  const addItem = async (item: CartItem) => {
+  const addItem = async (item: Product) => {
     if (!user?.id) return;
 
     try {
@@ -57,18 +51,11 @@ export const useCartOperations = (user: User | null) => {
 
       if (error) throw error;
 
-      setItems(prev => [...prev, item]);
-      toast({
-        title: "Item added to cart",
-        description: `${item.name} has been added to your cart.`
-      });
+      setItems(prev => [...prev, { ...item, quantity: 1 }]);
+      
     } catch (error) {
       console.error('Error adding item to cart:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to add item to cart"
-      });
+      throw error;
     }
   };
 
@@ -85,21 +72,14 @@ export const useCartOperations = (user: User | null) => {
       if (error) throw error;
 
       setItems(prev => prev.filter(item => item.id !== itemId));
-      toast({
-        title: "Item removed",
-        description: "Item has been removed from your cart."
-      });
+      
     } catch (error) {
       console.error('Error removing item from cart:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to remove item from cart"
-      });
+      throw error;
     }
   };
 
-  const updateQuantity = (itemId: string, quantity: number) => {
+  const updateQuantity = async (itemId: string, quantity: number) => {
     setItems(prev =>
       prev.map(item =>
         item.id === itemId ? { ...item, quantity } : item
@@ -135,6 +115,7 @@ export const useCartOperations = (user: User | null) => {
           description: "Failed to clear cart"
         });
       }
+      throw error;
     }
   };
 
