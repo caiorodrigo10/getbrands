@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const useAuthWithPermissions = () => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   const { 
     data: profile, 
@@ -61,6 +61,8 @@ export const useAuthWithPermissions = () => {
   const hasLimitedAccess = isMember || isSampler;
 
   return {
+    isAuthenticated,
+    isLoading: isLoadingProfile,
     isAdmin,
     isMember,
     isSampler,
