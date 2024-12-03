@@ -22,19 +22,29 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
   const { items, clearCart } = useCart();
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [hasStartedSubmission, setHasStartedSubmission] = useState(false);
   const { createRequest } = useCreateSampleRequest();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Prevent multiple submissions
+    if (isProcessing || hasStartedSubmission) {
+      console.log('Preventing duplicate submission');
+      return;
+    }
 
     if (!stripe || !elements || !user?.id || !user?.email) {
       return;
     }
 
     setIsProcessing(true);
+    setHasStartedSubmission(true);
 
     try {
       const subtotal = items.reduce((sum, item) => sum + (item.from_price * (item.quantity || 1)), 0);
+      
+      // Create the sample request first
       const orderId = await createRequest({
         userId: user.id,
         items,
@@ -43,6 +53,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         total
       });
 
+      // Then confirm the payment
       const { error: paymentError, paymentIntent } = await stripe.confirmPayment({
         elements,
         redirect: 'if_required',
@@ -103,6 +114,8 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
         title: "Payment Error",
         description: error instanceof Error ? error.message : "An unexpected error occurred. Please try again.",
       });
+      // Reset submission state so user can try again
+      setHasStartedSubmission(false);
     } finally {
       setIsProcessing(false);
     }
@@ -115,7 +128,7 @@ const PaymentForm = ({ clientSecret, total, shippingCost }: PaymentFormProps) =>
       </div>
       <PaymentFormButton
         isProcessing={isProcessing}
-        isDisabled={!stripe || isProcessing}
+        isDisabled={!stripe || isProcessing || hasStartedSubmission}
         total={total}
       />
     </form>
