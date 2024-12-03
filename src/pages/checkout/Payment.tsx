@@ -11,6 +11,7 @@ import { useShippingCalculation } from "@/hooks/useShippingCalculation";
 import { PaymentForm } from "@/components/checkout/PaymentForm";
 import PaymentSummary from "@/components/checkout/PaymentSummary";
 import { useCouponValidation } from "@/hooks/useCouponValidation";
+import { useToast } from "@/components/ui/use-toast";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
@@ -18,6 +19,7 @@ const Payment = () => {
   const { items } = useCart();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [selectedCountry] = useState("USA");
+  const { toast } = useToast();
   
   const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
   
@@ -36,14 +38,22 @@ const Payment = () => {
     validateCoupon
   } = useCouponValidation(subtotal);
 
+  // Ensure total is never negative and at least 0.01
   const total = Math.max(subtotal + (shippingCost || 0) - discountAmount, 0.01);
 
   useEffect(() => {
     const createPaymentIntent = async () => {
       try {
+        console.log('Creating payment intent with:', {
+          amount: total,
+          shipping_amount: shippingCost,
+          subtotal: subtotal,
+          discountAmount: discountAmount
+        });
+
         const { data, error } = await supabase.functions.invoke('create-payment-intent', {
           body: { 
-            amount: total,
+            amount: total, // This is the final amount after discount
             currency: 'usd',
             shipping_amount: shippingCost,
             items: items.map(item => ({
@@ -62,19 +72,42 @@ const Payment = () => {
           },
         });
 
-        if (error) throw error;
-        if (!data?.clientSecret) throw new Error("No client secret returned");
+        if (error) {
+          console.error('Error creating payment intent:', error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to create payment intent. Please try again.",
+          });
+          throw error;
+        }
+        
+        if (!data?.clientSecret) {
+          console.error('No client secret returned');
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Invalid payment configuration. Please try again.",
+          });
+          throw new Error("No client secret returned");
+        }
 
+        console.log('Payment intent created successfully with discount:', discountAmount);
         setClientSecret(data.clientSecret);
       } catch (error) {
         console.error('Payment error:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to setup payment. Please try again.",
+        });
       }
     };
 
     if (items.length > 0 && !isLoadingShipping) {
       createPaymentIntent();
     }
-  }, [items, isLoadingShipping, total, shippingCost, subtotal, discountAmount]);
+  }, [items, isLoadingShipping, total, shippingCost, subtotal, discountAmount, toast]);
 
   if (!clientSecret || isLoadingShipping) {
     return (

@@ -19,12 +19,20 @@ serve(async (req) => {
   try {
     const { amount, currency = 'usd', shipping_amount, items, subtotal, total, discountAmount, metadata } = await req.json();
 
-    console.log('Creating payment intent with:', { amount, currency, shipping_amount, subtotal, total, discountAmount, metadata });
+    console.log('Creating payment intent with:', { 
+      amount, 
+      currency, 
+      shipping_amount, 
+      subtotal, 
+      total, 
+      discountAmount, 
+      metadata 
+    });
 
     // Convert amount to cents and ensure it's at least 1
     const amountInCents = Math.max(Math.round(amount * 100), 1);
 
-    console.log('Amount in cents:', amountInCents);
+    console.log('Final amount in cents (after discount):', amountInCents);
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amountInCents,
