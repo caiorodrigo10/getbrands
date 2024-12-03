@@ -7,7 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 
 export const useProductActions = (productId: string) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { addItem } = useCart();
+  const { addItem, loadCartItems } = useCart();
   const { toast } = useToast();
 
   const handleRequestSample = async () => {
@@ -24,6 +24,7 @@ export const useProductActions = (productId: string) => {
       if (error) throw error;
       
       await addItem(product as Product);
+      await loadCartItems(); // Reload cart items after adding
       
       // Track sample request event
       trackEvent("Sample Requested", {
