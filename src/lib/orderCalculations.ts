@@ -10,7 +10,7 @@ export const calculateShippingCost = (products: Array<any>) => {
   const totalItems = products.reduce((sum, item) => sum + (item.quantity || 1), 0);
   
   if (totalItems <= 3) {
-    return 10.00;
+    return 4.50;  // Updated base rate from 10.00 to 4.50
   } else if (totalItems <= 6) {
     return 14.00;
   } else {
