@@ -9,10 +9,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useEffect } from "react";
 
 export function CartButton() {
-  const { items } = useCart();
+  const { items, loadCartItems } = useCart();
   const navigate = useNavigate();
+
+  // Recarrega os itens do carrinho quando o componente é montado
+  useEffect(() => {
+    loadCartItems();
+  }, [loadCartItems]);
 
   // Calculate total quantity considering the quantity of each item
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
