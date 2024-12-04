@@ -1,3 +1,5 @@
+import { toast } from 'sonner';
+
 let analyticsInitialized = false;
 
 const initializeAnalytics = () => {
@@ -81,10 +83,8 @@ export const trackPage = async (properties?: Record<string, any>) => {
     
     const path = properties?.path || window.location.pathname;
     
-    // Define o nome do evento baseado no path
     let pageName = "";
     
-    // Mapeamento de rotas para eventos específicos
     if (path === "/") {
       pageName = "Homepage Viewed";
     } else if (path === "/comecarpt") {
@@ -109,8 +109,6 @@ export const trackPage = async (properties?: Record<string, any>) => {
       pageName = "Login Page Viewed";
     } else if (path === "/signup") {
       pageName = "Signup Page Viewed";
-    } else if (path.startsWith("/checkout")) {
-      pageName = "Checkout Page Viewed";
     } else {
       pageName = `${path.substring(1).replace(/\//g, " ").replace(/-/g, " ")} Viewed`.trim();
     }
