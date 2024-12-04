@@ -37,7 +37,6 @@ const formatUrl = (url: string) => {
     const urlObj = new URL(url);
     return urlObj.toString();
   } catch (e) {
-    console.error('Invalid URL:', url);
     return url;
   }
 };
@@ -55,7 +54,6 @@ export const identifyUser = async (userId: string, traits?: Record<string, any>)
 
     window.analytics.identify(userId, identifyTraits);
   } catch (error) {
-    console.error('Error in identify call:', error);
     toast.error('Analytics Error: Failed to identify user');
   }
 };
@@ -73,7 +71,6 @@ export const trackEvent = async (eventName: string, properties?: Record<string, 
 
     window.analytics.track(eventName, eventProperties);
   } catch (error) {
-    console.error('Error tracking event:', error);
     toast.error(`Analytics Error: Failed to track ${eventName}`);
   }
 };
@@ -115,11 +112,10 @@ export const trackPage = async (properties?: Record<string, any>) => {
     } else if (path.startsWith("/checkout")) {
       pageName = "Checkout Page Viewed";
     } else {
-      // Se não houver mapeamento específico, usa o path como nome do evento
       pageName = `${path.substring(1).replace(/\//g, " ").replace(/-/g, " ")} Viewed`.trim();
     }
     
-    if (!pageName) return; // Não envia evento se não tiver nome definido
+    if (!pageName) return;
     
     const pageProperties = {
       url: formatUrl(window.location.href),
@@ -136,7 +132,6 @@ export const trackPage = async (properties?: Record<string, any>) => {
 
     window.analytics.page(pageName, pageProperties);
   } catch (error) {
-    console.error('Error tracking page view:', error);
     toast.error('Analytics Error: Failed to track page view');
   }
 };
