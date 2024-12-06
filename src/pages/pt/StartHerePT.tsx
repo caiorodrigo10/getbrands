@@ -26,8 +26,16 @@ const StartHerePT = () => {
     enabled: !!user?.id,
   });
 
-  // Apenas o useEffect do vídeo
   useEffect(() => {
+    // Track CompleteRegistration event when the user reaches this page
+    if (window.fbq && user) {
+      window.fbq('track', 'CompleteRegistration', {
+        content_name: 'Registro Completo PT',
+        status: true,
+        language: 'pt'
+      });
+    }
+
     const script = document.createElement("script");
     script.src = "https://scripts.converteai.net/lib/js/smartplayer/v1/sdk.min.js";
     script.setAttribute("data-id", "673f76196fbe5b000be3566d");
@@ -37,7 +45,7 @@ const StartHerePT = () => {
     return () => {
       script.remove();
     };
-  }, []);
+  }, [user]);
 
   if (isLoading) {
     return (
