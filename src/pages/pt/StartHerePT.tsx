@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
@@ -9,6 +9,7 @@ import { ArrowRight, Video } from "lucide-react";
 const StartHerePT = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const hasTrackedRegistration = useRef(false);
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["user-profile", user?.id],
@@ -28,12 +29,13 @@ const StartHerePT = () => {
 
   useEffect(() => {
     // Track CompleteRegistration event when the user reaches this page
-    if (window.fbq && user) {
+    if (window.fbq && user && !hasTrackedRegistration.current) {
       window.fbq('track', 'CompleteRegistration', {
         content_name: 'Registro Completo PT',
         status: true,
         language: 'pt'
       });
+      hasTrackedRegistration.current = true;
     }
 
     const script = document.createElement("script");
