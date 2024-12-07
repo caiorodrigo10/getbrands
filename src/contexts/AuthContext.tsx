@@ -45,12 +45,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     const initSession = async () => {
       try {
-        setIsLoading(true);
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('Session error:', error);
-          throw error;
+          if (mounted) {
+            setIsLoading(false);
+            setSessionChecked(true);
+          }
+          return;
         }
         
         if (mounted) {
@@ -73,11 +76,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     initSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (mounted) {
-        await handleAuthChange(session);
-      }
-    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthChange);
 
     return () => {
       mounted = false;

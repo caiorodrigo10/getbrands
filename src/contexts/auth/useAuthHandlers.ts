@@ -11,7 +11,7 @@ export const useAuthHandlers = (
 ) => {
   const navigate = useNavigate();
 
-  const handleAuthChange = async (session: any) => {
+  const handleAuthChange = async (event: any, session: any) => {
     console.log("[DEBUG] AuthContext - Auth state changed:", session?.user?.email);
     try {
       if (session?.user) {
