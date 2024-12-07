@@ -23,31 +23,25 @@ const Login = () => {
     console.log("[DEBUG] Login - Sending OTP request for email:", email);
 
     try {
-      const { data, error } = await supabase.auth.signInWithOtp({
+      // Track event in Segment which will trigger email sending
+      await trackEvent("otp_requested", {
         email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`
-        }
+        type: "login",
+        timestamp: new Date().toISOString()
       });
-
-      if (error) throw error;
 
       setShowOTP(true);
       toast({
         title: "Success",
-        description: "Check your email for the magic link",
+        description: "Check your email for the verification code",
       });
 
-      trackEvent("OTP Sent", {
-        email: email,
-        timestamp: new Date().toISOString()
-      });
     } catch (error: any) {
       console.error("[ERROR] Login - OTP request failed:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Failed to send OTP",
+        description: error.message || "Failed to send verification code",
       });
     } finally {
       setIsLoading(false);
@@ -66,17 +60,27 @@ const Login = () => {
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.auth.verifyOtp({
+      // Sign in with email + OTP code
+      const { data, error } = await supabase.auth.signInWithOtp({
         email,
         token: otp,
-        type: 'email'
+        options: {
+          shouldCreateUser: false // Only allow existing users to login
+        }
       });
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Successfully verified!",
+        description: "Successfully logged in!",
+      });
+
+      // Track successful login
+      await trackEvent("login_successful", {
+        email,
+        method: "otp",
+        timestamp: new Date().toISOString()
       });
 
       navigate('/catalog');
@@ -85,7 +89,7 @@ const Login = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Failed to verify OTP",
+        description: error.message || "Failed to verify code",
       });
     } finally {
       setIsLoading(false);
@@ -162,7 +166,7 @@ const Login = () => {
                   <span>Sending...</span>
                 </div>
               ) : (
-                "Send Magic Link"
+                "Send Verification Code"
               )}
             </Button>
           )}
