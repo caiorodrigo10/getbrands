@@ -18,8 +18,8 @@ export function OTPInput({ value, onChange, maxLength = 6 }: OTPInputProps) {
       onChange={onChange}
       render={({ slots }) => (
         <InputOTPGroup className="gap-2">
-          {slots.map((slot, index) => (
-            <InputOTPSlot key={index} {...slot} index={index} />
+          {Array.from({ length: maxLength }).map((_, i) => (
+            <InputOTPSlot key={i} index={i} />
           ))}
         </InputOTPGroup>
       )}
