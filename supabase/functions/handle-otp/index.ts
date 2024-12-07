@@ -40,12 +40,17 @@ serve(async (req) => {
       }
     }
 
-    // Track event in Segment
+    // Generate OTP code (6 digits)
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
+    
+    // Track OTP requested event in Segment
     analytics.track({
       userId: email,
-      event: type === 'signup' ? 'OTP Signup Requested' : 'OTP Login Requested',
+      event: 'otp_requested',
       properties: {
         email,
+        type: type === 'signup' ? 'signup' : 'login',
+        otpCode: otpCode, // This will be used by SendGrid to include in the email
         timestamp: new Date().toISOString()
       }
     })
@@ -69,11 +74,14 @@ serve(async (req) => {
         last_attempt: new Date().toISOString()
       })
 
+    console.log(`OTP requested for ${email} with code ${otpCode}`)
+
     return new Response(
       JSON.stringify({ success: true }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
+    console.error('Error handling OTP request:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
