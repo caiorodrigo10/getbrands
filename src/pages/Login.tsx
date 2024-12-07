@@ -74,6 +74,7 @@ const Login = () => {
       // Sign in with email + OTP code
       const { data, error } = await supabase.auth.signInWithOtp({
         email,
+        token: otp,
         options: {
           shouldCreateUser: false // Only allow existing users to login
         }
