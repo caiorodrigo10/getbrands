@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SignUpFormFields } from "@/components/auth/signup/SignUpFormFields";
-import { trackEvent } from "@/lib/analytics";
 
 export interface SignUpFormStepPTProps {
   onBack: () => void;
@@ -21,25 +20,17 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
     firstName: "",
     lastName: "",
     email: "",
-    password: "",
     phone: "",
   });
   const [errors, setErrors] = useState({
-    password: "",
     phone: "",
   });
 
   const validateForm = () => {
     const newErrors = {
-      password: "",
       phone: "",
     };
     let isValid = true;
-
-    if (formData.password.length < 6) {
-      newErrors.password = "A senha deve ter pelo menos 6 caracteres";
-      isValid = false;
-    }
 
     if (!formData.phone) {
       newErrors.phone = "Número de telefone é obrigatório";
@@ -65,10 +56,10 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
     setIsLoading(true);
 
     try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      const { data, error: signUpError } = await supabase.auth.signInWithOtp({
         email: formData.email,
-        password: formData.password,
         options: {
+          shouldCreateUser: true,
           data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
@@ -78,14 +69,7 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
         },
       });
 
-      if (signUpError) {
-        if (signUpError.message.includes("User already registered")) {
-          toast.error("Este email já está cadastrado. Por favor, faça login.");
-          setIsLoading(false);
-          return;
-        }
-        throw signUpError;
-      }
+      if (signUpError) throw signUpError;
 
       if (data?.user) {
         const { error: profileError } = await supabase
