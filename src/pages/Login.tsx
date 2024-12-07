@@ -34,7 +34,7 @@ const Login = () => {
           body: JSON.stringify({
             email,
             type: 'login',
-            persistSession: true // Add this flag to indicate we want a persistent session
+            persistSession: true
           }),
         }
       );
@@ -61,6 +61,44 @@ const Login = () => {
         variant: "destructive",
         title: "Error",
         description: error.message || "Failed to send OTP",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    if (!otp || otp.length !== 6) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please enter a valid 6-digit code",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: otp,
+        type: 'magiclink'
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Login successful",
+      });
+
+      navigate('/dashboard');
+    } catch (error: any) {
+      console.error("[ERROR] Login - OTP verification failed:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to verify OTP",
       });
     } finally {
       setIsLoading(false);
@@ -97,30 +135,43 @@ const Login = () => {
             </div>
 
             {showOTP && (
-              <div className="mt-4">
+              <div className="mt-4 space-y-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Check your email for the magic link
+                  Enter the 6-digit code sent to your email
                 </label>
+                <OTPInput
+                  value={otp}
+                  onChange={setOtp}
+                  maxLength={6}
+                />
+                <Button
+                  type="button"
+                  onClick={handleVerifyOTP}
+                  className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Verifying..." : "Verify Code"}
+                </Button>
               </div>
             )}
           </div>
 
-          <Button
-            type="submit"
-            className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
-            disabled={isLoading || showOTP}
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                <span>Sending...</span>
-              </div>
-            ) : showOTP ? (
-              "Check your email"
-            ) : (
-              "Send Magic Link"
-            )}
-          </Button>
+          {!showOTP && (
+            <Button
+              type="submit"
+              className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                  <span>Sending...</span>
+                </div>
+              ) : (
+                "Send Magic Link"
+              )}
+            </Button>
+          )}
         </form>
 
         <div className="mt-4 text-center text-sm">
