@@ -63,7 +63,6 @@ const Login = () => {
       // Sign in with email + OTP code
       const { data, error } = await supabase.auth.signInWithOtp({
         email,
-        token: otp,
         options: {
           shouldCreateUser: false // Only allow existing users to login
         }
@@ -130,11 +129,13 @@ const Login = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Enter the 6-digit code sent to your email
                 </label>
-                <OTPInput
-                  value={otp}
-                  onChange={setOtp}
-                  maxLength={6}
-                />
+                <div className="flex justify-center">
+                  <OTPInput
+                    value={otp}
+                    onChange={setOtp}
+                    maxLength={6}
+                  />
+                </div>
                 <Button
                   type="button"
                   onClick={handleVerifyOTP}

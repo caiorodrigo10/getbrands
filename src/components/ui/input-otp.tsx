@@ -29,26 +29,8 @@ InputOTPGroup.displayName = "InputOTPGroup"
 
 const InputOTPSlot = React.forwardRef<
   HTMLDivElement,
-  React.ComponentPropsWithoutRef<"div"> & { index: number }
->(({ index, className, ...props }, ref) => {
-  const inputOTPContext = React.useContext(OTPInputContext)
-  
-  // Add null check for slots
-  if (!inputOTPContext?.slots) {
-    console.error("InputOTPSlot must be used within an OTPInput");
-    return null;
-  }
-
-  const slot = inputOTPContext.slots[index];
-  
-  // Add null check for slot
-  if (!slot) {
-    console.error(`No slot found at index ${index}`);
-    return null;
-  }
-
-  const { char, hasFakeCaret, isActive } = slot;
-
+  React.HTMLAttributes<HTMLDivElement> & { char?: string; hasFakeCaret?: boolean; isActive?: boolean }
+>(({ className, char, hasFakeCaret, isActive, ...props }, ref) => {
   return (
     <div
       ref={ref}
