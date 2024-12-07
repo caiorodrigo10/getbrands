@@ -23,10 +23,8 @@ const waitForAnalytics = () => {
     const check = () => {
       attempts++;
       if (initializeAnalytics()) {
-        console.log('[Analytics] Initialized successfully');
         resolve();
       } else if (attempts >= maxAttempts) {
-        console.error('[Analytics] Failed to initialize after multiple attempts');
         reject(new Error('Failed to initialize analytics after multiple attempts'));
       } else {
         setTimeout(check, 100);
@@ -56,10 +54,8 @@ export const identifyUser = async (userId: string, traits?: Record<string, any>)
       source: 'web_app'
     };
 
-    console.log('[Analytics] Identifying user:', userId, identifyTraits);
     window.analytics.identify(userId, identifyTraits);
   } catch (error) {
-    console.error('[Analytics] Error identifying user:', error);
     toast.error('Analytics Error: Failed to identify user');
   }
 };
@@ -75,10 +71,8 @@ export const trackEvent = async (eventName: string, properties?: Record<string, 
       source: 'web_app'
     };
 
-    console.log('[Analytics] Tracking event:', eventName, eventProperties);
     window.analytics.track(eventName, eventProperties);
   } catch (error) {
-    console.error('[Analytics] Error tracking event:', error);
     toast.error(`Analytics Error: Failed to track ${eventName}`);
   }
 };
@@ -134,10 +128,8 @@ export const trackPage = async (properties?: Record<string, any>) => {
       ...(properties?.url ? { url: formatUrl(properties.url) } : {})
     };
 
-    console.log('[Analytics] Tracking page view:', pageName, pageProperties);
     window.analytics.page(pageName, pageProperties);
   } catch (error) {
-    console.error('[Analytics] Error tracking page view:', error);
     toast.error('Analytics Error: Failed to track page view');
   }
 };
