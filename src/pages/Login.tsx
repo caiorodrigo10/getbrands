@@ -20,6 +20,7 @@ const Login = () => {
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    console.log("[DEBUG] Login - Sending OTP request for email:", email);
 
     try {
       const response = await fetch(
@@ -38,6 +39,7 @@ const Login = () => {
       );
 
       const data = await response.json();
+      console.log("[DEBUG] Login - OTP response:", data);
       
       if (!response.ok) throw new Error(data.error || 'Failed to send OTP');
 
@@ -49,9 +51,10 @@ const Login = () => {
 
       trackEvent("OTP Sent", {
         email: email,
+        timestamp: new Date().toISOString()
       });
     } catch (error: any) {
-      console.error("Login error:", error);
+      console.error("[ERROR] Login - OTP request failed:", error);
       toast({
         variant: "destructive",
         title: "Error",
