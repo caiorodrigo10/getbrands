@@ -17,16 +17,25 @@ const Login = () => {
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
 
+  const generateOTP = () => {
+    // Generate a 6-digit OTP code
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  };
+
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     console.log("[DEBUG] Login - Sending OTP request for email:", email);
 
     try {
+      const otpCode = generateOTP();
+      console.log("[DEBUG] Generated OTP code:", otpCode);
+
       // Track event in Segment which will trigger email sending
       await trackEvent("otp_requested", {
         email,
         type: "login",
+        otpCode, // Include the OTP code in the event
         timestamp: new Date().toISOString()
       });
 
