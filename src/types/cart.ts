@@ -10,6 +10,4 @@ export interface CartOperations {
   removeItem: (id: string) => Promise<void>;
   updateQuantity: (id: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
-  loadCartItems: () => Promise<void>;
-  isLoading: boolean;
 }

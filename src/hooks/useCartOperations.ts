@@ -1,76 +1,116 @@
-import { useState } from 'react';
-import { CartItem } from '@/types/cart';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { CartItem } from "@/types/cart";
+import { Product } from "@/types/product";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const useCartOperations = () => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
 
-  const addItem = async (item: CartItem) => {
+  const addItem = async (product: Product) => {
+    if (!user?.id) return;
+    
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      const { data: existingItem, error: fetchError } = await supabase
-        .from('cart_items')
-        .select('*')
-        .eq('user_id', item.user_id)
-        .eq('product_id', item.id)
+      const { data, error } = await supabase
+        .from("cart_items")
+        .insert({
+          user_id: user.id,
+          product_id: product.id,
+          quantity: 1
+        })
+        .select()
         .single();
 
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        throw fetchError;
-      }
+      if (error) throw error;
 
-      if (existingItem) {
-        const { error: updateError } = await supabase
-          .from('cart_items')
-          .update({ quantity: existingItem.quantity + 1 })
-          .eq('id', existingItem.id);
-
-        if (updateError) throw updateError;
-      } else {
-        const { error: insertError } = await supabase
-          .from('cart_items')
-          .insert([
-            {
-              user_id: item.user_id,
-              product_id: item.id,
-              quantity: 1,
-            },
-          ]);
-
-        if (insertError) throw insertError;
-      }
-
-      // Update local state
-      const updatedItems = [...items];
-      const existingItemIndex = updatedItems.findIndex((i) => i.id === item.id);
+      const cartItem: CartItem = {
+        ...product,
+        quantity: 1
+      };
       
-      if (existingItemIndex >= 0) {
-        updatedItems[existingItemIndex].quantity += 1;
-      } else {
-        updatedItems.push({ ...item, quantity: 1 });
-      }
-      
-      setItems(updatedItems);
-      toast.success('Item added to cart');
+      setItems([...items, cartItem]);
     } catch (error) {
-      console.error('Error adding item to cart:', error);
-      toast.error('Failed to add item to cart');
+      console.error("Error adding item to cart:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const calculateTotal = () => {
-    return items.reduce((total, item) => total + (item.from_price * item.quantity), 0);
+  const removeItem = async (id: string) => {
+    if (!user?.id) return;
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from("cart_items")
+        .delete()
+        .eq("product_id", id)
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      setItems(items.filter(item => item.id !== id));
+    } catch (error) {
+      console.error("Error removing item from cart:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateQuantity = async (id: string, quantity: number) => {
+    if (!user?.id) return;
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from("cart_items")
+        .update({ quantity })
+        .eq("product_id", id)
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      setItems(
+        items.map(item =>
+          item.id === id ? { ...item, quantity } : item
+        )
+      );
+    } catch (error) {
+      console.error("Error updating cart item quantity:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const clearCart = async () => {
+    if (!user?.id) return;
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from("cart_items")
+        .delete()
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      setItems([]);
+    } catch (error) {
+      console.error("Error clearing cart:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return {
     items,
-    setItems,
     addItem,
-    isLoading,
-    calculateTotal,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    isLoading
   };
 };
