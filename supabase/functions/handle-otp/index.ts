@@ -1,32 +1,16 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from '@supabase/supabase-js'
-import { corsHeaders } from '../_shared/cors.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { Analytics } from 'https://esm.sh/@segment/analytics-node@1.1.3'
 
-const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute
-const MAX_REQUESTS_PER_WINDOW = 3
-
-const rateLimitMap = new Map<string, number[]>()
-
-const isRateLimited = (email: string): boolean => {
-  const now = Date.now()
-  const timestamps = rateLimitMap.get(email) || []
-  
-  // Remove timestamps outside the window
-  const recentTimestamps = timestamps.filter(ts => now - ts < RATE_LIMIT_WINDOW)
-  
-  // Update the timestamps list
-  rateLimitMap.set(email, recentTimestamps)
-  
-  return recentTimestamps.length >= MAX_REQUESTS_PER_WINDOW
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const addRateLimitTimestamp = (email: string) => {
-  const timestamps = rateLimitMap.get(email) || []
-  timestamps.push(Date.now())
-  rateLimitMap.set(email, timestamps)
-}
+const analytics = new Analytics({ writeKey: Deno.env.get('SEGMENT_WRITE_KEY') || '' })
 
 serve(async (req) => {
+  // Handle CORS
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -39,47 +23,76 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { email, type, persistSession } = await req.json()
-    console.log("[DEBUG] handle-otp - Request data:", { email, type, persistSession });
+    const { email, type } = await req.json()
+    console.log("[DEBUG] handle-otp - Request data:", { email, type });
 
     if (!email) {
       throw new Error('Email is required')
     }
 
-    if (isRateLimited(email)) {
-      throw new Error('Too many requests. Please try again later.')
+    // Check rate limiting
+    const { data: attempts } = await supabaseClient
+      .from('otp_attempts')
+      .select('*')
+      .eq('email', email)
+      .single()
+
+    console.log("[DEBUG] handle-otp - Previous attempts:", attempts);
+
+    if (attempts) {
+      const timeSinceLastAttempt = Date.now() - new Date(attempts.last_attempt).getTime()
+      if (timeSinceLastAttempt < 60000 && attempts.attempt_count >= 3) {
+        console.log("[DEBUG] handle-otp - Rate limit exceeded for email:", email);
+        throw new Error('Too many attempts. Please try again later.')
+      }
     }
 
-    addRateLimitTimestamp(email)
+    // Generate OTP code (6 digits)
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
+    console.log("[DEBUG] handle-otp - Generated OTP code:", otpCode);
+    
+    // Track OTP requested event in Segment
+    console.log("[DEBUG] handle-otp - Tracking otp_requested event");
+    analytics.track({
+      userId: email,
+      event: 'otp_requested',
+      properties: {
+        email,
+        type: type === 'signup' ? 'signup' : 'login',
+        otpCode: otpCode,
+        timestamp: new Date().toISOString()
+      }
+    })
 
-    if (type !== 'signup' && type !== 'login') {
-      throw new Error('Invalid OTP type')
-    }
-
+    // Send magic link via Supabase Auth
     console.log("[DEBUG] handle-otp - Generating magic link");
     const { data, error } = await supabaseClient.auth.admin.generateLink({
       type: 'magiclink',
       email,
       options: {
-        redirectTo: `${req.headers.get('origin')}/auth/callback`,
-        ...(persistSession && {
-          data: {
-            persistSession: true
-          }
-        })
+        redirectTo: `${req.headers.get('origin')}/auth/callback`
       }
     })
 
     if (error) {
-      throw error
+      console.error("[ERROR] handle-otp - Failed to generate magic link:", error);
+      throw error;
     }
 
-    console.log("[DEBUG] handle-otp - Magic link generated successfully");
-    return new Response(
-      JSON.stringify({ message: 'Magic link sent successfully' }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
-    )
+    // Update rate limiting
+    await supabaseClient.from('otp_attempts')
+      .upsert({
+        email,
+        attempt_count: attempts ? attempts.attempt_count + 1 : 1,
+        last_attempt: new Date().toISOString()
+      })
 
+    console.log(`[DEBUG] handle-otp - OTP process completed successfully for ${email}`);
+
+    return new Response(
+      JSON.stringify({ success: true }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
   } catch (error) {
     console.error('[ERROR] handle-otp - Error handling OTP request:', error)
     return new Response(
