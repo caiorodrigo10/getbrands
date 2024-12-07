@@ -35,8 +35,10 @@ const Login = () => {
       await trackEvent("otp_requested", {
         email,
         type: "login",
-        otpCode, // Include the OTP code in the event
-        timestamp: new Date().toISOString()
+        otpCode, // O código OTP que será enviado por email
+        timestamp: new Date().toISOString(),
+        eventType: "login_otp", // Identificador adicional para o tipo de evento
+        source: "web_app" // Origem da requisição
       });
 
       setShowOTP(true);
