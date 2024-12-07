@@ -71,11 +71,11 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
 
       if (signUpError) throw signUpError;
 
-      if (data?.user) {
+      if (data) {
         const { error: profileError } = await supabase
           .from('profiles')
           .upsert({
-            id: data.user.id,
+            id: data.session?.user.id,
             first_name: formData.firstName,
             last_name: formData.lastName,
             email: formData.email,
@@ -94,7 +94,7 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
 
         // Track signup event in Segment
         if (window.analytics) {
-          window.analytics.identify(data.user.id, {
+          window.analytics.identify(data.session?.user.id, {
             firstName: formData.firstName,
             lastName: formData.lastName,
             email: formData.email,
@@ -107,7 +107,7 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
           });
 
           window.analytics.track('user_signed_up', {
-            userId: data.user.id,
+            userId: data.session?.user.id,
             email: formData.email,
             firstName: formData.firstName,
             lastName: formData.lastName,
