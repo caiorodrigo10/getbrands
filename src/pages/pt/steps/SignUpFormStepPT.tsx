@@ -56,6 +56,9 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
     setIsLoading(true);
 
     try {
+      console.log("Starting signup process...");
+      
+      // First, sign up the user with OTP
       const { data, error: signUpError } = await supabase.auth.signInWithOtp({
         email: formData.email,
         options: {
@@ -69,63 +72,78 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
         },
       });
 
-      if (signUpError) throw signUpError;
-
-      if (data) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: data.session?.user.id,
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            email: formData.email,
-            phone: formData.phone,
-            role: 'member',
-            language: 'pt',
-            product_interest: quizData.productCategories,
-            profile_type: quizData.profileType,
-            brand_status: quizData.brandStatus,
-            launch_urgency: quizData.launchUrgency,
-            onboarding_completed: true,
-            updated_at: new Date().toISOString()
-          });
-
-        if (profileError) throw profileError;
-
-        // Track signup event in Segment
-        if (window.analytics) {
-          window.analytics.identify(data.session?.user.id, {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            phone: formData.phone,
-            language: 'pt',
-            product_interest: quizData.productCategories,
-            profile_type: quizData.profileType,
-            brand_status: quizData.brandStatus,
-            launch_urgency: quizData.launchUrgency
-          });
-
-          window.analytics.track('user_signed_up', {
-            userId: data.session?.user.id,
-            email: formData.email,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            phone: formData.phone,
-            signupMethod: 'email',
-            language: 'pt',
-            product_interest: quizData.productCategories,
-            profile_type: quizData.profileType,
-            brand_status: quizData.brandStatus,
-            launch_urgency: quizData.launchUrgency,
-            onboarding_completed: true
-          });
-        }
-
-        window.location.href = "/pt/start-here";
+      if (signUpError) {
+        console.error("Signup error:", signUpError);
+        throw signUpError;
       }
+
+      if (!data?.user?.id) {
+        console.error("No user ID received after signup");
+        throw new Error("Falha ao criar usuário. Por favor, tente novamente.");
+      }
+
+      console.log("User created successfully, creating profile...");
+
+      // Create the profile with the user ID
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: data.user.id,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          role: 'member',
+          language: 'pt',
+          product_interest: quizData.productCategories,
+          profile_type: quizData.profileType,
+          brand_status: quizData.brandStatus,
+          launch_urgency: quizData.launchUrgency,
+          onboarding_completed: true,
+          updated_at: new Date().toISOString()
+        });
+
+      if (profileError) {
+        console.error("Profile creation error:", profileError);
+        throw profileError;
+      }
+
+      console.log("Profile created successfully");
+
+      // Track signup event in Segment
+      if (window.analytics) {
+        window.analytics.identify(data.user.id, {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          language: 'pt',
+          product_interest: quizData.productCategories,
+          profile_type: quizData.profileType,
+          brand_status: quizData.brandStatus,
+          launch_urgency: quizData.launchUrgency
+        });
+
+        window.analytics.track('user_signed_up', {
+          userId: data.user.id,
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          signupMethod: 'email',
+          language: 'pt',
+          product_interest: quizData.productCategories,
+          profile_type: quizData.profileType,
+          brand_status: quizData.brandStatus,
+          launch_urgency: quizData.launchUrgency,
+          onboarding_completed: true
+        });
+      }
+
+      toast.success("Conta criada com sucesso! Verifique seu email para continuar.");
+      window.location.href = "/pt/start-here";
     } catch (error: any) {
-      console.error("Erro ao criar conta:", error);
+      console.error("Error in signup process:", error);
       toast.error(error.message || "Falha ao criar conta. Por favor, tente novamente.");
     } finally {
       setIsLoading(false);
