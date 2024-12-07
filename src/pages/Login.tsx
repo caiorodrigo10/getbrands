@@ -1,38 +1,61 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
+import { OTPInput } from "@/components/auth/OTPInput";
+import { supabase } from "@/integrations/supabase/client";
+import { trackEvent } from "@/lib/analytics";
 
 const Login = () => {
   const { toast } = useToast();
-  const { login, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showOTP, setShowOTP] = useState(false);
+  const [otp, setOtp] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, navigate]);
-
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      await login(email, password);
-      navigate('/catalog');
-      setIsLoading(false);
+      const response = await fetch(
+        'https://skrvprmnncxpkojraoem.supabase.co/functions/v1/handle-otp',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            email,
+            type: 'login'
+          }),
+        }
+      );
+
+      const data = await response.json();
+      
+      if (!response.ok) throw new Error(data.error || 'Failed to send OTP');
+
+      setShowOTP(true);
+      toast({
+        title: "Success",
+        description: "Check your email for the magic link",
+      });
+
+      trackEvent("OTP Sent", {
+        email: email,
+      });
     } catch (error: any) {
       console.error("Login error:", error);
       toast({
         variant: "destructive",
-        title: "Login Error",
-        description: "Incorrect email or password. Please try again.",
+        title: "Error",
+        description: error.message || "Failed to send OTP",
       });
     } finally {
       setIsLoading(false);
@@ -53,7 +76,7 @@ const Login = () => {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+        <form className="mt-8 space-y-6" onSubmit={handleSendOTP}>
           <div className="space-y-4">
             <div>
               <Input
@@ -64,44 +87,38 @@ const Login = () => {
                 required
                 className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0562e]/20"
                 placeholder="your@email.com"
-                disabled={isLoading}
+                disabled={isLoading || showOTP}
               />
             </div>
-            <div>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0562e]/20"
-                placeholder="••••••••"
-                disabled={isLoading}
-              />
-            </div>
+
+            {showOTP && (
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Check your email for the magic link
+                </label>
+              </div>
+            )}
           </div>
 
           <Button
             type="submit"
             className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90 text-white py-2.5 rounded-lg transition-all duration-200 font-medium"
-            disabled={isLoading}
+            disabled={isLoading || showOTP}
           >
             {isLoading ? (
               <div className="flex items-center justify-center">
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                <span>Signing in...</span>
+                <span>Sending...</span>
               </div>
+            ) : showOTP ? (
+              "Check your email"
             ) : (
-              "Sign in"
+              "Send Magic Link"
             )}
           </Button>
         </form>
 
         <div className="mt-4 text-center text-sm">
-          <Link to="/forgot-password" className="text-[#f0562e] hover:text-[#f0562e]/90">
-            Forgot password?
-          </Link>
-          <span className="mx-2 text-gray-400">•</span>
           <Link to="/signup" className="text-[#f0562e] hover:text-[#f0562e]/90">
             Create an account
           </Link>
