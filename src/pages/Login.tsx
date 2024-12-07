@@ -33,7 +33,8 @@ const Login = () => {
           },
           body: JSON.stringify({
             email,
-            type: 'login'
+            type: 'login',
+            persistSession: true // Add this flag to indicate we want a persistent session
           }),
         }
       );
@@ -51,7 +52,8 @@ const Login = () => {
 
       trackEvent("OTP Sent", {
         email: email,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        persistSession: true
       });
     } catch (error: any) {
       console.error("[ERROR] Login - OTP request failed:", error);

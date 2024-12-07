@@ -50,7 +50,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (error) throw error;
 
       if (profile) {
-        // Retry analytics identification if it fails
         const retryAnalytics = async (retries = 3) => {
           try {
             await Promise.all([
@@ -80,7 +79,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (session?.user) {
         setUser(session.user);
         setIsAuthenticated(true);
-        // Identifica o usuário nos serviços de analytics em background
+        // Set persistent session for 30 days
+        await supabase.auth.setSession({
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+          expires_in: 30 * 24 * 60 * 60, // 30 days in seconds
+        });
         identifyUserInAnalytics(session);
       } else {
         setUser(null);
@@ -130,17 +134,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (mounted) {
-        if (session?.user) {
-          setUser(session.user);
-          setIsAuthenticated(true);
-          identifyUserInAnalytics(session);
-        } else {
-          setUser(null);
-          setIsAuthenticated(false);
-          clearGleapIdentity();
-        }
-        setSessionChecked(true);
-        setIsLoading(false);
+        await handleAuthChange(session);
       }
     });
 
@@ -196,7 +190,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  // Não renderiza nada até a primeira verificação de sessão ser concluída
   if (!sessionChecked) {
     return <div className="min-h-screen flex items-center justify-center">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
