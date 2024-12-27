@@ -14,9 +14,9 @@ export const DesktopNavigation = ({ menuItems, renderMenuItem }: DesktopNavigati
   const { hasFullAccess, isMember, isSampler } = useUserPermissions();
 
   return (
-    <header className="border-r border-gray-200 bg-[#fafafa] fixed left-0 top-0 h-screen hidden md:block w-64">
-      <div className="flex flex-col h-full">
-        <div className="p-6">
+    <header className="border-r border-gray-200 bg-[#fafafa] hidden md:flex md:w-64 md:flex-col">
+      <div className="flex h-screen flex-col overflow-y-auto">
+        <div className="flex-shrink-0 p-6">
           <Link to="/catalog">
             <img 
               src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
@@ -26,14 +26,14 @@ export const DesktopNavigation = ({ menuItems, renderMenuItem }: DesktopNavigati
           </Link>
         </div>
         
-        <nav className="flex-1 px-3">
+        <nav className="flex-1 space-y-1 px-3 pb-4">
           {menuItems.map(item => renderMenuItem(item))}
         </nav>
 
         {hasFullAccess && <ProjectPointsInfo />}
         {(isMember || isSampler) && <ScheduleDemoInfo />}
 
-        <div className="p-4 border-t border-gray-200">
+        <div className="flex-shrink-0 p-4 border-t border-gray-200">
           <UserMenu isMobile={false} />
         </div>
       </div>
