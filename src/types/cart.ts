@@ -1,5 +1,7 @@
 import type { Product } from "./product";
 
+export type { Product };
+
 export interface CartItem extends Product {
   quantity: number;
   price?: number;
