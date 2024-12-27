@@ -21,6 +21,7 @@ const CatalogLayout = () => {
   const isMobile = width ? width < 768 : false;
   const itemsPerPage = isMobile ? MOBILE_ITEMS_PER_PAGE : DESKTOP_ITEMS_PER_PAGE;
   const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const { toast } = useToast();
   
   const { ref: loadMoreRef, inView } = useInView({
     threshold: 0,
@@ -44,6 +45,16 @@ const CatalogLayout = () => {
     fetchNextPage,
     data: infiniteData,
   } = productsQuery as UseInfiniteQueryResult<any>;
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load products. Please try again.",
+      });
+    }
+  }, [error, toast]);
 
   useEffect(() => {
     if (isMobile && infiniteData?.pages) {

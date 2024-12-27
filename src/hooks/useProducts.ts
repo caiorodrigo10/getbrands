@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { useSearchParams } from "react-router-dom";
 import { useWindowSize } from "./useWindowSize";
+import { useToast } from "./use-toast";
 
 interface UseProductsOptions {
   page?: number;
@@ -19,45 +20,50 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
   const [searchParams] = useSearchParams();
   const searchTerm = searchParams.get("search");
   const { width } = useWindowSize();
+  const { toast } = useToast();
   const isMobile = width ? width < 768 : false;
 
   const fetchProducts = async ({ pageParam = 1 }) => {
-    const from = (pageParam - 1) * limit;
-    const to = from + limit - 1;
+    try {
+      const from = (pageParam - 1) * limit;
+      const to = from + limit - 1;
 
-    let query = supabase.from("products").select("*", { count: "exact" });
+      let query = supabase
+        .from("products")
+        .select("*, product_images(*)", { count: "exact" });
 
-    if (searchTerm) {
-      const formattedSearch = searchTerm.replace(/[%_]/g, '\\$&').trim();
-      query = query.ilike('name', `%${formattedSearch}%`).or(`description.ilike.%${formattedSearch}%`);
-    }
+      if (searchTerm) {
+        const formattedSearch = searchTerm.replace(/[%_]/g, '\\$&').trim();
+        query = query
+          .ilike('name', `%${formattedSearch}%`)
+          .or(`description.ilike.%${formattedSearch}%`);
+      }
 
-    const { count } = await query;
+      const { data, count, error } = await query;
 
-    let dataQuery = supabase.from("products").select("*");
+      if (error) {
+        console.error("Error fetching products:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load products. Please try again.",
+        });
+        throw error;
+      }
 
-    if (searchTerm) {
-      const formattedSearch = searchTerm.replace(/[%_]/g, '\\$&').trim();
-      dataQuery = dataQuery.ilike('name', `%${formattedSearch}%`).or(`description.ilike.%${formattedSearch}%`);
-    }
+      const totalCount = count || 0;
+      const hasNextPage = from + limit < totalCount;
 
-    const { data, error } = await dataQuery
-      .range(from, to)
-      .order("created_at", { ascending: false });
-
-    if (error) {
+      return {
+        data: data as Product[],
+        totalPages: Math.ceil(totalCount / limit),
+        totalCount: totalCount,
+        nextPage: hasNextPage ? pageParam + 1 : undefined,
+      };
+    } catch (error) {
+      console.error("Error in fetchProducts:", error);
       throw error;
     }
-
-    const totalCount = count || 0;
-    const hasNextPage = from + limit < totalCount;
-
-    return {
-      data: data as Product[],
-      totalPages: Math.ceil(totalCount / limit),
-      totalCount: totalCount,
-      nextPage: hasNextPage ? pageParam + 1 : undefined,
-    };
   };
 
   // Use React Query's useInfiniteQuery for mobile
