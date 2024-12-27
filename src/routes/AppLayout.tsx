@@ -13,10 +13,10 @@ export const AppLayout = () => {
   const hideNav = ['/login', '/signup', '/onboarding'].includes(location.pathname);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex">
       {!hideNav && <NavigationMenu />}
-      <main className={!hideNav ? "md:pl-64 w-full min-h-screen" : ""}>
-        <div className="max-w-[1200px] mx-auto px-4 py-2 md:py-6 md:mt-0">
+      <main className={`flex-1 ${!hideNav ? "md:ml-64" : ""}`}>
+        <div className="max-w-[1200px] mx-auto px-4 py-2 md:py-6">
           <Outlet />
         </div>
       </main>
