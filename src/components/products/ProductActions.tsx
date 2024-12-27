@@ -12,7 +12,7 @@ interface ProductActionsProps {
 }
 
 export const ProductActions = ({ productId, onSelectProduct, showNotification = true }: ProductActionsProps) => {
-  const { isLoading, handleRequestSample } = useProductActions(productId);
+  const { isLoading, handleRequestSample } = useProductActions(productId, showNotification);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { hasFullAccess, isMember, isSampler } = useUserPermissions();
@@ -21,6 +21,7 @@ export const ProductActions = ({ productId, onSelectProduct, showNotification = 
     try {
       const success = await handleRequestSample();
       if (success) {
+        // Add a small delay to ensure cart state is updated
         setTimeout(() => {
           navigate("/checkout/confirmation", { replace: true });
         }, 800);
