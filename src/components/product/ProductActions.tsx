@@ -8,7 +8,7 @@ interface ProductActionsProps {
 }
 
 export const ProductActions = ({ productId, onSelectProduct, showNotification = true }: ProductActionsProps) => {
-  const { isLoading, handleRequestSample } = useProductActions(productId, showNotification);
+  const { isLoading, handleRequestSample } = useProductActions(productId);
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:gap-4 mt-6 px-4 sm:px-0">
