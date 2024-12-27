@@ -14,8 +14,8 @@ export const DesktopNavigation = ({ menuItems, renderMenuItem }: DesktopNavigati
   const { hasFullAccess, isMember, isSampler } = useUserPermissions();
 
   return (
-    <header className="border-r border-gray-200 bg-[#fafafa] fixed left-0 top-0 h-screen hidden md:block w-64">
-      <div className="flex flex-col h-full">
+    <header className="border-r border-gray-200 bg-[#fafafa] h-screen hidden md:block w-64 overflow-y-auto">
+      <div className="flex flex-col h-full min-h-[600px]">
         <div className="p-6">
           <Link to="/catalog">
             <img 
@@ -26,7 +26,7 @@ export const DesktopNavigation = ({ menuItems, renderMenuItem }: DesktopNavigati
           </Link>
         </div>
         
-        <nav className="flex-1 px-3">
+        <nav className="flex-1 px-3 overflow-y-auto">
           {menuItems.map(item => renderMenuItem(item))}
         </nav>
 
