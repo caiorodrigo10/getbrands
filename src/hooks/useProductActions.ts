@@ -12,7 +12,6 @@ export const useProductActions = (productId: string) => {
     try {
       setIsLoading(true);
       
-      // Fetch product data first
       const { data: product, error } = await supabase
         .from('products')
         .select('*')
@@ -22,14 +21,12 @@ export const useProductActions = (productId: string) => {
       if (error) throw error;
       
       await addItem(product as Product);
-      await loadCartItems(); // Reload cart items after adding
+      await loadCartItems();
       
-      // Track sample request event
       trackEvent("Sample Requested", {
         product_id: productId
       });
 
-      // Return true to indicate success
       return true;
     } catch (error) {
       console.error('Error requesting sample:', error);

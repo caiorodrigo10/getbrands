@@ -1,7 +1,8 @@
 import { Product } from "./product";
 
 export interface CartItem extends Product {
-  quantity: number;
+  quantity?: number;
+  price?: number;
 }
 
 export interface CartOperations {
@@ -9,7 +10,7 @@ export interface CartOperations {
   addItem: (product: Product) => Promise<void>;
   removeItem: (id: string) => Promise<void>;
   updateQuantity: (id: string, quantity: number) => Promise<void>;
-  clearCart: () => Promise<void>;
+  clearCart: (silent?: boolean) => Promise<void>;
   loadCartItems: () => Promise<void>;
   isLoading: boolean;
 }

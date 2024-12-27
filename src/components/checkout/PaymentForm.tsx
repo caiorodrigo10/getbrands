@@ -31,7 +31,7 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!stripe || !elements || !user) {
+    if (!stripe || !elements || !user?.email) {
       return;
     }
 
@@ -43,11 +43,17 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
         throw new Error("No active session found");
       }
 
+      // Create order with validated user data
+      const orderUser = {
+        id: user.id,
+        email: user.email
+      };
+
       // Create sample request first
       const { data: sampleRequest, error: sampleRequestError } = await supabase
         .from('sample_requests')
         .insert({
-          user_id: user.id,
+          user_id: orderUser.id,
           status: 'pending',
           shipping_address: localStorage.getItem('shipping_address'),
           shipping_city: localStorage.getItem('shipping_city'),
@@ -104,7 +110,7 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
       // Create Shopify order
       try {
         await createOrder({
-          user,
+          user: orderUser,
           items,
           total,
           shippingCost,
@@ -180,3 +186,5 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
     </form>
   );
 };
+
+export default PaymentForm;
