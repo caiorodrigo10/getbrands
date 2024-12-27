@@ -17,8 +17,8 @@ export const AppLayout = () => {
   return (
     <div className="min-h-screen bg-background">
       {!hideNav && <NavigationMenu />}
-      <main className={!hideNav ? "md:pl-64 w-full" : ""}>
-        <div className="max-w-[1200px] mx-auto px-4 py-2 md:py-6 md:mt-0">
+      <main className={!hideNav ? "md:pl-64" : ""}>
+        <div className="h-full w-full max-w-[1200px] mx-auto px-4 py-2 md:py-6">
           <Outlet />
         </div>
       </main>
