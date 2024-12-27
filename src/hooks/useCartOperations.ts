@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import type { CartItem } from "@/types/cart";
+import type { CartItem, Product } from "@/types/cart";
 import type { User } from "@supabase/supabase-js";
 
 export const useCartOperations = (user: User | null) => {
@@ -18,20 +18,13 @@ export const useCartOperations = (user: User | null) => {
         .from('cart_items')
         .select(`
           product_id,
-          products (
-            id,
-            name,
-            description,
-            image_url,
-            from_price
-          )
+          products (*)
         `)
         .eq('user_id', user.id);
 
       if (error) throw error;
 
-      const cartItems = data.map(item => ({
-        id: item.product_id,
+      const cartItems: CartItem[] = data.map(item => ({
         ...item.products,
         quantity: 1,
         price: Number(item.products.from_price) || 0
@@ -45,7 +38,7 @@ export const useCartOperations = (user: User | null) => {
     }
   };
 
-  const addItem = async (item: CartItem) => {
+  const addItem = async (item: Product) => {
     if (!user?.id) return;
 
     try {
@@ -58,13 +51,13 @@ export const useCartOperations = (user: User | null) => {
 
       if (error) throw error;
 
-      const itemWithPrice = {
+      const itemWithQuantity: CartItem = {
         ...item,
-        price: Number(item.price) || 0,
-        quantity: 1
+        quantity: 1,
+        price: Number(item.from_price) || 0
       };
 
-      setItems(prev => [...prev, itemWithPrice]);
+      setItems(prev => [...prev, itemWithQuantity]);
     } catch (error) {
       console.error('Error adding item to cart:', error);
       toast({
@@ -102,7 +95,7 @@ export const useCartOperations = (user: User | null) => {
     }
   };
 
-  const updateQuantity = (itemId: string, quantity: number) => {
+  const updateQuantity = async (itemId: string, quantity: number) => {
     setItems(prev =>
       prev.map(item =>
         item.id === itemId ? { ...item, quantity } : item

@@ -104,7 +104,10 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
       // Create Shopify order
       try {
         await createOrder({
-          user,
+          user: {
+            id: user.id,
+            email: user.email || ''
+          },
           items,
           total,
           shippingCost,
