@@ -76,29 +76,19 @@ const SignUp = () => {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
+        options: {
+          data: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            phone: formData.phone,
+            role: 'member',
+          },
+        },
       });
 
       if (signUpError) throw signUpError;
 
       if (data?.user) {
-        // Create or update profile with first and last name
-        const { error: profileUpdateError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: data.user.id,
-            email: formData.email,
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            phone: formData.phone,
-            role: 'member',
-            language: 'en'
-          });
-
-        if (profileUpdateError) {
-          console.error('Error updating profile:', profileUpdateError);
-          throw profileUpdateError;
-        }
-
         // Track signup event in Segment
         if (window.analytics) {
           window.analytics.identify(data.user.id, {
