@@ -31,13 +31,14 @@ const CatalogFilters = () => {
         throw error;
       }
 
-      // Log para debug
-      console.log('Raw categories data:', data);
+      // Debug logs
+      console.log('Raw categories data from DB:', data);
 
       const uniqueCategories = [...new Set(data.map(item => item.category))];
       
-      // Log para debug
+      // Debug logs
       console.log('Unique categories:', uniqueCategories);
+      console.log('Currently selected categories:', selectedCategories);
       
       return uniqueCategories;
     }

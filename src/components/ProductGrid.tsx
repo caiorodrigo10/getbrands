@@ -10,25 +10,32 @@ const ProductGrid = ({ products }: ProductGridProps) => {
   const [searchParams] = useSearchParams();
   const categories = searchParams.get("categories");
   
-  // Log para debug
-  console.log('URL categories:', categories);
-  console.log('Available products:', products);
+  // Debug logs for category filtering
+  console.log('URL categories parameter:', categories);
+  console.log('All available products:', products);
   
   const filteredProducts = categories 
     ? products.filter(product => {
-        const selectedCategories = decodeURIComponent(categories)
+        const selectedCategories = categories
           .split(",")
-          .map(cat => cat.trim());
+          .map(cat => cat.trim().toLowerCase());
           
-        // Log para debug
-        console.log('Comparing product category:', product.category);
-        console.log('With selected categories:', selectedCategories);
+        // Debug logs for category comparison
+        console.log('Product being checked:', {
+          name: product.name,
+          category: product.category,
+          lowercaseCategory: product.category?.toLowerCase()
+        });
+        console.log('Selected categories (lowercase):', selectedCategories);
         
-        return selectedCategories.includes(product.category);
+        const isIncluded = selectedCategories.includes(product.category?.toLowerCase() || '');
+        console.log('Is product included?', isIncluded);
+        
+        return isIncluded;
       })
     : products;
 
-  // Log para debug
+  // Debug log for filtered results
   console.log('Filtered products:', filteredProducts);
 
   return (
