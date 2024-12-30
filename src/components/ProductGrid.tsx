@@ -12,8 +12,10 @@ const ProductGrid = ({ products }: ProductGridProps) => {
   
   const filteredProducts = categories 
     ? products.filter(product => {
-        const selectedCategories = decodeURIComponent(categories).split(",");
-        return selectedCategories.includes(product.category);
+        const selectedCategories = decodeURIComponent(categories)
+          .split(",")
+          .map(cat => cat.trim().toLowerCase());
+        return selectedCategories.includes(product.category.toLowerCase());
       })
     : products;
 

@@ -6,10 +6,13 @@ export const useCategoryFilter = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
+  // Sincroniza o estado com os parâmetros da URL quando o componente monta
   useEffect(() => {
     const categoriesParam = searchParams.get("categories");
     if (categoriesParam) {
-      const decodedCategories = decodeURIComponent(categoriesParam).split(",");
+      const decodedCategories = decodeURIComponent(categoriesParam)
+        .split(",")
+        .map(cat => cat.trim());
       setSelectedCategories(decodedCategories);
     } else {
       setSelectedCategories([]);
@@ -18,10 +21,11 @@ export const useCategoryFilter = () => {
 
   const handleCategoryToggle = (category: string) => {
     setSelectedCategories(prev => {
-      if (prev.includes(category)) {
-        return prev.filter(c => c !== category);
+      const normalizedCategory = category.trim();
+      if (prev.includes(normalizedCategory)) {
+        return prev.filter(c => c !== normalizedCategory);
       } else {
-        return [...prev, category];
+        return [...prev, normalizedCategory];
       }
     });
   };
@@ -37,7 +41,9 @@ export const useCategoryFilter = () => {
   const applyFilters = () => {
     const newParams = new URLSearchParams(searchParams);
     if (selectedCategories.length > 0) {
-      const encodedCategories = selectedCategories.map(cat => encodeURIComponent(cat)).join(",");
+      const encodedCategories = selectedCategories
+        .map(cat => encodeURIComponent(cat.trim()))
+        .join(",");
       newParams.set("categories", encodedCategories);
     } else {
       newParams.delete("categories");
