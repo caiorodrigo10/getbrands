@@ -51,12 +51,12 @@ const CatalogFilters = () => {
     <div className="space-y-4">
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="w-full justify-between">
+          <Button variant="outline" className="w-[200px] justify-between">
             Select Categories
             <ChevronDown className="ml-2 h-4 w-4" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-4" align="start">
+        <PopoverContent className="w-[200px] p-4" align="start">
           <div className="space-y-4">
             <div className="space-y-2">
               {categories?.map((category) => (
