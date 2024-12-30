@@ -18,6 +18,7 @@ interface ProductsResponse {
 export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) => {
   const [searchParams] = useSearchParams();
   const searchTerm = searchParams.get("search");
+  const categories = searchParams.get("categories")?.split(",") || [];
   const { width } = useWindowSize();
   const isMobile = width ? width < 768 : false;
 
@@ -32,6 +33,10 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
       query = query.ilike('name', `%${formattedSearch}%`).or(`description.ilike.%${formattedSearch}%`);
     }
 
+    if (categories.length > 0) {
+      query = query.in('category', categories);
+    }
+
     const { count } = await query;
 
     let dataQuery = supabase.from("products").select("*");
@@ -39,6 +44,10 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
     if (searchTerm) {
       const formattedSearch = searchTerm.replace(/[%_]/g, '\\$&').trim();
       dataQuery = dataQuery.ilike('name', `%${formattedSearch}%`).or(`description.ilike.%${formattedSearch}%`);
+    }
+
+    if (categories.length > 0) {
+      dataQuery = dataQuery.in('category', categories);
     }
 
     const { data, error } = await dataQuery
@@ -63,7 +72,7 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
   // Use React Query's useInfiniteQuery for mobile
   if (isMobile) {
     return useInfiniteQuery({
-      queryKey: ["products-infinite", { limit, search: searchTerm }],
+      queryKey: ["products-infinite", { limit, search: searchTerm, categories }],
       queryFn: fetchProducts,
       initialPageParam: 1,
       getNextPageParam: (lastPage) => lastPage.nextPage,
@@ -72,7 +81,7 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
 
   // Use regular useQuery for desktop
   return useQuery({
-    queryKey: ["products", { page, limit, search: searchTerm }],
+    queryKey: ["products", { page, limit, search: searchTerm, categories }],
     queryFn: () => fetchProducts({ pageParam: page }),
   });
 };

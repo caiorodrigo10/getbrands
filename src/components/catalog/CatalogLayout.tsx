@@ -11,6 +11,7 @@ import { useProducts } from "@/hooks/useProducts";
 import { UseQueryResult, UseInfiniteQueryResult } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { useWindowSize } from "@/hooks/useWindowSize";
+import { useSearchParams } from "react-router-dom";
 
 const MOBILE_ITEMS_PER_PAGE = 7;
 const DESKTOP_ITEMS_PER_PAGE = 9;
@@ -21,6 +22,7 @@ const CatalogLayout = () => {
   const isMobile = width ? width < 768 : false;
   const itemsPerPage = isMobile ? MOBILE_ITEMS_PER_PAGE : DESKTOP_ITEMS_PER_PAGE;
   const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [searchParams] = useSearchParams();
   
   const { ref: loadMoreRef, inView } = useInView({
     threshold: 0,
@@ -48,17 +50,29 @@ const CatalogLayout = () => {
   useEffect(() => {
     if (isMobile && infiniteData?.pages) {
       const products = infiniteData.pages.flatMap(page => page.data);
-      setAllProducts(products);
+      setAllProducts(filterProducts(products));
     } else if (productsData?.data) {
-      setAllProducts(productsData.data);
+      setAllProducts(filterProducts(productsData.data));
     }
-  }, [productsData?.data, infiniteData?.pages, isMobile]);
+  }, [productsData?.data, infiniteData?.pages, isMobile, searchParams]);
 
   useEffect(() => {
     if (inView && isMobile && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
   }, [inView, isMobile, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const filterProducts = (products: Product[]) => {
+    const selectedCategories = searchParams.get("categories")?.split(",") || [];
+    
+    if (selectedCategories.length === 0) {
+      return products;
+    }
+
+    return products.filter(product => 
+      selectedCategories.includes(product.category)
+    );
+  };
 
   if (error) {
     return (

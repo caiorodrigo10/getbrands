@@ -12,9 +12,15 @@ import { ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 const CatalogFilters = () => {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(() => {
+    const categories = searchParams.get("categories");
+    return categories ? categories.split(",") : [];
+  });
+  const [isOpen, setIsOpen] = useState(false);
   
   const { data: categories } = useQuery({
     queryKey: ['product-categories'],
@@ -45,11 +51,24 @@ const CatalogFilters = () => {
 
   const clearFilters = () => {
     setSelectedCategories([]);
+    searchParams.delete("categories");
+    setSearchParams(searchParams);
+    setIsOpen(false);
+  };
+
+  const applyFilters = () => {
+    if (selectedCategories.length > 0) {
+      searchParams.set("categories", selectedCategories.join(","));
+    } else {
+      searchParams.delete("categories");
+    }
+    setSearchParams(searchParams);
+    setIsOpen(false);
   };
 
   return (
     <div className="space-y-4">
-      <Popover>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" className="w-[200px] justify-between">
             Select Categories
@@ -85,7 +104,11 @@ const CatalogFilters = () => {
               >
                 Clear
               </Button>
-              <Button size="sm" className="text-sm">
+              <Button 
+                size="sm" 
+                className="text-sm"
+                onClick={applyFilters}
+              >
                 Apply filter
               </Button>
             </div>
