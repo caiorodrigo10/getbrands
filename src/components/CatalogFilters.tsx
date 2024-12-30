@@ -26,9 +26,19 @@ const CatalogFilters = () => {
         .not('category', 'is', null)
         .order('category');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching categories:', error);
+        throw error;
+      }
+
+      // Log para debug
+      console.log('Raw categories data:', data);
 
       const uniqueCategories = [...new Set(data.map(item => item.category))];
+      
+      // Log para debug
+      console.log('Unique categories:', uniqueCategories);
+      
       return uniqueCategories;
     }
   });
