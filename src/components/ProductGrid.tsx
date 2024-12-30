@@ -18,17 +18,18 @@ const ProductGrid = ({ products }: ProductGridProps) => {
     ? products.filter(product => {
         const selectedCategories = categories
           .split(",")
-          .map(cat => cat.trim().toLowerCase());
+          .map(cat => cat.trim().toLowerCase().replace(/\s+/g, ' '));
           
         // Debug logs for category comparison
         console.log('Product being checked:', {
           name: product.name,
           category: product.category,
-          lowercaseCategory: product.category?.toLowerCase()
+          normalizedCategory: product.category?.toLowerCase().trim().replace(/\s+/g, ' ')
         });
-        console.log('Selected categories (lowercase):', selectedCategories);
+        console.log('Selected categories (normalized):', selectedCategories);
         
-        const isIncluded = selectedCategories.includes(product.category?.toLowerCase() || '');
+        const normalizedProductCategory = product.category?.toLowerCase().trim().replace(/\s+/g, ' ') || '';
+        const isIncluded = selectedCategories.includes(normalizedProductCategory);
         console.log('Is product included?', isIncluded);
         
         return isIncluded;
