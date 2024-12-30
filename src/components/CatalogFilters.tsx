@@ -42,6 +42,8 @@ const CatalogFilters = () => {
     if (categoriesParam) {
       const decodedCategories = decodeURIComponent(categoriesParam).split(",");
       setSelectedCategories(decodedCategories);
+    } else {
+      setSelectedCategories([]);
     }
   }, [searchParams]);
 
@@ -57,19 +59,21 @@ const CatalogFilters = () => {
 
   const clearFilters = () => {
     setSelectedCategories([]);
-    searchParams.delete("categories");
-    setSearchParams(searchParams);
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete("categories");
+    setSearchParams(newParams);
     setIsOpen(false);
   };
 
   const applyFilters = () => {
+    const newParams = new URLSearchParams(searchParams);
     if (selectedCategories.length > 0) {
-      const encodedCategories = encodeURIComponent(selectedCategories.join(","));
-      searchParams.set("categories", encodedCategories);
+      const encodedCategories = selectedCategories.map(cat => encodeURIComponent(cat)).join(",");
+      newParams.set("categories", encodedCategories);
     } else {
-      searchParams.delete("categories");
+      newParams.delete("categories");
     }
-    setSearchParams(searchParams);
+    setSearchParams(newParams);
     setIsOpen(false);
   };
 
