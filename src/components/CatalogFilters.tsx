@@ -1,23 +1,21 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { CategoryCheckbox } from "./catalog/filters/CategoryCheckbox";
+import { FilterActions } from "./catalog/filters/FilterActions";
+import { useCategoryFilter } from "./catalog/filters/useCategoryFilter";
 
 const CatalogFilters = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
+  const {
+    selectedCategories,
+    isOpen,
+    setIsOpen,
+    handleCategoryToggle,
+    clearFilters,
+    applyFilters
+  } = useCategoryFilter();
   
   const { data: categories } = useQuery({
     queryKey: ['product-categories'],
@@ -30,52 +28,10 @@ const CatalogFilters = () => {
 
       if (error) throw error;
 
-      // Remove duplicates and format categories
       const uniqueCategories = [...new Set(data.map(item => item.category))];
       return uniqueCategories;
     }
   });
-
-  // Initialize selected categories from URL params
-  useEffect(() => {
-    const categoriesParam = searchParams.get("categories");
-    if (categoriesParam) {
-      const decodedCategories = decodeURIComponent(categoriesParam).split(",");
-      setSelectedCategories(decodedCategories);
-    } else {
-      setSelectedCategories([]);
-    }
-  }, [searchParams]);
-
-  const handleCategoryToggle = (category: string) => {
-    setSelectedCategories(prev => {
-      if (prev.includes(category)) {
-        return prev.filter(c => c !== category);
-      } else {
-        return [...prev, category];
-      }
-    });
-  };
-
-  const clearFilters = () => {
-    setSelectedCategories([]);
-    const newParams = new URLSearchParams(searchParams);
-    newParams.delete("categories");
-    setSearchParams(newParams);
-    setIsOpen(false);
-  };
-
-  const applyFilters = () => {
-    const newParams = new URLSearchParams(searchParams);
-    if (selectedCategories.length > 0) {
-      const encodedCategories = selectedCategories.map(cat => encodeURIComponent(cat)).join(",");
-      newParams.set("categories", encodedCategories);
-    } else {
-      newParams.delete("categories");
-    }
-    setSearchParams(newParams);
-    setIsOpen(false);
-  };
 
   return (
     <div className="space-y-4">
@@ -92,39 +48,19 @@ const CatalogFilters = () => {
           <div className="space-y-4">
             <div className="space-y-2">
               {categories?.map((category) => (
-                <div key={category} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={category}
-                    checked={selectedCategories.includes(category)}
-                    onCheckedChange={() => handleCategoryToggle(category)}
-                  />
-                  <label
-                    htmlFor={category}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {category}
-                  </label>
-                </div>
+                <CategoryCheckbox
+                  key={category}
+                  category={category}
+                  isSelected={selectedCategories.includes(category)}
+                  onToggle={handleCategoryToggle}
+                />
               ))}
             </div>
             
-            <div className="flex justify-between">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-                className="text-sm"
-              >
-                Clear
-              </Button>
-              <Button 
-                size="sm" 
-                className="text-sm"
-                onClick={applyFilters}
-              >
-                Apply filter
-              </Button>
-            </div>
+            <FilterActions
+              onClear={clearFilters}
+              onApply={applyFilters}
+            />
           </div>
         </PopoverContent>
       </Popover>
