@@ -56,7 +56,7 @@ const CatalogFilters = () => {
             <ChevronDown className="ml-2 h-4 w-4" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-4" align="start">
+        <PopoverContent className="w-[200px] p-4 bg-white" align="start">
           <div className="space-y-4">
             <div className="space-y-2">
               {categories?.map((category) => (
