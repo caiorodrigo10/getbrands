@@ -11,15 +11,12 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 
 const CatalogFilters = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(() => {
-    const categories = searchParams.get("categories");
-    return categories ? decodeURIComponent(categories).split(",") : [];
-  });
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   
   const { data: categories } = useQuery({
@@ -38,6 +35,15 @@ const CatalogFilters = () => {
       return uniqueCategories;
     }
   });
+
+  // Initialize selected categories from URL params
+  useEffect(() => {
+    const categoriesParam = searchParams.get("categories");
+    if (categoriesParam) {
+      const decodedCategories = decodeURIComponent(categoriesParam).split(",");
+      setSelectedCategories(decodedCategories);
+    }
+  }, [searchParams]);
 
   const handleCategoryToggle = (category: string) => {
     setSelectedCategories(prev => {
@@ -72,7 +78,9 @@ const CatalogFilters = () => {
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" className="w-[200px] justify-between">
-            Select Categories
+            {selectedCategories.length > 0 
+              ? `${selectedCategories.length} selected`
+              : "Select Categories"}
             <ChevronDown className="ml-2 h-4 w-4" />
           </Button>
         </PopoverTrigger>
