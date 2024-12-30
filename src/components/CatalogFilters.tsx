@@ -18,7 +18,7 @@ const CatalogFilters = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCategories, setSelectedCategories] = useState<string[]>(() => {
     const categories = searchParams.get("categories");
-    return categories ? categories.split(",") : [];
+    return categories ? decodeURIComponent(categories).split(",") : [];
   });
   const [isOpen, setIsOpen] = useState(false);
   
@@ -58,7 +58,8 @@ const CatalogFilters = () => {
 
   const applyFilters = () => {
     if (selectedCategories.length > 0) {
-      searchParams.set("categories", selectedCategories.join(","));
+      const encodedCategories = encodeURIComponent(selectedCategories.join(","));
+      searchParams.set("categories", encodedCategories);
     } else {
       searchParams.delete("categories");
     }
