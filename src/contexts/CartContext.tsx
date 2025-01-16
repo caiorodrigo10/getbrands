@@ -21,7 +21,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (user?.id) {
       loadCartItems();
     } else {
-      items.length > 0 && clearCart(true);
+      items.length > 0 && clearCart();
     }
   }, [user?.id]); 
 

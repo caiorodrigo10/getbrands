@@ -31,7 +31,7 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!stripe || !elements || !user) {
+    if (!stripe || !elements || !user?.email) {
       return;
     }
 
@@ -104,7 +104,10 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
       // Create Shopify order
       try {
         await createOrder({
-          user,
+          user: {
+            id: user.id,
+            email: user.email
+          },
           items,
           total,
           shippingCost,
@@ -119,8 +122,8 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
         });
       }
 
-      // Silently clear cart without showing notification
-      await clearCart(true);
+      // Clear cart without showing notification
+      await clearCart();
       
       // Navigate to success page with order details
       navigate('/checkout/success', {
