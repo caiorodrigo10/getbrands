@@ -12,7 +12,7 @@ export const AppLayout = () => {
   }
 
   // Don't show navigation menu for landing page, onboarding and auth pages
-  const hideNav = ['/', '/login', '/signup', '/onboarding'].includes(location.pathname);
+  const hideNav = ['/', '/login', '/signup', '/onboarding', '/forgot-password'].includes(location.pathname);
 
   return (
     <div className="min-h-screen bg-background">
