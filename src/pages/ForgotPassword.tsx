@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 const schema = z.object({
-  email: z.string().email("Digite um email válido"),
+  email: z.string().email("Please enter a valid email"),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -51,11 +51,11 @@ const ForgotPassword = () => {
 
       if (response.error) throw response.error;
 
-      toast.success("Email de recuperação enviado com sucesso!");
+      toast.success("Password reset email sent successfully!");
       navigate("/login");
     } catch (error: any) {
       console.error("Error:", error);
-      toast.error(error.message || "Erro ao enviar email de recuperação");
+      toast.error(error.message || "Error sending reset email");
     } finally {
       setIsLoading(false);
     }
@@ -70,9 +70,9 @@ const ForgotPassword = () => {
             alt="Logo"
             className="w-[180px] h-auto"
           />
-          <h2 className="text-2xl font-bold">Recuperar Senha</h2>
+          <h2 className="text-2xl font-bold">Reset Password</h2>
           <p className="text-gray-600 text-center">
-            Digite seu email para receber as instruções de recuperação de senha
+            Enter your email to receive password reset instructions
           </p>
         </div>
 
@@ -87,7 +87,7 @@ const ForgotPassword = () => {
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="seu@email.com"
+                      placeholder="your@email.com"
                       {...field}
                       disabled={isLoading}
                     />
@@ -102,7 +102,7 @@ const ForgotPassword = () => {
               className="w-full bg-[#f0562e] hover:bg-[#f0562e]/90"
               disabled={isLoading}
             >
-              {isLoading ? "Enviando..." : "Enviar Email de Recuperação"}
+              {isLoading ? "Sending..." : "Send Reset Email"}
             </Button>
 
             <Button
@@ -112,7 +112,7 @@ const ForgotPassword = () => {
               onClick={() => navigate("/login")}
               disabled={isLoading}
             >
-              Voltar para Login
+              Back to Login
             </Button>
           </form>
         </Form>
