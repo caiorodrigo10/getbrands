@@ -4,7 +4,7 @@ import { trackEvent } from "@/lib/analytics";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 
-export const useProductActions = (productId: string, showNotification: boolean = true) => {
+export const useProductActions = (productId: string) => {
   const [isLoading, setIsLoading] = useState(false);
   const { addItem, loadCartItems } = useCart();
 

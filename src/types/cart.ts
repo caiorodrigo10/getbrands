@@ -2,8 +2,6 @@ import { Product } from "./product";
 
 export interface CartItem extends Product {
   quantity: number;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface CartOperations {
