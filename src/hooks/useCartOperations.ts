@@ -18,6 +18,8 @@ export const useCartOperations = (user: User | null) => {
         .from('cart_items')
         .select(`
           product_id,
+          created_at,
+          updated_at,
           products (
             id,
             name,
@@ -27,7 +29,9 @@ export const useCartOperations = (user: User | null) => {
             category,
             srp,
             is_new,
-            is_tiktok
+            is_tiktok,
+            created_at,
+            updated_at
           )
         `)
         .eq('user_id', user.id);
@@ -36,7 +40,9 @@ export const useCartOperations = (user: User | null) => {
 
       const cartItems: CartItem[] = data.map(item => ({
         ...item.products,
-        quantity: 1
+        quantity: 1,
+        created_at: item.created_at,
+        updated_at: item.updated_at
       }));
 
       setItems(cartItems);
