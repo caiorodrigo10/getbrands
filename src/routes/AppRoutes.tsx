@@ -6,7 +6,7 @@ import { MarketingRoutes } from "./MarketingRoutes";
 import AdminRoutes from "./AdminRoutes";
 import Login from "@/pages/Login";
 import SignUp from "@/pages/SignUp";
-import SignUpPT from "@/pages/pt/SignUpPT";
+import SignUpPT from "@/pages/pt/SignUp";
 import StartHere from "@/pages/StartHere";
 import StartHerePT from "@/pages/pt/StartHerePT";
 import Profile from "@/pages/Profile";
