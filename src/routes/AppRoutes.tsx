@@ -1,189 +1,86 @@
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { useEffect } from 'react';
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "./ProtectedRoute";
-import { AppLayout } from "./AppLayout";
+import { AdminRoutes } from "./AdminRoutes";
 import { MarketingRoutes } from "./MarketingRoutes";
-import AdminRoutes from "./AdminRoutes";
+import { AppLayout } from "./AppLayout";
+import Index from "@/pages/Index";
+import ComecarPT from "@/pages/pt/ComecarPT";
+import OnboardingQuizPT from "@/pages/pt/OnboardingQuizPT";
+import SignUpPT from "@/pages/pt/SignUpPT";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TermsAndConditions from "@/pages/TermsAndConditions";
 import Login from "@/pages/Login";
 import SignUp from "@/pages/SignUp";
-import SignUpPT from "@/pages/pt/SignUp";
-import StartHere from "@/pages/StartHere";
-import StartHerePT from "@/pages/pt/StartHerePT";
+import ForgotPassword from "@/pages/ForgotPassword";
+import Error404 from "@/pages/Error404";
+import Dashboard from "@/pages/Dashboard";
+import Catalog from "@/pages/Catalog";
 import Profile from "@/pages/Profile";
 import Projects from "@/pages/Projects";
-import ProjectDetails from "@/pages/ProjectDetails";
-import Catalog from "@/pages/Catalog";
-import Dashboard from "@/pages/Dashboard";
-import Products from "@/pages/Products";
-import ProductDetails from "@/pages/ProductDetails";
-import ProductSelectedSuccess from "@/pages/products/ProductSelectedSuccess";
-import Documents from "@/pages/Documents";
+import Project from "@/pages/Project";
 import SampleOrders from "@/pages/SampleOrders";
-import Checkout from "@/pages/checkout/Checkout";
-import Success from "@/pages/checkout/Success";
 import ProfitCalculator from "@/pages/ProfitCalculator";
-import Error404 from "@/pages/Error404";
-import PackageQuizPage from "@/pages/PackageQuizPage";
-import OnboardingQuizPage from "@/pages/OnboardingQuiz";
-import { OnboardingQuizPT } from "@/pages/pt/OnboardingQuiz";
-import ComecarPT from "@/pages/pt/ComecarPT";
-import DemoScheduling from "@/pages/DemoScheduling";
+import StartHere from "@/pages/StartHere";
 
 export const AppRoutes = () => {
-  const location = useLocation();
-  
-  useEffect(() => {
-    console.log('[DEBUG] AppRoutes - Current location:', location.pathname);
-  }, [location]);
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <Routes>
-      {/* Root Route */}
-      <Route element={<AppLayout />}>
-        <Route path="/" element={
-          <ProtectedRoute>
-            <Catalog />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        } />
-        
-        {/* Client Routes */}
-        <Route path="/start-here" element={
-          <ProtectedRoute>
-            <StartHere />
-          </ProtectedRoute>
-        } />
-
-        <Route path="/pt/start-here" element={
-          <ProtectedRoute>
-            <StartHerePT />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/profile" element={
-          <ProtectedRoute>
-            <Profile />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/projects" element={
-          <ProtectedRoute>
-            <Projects />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/projects/:id" element={
-          <ProtectedRoute>
-            <ProjectDetails />
-          </ProtectedRoute>
-        } />
-
-        <Route path="/package-quiz/:projectId" element={
-          <ProtectedRoute>
-            <PackageQuizPage />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/catalog" element={
-          <ProtectedRoute>
-            <Catalog />
-          </ProtectedRoute>
-        } />
-
-        <Route path="/catalog/:id" element={
-          <ProtectedRoute>
-            <ProductDetails />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/products" element={
-          <ProtectedRoute>
-            <Products />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/products/:id" element={
-          <ProtectedRoute>
-            <ProductDetails />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/products/success" element={
-          <ProtectedRoute>
-            <ProductSelectedSuccess />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/documents" element={
-          <ProtectedRoute>
-            <Documents />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/sample-orders" element={
-          <ProtectedRoute>
-            <SampleOrders />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/profit-calculator" element={
-          <ProtectedRoute>
-            <ProfitCalculator />
-          </ProtectedRoute>
-        } />
-
-        <Route path="/schedule-demo" element={<DemoScheduling />} />
-
-        <Route path="*" element={<Error404 />} />
-      </Route>
-
-      {/* Portuguese Routes */}
-      <Route path="/pt/signup" element={<SignUpPT />} />
-      <Route path="/pt/onboarding" element={
-        <ProtectedRoute>
-          <OnboardingQuizPT />
-        </ProtectedRoute>
-      } />
-      <Route path="/comecarpt" element={<ComecarPT />} />
-
       {/* Marketing Routes */}
-      {MarketingRoutes}
-      
-      {/* Public Routes */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/onboarding" element={<OnboardingQuizPage />} />
-      
-      {/* Admin Routes */}
-      <Route path="/admin/*" element={
-        <ProtectedRoute requiresAdmin>
-          <AdminRoutes />
-        </ProtectedRoute>
-      } />
-
-      {/* Standalone Checkout Routes */}
-      <Route path="/checkout/*" element={
-        <ProtectedRoute>
-          <Checkout />
-        </ProtectedRoute>
-      }>
-        <Route path="shipping" element={<Checkout />} />
-        <Route path="payment" element={<Checkout />} />
-        <Route path="confirmation" element={<Checkout />} />
-        <Route path="points" element={<Checkout />} />
+      <Route element={<MarketingRoutes />}>
+        <Route path="/" element={<Index />} />
+        <Route path="/comecarpt" element={<ComecarPT />} />
+        <Route path="/pt/quiz" element={<OnboardingQuizPT />} />
+        <Route path="/pt/signup" element={<SignUpPT />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
       </Route>
 
-      {/* Success page as a standalone route */}
-      <Route path="/checkout/success" element={
-        <ProtectedRoute>
-          <Success />
-        </ProtectedRoute>
-      } />
+      {/* Auth Routes */}
+      <Route
+        path="/login"
+        element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />}
+      />
+      <Route
+        path="/signup"
+        element={!isAuthenticated ? <SignUp /> : <Navigate to="/dashboard" />}
+      />
+      <Route
+        path="/forgot-password"
+        element={!isAuthenticated ? <ForgotPassword /> : <Navigate to="/dashboard" />}
+      />
+
+      {/* Protected Routes */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/catalog" element={<Catalog />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:id" element={<Project />} />
+          <Route path="/sample-orders" element={<SampleOrders />} />
+          <Route path="/profit-calculator" element={<ProfitCalculator />} />
+          <Route path="/start-here" element={<StartHere />} />
+        </Route>
+      </Route>
+
+      {/* Admin Routes */}
+      <Route element={<ProtectedRoute requiresAdmin />}>
+        <Route path="/admin/*" element={<AdminRoutes />} />
+      </Route>
+
+      {/* 404 Route */}
+      <Route path="*" element={<Error404 />} />
     </Routes>
   );
 };
