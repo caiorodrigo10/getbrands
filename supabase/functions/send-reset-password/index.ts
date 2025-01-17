@@ -80,7 +80,7 @@ const handler = async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "onboarding@resend.dev",
+        from: "GetBrands <noreply@updates.getbrands.io>",
         to: [email],
         subject: "Password Reset - GetBrands",
         html: `
