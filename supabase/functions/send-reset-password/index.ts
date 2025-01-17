@@ -57,15 +57,12 @@ const handler = async (req: Request): Promise<Response> => {
         subject: "Password Reset - GetBrands",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <img src="https://content.app-sources.com/s/97257455971736356/uploads/Logos/Logotipo_4-7282325.png" 
-                 alt="GetBrands Logo" 
-                 style="max-width: 200px; margin: 20px 0;">
             <h2>Hello ${firstName},</h2>
             <p>We received a request to reset your password.</p>
             <p>Click the button below to create a new password:</p>
             <div style="text-align: center; margin: 30px 0;">
               <a href="${resetLink}" 
-                 style="background-color: #FF69B4; 
+                 style="background-color: #f0562e; 
                         color: white; 
                         padding: 12px 24px; 
                         text-decoration: none; 
