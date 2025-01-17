@@ -66,6 +66,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     const firstName = profile?.first_name || "User";
 
+    if (!RESEND_API_KEY) {
+      throw new Error("RESEND API key is not configured");
+    }
+
     // Send email via Resend
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
