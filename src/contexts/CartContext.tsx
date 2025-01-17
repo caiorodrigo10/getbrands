@@ -7,36 +7,18 @@ const CartContext = createContext<CartOperations | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const {
-    items,
-    isLoading,
-    loadCartItems,
-    addItem,
-    removeItem,
-    updateQuantity,
-    clearCart,
-  } = useCartOperations(user);
+  const cartOperations = useCartOperations(user);
 
   useEffect(() => {
     if (user?.id) {
-      loadCartItems();
+      cartOperations.loadCartItems();
     } else {
-      items.length > 0 && clearCart(true);
+      cartOperations.items.length > 0 && cartOperations.clearCart(true);
     }
   }, [user?.id]); 
 
   return (
-    <CartContext.Provider
-      value={{ 
-        items, 
-        addItem, 
-        removeItem, 
-        updateQuantity, 
-        clearCart, 
-        isLoading,
-        loadCartItems 
-      }}
-    >
+    <CartContext.Provider value={cartOperations}>
       {children}
     </CartContext.Provider>
   );
