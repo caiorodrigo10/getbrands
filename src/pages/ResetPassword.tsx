@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 const ResetPassword = () => {
@@ -10,25 +10,63 @@ const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isTokenValid, setIsTokenValid] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if we have a valid token
-    const token = searchParams.get("token");
-    if (!token) {
-      toast({
-        variant: "destructive",
-        title: "Invalid Link",
-        description: "This password reset link is invalid or has expired.",
-      });
-      navigate("/login");
-    }
+    const validateToken = async () => {
+      const token = searchParams.get("token");
+      
+      if (!token) {
+        toast({
+          variant: "destructive",
+          title: "Invalid Link",
+          description: "This password reset link is invalid or has expired.",
+        });
+        navigate("/forgot-password");
+        return;
+      }
+
+      try {
+        // Verify token with Supabase
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: token,
+          type: 'recovery'
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        setIsTokenValid(true);
+      } catch (error) {
+        console.error("Token validation error:", error);
+        toast({
+          variant: "destructive",
+          title: "Invalid Link",
+          description: "This password reset link is invalid or has expired.",
+        });
+        navigate("/forgot-password");
+      }
+    };
+
+    validateToken();
   }, [searchParams, navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
+    if (!isTokenValid) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Link",
+        description: "This password reset link is invalid or has expired.",
+      });
+      navigate("/forgot-password");
+      return;
+    }
 
     if (password !== confirmPassword) {
       toast({
@@ -69,12 +107,17 @@ const ResetPassword = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Failed to update password",
+        description: "This password reset link is invalid or has expired.",
       });
+      navigate("/forgot-password");
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (!isTokenValid) {
+    return null; // Don't render form while validating token
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
