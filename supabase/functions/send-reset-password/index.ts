@@ -44,16 +44,17 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (userError) throw userError;
+    
+    // For security reasons, we return success even if the user doesn't exist
     if (!users || users.length === 0) {
-      // Return success even if user doesn't exist for security
       return new Response(JSON.stringify({ success: true }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Generate a token with expiration timestamp
-    const timestamp = new Date().getTime();
+    // Generate a token with expiration timestamp (24 hours)
+    const timestamp = new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours from now
     const token = Buffer.from(`${timestamp}:${users[0].id}`).toString('base64');
 
     // Get user profile

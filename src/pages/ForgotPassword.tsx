@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,27 +9,34 @@ import { supabase } from "@/integrations/supabase/client";
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // Call our edge function to send the custom email
-      const { error: emailError } = await supabase.functions.invoke("send-reset-password", {
+      const { data, error } = await supabase.functions.invoke("send-reset-password", {
         body: {
           email,
           resetLink: `${window.location.origin}/reset-password`,
         },
       });
 
-      if (emailError) throw emailError;
+      if (error) throw error;
 
-      toast.success("If an account exists with this email, you will receive password reset instructions.");
+      toast({
+        title: "Success",
+        description: "If an account exists with this email, you will receive password reset instructions.",
+      });
       
     } catch (error: any) {
-      console.error("Error resetting password:", error);
-      toast.error("Failed to send instructions. Please try again.");
+      console.error("Error in password reset:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to send instructions. Please try again.",
+      });
     } finally {
       setIsLoading(false);
     }
