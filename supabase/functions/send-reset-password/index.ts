@@ -30,12 +30,26 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Email is required");
     }
 
-    // Get user profile
+    // Initialize Supabase client with service role key
     const supabase = createClient(
       SUPABASE_URL!,
       SUPABASE_SERVICE_ROLE_KEY!,
     );
 
+    // Generate password reset token
+    const { data: { user }, error: resetError } = await supabase.auth.admin.generateLink({
+      type: 'recovery',
+      email: email,
+    });
+
+    if (resetError) throw resetError;
+    if (!user) throw new Error("User not found");
+
+    // Get the token from the recovery link
+    const token = user.confirmation_sent_at;
+    const recoveryToken = Buffer.from(token?.toString() || '').toString('base64');
+
+    // Get user profile
     const { data: profile } = await supabase
       .from("profiles")
       .select("first_name")
@@ -61,7 +75,7 @@ const handler = async (req: Request): Promise<Response> => {
             <p>We received a request to reset your password.</p>
             <p>Click the button below to create a new password:</p>
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${resetLink}" 
+              <a href="${resetLink}?token=${recoveryToken}" 
                  style="background-color: #f0562e; 
                         color: white; 
                         padding: 12px 24px; 

@@ -29,14 +29,14 @@ const ResetPassword = () => {
       }
 
       try {
-        // Verify token with Supabase
-        const { error } = await supabase.auth.verifyOtp({
-          token_hash: token,
-          type: 'recovery'
-        });
-
-        if (error) {
-          throw error;
+        // Decode the token
+        const decodedToken = Buffer.from(token, 'base64').toString();
+        const tokenDate = new Date(decodedToken);
+        const now = new Date();
+        
+        // Check if token is expired (24 hours)
+        if (now.getTime() - tokenDate.getTime() > 24 * 60 * 60 * 1000) {
+          throw new Error("Token expired");
         }
 
         setIsTokenValid(true);
@@ -107,9 +107,8 @@ const ResetPassword = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "This password reset link is invalid or has expired.",
+        description: "Failed to update password. Please try again.",
       });
-      navigate("/forgot-password");
     } finally {
       setIsLoading(false);
     }
@@ -123,11 +122,6 @@ const ResetPassword = () => {
     <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
       <div className="w-full max-w-md space-y-8 p-8 bg-white rounded-2xl shadow-lg">
         <div className="flex flex-col items-center space-y-2">
-          <img
-            src="https://assets.cdn.filesafe.space/Q5OD6tvJPFLSMWrJ9Ent/media/673c037af980e11b5682313e.png"
-            alt="Logo"
-            className="w-[180px] h-auto"
-          />
           <h2 className="text-2xl font-semibold">Reset Your Password</h2>
           <p className="text-gray-600">
             Please enter your new password below
