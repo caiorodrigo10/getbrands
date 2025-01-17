@@ -22,6 +22,16 @@ const ForgotPassword = () => {
 
       if (error) throw error;
 
+      // Call our edge function to send the custom email
+      const { error: emailError } = await supabase.functions.invoke("send-reset-password", {
+        body: {
+          email,
+          resetLink: `${window.location.origin}/reset-password`,
+        },
+      });
+
+      if (emailError) throw emailError;
+
       toast({
         title: "Email sent",
         description: "If an account exists with this email, you will receive password reset instructions.",

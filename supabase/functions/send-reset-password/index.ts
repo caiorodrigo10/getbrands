@@ -42,7 +42,7 @@ const handler = async (req: Request): Promise<Response> => {
       .eq("email", email)
       .single();
 
-    const firstName = profile?.first_name || "Usuário";
+    const firstName = profile?.first_name || "User";
 
     // Send email via Resend
     const res = await fetch("https://api.resend.com/emails", {
@@ -52,17 +52,17 @@ const handler = async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Mainer <noreply@mainer.com.br>",
+        from: "GetBrands <noreply@updates.getbrands.io>",
         to: [email],
-        subject: "Redefinição de Senha - Mainer",
+        subject: "Password Reset - GetBrands",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <img src="https://content.app-sources.com/s/97257455971736356/uploads/Logos/Logotipo_4-7282325.png" 
-                 alt="Mainer Logo" 
+                 alt="GetBrands Logo" 
                  style="max-width: 200px; margin: 20px 0;">
-            <h2>Olá ${firstName},</h2>
-            <p>Recebemos sua solicitação para redefinir sua senha.</p>
-            <p>Clique no botão abaixo para criar uma nova senha:</p>
+            <h2>Hello ${firstName},</h2>
+            <p>We received a request to reset your password.</p>
+            <p>Click the button below to create a new password:</p>
             <div style="text-align: center; margin: 30px 0;">
               <a href="${resetLink}" 
                  style="background-color: #FF69B4; 
@@ -71,14 +71,14 @@ const handler = async (req: Request): Promise<Response> => {
                         text-decoration: none; 
                         border-radius: 4px; 
                         display: inline-block;">
-                Redefinir Senha
+                Reset Password
               </a>
             </div>
-            <p>Se você não solicitou esta alteração, ignore este email.</p>
-            <p>Este link expira em 24 horas.</p>
+            <p>If you didn't request this change, please ignore this email.</p>
+            <p>This link expires in 24 hours.</p>
             <hr style="margin: 30px 0; border: 1px solid #eee;">
             <p style="color: #666; font-size: 12px;">
-              Este é um email automático, por favor não responda.
+              This is an automated email, please do not reply.
             </p>
           </div>
         `,
