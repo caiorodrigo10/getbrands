@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
+import { Mail, ArrowLeft } from "lucide-react";
 
 const ForgotPassword = () => {
   const { toast } = useToast();
@@ -14,17 +15,17 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      // Password reset functionality will be implemented later
+      // We'll implement the actual password reset logic later
       toast({
         title: "Check your email",
-        description: "If an account exists, you will receive a password reset link.",
+        description: "If an account exists with this email, you will receive password reset instructions.",
       });
     } catch (error: any) {
       console.error("Password reset error:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to send reset password email. Please try again.",
+        description: "Failed to send reset instructions. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -40,8 +41,11 @@ const ForgotPassword = () => {
             alt="Logo"
             className="w-[180px] h-auto"
           />
-          <p className="text-gray-600">
+          <h2 className="mt-6 text-2xl font-semibold text-gray-900">
             Reset your password
+          </h2>
+          <p className="text-gray-600">
+            Enter your email to receive reset instructions
           </p>
         </div>
 
@@ -67,17 +71,24 @@ const ForgotPassword = () => {
             {isLoading ? (
               <div className="flex items-center justify-center">
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                <span>Sending...</span>
+                <span>Sending instructions...</span>
               </div>
             ) : (
-              "Send Reset Link"
+              <div className="flex items-center justify-center">
+                <Mail className="mr-2 h-4 w-4" />
+                <span>Send reset instructions</span>
+              </div>
             )}
           </Button>
         </form>
 
         <div className="mt-4 text-center text-sm">
-          <Link to="/login" className="text-[#f0562e] hover:text-[#f0562e]/90">
-            Back to Login
+          <Link 
+            to="/login" 
+            className="text-[#f0562e] hover:text-[#f0562e]/90 inline-flex items-center"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to login
           </Link>
         </div>
       </div>
