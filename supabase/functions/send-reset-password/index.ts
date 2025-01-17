@@ -36,24 +36,31 @@ const handler = async (req: Request): Promise<Response> => {
       SUPABASE_SERVICE_ROLE_KEY!,
     );
 
-    // Generate password reset token
-    const { data: { user }, error: resetError } = await supabase.auth.admin.generateLink({
-      type: 'recovery',
-      email: email,
+    // Check if user exists
+    const { data: { users }, error: userError } = await supabase.auth.admin.listUsers({
+      filters: {
+        email: email
+      }
     });
 
-    if (resetError) throw resetError;
-    if (!user) throw new Error("User not found");
+    if (userError) throw userError;
+    if (!users || users.length === 0) {
+      // Return success even if user doesn't exist for security
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
-    // Get the token from the recovery link
-    const token = user.confirmation_sent_at;
-    const recoveryToken = Buffer.from(token?.toString() || '').toString('base64');
+    // Generate a token with expiration timestamp
+    const timestamp = new Date().getTime();
+    const token = Buffer.from(`${timestamp}:${users[0].id}`).toString('base64');
 
     // Get user profile
     const { data: profile } = await supabase
       .from("profiles")
       .select("first_name")
-      .eq("email", email)
+      .eq("id", users[0].id)
       .single();
 
     const firstName = profile?.first_name || "User";
@@ -75,7 +82,7 @@ const handler = async (req: Request): Promise<Response> => {
             <p>We received a request to reset your password.</p>
             <p>Click the button below to create a new password:</p>
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${resetLink}?token=${recoveryToken}" 
+              <a href="${resetLink}?token=${token}" 
                  style="background-color: #f0562e; 
                         color: white; 
                         padding: 12px 24px; 

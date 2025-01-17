@@ -11,6 +11,7 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isTokenValid, setIsTokenValid] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -30,8 +31,9 @@ const ResetPassword = () => {
 
       try {
         // Decode the token
-        const decodedToken = Buffer.from(token, 'base64').toString();
-        const tokenDate = new Date(decodedToken);
+        const decoded = Buffer.from(token, 'base64').toString();
+        const [timestamp, uid] = decoded.split(':');
+        const tokenDate = new Date(Number(timestamp));
         const now = new Date();
         
         // Check if token is expired (24 hours)
@@ -39,6 +41,7 @@ const ResetPassword = () => {
           throw new Error("Token expired");
         }
 
+        setUserId(uid);
         setIsTokenValid(true);
       } catch (error) {
         console.error("Token validation error:", error);
@@ -58,7 +61,7 @@ const ResetPassword = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    if (!isTokenValid) {
+    if (!isTokenValid || !userId) {
       toast({
         variant: "destructive",
         title: "Invalid Link",
@@ -89,7 +92,10 @@ const ResetPassword = () => {
     }
 
     try {
-      const { error } = await supabase.auth.updateUser({ password });
+      const { error } = await supabase.auth.admin.updateUserById(
+        userId,
+        { password: password }
+      );
 
       if (error) throw error;
 

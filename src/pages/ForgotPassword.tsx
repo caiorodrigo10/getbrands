@@ -15,16 +15,6 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      // First, check if user exists
-      const { data: existingUser, error: userError } = await supabase.auth.resetPasswordForEmail(
-        email,
-        {
-          redirectTo: `${window.location.origin}/reset-password`,
-        }
-      );
-
-      if (userError) throw userError;
-
       // Call our edge function to send the custom email
       const { error: emailError } = await supabase.functions.invoke("send-reset-password", {
         body: {
