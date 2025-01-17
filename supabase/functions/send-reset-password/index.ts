@@ -55,7 +55,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Generate a token with expiration timestamp (24 hours)
     const timestamp = new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours from now
-    const token = Buffer.from(`${timestamp}:${users[0].id}`).toString('base64');
+    const tokenData = `${timestamp}:${users[0].id}`;
+    const encoder = new TextEncoder();
+    const token = btoa(String.fromCharCode(...encoder.encode(tokenData)));
 
     // Get user profile
     const { data: profile } = await supabase
