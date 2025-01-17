@@ -12,7 +12,7 @@ export const AppLayout = () => {
   }
 
   // Don't show navigation menu for onboarding, auth pages and 404
-  const hideNav = ['/login', '/signup', '/onboarding'].includes(location.pathname) || location.pathname.includes('404');
+  const hideNav = ['/login', '/signup', '/onboarding', '/404'].includes(location.pathname);
 
   return (
     <div className="min-h-screen bg-background">
