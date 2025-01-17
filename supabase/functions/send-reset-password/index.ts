@@ -68,12 +68,12 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         from: "GetBrands <noreply@getbrands.io>",
         to: [email],
-        subject: "Redefinição de Senha - GetBrands",
+        subject: "Password Reset - GetBrands",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2>Olá ${firstName},</h2>
-            <p>Recebemos uma solicitação para redefinir sua senha.</p>
-            <p>Clique no botão abaixo para criar uma nova senha:</p>
+            <h2>Hello ${firstName},</h2>
+            <p>We received a request to reset your password.</p>
+            <p>Click the button below to create a new password:</p>
             <div style="text-align: center; margin: 30px 0;">
               <a href="${resetLink}?token=${recoveryToken}" 
                  style="background-color: #f0562e; 
@@ -82,14 +82,14 @@ const handler = async (req: Request): Promise<Response> => {
                         text-decoration: none; 
                         border-radius: 4px; 
                         display: inline-block;">
-                Redefinir Senha
+                Reset Password
               </a>
             </div>
-            <p>Se você não solicitou esta alteração, por favor ignore este email.</p>
-            <p>Este link expira em 24 horas.</p>
+            <p>If you didn't request this change, please ignore this email.</p>
+            <p>This link expires in 24 hours.</p>
             <hr style="margin: 30px 0; border: 1px solid #eee;">
             <p style="color: #666; font-size: 12px;">
-              Este é um email automático, por favor não responda.
+              This is an automated email, please do not reply.
             </p>
           </div>
         `,

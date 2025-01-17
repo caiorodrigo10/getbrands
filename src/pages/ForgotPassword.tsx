@@ -35,11 +35,11 @@ const ForgotPassword = () => {
 
       if (emailError) throw emailError;
 
-      toast.success("Se uma conta existir com este email, você receberá instruções para redefinir sua senha.");
+      toast.success("If an account exists with this email, you will receive password reset instructions.");
       
     } catch (error: any) {
       console.error("Error resetting password:", error);
-      toast.error("Falha ao enviar instruções. Por favor, tente novamente.");
+      toast.error("Failed to send instructions. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -55,10 +55,10 @@ const ForgotPassword = () => {
             className="w-[180px] h-auto"
           />
           <h2 className="mt-6 text-2xl font-semibold text-gray-900">
-            Redefinir sua senha
+            Reset your password
           </h2>
           <p className="text-gray-600">
-            Digite seu email para receber instruções
+            Enter your email to receive instructions
           </p>
         </div>
 
@@ -71,7 +71,7 @@ const ForgotPassword = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0562e]/20"
-              placeholder="seu@email.com"
+              placeholder="your@email.com"
               disabled={isLoading}
             />
           </div>
@@ -84,12 +84,12 @@ const ForgotPassword = () => {
             {isLoading ? (
               <div className="flex items-center justify-center">
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                <span>Enviando instruções...</span>
+                <span>Sending instructions...</span>
               </div>
             ) : (
               <div className="flex items-center justify-center">
                 <Mail className="mr-2 h-4 w-4" />
-                <span>Enviar instruções</span>
+                <span>Send instructions</span>
               </div>
             )}
           </Button>
@@ -101,7 +101,7 @@ const ForgotPassword = () => {
             className="text-[#f0562e] hover:text-[#f0562e]/90 inline-flex items-center"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Voltar para login
+            Back to login
           </Link>
         </div>
       </div>
