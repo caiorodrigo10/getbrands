@@ -18,18 +18,26 @@ export const useCartOperations = (user: User | null) => {
         .from('cart_items')
         .select(`
           product_id,
-          products (*)
+          products (
+            id,
+            name,
+            description,
+            image_url,
+            from_price
+          )
         `)
         .eq('user_id', user.id);
 
       if (error) throw error;
 
       const cartItems = data.map(item => ({
+        id: item.product_id,
         ...item.products,
-        quantity: 1
+        quantity: 1,
+        price: Number(item.products.from_price) || 0
       }));
 
-      setItems(cartItems as CartItem[]);
+      setItems(cartItems);
     } catch (error) {
       console.error('Error loading cart items:', error);
     } finally {
@@ -50,7 +58,13 @@ export const useCartOperations = (user: User | null) => {
 
       if (error) throw error;
 
-      setItems(prev => [...prev, { ...item, quantity: 1 }]);
+      const itemWithPrice = {
+        ...item,
+        price: Number(item.price) || 0,
+        quantity: 1
+      };
+
+      setItems(prev => [...prev, itemWithPrice]);
     } catch (error) {
       console.error('Error adding item to cart:', error);
       toast({
@@ -88,7 +102,7 @@ export const useCartOperations = (user: User | null) => {
     }
   };
 
-  const updateQuantity = async (itemId: string, quantity: number) => {
+  const updateQuantity = (itemId: string, quantity: number) => {
     setItems(prev =>
       prev.map(item =>
         item.id === itemId ? { ...item, quantity } : item
