@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const ForgotPassword = () => {
   const { toast } = useToast();
@@ -15,17 +16,23 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      // We'll implement the actual password reset logic later
-      toast({
-        title: "Check your email",
-        description: "If an account exists with this email, you will receive password reset instructions.",
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
       });
+
+      if (error) throw error;
+
+      toast({
+        title: "Email enviado",
+        description: "Se existe uma conta com este email, você receberá instruções para redefinir sua senha.",
+      });
+      
     } catch (error: any) {
-      console.error("Password reset error:", error);
+      console.error("Erro ao resetar senha:", error);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to send reset instructions. Please try again.",
+        title: "Erro",
+        description: "Falha ao enviar instruções. Por favor, tente novamente.",
       });
     } finally {
       setIsLoading(false);
@@ -42,10 +49,10 @@ const ForgotPassword = () => {
             className="w-[180px] h-auto"
           />
           <h2 className="mt-6 text-2xl font-semibold text-gray-900">
-            Reset your password
+            Redefinir sua senha
           </h2>
           <p className="text-gray-600">
-            Enter your email to receive reset instructions
+            Digite seu email para receber instruções
           </p>
         </div>
 
@@ -58,7 +65,7 @@ const ForgotPassword = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0562e]/20"
-              placeholder="your@email.com"
+              placeholder="seu@email.com"
               disabled={isLoading}
             />
           </div>
@@ -71,12 +78,12 @@ const ForgotPassword = () => {
             {isLoading ? (
               <div className="flex items-center justify-center">
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                <span>Sending instructions...</span>
+                <span>Enviando instruções...</span>
               </div>
             ) : (
               <div className="flex items-center justify-center">
                 <Mail className="mr-2 h-4 w-4" />
-                <span>Send reset instructions</span>
+                <span>Enviar instruções</span>
               </div>
             )}
           </Button>
@@ -88,7 +95,7 @@ const ForgotPassword = () => {
             className="text-[#f0562e] hover:text-[#f0562e]/90 inline-flex items-center"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to login
+            Voltar para login
           </Link>
         </div>
       </div>
