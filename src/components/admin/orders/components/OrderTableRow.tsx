@@ -30,8 +30,15 @@ export const OrderTableRow = ({
   // Log the order object to debug
   console.log("OrderTableRow order:", order);
   
-  // Get the product count safely - handle case where products might be null or empty
-  const productCount = Array.isArray(order.products) ? order.products.length : 0;
+  // Get the product count safely - filter out null products
+  const validProducts = Array.isArray(order.products) 
+    ? order.products.filter(item => item && item.product) 
+    : [];
+  
+  const productCount = validProducts.length;
+
+  // Calculate total quantity of all products
+  const totalItemsQuantity = validProducts.reduce((sum, item) => sum + (item.quantity || 1), 0);
   
   // Calculate total safely
   const total = typeof order.total === 'number' 
@@ -67,7 +74,7 @@ export const OrderTableRow = ({
           minute: "2-digit",
         }) : 'N/A'}
       </TableCell>
-      <TableCell>{productCount} items</TableCell>
+      <TableCell>{totalItemsQuantity} items ({productCount} products)</TableCell>
       <TableCell>
         <OrderStatusBadge status={order.status} />
       </TableCell>

@@ -13,8 +13,10 @@ export const OrderDetailsSection = ({ request, subtotal, shippingCost }: OrderDe
   // Debug log for the products data
   console.log('OrderDetailsSection products:', request.products);
   
-  // Make sure products is always an array, even if it's null or undefined
-  const products = Array.isArray(request.products) ? request.products : [];
+  // Make sure products is always an array and filter out invalid entries
+  const products = Array.isArray(request.products) 
+    ? request.products.filter(item => item && item.product) 
+    : [];
   
   return (
     <motion.div
@@ -36,8 +38,9 @@ export const OrderDetailsSection = ({ request, subtotal, shippingCost }: OrderDe
                 />
                 <div>
                   <h5 className="font-medium">{item.product?.name || "Unnamed Product"}</h5>
+                  <p className="text-sm text-muted-foreground">Quantity: {item.quantity || 1}</p>
                   <p className="text-sm font-medium mt-1">
-                    {formatCurrency(item.product?.from_price || item.unit_price || 0)}
+                    {formatCurrency(item.unit_price || item.product?.from_price || 0)}
                   </p>
                 </div>
               </div>

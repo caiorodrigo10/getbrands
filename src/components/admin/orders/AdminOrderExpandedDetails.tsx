@@ -24,6 +24,7 @@ interface AdminOrderExpandedDetailsProps {
         name: string;
         id: string;
         image_url: string | null;
+        from_price?: number;
       };
     }> | null;
     tracking_number?: string | null;
@@ -42,16 +43,21 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
   const { toast } = useToast();
   const [trackingNumber, setTrackingNumber] = useState(order.tracking_number || "");
   
-  // Ensure products is always an array, even if null
-  const products = Array.isArray(order.products) ? order.products : [];
+  // Ensure products is always an array and filter out invalid products
+  const products = Array.isArray(order.products) 
+    ? order.products.filter(item => item && item.product) 
+    : [];
   
-  // Calculate totals correctly
-  const subtotal = products.length > 0 ? calculateOrderSubtotal(products) : 0;
-  const shippingCost = order.shipping_cost || 0;
-  const total = subtotal + shippingCost;
-
   // Debug log for products data
   console.log("Admin order expanded details - products:", products);
+
+  // Calculate totals correctly
+  const subtotal = products.length > 0 
+    ? products.reduce((sum, item) => sum + ((item.unit_price || item.product?.from_price || 0) * (item.quantity || 1)), 0)
+    : 0;
+  
+  const shippingCost = order.shipping_cost || 0;
+  const total = subtotal + shippingCost;
 
   useEffect(() => {
     // Update tracking number if order changes
@@ -127,8 +133,11 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
                         <p className="text-sm text-muted-foreground">
                           SKU: {item.product?.id ? item.product.id.slice(0, 8) : 'N/A'}
                         </p>
+                        <p className="text-sm text-muted-foreground">
+                          Quantity: {item.quantity || 1}
+                        </p>
                         <p className="text-sm font-medium mt-1">
-                          {item.quantity || 1}x {formatCurrency(item.unit_price || 0)}
+                          {formatCurrency(item.unit_price || item.product?.from_price || 0)} per unit
                         </p>
                       </div>
                     </div>
