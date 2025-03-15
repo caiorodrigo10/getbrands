@@ -1,3 +1,4 @@
+
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect } from 'react';
 import { ProtectedRoute } from "./ProtectedRoute";
@@ -161,7 +162,7 @@ export const AppRoutes = () => {
       
       {/* Admin Routes */}
       <Route path="/admin/*" element={
-        <ProtectedRoute requiresAdmin>
+        <ProtectedRoute>
           <AdminRoutes />
         </ProtectedRoute>
       } />

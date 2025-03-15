@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useProductActions } from "@/hooks/useProductActions";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +13,7 @@ interface ProductActionsProps {
 }
 
 export const ProductActions = ({ productId, onSelectProduct, showNotification = true }: ProductActionsProps) => {
-  const { isLoading, handleRequestSample } = useProductActions(productId, showNotification);
+  const { isLoading, handleRequestSample } = useProductActions(productId);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { hasFullAccess, isMember, isSampler } = useUserPermissions();

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -104,7 +105,10 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
       // Create Shopify order
       try {
         await createOrder({
-          user,
+          user: {
+            id: user.id,
+            email: user.email || "unknown@example.com"
+          },
           items,
           total,
           shippingCost,
