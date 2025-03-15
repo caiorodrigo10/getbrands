@@ -25,7 +25,7 @@ interface AdminOrderExpandedDetailsProps {
         id: string;
         image_url: string | null;
       };
-    }>;
+    }> | null;
     tracking_number?: string | null;
     first_name?: string;
     last_name?: string;
@@ -42,13 +42,16 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
   const { toast } = useToast();
   const [trackingNumber, setTrackingNumber] = useState(order.tracking_number || "");
   
+  // Ensure products is always an array, even if null
+  const products = Array.isArray(order.products) ? order.products : [];
+  
   // Calculate totals correctly
-  const subtotal = order.products ? calculateOrderSubtotal(order.products) : 0;
+  const subtotal = products.length > 0 ? calculateOrderSubtotal(products) : 0;
   const shippingCost = order.shipping_cost || 0;
   const total = subtotal + shippingCost;
 
   // Debug log for products data
-  console.log("Admin order expanded details - products:", order.products);
+  console.log("Admin order expanded details - products:", products);
 
   useEffect(() => {
     // Update tracking number if order changes
@@ -92,16 +95,16 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
             <h4 className="font-semibold text-lg mb-4">Customer Details</h4>
             <Card className="p-4">
               <p className="font-medium">
-                {order.customer?.first_name || order.first_name} {order.customer?.last_name || order.last_name}
+                {order.customer?.first_name || order.first_name || 'Unknown'} {order.customer?.last_name || order.last_name || ''}
               </p>
               <p className="text-sm text-muted-foreground mt-1">
                 {order.customer?.email || "No email available"}
               </p>
               <div className="mt-4 pt-4 border-t">
                 <p className="text-sm font-medium mb-1">Shipping Address:</p>
-                <p className="text-sm">{order.shipping_address}</p>
+                <p className="text-sm">{order.shipping_address || 'N/A'}</p>
                 <p className="text-sm">
-                  {order.shipping_city}, {order.shipping_state} {order.shipping_zip}
+                  {order.shipping_city || 'N/A'}, {order.shipping_state || 'N/A'} {order.shipping_zip || 'N/A'}
                 </p>
               </div>
             </Card>
@@ -111,21 +114,21 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
             <h4 className="font-semibold text-lg mb-4">Order Details</h4>
             <Card className="p-4">
               <div className="space-y-4">
-                {order.products && order.products.length > 0 ? (
-                  order.products.map((item) => (
-                    <div key={item.id || `${item.product.id}-${Math.random()}`} className="flex items-start gap-3">
+                {products.length > 0 ? (
+                  products.map((item) => (
+                    <div key={item.id || `${item.product?.id || 'unknown'}-${Math.random()}`} className="flex items-start gap-3">
                       <img
-                        src={item.product.image_url || "/placeholder.svg"}
-                        alt={item.product.name}
+                        src={item.product?.image_url || "/placeholder.svg"}
+                        alt={item.product?.name || "Unknown Product"}
                         className="w-16 h-16 object-cover rounded-md"
                       />
                       <div>
-                        <h5 className="font-medium">{item.product.name}</h5>
+                        <h5 className="font-medium">{item.product?.name || "Unknown Product"}</h5>
                         <p className="text-sm text-muted-foreground">
-                          SKU: {item.product.id.slice(0, 8)}
+                          SKU: {item.product?.id ? item.product.id.slice(0, 8) : 'N/A'}
                         </p>
                         <p className="text-sm font-medium mt-1">
-                          {item.quantity}x {formatCurrency(item.unit_price)}
+                          {item.quantity || 1}x {formatCurrency(item.unit_price || 0)}
                         </p>
                       </div>
                     </div>

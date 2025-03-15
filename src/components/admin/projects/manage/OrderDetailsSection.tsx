@@ -13,6 +13,9 @@ export const OrderDetailsSection = ({ request, subtotal, shippingCost }: OrderDe
   // Debug log for the products data
   console.log('OrderDetailsSection products:', request.products);
   
+  // Make sure products is always an array, even if it's null or undefined
+  const products = Array.isArray(request.products) ? request.products : [];
+  
   return (
     <motion.div
       initial={{ height: 0, opacity: 0 }}
@@ -23,9 +26,9 @@ export const OrderDetailsSection = ({ request, subtotal, shippingCost }: OrderDe
     >
       <div className="p-4 border-t bg-gray-50">
         <div className="space-y-4">
-          {request.products && request.products.length > 0 ? (
-            request.products.map((item: any) => (
-              <div key={item.id || `${item.product?.id}-${Math.random()}`} className="flex items-start gap-3">
+          {products.length > 0 ? (
+            products.map((item: any) => (
+              <div key={item.id || `${item.product?.id || 'unknown'}-${Math.random()}`} className="flex items-start gap-3">
                 <img
                   src={item.product?.image_url || "/placeholder.svg"}
                   alt={item.product?.name || "Product"}

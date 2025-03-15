@@ -30,7 +30,7 @@ export const OrderTableRow = ({
   // Log the order object to debug
   console.log("OrderTableRow order:", order);
   
-  // Get the product count safely
+  // Get the product count safely - handle case where products might be null or empty
   const productCount = Array.isArray(order.products) ? order.products.length : 0;
   
   // Calculate total safely
@@ -51,21 +51,21 @@ export const OrderTableRow = ({
       <TableCell>
         <div className="flex flex-col">
           <span className="font-medium">
-            {order.customer?.first_name || order.first_name} {order.customer?.last_name || order.last_name}
+            {order.customer?.first_name || order.first_name || 'Unknown'} {order.customer?.last_name || order.last_name || ''}
           </span>
           <span className="text-sm text-muted-foreground">
             {order.customer?.email || "No email"}
           </span>
         </div>
       </TableCell>
-      <TableCell>SPL{order.id.slice(0, 6)}</TableCell>
+      <TableCell>SPL{order.id?.slice(0, 6) || 'N/A'}</TableCell>
       <TableCell>
-        {new Date(order.created_at).toLocaleDateString("en-US", {
+        {order.created_at ? new Date(order.created_at).toLocaleDateString("en-US", {
           month: "short",
           day: "numeric",
           hour: "2-digit",
           minute: "2-digit",
-        })}
+        }) : 'N/A'}
       </TableCell>
       <TableCell>{productCount} items</TableCell>
       <TableCell>
