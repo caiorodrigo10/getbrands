@@ -14,7 +14,7 @@ import {
   PaginationPrevious 
 } from "@/components/ui/pagination";
 
-const ITEMS_PER_PAGE = 10; // Changed from 15 to 10
+const ITEMS_PER_PAGE = 10;
 
 const AdminOrders = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,7 +29,8 @@ const AdminOrders = () => {
         .from("sample_requests")
         .select(`
           *,
-          products:sample_request_products (
+          products:sample_request_products!inner (
+            id,
             quantity,
             unit_price,
             product:products (
@@ -58,6 +59,8 @@ const AdminOrders = () => {
         .range(from, to);
 
       if (error) throw error;
+      
+      console.log("Fetched admin orders data:", data);
 
       return {
         data,

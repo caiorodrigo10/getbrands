@@ -4,9 +4,10 @@ import { formatCurrency } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { calculateOrderSubtotal } from "@/lib/orderCalculations";
 
 interface AdminOrderExpandedDetailsProps {
   order: {
@@ -16,6 +17,7 @@ interface AdminOrderExpandedDetailsProps {
     shipping_state: string;
     shipping_zip: string;
     products: Array<{
+      id?: string;
       quantity: number;
       unit_price: number;
       product: {
@@ -33,17 +35,25 @@ interface AdminOrderExpandedDetailsProps {
       email: string;
     };
     shipping_cost?: number;
-    subtotal: number;
-    total: number;
   };
 }
 
 const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) => {
   const { toast } = useToast();
   const [trackingNumber, setTrackingNumber] = useState(order.tracking_number || "");
+  
+  // Calculate totals correctly
+  const subtotal = order.products ? calculateOrderSubtotal(order.products) : 0;
+  const shippingCost = order.shipping_cost || 0;
+  const total = subtotal + shippingCost;
 
   // Debug log for products data
   console.log("Admin order expanded details - products:", order.products);
+
+  useEffect(() => {
+    // Update tracking number if order changes
+    setTrackingNumber(order.tracking_number || "");
+  }, [order.tracking_number]);
 
   const handleUpdateTracking = async () => {
     try {
@@ -82,10 +92,10 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
             <h4 className="font-semibold text-lg mb-4">Customer Details</h4>
             <Card className="p-4">
               <p className="font-medium">
-                {order.customer?.first_name} {order.customer?.last_name}
+                {order.customer?.first_name || order.first_name} {order.customer?.last_name || order.last_name}
               </p>
               <p className="text-sm text-muted-foreground mt-1">
-                {order.customer?.email}
+                {order.customer?.email || "No email available"}
               </p>
               <div className="mt-4 pt-4 border-t">
                 <p className="text-sm font-medium mb-1">Shipping Address:</p>
@@ -103,7 +113,7 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
               <div className="space-y-4">
                 {order.products && order.products.length > 0 ? (
                   order.products.map((item) => (
-                    <div key={item.product.id} className="flex items-start gap-3">
+                    <div key={item.id || `${item.product.id}-${Math.random()}`} className="flex items-start gap-3">
                       <img
                         src={item.product.image_url || "/placeholder.svg"}
                         alt={item.product.name}
@@ -127,15 +137,15 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
                 <div className="pt-4 border-t space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Subtotal:</span>
-                    <span>{formatCurrency(order.subtotal)}</span>
+                    <span>{formatCurrency(subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Shipping:</span>
-                    <span>{formatCurrency(order.shipping_cost || 0)}</span>
+                    <span>{formatCurrency(shippingCost)}</span>
                   </div>
                   <div className="flex justify-between font-medium pt-2 border-t">
                     <span>Total:</span>
-                    <span>{formatCurrency(order.total)}</span>
+                    <span>{formatCurrency(total)}</span>
                   </div>
                 </div>
               </div>

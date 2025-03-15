@@ -25,16 +25,16 @@ export const OrderDetailsSection = ({ request, subtotal, shippingCost }: OrderDe
         <div className="space-y-4">
           {request.products && request.products.length > 0 ? (
             request.products.map((item: any) => (
-              <div key={item.product.id} className="flex items-start gap-3">
+              <div key={item.id || `${item.product?.id}-${Math.random()}`} className="flex items-start gap-3">
                 <img
-                  src={item.product.image_url || "/placeholder.svg"}
-                  alt={item.product.name}
+                  src={item.product?.image_url || "/placeholder.svg"}
+                  alt={item.product?.name || "Product"}
                   className="w-16 h-16 object-cover rounded-md"
                 />
                 <div>
-                  <h5 className="font-medium">{item.product.name}</h5>
+                  <h5 className="font-medium">{item.product?.name || "Unnamed Product"}</h5>
                   <p className="text-sm font-medium mt-1">
-                    {formatCurrency(item.product.from_price)}
+                    {formatCurrency(item.product?.from_price || item.unit_price || 0)}
                   </p>
                 </div>
               </div>

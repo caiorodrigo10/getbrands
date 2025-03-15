@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,19 @@ export const OrderTableRow = ({
   onStatusChange,
   isUpdating,
 }: OrderTableRowProps) => {
+  // Log the order object to debug
+  console.log("OrderTableRow order:", order);
+  
+  // Get the product count safely
+  const productCount = Array.isArray(order.products) ? order.products.length : 0;
+  
+  // Calculate total safely
+  const total = typeof order.total === 'number' 
+    ? order.total 
+    : (typeof order.subtotal === 'number' && typeof order.shipping_cost === 'number'
+      ? order.subtotal + order.shipping_cost
+      : 0);
+
   return (
     <TableRow>
       <TableCell>
@@ -37,10 +51,10 @@ export const OrderTableRow = ({
       <TableCell>
         <div className="flex flex-col">
           <span className="font-medium">
-            {order.customer?.first_name} {order.customer?.last_name}
+            {order.customer?.first_name || order.first_name} {order.customer?.last_name || order.last_name}
           </span>
           <span className="text-sm text-muted-foreground">
-            {order.customer?.email}
+            {order.customer?.email || "No email"}
           </span>
         </div>
       </TableCell>
@@ -53,12 +67,12 @@ export const OrderTableRow = ({
           minute: "2-digit",
         })}
       </TableCell>
-      <TableCell>{order.products?.length || 0} items</TableCell>
+      <TableCell>{productCount} items</TableCell>
       <TableCell>
         <OrderStatusBadge status={order.status} />
       </TableCell>
       <TableCell>
-        {formatCurrency(order.total || 0)}
+        {formatCurrency(total)}
       </TableCell>
       <TableCell>
         <div className="flex items-center">
