@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -29,15 +30,8 @@ export const OrderTableRow = ({
   // Log the order object to debug
   console.log("OrderTableRow order:", order);
   
-  // Get the product count safely - filter out null products
-  const validProducts = Array.isArray(order.products) 
-    ? order.products.filter(item => item && item.product) 
-    : [];
-  
-  const productCount = validProducts.length;
-
-  // Calculate total quantity of all products
-  const totalItemsQuantity = validProducts.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
+  // Get total items quantity safely
+  const totalItemsQuantity = order.total_items || 0;
   
   // Calculate total safely
   const total = typeof order.total === 'number' 
@@ -73,7 +67,7 @@ export const OrderTableRow = ({
           minute: "2-digit",
         }) : 'N/A'}
       </TableCell>
-      <TableCell>{totalItemsQuantity} items ({productCount} products)</TableCell>
+      <TableCell>{totalItemsQuantity} items</TableCell>
       <TableCell>
         <OrderStatusBadge status={order.status} />
       </TableCell>

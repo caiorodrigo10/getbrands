@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { calculateOrderSubtotal } from "@/lib/orderCalculations";
 
 interface AdminOrderExpandedDetailsProps {
   order: {
