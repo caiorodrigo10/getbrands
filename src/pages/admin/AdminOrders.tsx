@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,18 +29,18 @@ const AdminOrders = () => {
         .from("sample_requests")
         .select(`
           *,
-          products:sample_request_products!left (
+          products:sample_request_products(
             id,
             quantity,
             unit_price,
-            product:products!left (
+            product:products(
               id,
               name,
               image_url,
               from_price
             )
           ),
-          customer:profiles (
+          customer:profiles(
             id,
             first_name,
             last_name,

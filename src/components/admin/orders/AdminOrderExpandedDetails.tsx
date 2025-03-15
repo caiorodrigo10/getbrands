@@ -53,7 +53,7 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
 
   // Calculate totals correctly
   const subtotal = products.length > 0 
-    ? products.reduce((sum, item) => sum + ((item.unit_price || item.product?.from_price || 0) * (item.quantity || 1)), 0)
+    ? products.reduce((sum, item) => sum + ((item.unit_price || item.product?.from_price || 0) * (Number(item.quantity) || 1)), 0)
     : 0;
   
   const shippingCost = order.shipping_cost || 0;

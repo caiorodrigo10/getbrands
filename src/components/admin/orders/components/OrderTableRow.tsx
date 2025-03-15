@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -38,7 +37,7 @@ export const OrderTableRow = ({
   const productCount = validProducts.length;
 
   // Calculate total quantity of all products
-  const totalItemsQuantity = validProducts.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  const totalItemsQuantity = validProducts.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
   
   // Calculate total safely
   const total = typeof order.total === 'number' 
