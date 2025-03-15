@@ -45,14 +45,15 @@ const AdminOrders = () => {
         if (orders && orders.length > 0) {
           const orderIds = orders.map(order => order.id);
           
-          // Count items per order directly with a single query
+          // Count items per order with a query
           const { data: itemCounts, error: countError } = await supabase
             .from('sample_request_products')
-            .select('sample_request_id, count(*)')
+            .select('sample_request_id, count')
             .in('sample_request_id', orderIds)
-            .groupBy('sample_request_id');
+            .group('sample_request_id');
             
           if (countError) throw countError;
+          console.log("Item counts:", itemCounts);
           
           // Create a map of order ID to item count
           const itemCountMap = {};
