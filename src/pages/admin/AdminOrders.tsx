@@ -30,15 +30,14 @@ const AdminOrders = () => {
         .from("sample_requests")
         .select(`
           *,
-          products:sample_request_products!left (
+          products:sample_request_products (
             id,
             quantity,
             unit_price,
             product:products (
               id,
               name,
-              image_url,
-              from_price
+              image_url
             )
           ),
           customer:profiles (
