@@ -27,7 +27,7 @@ const AdminOrders = () => {
     queryKey: ["admin-orders", selectedStatus, currentPage],
     queryFn: async () => {
       try {
-        // First, build the query for orders with customer and count
+        // Get orders with customer info
         const { data: orders, error, count } = await supabase
           .from("sample_requests")
           .select(`
@@ -42,16 +42,15 @@ const AdminOrders = () => {
         
         console.log("Fetched admin orders data:", orders);
 
-        // For each order, get the product items count
         if (orders && orders.length > 0) {
           const orderIds = orders.map(order => order.id);
           
-          // Get count of items for each order
+          // Count items per order directly with a single query
           const { data: itemCounts, error: countError } = await supabase
             .from('sample_request_products')
-            .select('sample_request_id, count')
+            .select('sample_request_id, count(*)')
             .in('sample_request_id', orderIds)
-            .group('sample_request_id');
+            .groupBy('sample_request_id');
             
           if (countError) throw countError;
           

@@ -15,7 +15,7 @@ interface AdminOrderExpandedDetailsProps {
     shipping_city: string;
     shipping_state: string;
     shipping_zip: string;
-    products: Array<{
+    products?: Array<{
       id?: string;
       quantity: number;
       unit_price: number;
@@ -47,9 +47,6 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
     ? order.products.filter(item => item && item.product) 
     : [];
   
-  // Debug log for products data
-  console.log("Admin order expanded details - products:", products);
-
   // Calculate totals correctly
   const subtotal = products.length > 0 
     ? products.reduce((sum, item) => sum + ((item.unit_price || item.product?.from_price || 0) * (Number(item.quantity) || 1)), 0)
@@ -119,7 +116,7 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
             <h4 className="font-semibold text-lg mb-4">Order Details</h4>
             <Card className="p-4">
               <div className="space-y-4">
-                {products.length > 0 ? (
+                {products && products.length > 0 ? (
                   products.map((item) => (
                     <div key={item.id || `${item.product?.id || 'unknown'}-${Math.random()}`} className="flex items-start gap-3">
                       <img

@@ -27,9 +27,6 @@ export const OrderTableRow = ({
   onStatusChange,
   isUpdating,
 }: OrderTableRowProps) => {
-  // Log the order object to debug
-  console.log("OrderTableRow order:", order);
-  
   // Get total items quantity safely
   const totalItemsQuantity = order.total_items || 0;
   
