@@ -26,73 +26,89 @@ const AdminOrders = () => {
   const { data: ordersData, isLoading } = useQuery({
     queryKey: ["admin-orders", selectedStatus, currentPage],
     queryFn: async () => {
-      // First, build the initial query
-      let query = supabase
-        .from("sample_requests")
-        .select(`
-          *,
-          customer:profiles(id, first_name, last_name, email),
-          total_items:sample_request_products(count)
-        `, { count: 'exact' });
-
-      // Apply status filter if not "all"
-      if (selectedStatus !== "all") {
-        query = query.eq('status', selectedStatus);
-      }
-
-      // Calculate pagination range
-      const from = (currentPage - 1) * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
-
-      // Execute the query with pagination
-      const { data, error, count } = await query
-        .order('created_at', { ascending: false })
-        .range(from, to);
-
-      if (error) throw error;
-      
-      console.log("Fetched admin orders data:", data);
-
-      // Fetch product details for each order in a second query
-      if (data && data.length > 0) {
-        const orderIds = data.map(order => order.id);
-        
-        // Fetch order products with detailed product information
-        const { data: orderProductsData, error: orderProductsError } = await supabase
-          .from('sample_request_products')
+      try {
+        // First, build the query for orders with customer and count
+        const { data: orders, error, count } = await supabase
+          .from("sample_requests")
           .select(`
             *,
-            sample_request_id,
-            product:products(*)
-          `)
-          .in('sample_request_id', orderIds);
-          
-        if (orderProductsError) throw orderProductsError;
-        
-        console.log("Order products data:", orderProductsData);
-        
-        // Organize product data by order
-        const orderProductsMap = {};
-        orderProductsData?.forEach(item => {
-          if (!orderProductsMap[item.sample_request_id]) {
-            orderProductsMap[item.sample_request_id] = [];
-          }
-          orderProductsMap[item.sample_request_id].push(item);
-        });
-        
-        // Add products to each order
-        data.forEach(order => {
-          order.products = orderProductsMap[order.id] || [];
-        });
-      }
+            customer:profiles(id, first_name, last_name, email)
+          `, { count: 'exact' })
+          .eq(selectedStatus !== "all" ? 'status' : 'id', selectedStatus !== "all" ? selectedStatus : 'id')
+          .order('created_at', { ascending: false })
+          .range((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE - 1);
 
-      return {
-        data,
-        totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE),
-        totalCount: count || 0,
-        currentPage
-      };
-    },
+        if (error) throw error;
+        
+        console.log("Fetched admin orders data:", orders);
+
+        // For each order, get the product items count
+        if (orders && orders.length > 0) {
+          const orderIds = orders.map(order => order.id);
+          
+          // Get count of items for each order
+          const { data: itemCounts, error: countError } = await supabase
+            .from('sample_request_products')
+            .select('sample_request_id, count')
+            .in('sample_request_id', orderIds)
+            .group('sample_request_id');
+            
+          if (countError) throw countError;
+          
+          // Create a map of order ID to item count
+          const itemCountMap = {};
+          itemCounts?.forEach(item => {
+            itemCountMap[item.sample_request_id] = parseInt(item.count, 10);
+          });
+          
+          // Add item count to each order
+          orders.forEach(order => {
+            order.total_items = itemCountMap[order.id] || 0;
+          });
+          
+          // Get all products for these orders
+          const { data: orderProducts, error: productsError } = await supabase
+            .from('sample_request_products')
+            .select(`
+              id,
+              sample_request_id,
+              product_id,
+              quantity,
+              unit_price,
+              product:products(*)
+            `)
+            .in('sample_request_id', orderIds);
+            
+          if (productsError) throw productsError;
+          
+          console.log("Order products data:", orderProducts);
+          
+          // Group products by order ID
+          const orderProductsMap = {};
+          orderProducts?.forEach(item => {
+            if (!orderProductsMap[item.sample_request_id]) {
+              orderProductsMap[item.sample_request_id] = [];
+            }
+            orderProductsMap[item.sample_request_id].push(item);
+          });
+          
+          // Add products to each order
+          orders.forEach(order => {
+            order.products = orderProductsMap[order.id] || [];
+          });
+        }
+
+        return {
+          data: orders,
+          totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE),
+          totalCount: count || 0,
+          currentPage
+        };
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        throw error;
+      }
+    }
   });
 
   const filteredOrders = ordersData?.data?.filter(order => {
