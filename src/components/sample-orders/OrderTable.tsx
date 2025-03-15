@@ -1,3 +1,4 @@
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Package, Truck, ChevronDown, ChevronUp } from "lucide-react";
@@ -17,6 +18,9 @@ interface OrderTableProps {
 const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+
+  // Log the orders data structure for debugging
+  console.log("Orders data in OrderTable:", orders);
 
   const toggleOrderExpansion = (orderId: string) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
@@ -40,8 +44,13 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
           </TableHeader>
           <TableBody>
             {orders?.map((order) => {
-              const subtotal = calculateOrderSubtotal(order.products || []);
+              // Ensure products array is properly formatted
+              const products = order.products || [];
+              const subtotal = calculateOrderSubtotal(products);
               const total = subtotal + (order.shipping_cost || 0);
+
+              // Log each order's products for debugging
+              console.log(`Order ${order.id} products:`, products);
 
               return (
                 <>
@@ -74,7 +83,7 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
                         minute: "2-digit",
                       })}
                     </TableCell>
-                    <TableCell className="whitespace-nowrap">{order.products?.length || 0} items</TableCell>
+                    <TableCell className="whitespace-nowrap">{products.length || 0} items</TableCell>
                     <TableCell>
                       {order.tracking_number ? (
                         <div className="flex items-center gap-2 whitespace-nowrap">

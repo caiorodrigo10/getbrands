@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
@@ -40,6 +41,9 @@ interface AdminOrderExpandedDetailsProps {
 const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) => {
   const { toast } = useToast();
   const [trackingNumber, setTrackingNumber] = useState(order.tracking_number || "");
+
+  // Debug log for products data
+  console.log("Admin order expanded details - products:", order.products);
 
   const handleUpdateTracking = async () => {
     try {
@@ -97,24 +101,28 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
             <h4 className="font-semibold text-lg mb-4">Order Details</h4>
             <Card className="p-4">
               <div className="space-y-4">
-                {order.products.map((item) => (
-                  <div key={item.product.id} className="flex items-start gap-3">
-                    <img
-                      src={item.product.image_url || "/placeholder.svg"}
-                      alt={item.product.name}
-                      className="w-16 h-16 object-cover rounded-md"
-                    />
-                    <div>
-                      <h5 className="font-medium">{item.product.name}</h5>
-                      <p className="text-sm text-muted-foreground">
-                        SKU: {item.product.id.slice(0, 8)}
-                      </p>
-                      <p className="text-sm font-medium mt-1">
-                        {item.quantity}x {formatCurrency(item.unit_price)}
-                      </p>
+                {order.products && order.products.length > 0 ? (
+                  order.products.map((item) => (
+                    <div key={item.product.id} className="flex items-start gap-3">
+                      <img
+                        src={item.product.image_url || "/placeholder.svg"}
+                        alt={item.product.name}
+                        className="w-16 h-16 object-cover rounded-md"
+                      />
+                      <div>
+                        <h5 className="font-medium">{item.product.name}</h5>
+                        <p className="text-sm text-muted-foreground">
+                          SKU: {item.product.id.slice(0, 8)}
+                        </p>
+                        <p className="text-sm font-medium mt-1">
+                          {item.quantity}x {formatCurrency(item.unit_price)}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">No products found for this order.</p>
+                )}
 
                 <div className="pt-4 border-t space-y-2">
                   <div className="flex justify-between text-sm">

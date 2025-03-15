@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +29,8 @@ const SampleOrders = () => {
     queryKey: ["sample-orders", currentPage, selectedStatus, user?.id],
     queryFn: async () => {
       if (!user) throw new Error("User not authenticated");
+
+      console.log("Fetching orders with status:", selectedStatus);
 
       let query = supabase
         .from("sample_requests")
@@ -65,8 +68,24 @@ const SampleOrders = () => {
         throw error;
       }
 
+      // Process data to ensure products are correctly formatted
+      const processedData = data.map(order => {
+        // Log raw order data for debugging
+        console.log("Raw order data:", order);
+        
+        // Ensure products is an array
+        const products = Array.isArray(order.products) ? order.products : [];
+        
+        return {
+          ...order,
+          products
+        };
+      });
+
+      console.log("Processed orders data:", processedData);
+
       return {
-        data,
+        data: processedData,
         totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE),
         currentPage
       };

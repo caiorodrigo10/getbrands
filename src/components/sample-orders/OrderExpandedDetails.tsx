@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
@@ -35,6 +36,9 @@ const OrderExpandedDetails = ({ order }: OrderExpandedDetailsProps) => {
   const subtotal = calculateOrderSubtotal(order.products);
   const shippingCost = order.shipping_cost || 0;
   const total = subtotal + shippingCost;
+
+  // Debug logs to verify data structure
+  console.log("Order products data:", order.products);
 
   return (
     <motion.div
@@ -75,24 +79,28 @@ const OrderExpandedDetails = ({ order }: OrderExpandedDetailsProps) => {
               <div className="space-y-6">
                 {/* Products List */}
                 <div className="space-y-4">
-                  {order.products.map((item) => (
-                    <div key={item.product.id} className="flex items-center gap-4">
-                      <img
-                        src={item.product.image_url || "/placeholder.svg"}
-                        alt={item.product.name}
-                        className="w-16 h-16 object-cover rounded-lg"
-                      />
-                      <div className="flex-1">
-                        <h5 className="font-medium">{item.product.name}</h5>
-                        <p className="text-sm text-gray-600">
-                          SKU: {item.product.id.slice(0, 8)}
-                        </p>
-                        <p className="text-sm font-medium mt-1">
-                          {item.quantity} x {formatCurrency(item.unit_price)}
-                        </p>
+                  {order.products && order.products.length > 0 ? (
+                    order.products.map((item) => (
+                      <div key={item.product.id} className="flex items-center gap-4">
+                        <img
+                          src={item.product.image_url || "/placeholder.svg"}
+                          alt={item.product.name}
+                          className="w-16 h-16 object-cover rounded-lg"
+                        />
+                        <div className="flex-1">
+                          <h5 className="font-medium">{item.product.name}</h5>
+                          <p className="text-sm text-gray-600">
+                            SKU: {item.product.id.slice(0, 8)}
+                          </p>
+                          <p className="text-sm font-medium mt-1">
+                            {item.quantity} x {formatCurrency(item.unit_price)}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-gray-600">No products found for this order.</p>
+                  )}
                 </div>
 
                 {/* Order Summary */}

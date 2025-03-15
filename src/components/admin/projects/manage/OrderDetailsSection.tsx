@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/lib/utils";
 import { OrderSummarySection } from "./OrderSummarySection";
@@ -9,6 +10,9 @@ interface OrderDetailsSectionProps {
 }
 
 export const OrderDetailsSection = ({ request, subtotal, shippingCost }: OrderDetailsSectionProps) => {
+  // Debug log for the products data
+  console.log('OrderDetailsSection products:', request.products);
+  
   return (
     <motion.div
       initial={{ height: 0, opacity: 0 }}
@@ -19,21 +23,25 @@ export const OrderDetailsSection = ({ request, subtotal, shippingCost }: OrderDe
     >
       <div className="p-4 border-t bg-gray-50">
         <div className="space-y-4">
-          {request.products?.map((item: any) => (
-            <div key={item.product.id} className="flex items-start gap-3">
-              <img
-                src={item.product.image_url || "/placeholder.svg"}
-                alt={item.product.name}
-                className="w-16 h-16 object-cover rounded-md"
-              />
-              <div>
-                <h5 className="font-medium">{item.product.name}</h5>
-                <p className="text-sm font-medium mt-1">
-                  {formatCurrency(item.product.from_price)}
-                </p>
+          {request.products && request.products.length > 0 ? (
+            request.products.map((item: any) => (
+              <div key={item.product.id} className="flex items-start gap-3">
+                <img
+                  src={item.product.image_url || "/placeholder.svg"}
+                  alt={item.product.name}
+                  className="w-16 h-16 object-cover rounded-md"
+                />
+                <div>
+                  <h5 className="font-medium">{item.product.name}</h5>
+                  <p className="text-sm font-medium mt-1">
+                    {formatCurrency(item.product.from_price)}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="text-sm text-gray-500">No products found for this order.</p>
+          )}
 
           <OrderSummarySection
             subtotal={subtotal}
