@@ -24,6 +24,7 @@ interface AdminOrderExpandedDetailsProps {
         name: string;
         id: string;
         image_url: string | null;
+        from_price?: number;
       };
     }> | null;
     tracking_number?: string | null;
@@ -35,6 +36,7 @@ interface AdminOrderExpandedDetailsProps {
       email: string;
     };
     shipping_cost?: number;
+    subtotal?: number;
   };
 }
 
@@ -43,10 +45,10 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
   const [trackingNumber, setTrackingNumber] = useState(order.tracking_number || "");
   
   // Ensure products is always an array, even if null
-  const products = Array.isArray(order.products) ? order.products : [];
+  const products = Array.isArray(order.products) ? order.products.filter(item => item && item.product) : [];
   
   // Calculate totals correctly
-  const subtotal = products.length > 0 ? calculateOrderSubtotal(products) : 0;
+  const subtotal = order.subtotal || (products.length > 0 ? calculateOrderSubtotal(products) : 0);
   const shippingCost = order.shipping_cost || 0;
   const total = subtotal + shippingCost;
 
@@ -128,7 +130,7 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
                           SKU: {item.product?.id ? item.product.id.slice(0, 8) : 'N/A'}
                         </p>
                         <p className="text-sm font-medium mt-1">
-                          {item.quantity || 1}x {formatCurrency(item.unit_price || 0)}
+                          {item.quantity || 1}x {formatCurrency(item.unit_price || item.product?.from_price || 0)}
                         </p>
                       </div>
                     </div>

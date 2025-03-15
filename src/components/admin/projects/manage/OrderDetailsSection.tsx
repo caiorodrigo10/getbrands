@@ -36,8 +36,9 @@ export const OrderDetailsSection = ({ request, subtotal, shippingCost }: OrderDe
                 />
                 <div>
                   <h5 className="font-medium">{item.product?.name || "Unnamed Product"}</h5>
+                  <p className="text-sm text-gray-600">Quantity: {item.quantity || 1}</p>
                   <p className="text-sm font-medium mt-1">
-                    {formatCurrency(item.product?.from_price || item.unit_price || 0)}
+                    {formatCurrency(item.unit_price || item.product?.from_price || 0)}
                   </p>
                 </div>
               </div>
