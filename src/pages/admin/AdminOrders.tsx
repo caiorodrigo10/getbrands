@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -91,8 +90,7 @@ const AdminOrders = () => {
             .from('sample_request_products')
             .select('sample_request_id, count(*)')
             .in('sample_request_id', orderIds)
-            // Use proper syntax for groupBy in Supabase JS client
-            .group('sample_request_id');
+            .groupBy('sample_request_id');
             
           if (countError) throw countError;
           console.log("Item counts:", itemCounts);

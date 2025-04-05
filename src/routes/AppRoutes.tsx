@@ -29,6 +29,8 @@ import OnboardingQuizPage from "@/pages/OnboardingQuiz";
 import { OnboardingQuizPT } from "@/pages/pt/OnboardingQuiz";
 import ComecarPT from "@/pages/pt/ComecarPT";
 import DemoScheduling from "@/pages/DemoScheduling";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
 
 export const AppRoutes = () => {
   const location = useLocation();
@@ -158,6 +160,8 @@ export const AppRoutes = () => {
       {/* Public Routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/onboarding" element={<OnboardingQuizPage />} />
       
       {/* Admin Routes */}
