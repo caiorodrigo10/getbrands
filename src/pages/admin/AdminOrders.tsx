@@ -91,7 +91,8 @@ const AdminOrders = () => {
             .from('sample_request_products')
             .select('sample_request_id, count(*)')
             .in('sample_request_id', orderIds)
-            .groupBy('sample_request_id');
+            // Use proper syntax for groupBy in Supabase JS client
+            .group('sample_request_id');
             
           if (countError) throw countError;
           console.log("Item counts:", itemCounts);
