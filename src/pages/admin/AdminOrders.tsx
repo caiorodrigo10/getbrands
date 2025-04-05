@@ -17,6 +17,47 @@ import {
 
 const ITEMS_PER_PAGE = 10;
 
+// Define interfaces for type safety
+interface OrderProduct {
+  id?: string;
+  sample_request_id: string;
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  product: {
+    id: string;
+    name: string;
+    image_url: string | null;
+    from_price?: number;
+  };
+}
+
+interface OrderCustomer {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+}
+
+interface Order {
+  id: string;
+  created_at: string;
+  status: string;
+  shipping_address?: string;
+  shipping_city?: string;
+  shipping_state?: string;
+  shipping_zip?: string;
+  tracking_number?: string | null;
+  first_name?: string;
+  last_name?: string;
+  customer?: OrderCustomer;
+  total?: number;
+  subtotal?: number;
+  shipping_cost?: number;
+  total_items?: number;
+  products?: OrderProduct[];
+}
+
 const AdminOrders = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -45,26 +86,27 @@ const AdminOrders = () => {
         if (orders && orders.length > 0) {
           const orderIds = orders.map(order => order.id);
           
-          // Count items per order
+          // Count items per order - fixed groupBy issue
           const { data: itemCounts, error: countError } = await supabase
             .from('sample_request_products')
             .select('sample_request_id, count(*)')
             .in('sample_request_id', orderIds)
-            .groupBy('sample_request_id');
+            .group('sample_request_id');
             
           if (countError) throw countError;
           console.log("Item counts:", itemCounts);
           
           // Create a map of order ID to item count
-          const itemCountMap = {};
-          itemCounts?.forEach(item => {
+          const itemCountMap: Record<string, number> = {};
+          itemCounts?.forEach((item: any) => {
             itemCountMap[item.sample_request_id] = parseInt(item.count, 10);
           });
           
           // Add item count to each order
-          orders.forEach(order => {
-            order.total_items = itemCountMap[order.id] || 0;
-          });
+          const ordersWithTotalItems = orders.map(order => ({
+            ...order,
+            total_items: itemCountMap[order.id] || 0,
+          }));
           
           // Get all products for these orders
           const { data: orderProducts, error: productsError } = await supabase
@@ -84,8 +126,8 @@ const AdminOrders = () => {
           console.log("Order products data:", orderProducts);
           
           // Group products by order ID
-          const orderProductsMap = {};
-          orderProducts?.forEach(item => {
+          const orderProductsMap: Record<string, OrderProduct[]> = {};
+          orderProducts?.forEach((item: any) => {
             if (!orderProductsMap[item.sample_request_id]) {
               orderProductsMap[item.sample_request_id] = [];
             }
@@ -93,13 +135,21 @@ const AdminOrders = () => {
           });
           
           // Add products to each order
-          orders.forEach(order => {
-            order.products = orderProductsMap[order.id] || [];
-          });
+          const ordersWithProducts = ordersWithTotalItems.map(order => ({
+            ...order,
+            products: orderProductsMap[order.id] || [],
+          }));
+
+          return {
+            data: ordersWithProducts,
+            totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE),
+            totalCount: count || 0,
+            currentPage
+          };
         }
 
         return {
-          data: orders,
+          data: orders as Order[],
           totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE),
           totalCount: count || 0,
           currentPage
