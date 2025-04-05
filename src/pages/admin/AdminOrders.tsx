@@ -86,12 +86,12 @@ const AdminOrders = () => {
         if (orders && orders.length > 0) {
           const orderIds = orders.map(order => order.id);
           
-          // Count items per order - fixed groupBy issue
+          // Count items per order - fixed query syntax
           const { data: itemCounts, error: countError } = await supabase
             .from('sample_request_products')
             .select('sample_request_id, count(*)')
             .in('sample_request_id', orderIds)
-            .group('sample_request_id');
+            .groupBy('sample_request_id');
             
           if (countError) throw countError;
           console.log("Item counts:", itemCounts);
