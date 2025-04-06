@@ -1,182 +1,119 @@
-
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import AdminOrdersTable from "@/components/admin/orders/AdminOrdersTable";
-import { OrderStatusFilters } from "@/components/sample-orders/OrderStatusFilters";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader } from "lucide-react";
-import { OrderFilters } from "@/components/sample-orders/OrderFilters";
+import AdminOrdersTable from "@/components/admin/orders/AdminOrdersTable";
+import { Pagination } from "@/components/ui/pagination";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import OrderStatusFilters from "@/components/sample-orders/OrderStatusFilters";
+import OrderFilters from "@/components/sample-orders/OrderFilters";
 
-const AdminOrders = () => {
-  const [activeStatus, setActiveStatus] = useState<string>("all");
+interface AdminOrdersProps { }
+
+const AdminOrders: React.FC<AdminOrdersProps> = () => {
+  const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [showOnHold, setShowOnHold] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(10);
-  const navigate = useNavigate();
+  const [pageSize, setPageSize] = useState(10);
+
   const { toast } = useToast();
-  const startIndex = (currentPage - 1) * pageSize;
-  
-  const fetchOrderCount = async () => {
-    // Construct the base query with filters
-    let query = supabase
-      .from("sample_requests")
-      .select("id", { count: "exact" });
-    
-    // Apply status filter
-    if (activeStatus !== "all") {
-      query = query.eq("status", activeStatus);
+
+  const { data: ordersData, isLoading, error } = useQuery(
+    ["admin-orders", page, statusFilter, showOnHold, searchQuery, pageSize],
+    async () => {
+      let query = supabase
+        .from("sample_requests")
+        .select("*", { count: "exact" })
+        .range((page - 1) * pageSize, page * pageSize - 1)
+        .order("created_at", { ascending: false });
+
+      if (statusFilter !== "all") {
+        query = query.eq("status", statusFilter);
+      }
+
+      if (showOnHold) {
+        query = query.eq("status", "on_hold");
+      }
+
+      if (searchQuery) {
+        query = query.ilike("product_name", `%${searchQuery}%`);
+      }
+
+      const { data, error, count } = await query;
+
+      if (error) {
+        throw error;
+      }
+
+      return {
+        data,
+        count: count || 0,
+      };
     }
-    
-    // Apply search filter if provided
-    if (searchQuery) {
-      query = query.or(`first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`);
-    }
-    
-    const { count, error } = await query;
-    
-    if (error) throw error;
-    return count || 0;
+  );
+
+  const totalOrders = ordersData?.count || 0;
+  const orders = ordersData?.data || [];
+  const pageCount = Math.ceil(totalOrders / pageSize);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
   };
 
-  const fetchOrders = async () => {
-    // Construct the base query for orders with related products
-    let query = supabase
-      .from("sample_requests")
-      .select(`
-        *,
-        sample_request_products (
-          *,
-          product:product_id (*)
-        ),
-        user:user_id (*)
-      `)
-      .order("created_at", { ascending: false })
-      .range(startIndex, startIndex + pageSize - 1);
-
-    // Apply status filter
-    if (activeStatus !== "all") {
-      query = query.eq("status", activeStatus);
-    }
-    
-    // Apply search filter if provided
-    if (searchQuery) {
-      query = query.or(`first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`);
-    }
-    
-    const { data, error } = await query;
-    
-    if (error) throw error;
-    
-    // Get order totals from the sample_request_products
-    const ordersWithTotals = await Promise.all(
-      data.map(async (order) => {
-        // Calculate the total using the actual products in the order
-        const { count } = await supabase
-          .rpc("get_user_role", { user_id: order.user_id })
-          .select("count");
-          
-        return {
-          ...order,
-          itemCount: order.sample_request_products ? order.sample_request_products.length : 0,
-        };
-      })
-    );
-    
-    return ordersWithTotals;
-  };
-
-  const { 
-    data: orders = [], 
-    isLoading, 
-    error
-  } = useQuery({
-    queryKey: ["admin-orders", activeStatus, searchQuery, startIndex, pageSize],
-    queryFn: fetchOrders
-  });
-  
-  const { 
-    data: totalOrders = 0, 
-    isLoading: isCountLoading 
-  } = useQuery({
-    queryKey: ["admin-orders-count", activeStatus, searchQuery],
-    queryFn: fetchOrderCount
-  });
-  
-  const handleStatusChange = (newStatus: string) => {
-    setActiveStatus(newStatus);
-    setCurrentPage(1);
-  };
-  
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    setCurrentPage(1);
-  };
-  
-  const totalPages = Math.ceil(totalOrders / pageSize);
-  
   if (error) {
     toast({
       variant: "destructive",
       title: "Error",
-      description: "Failed to fetch orders",
+      description: "Failed to fetch orders. Please try again.",
     });
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-        <h1 className="text-2xl font-bold mb-4 md:mb-0">Order Management</h1>
-        <Button onClick={() => navigate("/admin/orders/export")}>
-          Export Orders
-        </Button>
-      </div>
+    <div className="container mx-auto py-6">
+      <div className="mb-4 flex flex-col gap-4">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <h1 className="text-2xl font-semibold">Admin Orders</h1>
+          <Input
+            placeholder="Search by product or order number"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="max-w-md"
+          />
+        </div>
 
-      <div className="mb-6">
-        <Input
-          placeholder="Search by customer name or email"
-          value={searchQuery}
-          onChange={handleSearch}
-          className="max-w-md"
+        <OrderStatusFilters
+          selectedStatus={statusFilter}
+          setSelectedStatus={setStatusFilter}
+          showOnHold={showOnHold}
+          setShowOnHold={setShowOnHold}
         />
       </div>
 
-      <Tabs defaultValue="all" value={activeStatus} onValueChange={handleStatusChange}>
-        <div className="mb-6 border-b">
-          <TabsList className="bg-transparent">
-            <TabsTrigger value="all" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">
-              All Orders
-            </TabsTrigger>
-            <OrderStatusFilters />
-          </TabsList>
+      {isLoading ? (
+        <div className="space-y-2">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-40 w-full" />
+          <Skeleton className="h-10 w-32" />
         </div>
-          
-        <TabsContent value={activeStatus} className="mt-0">
-          {isLoading || isCountLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <Loader className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : (
-            <>
-              <AdminOrdersTable orders={orders} totalOrders={totalOrders} />
-              
-              {totalPages > 1 && (
-                <div className="flex justify-center mt-8">
-                  <OrderFilters 
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                  />
-                </div>
-              )}
-            </>
+      ) : (
+        <>
+          <AdminOrdersTable orders={orders} totalOrders={totalOrders} />
+
+          {totalOrders > 0 && (
+            <Pagination
+              page={page}
+              onPageChange={handlePageChange}
+              pageCount={pageCount}
+              pageSize={pageSize}
+              setPageSize={setPageSize}
+              totalItems={totalOrders}
+            />
           )}
-        </TabsContent>
-      </Tabs>
+        </>
+      )}
     </div>
   );
 };
