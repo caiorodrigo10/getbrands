@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -54,6 +55,7 @@ export const useDashboardData = () => {
     enabled: !!user?.id && isAuthenticated,
   });
 
+  // Use mock data for meetings to avoid backend calls
   const { data: meetings } = useQuery({
     queryKey: ["meetings", user?.id],
     queryFn: async () => {
@@ -95,40 +97,50 @@ export const useDashboardData = () => {
     staleTime: Infinity,
   });
 
+  // Fix the products query by using standard client instead of admin
   const { data: products } = useQuery({
     queryKey: ["my-products", user?.id],
     queryFn: async () => {
-      if (!user?.id) return null;
-      const { data, error } = await supabase
-        .from('project_products')
-        .select(`
-          id,
-          project:projects (
+      if (!user?.id) return [];
+      
+      try {
+        const { data, error } = await supabase
+          .from('project_products')
+          .select(`
             id,
-            name,
-            description
-          ),
-          product:products (*),
-          specific:project_specific_products (
-            id,
-            name,
-            description,
-            image_url,
-            selling_price
-          )
-        `)
-        .order('created_at', { ascending: false })
-        .limit(3);
+            project:projects (
+              id,
+              name,
+              description
+            ),
+            product:products (*),
+            specific:project_specific_products (
+              id,
+              name,
+              description,
+              image_url,
+              selling_price
+            )
+          `)
+          .eq('project:projects.user_id', user.id)  // Filter by user's projects
+          .order('created_at', { ascending: false })
+          .limit(3);
 
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error loading products",
-          description: error.message
-        });
-        throw error;
+        if (error) {
+          console.error("Error loading products:", error);
+          toast({
+            variant: "destructive",
+            title: "Error loading products",
+            description: error.message
+          });
+          return [];
+        }
+        
+        return data || [];
+      } catch (err) {
+        console.error("Unexpected error loading products:", err);
+        return [];
       }
-      return data;
     },
     enabled: !!user?.id && isAuthenticated,
     staleTime: 30000,
@@ -137,50 +149,64 @@ export const useDashboardData = () => {
   const { data: catalogProducts } = useQuery({
     queryKey: ["catalog-products"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .limit(8);
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .limit(8);
 
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error loading catalog products",
-          description: error.message,
-        });
-        throw error;
+        if (error) {
+          toast({
+            variant: "destructive",
+            title: "Error loading catalog products",
+            description: error.message,
+          });
+          throw error;
+        }
+        return data || [];
+      } catch (err) {
+        console.error("Error fetching catalog products:", err);
+        return [];
       }
-      return data;
     },
     enabled: isAuthenticated,
     staleTime: 30000,
   });
 
+  // Fix the samples query to handle errors better
   const { data: samples } = useQuery({
     queryKey: ["samples", user?.id],
     queryFn: async () => {
-      if (!user?.id) return null;
-      const { data, error } = await supabase
-        .from("sample_requests")
-        .select(`
-          *,
-          products:sample_request_products (
-            product:products (*)
-          )
-        `)
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(3);
+      if (!user?.id) return [];
+      
+      try {
+        const { data, error } = await supabase
+          .from("sample_requests")
+          .select(`
+            *,
+            products:sample_request_products (
+              product:products (*)
+            )
+          `)
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(3);
 
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error loading samples",
-          description: error.message,
-        });
-        throw error;
+        if (error) {
+          console.error("Error loading samples:", error);
+          toast({
+            variant: "destructive",
+            title: "Error loading samples",
+            description: error.message,
+          });
+          return [];
+        }
+        
+        return data || [];
+      } catch (err) {
+        console.error("Unexpected error loading samples:", err);
+        return [];
       }
-      return data;
     },
     enabled: !!user?.id && isAuthenticated,
   });
@@ -189,9 +215,9 @@ export const useDashboardData = () => {
     profile,
     projects,
     meetings,
-    products,
-    catalogProducts,
-    samples,
+    products: products || [],
+    catalogProducts: catalogProducts || [],
+    samples: samples || [],
     isAuthenticated,
   };
 };
