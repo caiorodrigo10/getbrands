@@ -1,18 +1,24 @@
+
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Minus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { ProductSearch } from "@/components/ProductSearch";
 import { useShippingCalculation } from "@/hooks/useShippingCalculation";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const PedidoAmostra = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedCountry] = useState("USA");
-  const { items, updateQuantity, removeItem } = useCart();
+  const { items, updateQuantity, removeItem, loadCartItems } = useCart();
+
+  // Load cart items when component mounts
+  useEffect(() => {
+    loadCartItems();
+  }, []);
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   

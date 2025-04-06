@@ -75,6 +75,11 @@ export const useProductActions = (productId: string) => {
         description: `${product.name} has been added to your cart.`,
       });
       
+      // After adding to cart, navigate to the checkout confirmation page
+      setTimeout(() => {
+        navigate("/checkout/confirmation", { replace: true });
+      }, 800);
+      
       return true;
     } catch (error: any) {
       console.error('Error requesting sample:', error);

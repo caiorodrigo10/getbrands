@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useProductActions } from "@/hooks/useProductActions";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useUserPermissions } from "@/lib/permissions";
 import { Video } from "lucide-react";
 import { useEffect } from "react";
@@ -36,14 +36,8 @@ export const ProductActions = ({ productId, onSelectProduct, showNotification = 
   const handleOrderSample = async () => {
     try {
       console.log("Order Sample button clicked for product:", productId);
-      const success = await handleRequestSample();
-      if (success) {
-        console.log("Sample added successfully, navigating to checkout");
-        // Add a small delay to ensure cart state is updated
-        setTimeout(() => {
-          navigate("/checkout/confirmation", { replace: true });
-        }, 800);
-      }
+      await handleRequestSample();
+      // Navigation is now handled inside handleRequestSample
     } catch (error) {
       console.error('Error requesting sample:', error);
       toast({

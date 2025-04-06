@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
@@ -9,10 +10,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useEffect } from "react";
 
 export function CartButton() {
-  const { items } = useCart();
+  const { items, loadCartItems } = useCart();
   const navigate = useNavigate();
+
+  // Load cart items on mount
+  useEffect(() => {
+    loadCartItems();
+  }, []);
 
   // Calculate total quantity considering the quantity of each item
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);

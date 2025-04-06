@@ -18,14 +18,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     clearCart,
   } = useCartOperations(user);
 
+  // Load cart items when the user changes or on mount
   useEffect(() => {
     if (user?.id) {
+      console.log("CartContext - Loading cart items for user:", user.id);
       loadCartItems();
     } else {
+      console.log("CartContext - No user, clearing cart");
       items.length > 0 && clearCart(true);
     }
-  }, [user?.id]); 
+  }, [user?.id]);
 
+  // Provide all cart operations to consumers
   return (
     <CartContext.Provider
       value={{ 

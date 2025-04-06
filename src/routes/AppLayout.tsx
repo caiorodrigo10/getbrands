@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { NavigationMenu } from "@/components/NavigationMenu";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import { useAuth } from "@/contexts/AuthContext";
+import { CartProvider } from "@/contexts/CartContext";
 
 export const AppLayout = () => {
   const location = useLocation();
@@ -32,7 +33,11 @@ export const AppLayout = () => {
   // Don't show navigation menu for onboarding and auth pages
   const hideNav = ['/login', '/signup', '/onboarding', '/pt/onboarding', '/pt/signup'].includes(location.pathname);
 
-  return (
+  // Check if we're in the checkout flow
+  const isCheckoutPath = location.pathname.startsWith("/checkout");
+
+  // Render the content with or without the cart provider based on the path
+  const renderContent = () => (
     <div className="min-h-screen bg-background">
       {!hideNav && <NavigationMenu />}
       <main className={!hideNav ? "md:pl-64 w-full" : ""}>
@@ -41,5 +46,15 @@ export const AppLayout = () => {
         </div>
       </main>
     </div>
+  );
+
+  // Wrap non-checkout paths with CartProvider
+  // Checkout paths already have CartProvider
+  return isCheckoutPath ? (
+    renderContent()
+  ) : (
+    <CartProvider>
+      {renderContent()}
+    </CartProvider>
   );
 };
