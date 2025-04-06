@@ -15,7 +15,7 @@ export const MenuItems = ({
   handleAdminNavigation,
   handleLogout,
 }: MenuItemsProps) => {
-  console.log("MenuItems - Permissões:", { isAdmin, isInAdminPanel });
+  console.log("MenuItems - Permissions:", { isAdmin, isInAdminPanel });
   
   return (
     <div className="flex flex-col space-y-1">
@@ -24,7 +24,7 @@ export const MenuItems = ({
         className="flex items-center gap-2 px-3 py-2 text-sm text-black hover:bg-[#fff4fc] hover:text-black rounded-md"
       >
         <User className="h-4 w-4 text-black" />
-        <span>Meu Perfil</span>
+        <span>My Profile</span>
       </Link>
       
       <Link
@@ -32,7 +32,7 @@ export const MenuItems = ({
         className="flex items-center gap-2 px-3 py-2 text-sm text-black hover:bg-[#fff4fc] hover:text-black rounded-md"
       >
         <ShoppingBag className="h-4 w-4 text-black" />
-        <span>Pedidos</span>
+        <span>Orders</span>
       </Link>
       
       {isAdmin && (
@@ -41,7 +41,7 @@ export const MenuItems = ({
           className="flex items-center gap-2 px-3 py-2 text-sm text-purple-600 hover:bg-[#fff4fc] hover:text-purple-700 rounded-md w-full text-left"
         >
           <Settings className="h-4 w-4" />
-          <span>{isInAdminPanel ? "Ver como Usuário" : "Ver como Admin"}</span>
+          <span>{isInAdminPanel ? "View as User" : "View as Admin"}</span>
         </button>
       )}
       
@@ -50,7 +50,7 @@ export const MenuItems = ({
         className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-[#fff4fc] hover:text-red-500 rounded-md w-full text-left"
       >
         <LogOut className="h-4 w-4" />
-        <span>Sair</span>
+        <span>Logout</span>
       </button>
     </div>
   );
