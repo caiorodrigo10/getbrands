@@ -105,7 +105,9 @@ export const CRMTable = ({ users, onUserUpdated, totalUsers }: CRMTableProps) =>
   };
 
   const getUserTypeBadge = (role: string | null, hasProjects: boolean) => {
-    const effectiveType = hasProjects ? "customer" : role || "lead";
+    // Determine the effective type - if has projects and not already a customer, show as customer
+    const effectiveType = role === 'customer' ? 'customer' : 
+                         (hasProjects ? "customer" : role || "lead");
 
     const styles = {
       lead: "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20",

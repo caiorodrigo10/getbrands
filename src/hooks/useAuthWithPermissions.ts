@@ -126,14 +126,16 @@ export const useAuthWithPermissions = () => {
   const isAdmin = role === "admin";
   const isMember = role === "member";
   const isSampler = role === "sampler";
+  const isCustomer = role === "customer";
   const hasFullAccess = isAdmin === true; // Explicit check
-  const hasLimitedAccess = isMember === true || isSampler === true;
+  const hasLimitedAccess = isMember === true || isSampler === true || isCustomer === true;
   const isAuthenticated = !!profile || !!user;
 
   console.log("useAuthWithPermissions - comprehensive permissions check:", { 
     isAdmin, 
     isMember, 
-    isSampler, 
+    isSampler,
+    isCustomer,
     hasFullAccess,
     role,
     profileRole,
@@ -148,6 +150,7 @@ export const useAuthWithPermissions = () => {
     isAdmin,
     isMember,
     isSampler,
+    isCustomer,
     hasFullAccess,
     hasLimitedAccess,
     isAuthenticated,

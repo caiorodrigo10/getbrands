@@ -2,6 +2,7 @@
 import { useAuthWithPermissions } from "@/hooks/useAuthWithPermissions";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
+import { UserRole } from "@/lib/auth/types";
 
 /**
  * A utility hook that provides user permissions
@@ -20,12 +21,16 @@ export const useUserPermissions = () => {
     profileRole === "admin" || 
     userMetadataRole === "admin";
   
+  // Add specific checks for other roles
+  const isCustomer = profileRole === "customer" || userMetadataRole === "customer";
+  
   // Debug logging for permissions with more detail
   useEffect(() => {
     console.log("useUserPermissions - Detailed role check:", { 
       profileRole, 
       userMetadataRole, 
       isActuallyAdmin,
+      isCustomer,
       userEmail: user?.email,
       userId: user?.id,
       profileObj: auth.profile,
@@ -36,7 +41,9 @@ export const useUserPermissions = () => {
   return {
     ...auth,
     // Override isAdmin with our enhanced check
-    isAdmin: isActuallyAdmin
+    isAdmin: isActuallyAdmin,
+    // Add customer role check
+    isCustomer
   };
 };
 
@@ -44,11 +51,11 @@ export const useUserPermissions = () => {
  * Gets the user role from various sources
  * Useful for non-React components
  */
-export const getUserRole = (profile: any, user: any = null) => {
+export const getUserRole = (profile: any, user: any = null): UserRole | null => {
   if (!profile && !user) return null;
   
   // Check multiple sources in priority order
-  return profile?.role || 
+  return (profile?.role || 
          user?.user_metadata?.role || 
-         null;
+         null) as UserRole | null;
 };

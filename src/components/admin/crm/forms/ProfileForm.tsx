@@ -146,6 +146,7 @@ export function ProfileForm({ user, onClose, onUserUpdated }: any) {
                   <SelectItem value="admin">Admin</SelectItem>
                   <SelectItem value="member">Member</SelectItem>
                   <SelectItem value="sampler">Sampler</SelectItem>
+                  <SelectItem value="customer">Customer</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

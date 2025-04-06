@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { stripe } from "../_shared/stripe.ts";
 import { supabaseAdmin } from "../../src/lib/supabase/admin.ts";
@@ -64,6 +65,22 @@ serve(async (req) => {
       // If orderId is present, update the order status to 'processing'
       if (orderId) {
         console.log(`Updating order ${orderId} to processing status`);
+        // Get the order details including user_id
+        const { data: orderData, error: orderError } = await supabaseAdmin
+          .from('sample_requests')
+          .select('id, status, user_id')
+          .eq('id', orderId)
+          .single();
+
+        if (orderError) {
+          console.error("Error fetching order details:", orderError);
+          return new Response(JSON.stringify({ error: "Error fetching order details" }), { 
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
+
+        // Update order status to processing
         const { data, error } = await supabaseAdmin
           .from('sample_requests')
           .update({ status: 'processing' })
@@ -79,6 +96,34 @@ serve(async (req) => {
         }
 
         console.log("Order updated successfully:", data);
+
+        // If the user has made a purchase, update their role to 'customer' if they're not already an admin
+        if (orderData && orderData.user_id) {
+          const userId = orderData.user_id;
+          
+          // Check current role
+          const { data: profileData, error: profileError } = await supabaseAdmin
+            .from('profiles')
+            .select('id, role')
+            .eq('id', userId)
+            .single();
+
+          if (profileError) {
+            console.error("Error fetching user profile:", profileError);
+          } else if (profileData && profileData.role !== 'admin') {
+            // Only update if user is not an admin
+            const { error: updateError } = await supabaseAdmin
+              .from('profiles')
+              .update({ role: 'customer' })
+              .eq('id', userId);
+
+            if (updateError) {
+              console.error("Error updating user role to customer:", updateError);
+            } else {
+              console.log(`Updated user ${userId} role to customer`);
+            }
+          }
+        }
       } else {
         console.log("No orderId found in payment intent metadata");
       }
