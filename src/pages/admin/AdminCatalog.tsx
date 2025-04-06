@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -26,27 +26,7 @@ const AdminCatalog = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showImportDialog, setShowImportDialog] = useState(false);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate('/login');
-        return;
-      }
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();
-
-      if (!profile || profile.role !== 'admin') {
-        navigate('/catalog');
-      }
-    };
-
-    checkAuth();
-  }, [navigate]);
+  // Removing the redundant auth check that was causing redirection
 
   const { data: productsData, isLoading } = useQuery({
     queryKey: ["admin-catalog", currentPage],

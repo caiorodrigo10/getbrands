@@ -84,19 +84,20 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
 
       if (productsError) throw productsError;
 
-      // Confirm payment with Stripe - include orderId in metadata
+      // Confirm payment with Stripe - with order ID in the billing_details
       const { error: paymentError } = await stripe.confirmPayment({
         elements,
         confirmParams: {
           return_url: `${window.location.origin}/checkout/success`,
           payment_method_data: {
-            billing_details: {},
-            metadata: {
-              orderId: sampleRequest.id
+            billing_details: {
+              metadata: {
+                orderId: sampleRequest.id
+              }
             }
-          }
+          },
+          redirect: 'if_required',
         },
-        redirect: 'if_required',
       });
 
       if (paymentError) {
