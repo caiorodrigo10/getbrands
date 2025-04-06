@@ -28,6 +28,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
       console.log("[CART CONTEXT] Loading cart items for user:", user.id);
       loadCartItems().catch(error => {
         console.error("[CART CONTEXT] Error in useEffect loadCartItems:", error);
+        console.error("[CART CONTEXT] Error details:", {
+          message: error?.message,
+          code: error?.code,
+          details: error?.details
+        });
       });
     } else {
       console.log("[CART CONTEXT] No user, clearing cart");
@@ -41,9 +46,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     addItem: async (product: Product) => {
       console.log("[CART CONTEXT] addItem wrapper called with product:", product.id);
       try {
-        return await addItem(product);
-      } catch (error) {
+        const result = await addItem(product);
+        console.log("[CART CONTEXT] addItem wrapper completed with result:", result);
+        return result;
+      } catch (error: any) {
         console.error("[CART CONTEXT] Error in addItem wrapper:", error);
+        console.error("[CART CONTEXT] Error details:", {
+          message: error?.message,
+          stack: error?.stack
+        });
         return false;
       }
     },
@@ -56,6 +67,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   console.log("[CART CONTEXT] CartProvider: Providing cart operations:", 
     Object.keys(cartOperations).map(key => `${key}: ${typeof cartOperations[key as keyof CartOperations]}`));
+  console.log("[CART CONTEXT] Current cart items:", items.length);
 
   return (
     <CartContext.Provider value={cartOperations}>

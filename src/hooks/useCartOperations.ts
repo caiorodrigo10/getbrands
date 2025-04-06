@@ -21,13 +21,22 @@ export const useCartOperations = (user: User | null) => {
     setIsLoading(true);
     try {
       // First, get cart_items for the user
+      console.log("[CART OPS] loadCartItems - Sending request for cart_items");
       const { data: cartItems, error: cartError } = await supabase
         .from('cart_items')
         .select('product_id')
         .eq('user_id', user.id);
 
+      console.log("[CART OPS] loadCartItems - Response received:", { cartItems, error: cartError });
+
       if (cartError) {
         console.error('[CART OPS] loadCartItems - Error fetching cart items:', cartError);
+        console.error('[CART OPS] Error details:', { 
+          message: cartError.message, 
+          details: cartError.details,
+          hint: cartError.hint,
+          code: cartError.code
+        });
         throw cartError;
       }
 
@@ -48,6 +57,12 @@ export const useCartOperations = (user: User | null) => {
         .select('*')
         .in('id', productIds);
         
+      console.log("[CART OPS] loadCartItems - Products query response:", { 
+        products, 
+        error: productsError,
+        errorMessage: productsError?.message 
+      });
+
       if (productsError) {
         console.error('[CART OPS] loadCartItems - Error fetching products:', productsError);
         throw productsError;
@@ -63,8 +78,9 @@ export const useCartOperations = (user: User | null) => {
 
       setItems(cartItemsWithDetails);
       console.log("[CART OPS] loadCartItems - Processed cart items:", cartItemsWithDetails);
-    } catch (error) {
+    } catch (error: any) {
       console.error('[CART OPS] loadCartItems - Error loading cart items:', error);
+      console.error('[CART OPS] Stack trace:', error?.stack);
     } finally {
       setIsLoading(false);
     }
@@ -78,11 +94,50 @@ export const useCartOperations = (user: User | null) => {
 
     console.log(`[CART OPS] addItem - Attempting to add product ${item.id} to cart for user ${user.id}`, item);
     try {
-      console.log('[CART OPS] addItem - Payload:', {
+      console.log('[CART OPS] addItem - Preparing payload:', {
         user_id: user.id,
         product_id: item.id
       });
       
+      // First check if item is already in cart
+      console.log('[CART OPS] addItem - Checking if item already exists in cart');
+      const { data: existingItems, error: checkError } = await supabase
+        .from('cart_items')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('product_id', item.id);
+        
+      if (checkError) {
+        console.error('[CART OPS] addItem - Error checking existing items:', checkError);
+        console.error('[CART OPS] Error details:', { 
+          message: checkError.message, 
+          details: checkError.details,
+          hint: checkError.hint,
+          code: checkError.code
+        });
+        throw checkError;
+      }
+      
+      console.log('[CART OPS] addItem - Check result:', existingItems);
+      
+      // If item already exists, don't add it again
+      if (existingItems && existingItems.length > 0) {
+        console.log('[CART OPS] addItem - Item already exists in cart, not adding again');
+        
+        // Still update the local state to ensure UI is correct
+        if (!items.some(cartItem => cartItem.id === item.id)) {
+          const cartItem: CartItem = {
+            ...item,
+            quantity: 1
+          };
+          setItems(prev => [...prev, cartItem]);
+          console.log("[CART OPS] addItem - Updated local cart state for existing item");
+        }
+        
+        return true;
+      }
+      
+      console.log('[CART OPS] addItem - Sending insert request to cart_items table');
       const { data, error } = await supabase
         .from('cart_items')
         .insert({
@@ -90,9 +145,17 @@ export const useCartOperations = (user: User | null) => {
           product_id: item.id
         })
         .select();
+      
+      console.log('[CART OPS] addItem - Insert response:', { data, error });
 
       if (error) {
         console.error('[CART OPS] addItem - Error inserting into cart_items:', error);
+        console.error('[CART OPS] Error details:', { 
+          message: error.message, 
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
         throw error;
       }
 
@@ -107,8 +170,9 @@ export const useCartOperations = (user: User | null) => {
       console.log("[CART OPS] addItem - Updated cart items in state:", [...items, cartItem]);
       
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('[CART OPS] addItem - Error adding item to cart:', error);
+      console.error('[CART OPS] Error stack:', error?.stack);
       toast({
         variant: "destructive",
         title: "Error",

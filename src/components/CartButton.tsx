@@ -20,15 +20,20 @@ export function CartButton() {
   useEffect(() => {
     console.log("CartButton: Mounted, loading cart items");
     loadCartItems().then(() => {
-      console.log("CartButton: Finished loading cart items");
+      console.log("CartButton: Finished loading cart items, count:", items.length);
     }).catch(error => {
       console.error("CartButton: Error loading cart items:", error);
+      console.error("CartButton: Error details:", {
+        message: error?.message,
+        code: error?.code,
+        details: error?.details
+      });
     });
   }, []);
 
   // Calculate total quantity considering the quantity of each item
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
-  console.log("CartButton: Current cart has", totalQuantity, "items");
+  console.log("CartButton: Current cart has", totalQuantity, "items", items);
 
   const handleCartClick = () => {
     console.log("CartButton: Cart button clicked, navigating to checkout");

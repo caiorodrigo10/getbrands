@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -17,7 +16,7 @@ export const useProductActions = (productId: string) => {
   const { isAdmin } = useUserPermissions();
   const { addItem, loadCartItems } = useCart();
 
-  console.log("useProductActions - initialized with:", {
+  console.log("[PRODUCT ACTIONS] Initialized with:", {
     productId,
     isAdmin,
     userId: user?.id,
@@ -67,18 +66,10 @@ export const useProductActions = (productId: string) => {
         console.error("[ORDER SAMPLE] addItem function is not available");
         throw new Error("Cart functionality is not available");
       }
-      
-      // Debug: Check addItem function
-      console.log("[ORDER SAMPLE] Before adding to cart - addItem function:", typeof addItem);
-      
+
+      // Direct database operation - For debugging purposes
+      console.log("[ORDER SAMPLE] Attempting direct database insert to cart_items table");
       try {
-        // Add the product to cart using the CartContext
-        console.log("[ORDER SAMPLE] Attempting to add product to cart with addItem");
-        const result = await addItem(product as Product);
-        console.log("[ORDER SAMPLE] Add to cart completed, result:", result);
-        
-        // Try to directly add the item to the cart_items table
-        console.log("[ORDER SAMPLE] Directly adding to cart_items table as fallback");
         const { data: directInsert, error: insertError } = await supabase
           .from('cart_items')
           .insert({
@@ -87,18 +78,39 @@ export const useProductActions = (productId: string) => {
           })
           .select();
           
-        console.log("[ORDER SAMPLE] Direct insert result:", { data: directInsert, error: insertError });
-      } catch (cartError) {
-        console.error("[ORDER SAMPLE] Error during cart operations:", cartError);
+        console.log("[ORDER SAMPLE] Direct insert result:", { 
+          data: directInsert, 
+          error: insertError,
+          errorMessage: insertError?.message,
+          errorDetails: insertError?.details
+        });
+        
+        if (insertError) {
+          console.error("[ORDER SAMPLE] Error with direct insert:", insertError);
+        } else {
+          console.log("[ORDER SAMPLE] Direct insert successful!");
+        }
+      } catch (insertCatchError: any) {
+        console.error("[ORDER SAMPLE] Exception during direct insert:", insertCatchError?.message);
+      }
+      
+      // Add to cart via the Cart context
+      console.log("[ORDER SAMPLE] Now attempting to add product via CartContext.addItem");
+      try {
+        const result = await addItem(product as Product);
+        console.log("[ORDER SAMPLE] Add to cart via context completed, result:", result);
+      } catch (cartError: any) {
+        console.error("[ORDER SAMPLE] Error during CartContext.addItem:", cartError?.message);
       }
       
       // Reload cart items to ensure UI is updated
+      console.log("[ORDER SAMPLE] Attempting to reload cart items");
       if (loadCartItems) {
-        console.log("[ORDER SAMPLE] Reloading cart items");
         try {
           await loadCartItems();
-        } catch (loadError) {
-          console.error("[ORDER SAMPLE] Error reloading cart items:", loadError);
+          console.log("[ORDER SAMPLE] Cart items reloaded");
+        } catch (loadError: any) {
+          console.error("[ORDER SAMPLE] Error reloading cart items:", loadError?.message);
         }
       } else {
         console.warn("[ORDER SAMPLE] loadCartItems function is not available");
@@ -128,11 +140,11 @@ export const useProductActions = (productId: string) => {
       
       return true;
     } catch (error: any) {
-      console.error('[ORDER SAMPLE] Error requesting sample:', error);
+      console.error('[ORDER SAMPLE] Error requesting sample:', error?.message);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Failed to add sample to cart. Please try again."
+        description: error?.message || "Failed to add sample to cart. Please try again."
       });
       return false;
     } finally {
