@@ -26,7 +26,7 @@ export const CallToActionSection = () => {
               asChild
               className="bg-white text-[#f0562e] hover:bg-white/90"
             >
-              <Link to="/signup">
+              <Link to="/signup" className="text-[#f0562e] font-medium">
                 Start Your Brand Journey
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
