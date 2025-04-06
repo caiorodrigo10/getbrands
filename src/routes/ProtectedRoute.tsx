@@ -14,20 +14,23 @@ export function ProtectedRoute({
   children, 
   requireAdmin = false 
 }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const { isAdmin, profile } = useUserPermissions();
   const location = useLocation();
 
   useEffect(() => {
+    // Enhanced debugging for admin routes
     if (isAuthenticated && requireAdmin) {
-      console.log("ProtectedRoute - Checking admin permission:", {
+      console.log("ProtectedRoute - ADMIN ACCESS CHECK:", {
         isAdmin,
         profileRole: profile?.role,
+        userMetadataRole: user?.user_metadata?.role,
         path: location.pathname,
-        profile
+        profile,
+        userEmail: user?.email
       });
     }
-  }, [isAuthenticated, requireAdmin, isAdmin, profile, location.pathname]);
+  }, [isAuthenticated, requireAdmin, isAdmin, profile, user, location.pathname]);
 
   if (isLoading) {
     return (
@@ -41,12 +44,19 @@ export function ProtectedRoute({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Enhanced admin check with better logging
-  if (requireAdmin && !isAdmin) {
+  // Enhanced admin check with multiple fallbacks
+  const userIsAdmin = 
+    isAdmin === true || 
+    profile?.role === "admin" || 
+    user?.user_metadata?.role === "admin";
+  
+  if (requireAdmin && !userIsAdmin) {
     console.error("Access denied: user is not admin", {
       role: profile?.role,
+      userMetadataRole: user?.user_metadata?.role,
       isAdmin,
-      path: location.pathname
+      path: location.pathname,
+      email: user?.email
     });
     
     toast.error("Access denied: You need administrator privileges to access this page");

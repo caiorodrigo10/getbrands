@@ -11,17 +11,29 @@ export const AdminLayout = () => {
   const { isAdmin, profile, isLoading } = useUserPermissions();
 
   useEffect(() => {
-    console.log("AdminLayout - Checking admin permissions:", {
+    // Enhanced debugging for admin access
+    const userMetadataRole = user?.user_metadata?.role;
+    const profileRole = profile?.role;
+    
+    console.log("AdminLayout - Comprehensive admin check:", {
       isAdmin, 
-      profile,
-      profileRole: profile?.role
+      profileRole,
+      userMetadataRole,
+      email: user?.email,
+      profile
     });
     
-    if (!isLoading && !isAdmin) {
+    // Multi-source admin check
+    const userIsAdmin = 
+      isAdmin === true || 
+      profileRole === "admin" || 
+      userMetadataRole === "admin";
+    
+    if (!isLoading && !userIsAdmin) {
       console.log("User is not admin, redirecting from admin area");
       navigate("/");
     }
-  }, [isAdmin, isLoading, navigate, profile]);
+  }, [isAdmin, isLoading, navigate, profile, user]);
 
   if (isLoading) {
     return (
@@ -31,7 +43,13 @@ export const AdminLayout = () => {
     );
   }
 
-  if (!isAdmin) {
+  // Multi-source admin check for rendering
+  const userIsAdmin = 
+    isAdmin === true || 
+    profile?.role === "admin" || 
+    user?.user_metadata?.role === "admin";
+  
+  if (!userIsAdmin) {
     return null;
   }
 

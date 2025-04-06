@@ -2,6 +2,7 @@
 import { User, ShoppingBag, LogOut, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface MenuItemsProps {
   isAdmin: boolean;
@@ -16,9 +17,16 @@ export const MenuItems = ({
   handleAdminNavigation,
   handleLogout,
 }: MenuItemsProps) => {
+  const { user } = useAuth();
+  
   useEffect(() => {
-    console.log("MenuItems - Admin permissions:", { isAdmin, isInAdminPanel });
-  }, [isAdmin, isInAdminPanel]);
+    console.log("MenuItems - Admin permissions check:", { 
+      isAdmin, 
+      isInAdminPanel,
+      userMetadataRole: user?.user_metadata?.role,
+      email: user?.email
+    });
+  }, [isAdmin, isInAdminPanel, user]);
   
   return (
     <div className="flex flex-col space-y-1">
@@ -38,7 +46,7 @@ export const MenuItems = ({
         <span>Orders</span>
       </Link>
       
-      {isAdmin === true && (
+      {(isAdmin === true || user?.user_metadata?.role === "admin") && (
         <button
           onClick={handleAdminNavigation}
           className="flex items-center gap-2 px-3 py-2 text-sm text-purple-600 hover:bg-[#fff4fc] hover:text-purple-700 rounded-md w-full text-left"

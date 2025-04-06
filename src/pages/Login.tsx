@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const { toast } = useToast();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -16,9 +17,41 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      // After login, check if user is admin to enable correct routing
+      const checkUserRole = async () => {
+        try {
+          if (!user?.id) return;
+          
+          // Try to get profile directly
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+          
+          const isAdmin = profile?.role === 'admin' || user?.user_metadata?.role === 'admin';
+          console.log("Login - Detected user role:", { 
+            profileRole: profile?.role, 
+            metadataRole: user?.user_metadata?.role,
+            isAdmin,
+            email: user?.email
+          });
+          
+          // Navigate based on role
+          if (isAdmin) {
+            navigate('/admin');
+          } else {
+            navigate('/catalog');
+          }
+        } catch (err) {
+          console.error("Error checking user role:", err);
+          navigate('/catalog'); // Fallback to catalog
+        }
+      };
+      
+      checkUserRole();
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, user]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +59,7 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate('/catalog');
+      // Navigation is handled in the useEffect above
       setIsLoading(false);
     } catch (error: any) {
       console.error("Login error:", error);
@@ -35,7 +68,6 @@ const Login = () => {
         title: "Login Error",
         description: "Incorrect email or password. Please try again.",
       });
-    } finally {
       setIsLoading(false);
     }
   };
