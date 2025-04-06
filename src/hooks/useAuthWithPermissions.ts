@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,11 +17,19 @@ export const useAuthWithPermissions = () => {
         .eq("id", user.id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return null;
+      }
+      
+      console.log("Profile data from useAuthWithPermissions:", data);
       return data;
     },
     enabled: !!user?.id,
-    gcTime: 1000 * 60 * 60 * 24, // 24 hours
+    retry: 3,
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 10000),
+    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const isAdmin = profile?.role === "admin";

@@ -14,7 +14,7 @@ import { UserInfo } from "./user-menu/UserInfo";
 import { MobileMenu } from "./user-menu/MobileMenu";
 import { MenuItems } from "./user-menu/MenuItems";
 import { useSessionManagement } from "@/hooks/useSessionManagement";
-import { useProfileManagement } from "@/hooks/useProfileManagement";
+import { useAuthWithPermissions } from "@/hooks/useAuthWithPermissions";
 import { errorMessages } from "@/utils/errorMessages";
 import { toast } from "sonner";
 
@@ -29,16 +29,11 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   const { handleLogout } = useSessionManagement();
   const [isInAdminPanel, setIsInAdminPanel] = useState(location.pathname.startsWith('/admin'));
   const isPortuguese = location.pathname.startsWith('/pt');
+  const { profile, isAdmin, isLoading } = useAuthWithPermissions();
 
   const getErrorMessage = (key: string) => {
     return errorMessages[key][isPortuguese ? 'pt' : 'en'];
   };
-
-  const { profile, isLoading } = useProfileManagement({
-    user,
-    isPortuguese,
-    getErrorMessage,
-  });
 
   if (!user) return null;
 
@@ -50,7 +45,6 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
     : userEmail.split('@')[0];
   
   const userAvatar = profile?.avatar_url || user?.user_metadata?.avatar_url;
-  const isAdmin = profile?.role === "admin";
 
   const handleAdminNavigation = () => {
     if (isInAdminPanel) {

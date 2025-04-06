@@ -7,17 +7,27 @@ interface UserAvatarProps {
 }
 
 export const UserAvatar = ({ userAvatar, userName }: UserAvatarProps) => {
-  // Get the first letter of the name, or fallback to email initial if available
+  // Get the first letter of the name, or fallback to a placeholder
   const getInitial = () => {
     if (userName && userName.trim().length > 0) {
       return userName.charAt(0).toUpperCase();
     }
-    return "?";
+    return "U";
   };
 
   return (
     <Avatar className="h-10 w-10 border border-gray-200">
-      <AvatarImage src={userAvatar || ''} alt={userName || 'User'} />
+      {userAvatar ? (
+        <AvatarImage 
+          src={userAvatar} 
+          alt={userName || 'User'} 
+          onError={(e) => {
+            // Handle image loading errors
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+          }}
+        />
+      ) : null}
       <AvatarFallback className="bg-primary text-primary-foreground">
         {getInitial()}
       </AvatarFallback>
