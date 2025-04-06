@@ -16,18 +16,10 @@ export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue, onSave }
   const { clearCart } = useCart();
   const { toast } = useToast();
 
-  const handleCancel = async () => {
-    try {
-      await clearCart(true); // Setting silent to true to suppress notification
-      onCancel();
-      navigate("/checkout/confirmation");
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to cancel order. Please try again.",
-      });
-    }
+  const handleCancel = () => {
+    // Just navigate back without clearing the cart
+    onCancel();
+    navigate("/checkout/confirmation");
   };
 
   return (

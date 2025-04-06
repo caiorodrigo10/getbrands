@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useShippingForm } from "@/hooks/useShippingForm";
@@ -11,11 +12,14 @@ const Shipping = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const form = useShippingForm();
   const { items } = useCart();
+  const [formKey, setFormKey] = useState(Date.now()); // Add a key to force re-render if needed
+  
+  const form = useShippingForm();
 
   useEffect(() => {
     trackCheckoutStep(2, items);
+    console.log("Shipping form initialized");
   }, [items]);
 
   const handleCancel = () => {
@@ -36,6 +40,7 @@ const Shipping = () => {
         <h2 className="text-xl font-semibold mb-6">Shipping Information</h2>
         
         <ShippingFormContainer
+          key={formKey}
           user={user}
           form={form}
           onCancel={handleCancel}

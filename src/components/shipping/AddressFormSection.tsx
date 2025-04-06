@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useEffect } from "react";
 import { Form } from "@/components/ui/form";
 import { PersonalInfoFields } from "@/components/shipping/PersonalInfoFields";
 import { AddressFields } from "@/components/shipping/AddressFields";
@@ -29,6 +30,21 @@ export const AddressFormSection = ({
 }: AddressFormSectionProps) => {
   const useSameForBilling = form.watch("useSameForBilling");
   const { toast } = useToast();
+
+  // Don't reset the form in useEffect - this causes issues with editing fields
+  useEffect(() => {
+    // Only initialize the billing checkbox if it hasn't been set already
+    if (form.getValues("useSameForBilling") === undefined) {
+      form.setValue("useSameForBilling", true);
+      console.log("Set initial useSameForBilling value to true");
+    }
+
+    // Check if address was previously saved
+    const wasAddressSaved = localStorage.getItem('addressSaved') === 'true';
+    if (wasAddressSaved) {
+      setIsAddressSaved(true);
+    }
+  }, [form, setIsAddressSaved]);
 
   const handleSubmit = async () => {
     const values = form.getValues();
@@ -84,44 +100,11 @@ export const AddressFormSection = ({
     setIsAddressSaved(true);
   };
 
-  // Load saved values from localStorage when component mounts
-  React.useEffect(() => {
-    const savedValues = {
-      firstName: localStorage.getItem('firstName') || '',
-      lastName: localStorage.getItem('lastName') || '',
-      phone: localStorage.getItem('phone') || '',
-      address1: localStorage.getItem('shipping_address') || '',
-      address2: localStorage.getItem('shipping_address2') || '',
-      city: localStorage.getItem('shipping_city') || '',
-      state: localStorage.getItem('shipping_state') || '',
-      zipCode: localStorage.getItem('shipping_zip') || '',
-      useSameForBilling: localStorage.getItem('useSameForBilling') === 'true',
-      billingAddress1: localStorage.getItem('billing_address') || '',
-      billingAddress2: localStorage.getItem('billing_address2') || '',
-      billingCity: localStorage.getItem('billing_city') || '',
-      billingState: localStorage.getItem('billing_state') || '',
-      billingZipCode: localStorage.getItem('billing_zip') || '',
-    };
-
-    // Only set form values if they're not already set
-    if (!form.getValues().firstName) {
-      form.reset(savedValues);
-    }
-
-    // Check if address was previously saved
-    const wasAddressSaved = localStorage.getItem('addressSaved') === 'true';
-    if (wasAddressSaved) {
-      setIsAddressSaved(true);
-    }
-  }, [form, setIsAddressSaved]);
-
-  React.useEffect(() => {
-    form.setValue("useSameForBilling", true);
-  }, [form]);
+  console.log("Current form values:", form.getValues());
 
   return (
     <Form {...form}>
-      <form className="space-y-6">
+      <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
         <PersonalInfoFields form={form} />
         <AddressFields form={form} />
         <ContactFields form={form} />
