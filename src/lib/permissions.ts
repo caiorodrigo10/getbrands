@@ -10,22 +10,9 @@ export const useUserPermissions = () => {
   const auth = useAuthWithPermissions();
   const { user } = useAuth();
   
-  // Get role from all possible sources
+  // Get role from all possible sources to ensure we don't miss any admin role
   const profileRole = auth.profile?.role;
   const userMetadataRole = user?.user_metadata?.role;
-  
-  // Enhanced logging with more comprehensive debug information
-  console.log("useUserPermissions - detailed check:", { 
-    isAdmin: auth.isAdmin,
-    hasFullAccess: auth.hasFullAccess,
-    isMember: auth.isMember,
-    isSampler: auth.isSampler,
-    role: auth.role,
-    profileRole,
-    userMetadataRole,
-    email: user?.email,
-    profile: auth.profile
-  });
   
   // Enhanced admin check considering all potential sources
   const isActuallyAdmin = 

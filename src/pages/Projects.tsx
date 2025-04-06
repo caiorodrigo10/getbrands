@@ -10,35 +10,29 @@ import { toast } from "sonner";
 
 const Projects = () => {
   const { user } = useAuth();
-  const { hasFullAccess, isAdmin, role, profile } = useUserPermissions();
+  const { hasFullAccess, isAdmin } = useUserPermissions();
   const navigate = useNavigate();
   
-  // Enhanced admin check that considers all sources
-  const actuallyIsAdmin = isAdmin === true || profile?.role === 'admin' || user?.user_metadata?.role === 'admin';
-  
   // Explicitly check for admin status or full access
-  const canAccessProjects = hasFullAccess || actuallyIsAdmin;
+  const canAccessProjects = hasFullAccess || isAdmin;
   
   // Debug logs
   console.log("Projects page - User permissions:", { 
     userId: user?.id,
     userEmail: user?.email,
-    userMetadataRole: user?.user_metadata?.role,
-    profileRole: profile?.role,
     hasFullAccess, 
-    isAdmin: actuallyIsAdmin, 
-    canAccessProjects,
-    role
+    isAdmin, 
+    canAccessProjects
   });
   
   useEffect(() => {
     // Only redirect if not an admin and we're sure about permissions
-    if (user && !canAccessProjects && !hasFullAccess && !actuallyIsAdmin) {
+    if (user && !canAccessProjects) {
       console.log("Redirecting: user doesn't have permission to access Projects");
       toast.error("You don't have permission to access projects");
       navigate('/catalog');
     }
-  }, [hasFullAccess, isAdmin, actuallyIsAdmin, navigate, canAccessProjects, user]);
+  }, [hasFullAccess, isAdmin, navigate, canAccessProjects, user]);
   
   const { data: projects, isLoading, error } = useQuery({
     queryKey: ["projects", user?.id],
@@ -60,7 +54,7 @@ const Projects = () => {
           `);
         
         // If user is admin, they can see all projects, otherwise only their own
-        if (!actuallyIsAdmin) {
+        if (!isAdmin) {
           query = query.eq('user_id', user.id);
         }
           
@@ -112,7 +106,7 @@ const Projects = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">
-        {actuallyIsAdmin ? "All Projects" : "My Projects"}
+        {isAdmin ? "All Projects" : "My Projects"}
       </h1>
 
       <div className="grid gap-4">
