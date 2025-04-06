@@ -31,6 +31,10 @@ const Profile = () => {
           return {
             id: user.id,
             email: user.email,
+            // Add empty values for fields we might need to reference safely
+            avatar_url: user.user_metadata?.avatar_url || null,
+            first_name: user.user_metadata?.first_name || '',
+            last_name: user.user_metadata?.last_name || '',
           };
         }
         throw error;
@@ -52,6 +56,9 @@ const Profile = () => {
     });
   }, [profile, isLoading, user]);
 
+  // Safely extract avatar URL with fallbacks
+  const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url || null;
+
   return (
     <div className="container max-w-2xl mx-auto space-y-8 p-4">
       <div>
@@ -70,7 +77,7 @@ const Profile = () => {
           <Separator className="my-4" />
           <AvatarUpload 
             user={user} 
-            avatarUrl={profile?.avatar_url} 
+            avatarUrl={avatarUrl} 
             setAvatarUrl={(url) => {}} 
           />
         </div>
