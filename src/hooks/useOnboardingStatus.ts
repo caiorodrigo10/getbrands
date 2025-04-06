@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuthWithPermissions } from './useAuthWithPermissions';
 
-export const useOnboardingStatus = () => {
+export const useOnboardingStatus = (shouldCheck = true) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { profile, isAdmin } = useAuthWithPermissions();
@@ -16,16 +16,12 @@ export const useOnboardingStatus = () => {
 
   useEffect(() => {
     const checkOnboardingStatus = async () => {
-      if (!user?.id) {
-        console.log('[DEBUG] useOnboardingStatus - No user ID');
+      // Skip if shouldCheck is false or on onboarding path
+      if (!shouldCheck || isOnboardingPath || !user?.id) {
         return;
       }
 
-      // Return early if we're already on the onboarding page to prevent loops
-      if (isOnboardingPath) {
-        console.log('[DEBUG] useOnboardingStatus - Already on onboarding page, no redirect needed');
-        return;
-      }
+      console.log('[DEBUG] useOnboardingStatus - Checking status for user:', user.id);
 
       // If we already have the profile from useAuthWithPermissions, use it
       if (profile) {
@@ -71,7 +67,6 @@ export const useOnboardingStatus = () => {
 
       // If no cached profile, fetch it directly
       try {
-        console.log('[DEBUG] useOnboardingStatus - Checking status for user:', user.id);
         const { data: profile, error } = await supabase
           .from('profiles')
           .select('onboarding_completed, role')
@@ -121,5 +116,5 @@ export const useOnboardingStatus = () => {
     };
 
     checkOnboardingStatus();
-  }, [user, navigate, profile, isAdmin, isOnboardingPath]);
+  }, [user, navigate, profile, isAdmin, isOnboardingPath, shouldCheck]);
 };

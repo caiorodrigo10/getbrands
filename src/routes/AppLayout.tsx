@@ -2,7 +2,6 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { NavigationMenu } from "@/components/NavigationMenu";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
-import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const AppLayout = () => {
@@ -22,22 +21,13 @@ export const AppLayout = () => {
     '/reset-password'
   ];
   
-  // Only use useOnboardingStatus when we have a user and not on excluded paths
+  // Only check onboarding when we have a user and not on excluded paths
   const shouldCheckOnboarding = 
     !!user && 
     !excludedPaths.some(path => location.pathname.startsWith(path));
   
-  // Use the hook conditionally based on our check
-  useEffect(() => {
-    if (shouldCheckOnboarding) {
-      const { checkOnboardingStatus } = require('@/hooks/useOnboardingStatus');
-      checkOnboardingStatus();
-    }
-  }, [shouldCheckOnboarding, location.pathname, user?.id]);
-  
-  if (shouldCheckOnboarding) {
-    useOnboardingStatus();
-  }
+  // Always call the hook, but pass a flag to control its behavior
+  useOnboardingStatus(shouldCheckOnboarding);
 
   // Don't show navigation menu for onboarding and auth pages
   const hideNav = ['/login', '/signup', '/onboarding', '/pt/onboarding', '/pt/signup'].includes(location.pathname);
