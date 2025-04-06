@@ -84,18 +84,15 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
 
       if (productsError) throw productsError;
 
-      // Confirm payment with Stripe - using proper parameter structure
+      // Confirm payment with Stripe - fix the parameter structure
       const { error: paymentError } = await stripe.confirmPayment({
         elements,
         confirmParams: {
           return_url: `${window.location.origin}/checkout/success`,
           payment_method_data: {
-            // Removing the invalid metadata property from billing_details
             billing_details: {}
           },
-          metadata: {
-            orderId: sampleRequest.id
-          },
+          // Remove metadata from the root level of confirmParams since it's not supported
           redirect: 'if_required',
         },
       });

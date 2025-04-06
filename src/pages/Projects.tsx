@@ -22,7 +22,7 @@ const Projects = () => {
     });
   }, [user, isAdmin, profile]);
   
-  const { data: projects, isLoading, error } = useQuery({
+  const { data: projects, isLoading, error, refetch } = useQuery({
     queryKey: ["projects", user?.id],
     queryFn: async () => {
       if (!user?.id) {
@@ -32,16 +32,12 @@ const Projects = () => {
       try {
         console.log("Fetching projects for user ID:", user.id);
         
-        // On the regular /projects route, always filter by user_id, even for admins
+        // Get all projects where user_id matches the logged-in user
         const { data: projectsData, error: projectsError } = await supabase
           .from("projects")
-          .select(`
-            *,
-            project_products (
-              id
-            )
-          `)
-          .eq("user_id", user.id);
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
 
         if (projectsError) {
           console.error("Error fetching projects:", projectsError);
