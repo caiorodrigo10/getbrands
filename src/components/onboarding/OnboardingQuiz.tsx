@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -42,24 +43,37 @@ export function OnboardingQuiz() {
         return;
       }
 
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          product_interest: quizData.productCategories,
-          profile_type: quizData.profileType,
-          brand_status: quizData.brandStatus,
-          launch_urgency: quizData.launchUrgency,
-          onboarding_completed: true,
-        })
-        .eq("id", user.id);
+      try {
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            product_interest: quizData.productCategories,
+            profile_type: quizData.profileType,
+            brand_status: quizData.brandStatus,
+            launch_urgency: quizData.launchUrgency,
+            onboarding_completed: true,
+          })
+          .eq("id", user.id);
 
-      if (error) throw error;
-
-      toast.success("Profile updated successfully!");
+        if (error) {
+          console.error("Error updating profile:", error);
+          // Não bloquear o fluxo se houver erro
+          console.warn("Continuing to start-here page despite error");
+        } else {
+          toast.success("Profile updated successfully!");
+        }
+      } catch (updateError) {
+        console.error("Exception during profile update:", updateError);
+        // Não bloquear o fluxo se houver erro
+      }
+      
+      // Sempre navegar para a próxima página, mesmo se houver erro
       navigate("/start-here");
     } catch (error: any) {
-      console.error("Error updating profile:", error);
-      toast.error(error.message || "Failed to update profile");
+      console.error("Error in handleComplete:", error);
+      toast.error(error.message || "Failed to complete onboarding");
+      // Tentar navegar mesmo assim
+      navigate("/start-here");
     }
   };
 

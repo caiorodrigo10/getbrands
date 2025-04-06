@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -28,31 +29,31 @@ export const LaunchUrgencyStep = ({
 
   const handleOptionSelect = async (value: string) => {
     try {
-      if (!user?.id) {
-        throw new Error('User not authenticated');
-      }
-
-      // First update local state
+      // Primeiro atualizar o estado local
       onAnswer(value);
 
-      // Then update Supabase
-      const { error } = await supabase
-        .from('profiles')
-        .update({ 
-          launch_urgency: value,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
+      // Só tenta atualizar no Supabase se o usuário estiver autenticado
+      if (user?.id) {
+        const { error } = await supabase
+          .from('profiles')
+          .update({ 
+            launch_urgency: value,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
+        if (error) {
+          console.error('Supabase error:', error);
+          // Não impedir o fluxo se houver erro no Supabase
+          console.warn('Continuing despite Supabase error');
+        } else {
+          toast.success("Launch timeline preference saved!");
+        }
       }
-
-      toast.success("Launch timeline preference saved!");
     } catch (error: any) {
       console.error('Error updating launch urgency:', error);
-      toast.error(error.message || "Failed to save your selection. Please try again.");
+      // Não impedir o fluxo se houver erro
+      console.warn('Continuing despite error');
     }
   };
 

@@ -65,12 +65,14 @@ export const useProfileManagement = ({ user, isPortuguese, getErrorMessage }: Us
           attempts++;
         }
         
+        // Se ainda houver erro e não for "no rows returned", reportar erro
         if (profileError && profileError.code !== 'PGRST116') {
           console.error('Error fetching profile after retries:', profileError);
           toast.error(getErrorMessage('profileError'));
-          return;
+          // Continuar com o fluxo mesmo com erro
         }
 
+        // Se encontramos um perfil, use-o
         if (profileData) {
           console.log('Found existing profile:', profileData);
           if (isMounted) {
@@ -80,25 +82,31 @@ export const useProfileManagement = ({ user, isPortuguese, getErrorMessage }: Us
           return;
         }
 
-        // Only create new profile if it doesn't exist
+        // Se nenhum perfil foi encontrado, criar um novo
         console.log('Creating new profile for user:', user.id);
-        const { data: newProfile, error: createError } = await supabase
-          .from('profiles')
-          .upsert([{ 
-            id: user.id, 
-            email: user.email,
-            language: isPortuguese ? 'pt' : 'en',
-            role: user.app_metadata?.role || 'member'
-          }])
-          .select()
-          .single();
-          
-        if (createError) {
-          console.error('Error creating profile:', createError);
-          toast.error(getErrorMessage('createError'));
-        } else if (newProfile && isMounted) {
-          console.log('Created new profile:', newProfile);
-          setProfile(newProfile);
+        try {
+          const { data: newProfile, error: createError } = await supabase
+            .from('profiles')
+            .upsert([{ 
+              id: user.id, 
+              email: user.email,
+              language: isPortuguese ? 'pt' : 'en',
+              role: user.app_metadata?.role || 'member'
+            }])
+            .select()
+            .single();
+            
+          if (createError) {
+            console.error('Error creating profile:', createError);
+            toast.error(getErrorMessage('createError'));
+            // Continuar com o fluxo mesmo com erro
+          } else if (newProfile && isMounted) {
+            console.log('Created new profile:', newProfile);
+            setProfile(newProfile);
+          }
+        } catch (upsertError) {
+          console.error('Error in upsert operation:', upsertError);
+          // Continuar com o fluxo mesmo com erro
         }
       } catch (error) {
         console.error('Error in profile fetch:', error);
