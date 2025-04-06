@@ -25,7 +25,31 @@ const Products = () => {
     queryFn: async () => {
       if (!user?.id) throw new Error('User not authenticated');
       
+      // Explicitly filter by the current user's ID
       const { data, error } = await supabase
+        .from('projects')
+        .select('id')
+        .eq('user_id', user.id);
+
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error loading projects",
+          description: error.message
+        });
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        console.log("No projects found for user:", user.id);
+        return [];
+      }
+
+      // Get project IDs to use in the next query
+      const projectIds = data.map(project => project.id);
+      
+      // Get all product selections for the user's projects
+      const { data: projectProducts, error: productsError } = await supabase
         .from('project_products')
         .select(`
           id,
@@ -43,19 +67,20 @@ const Products = () => {
             images,
             selling_price
           )
-        `);
+        `)
+        .in('project_id', projectIds);
 
-      if (error) {
+      if (productsError) {
         toast({
           variant: "destructive",
           title: "Error loading products",
-          description: error.message
+          description: productsError.message
         });
-        throw error;
+        throw productsError;
       }
       
-      console.log("Products fetched:", data);
-      return data as ProjectProduct[];
+      console.log("Products fetched:", projectProducts);
+      return projectProducts as ProjectProduct[];
     },
     enabled: !!user?.id && isAuthenticated,
     retry: 1,

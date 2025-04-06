@@ -6,6 +6,7 @@ import { ProjectProgressCard } from "@/components/projects/ProjectProgressCard";
 import { useUserPermissions } from "@/lib/permissions";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const Projects = () => {
   const { user } = useAuth();
@@ -19,31 +20,47 @@ const Projects = () => {
       hasFullAccess, 
       isAdmin, 
       canAccessProjects,
-      profileRole: profile?.role 
+      profileRole: profile?.role,
+      userId: user?.id
     });
     
     if (!canAccessProjects) {
       console.log("Redirecting: user doesn't have permission to access Projects");
       navigate('/catalog');
     }
-  }, [hasFullAccess, isAdmin, navigate, canAccessProjects, profile]);
+  }, [hasFullAccess, isAdmin, navigate, canAccessProjects, profile, user]);
   
-  const { data: projects, isLoading } = useQuery({
-    queryKey: ["projects"],
+  const { data: projects, isLoading, error } = useQuery({
+    queryKey: ["projects", user?.id],
     queryFn: async () => {
-      const { data: projectsData, error: projectsError } = await supabase
-        .from("projects")
-        .select(`
-          *,
-          project_products (
-            id
-          )
-        `)
-        .eq('user_id', user?.id)
-        .order("created_at", { ascending: false });
+      if (!user?.id) {
+        throw new Error("User ID is required");
+      }
+      
+      try {
+        const { data: projectsData, error: projectsError } = await supabase
+          .from("projects")
+          .select(`
+            *,
+            project_products (
+              id
+            )
+          `)
+          .eq('user_id', user.id)
+          .order("created_at", { ascending: false });
 
-      if (projectsError) throw projectsError;
-      return projectsData;
+        if (projectsError) {
+          console.error("Error fetching projects:", projectsError);
+          throw projectsError;
+        }
+        
+        console.log("Projects fetched:", projectsData);
+        return projectsData;
+      } catch (err) {
+        console.error("Unexpected error in projects query:", err);
+        toast.error("Failed to load projects. Please try again.");
+        throw err;
+      }
     },
     enabled: !!user?.id && canAccessProjects,
   });
@@ -65,6 +82,17 @@ const Projects = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold">My Projects</h1>
+        <div className="text-red-500">
+          Failed to load projects. Please try again later.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">My Projects</h1>
@@ -73,6 +101,11 @@ const Projects = () => {
         {projects?.map((project) => (
           <ProjectProgressCard key={project.id} project={project} />
         ))}
+        {(!projects || projects.length === 0) && (
+          <div className="p-8 text-center border rounded-lg">
+            <p className="text-muted-foreground">You don't have any projects yet.</p>
+          </div>
+        )}
       </div>
     </div>
   );
