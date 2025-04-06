@@ -1387,7 +1387,12 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: {
+          user_id: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       bulk_action_status: "pending" | "processing" | "completed" | "failed"

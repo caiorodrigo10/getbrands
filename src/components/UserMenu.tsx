@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import { MenuItems } from "./user-menu/MenuItems";
 import { useSessionManagement } from "@/hooks/useSessionManagement";
 import { useProfileManagement } from "@/hooks/useProfileManagement";
 import { errorMessages } from "@/utils/errorMessages";
+import { toast } from "sonner";
 
 interface UserMenuProps {
   isMobile: boolean;
@@ -38,12 +40,28 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
     getErrorMessage,
   });
 
+  console.log("UserMenu - Current user profile:", profile, "isAdmin:", profile?.role === "admin");
+
   if (!user) return null;
 
   const userEmail = user.email || "";
   const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : "";
   const userAvatar = profile?.avatar_url;
   const isAdmin = profile?.role === "admin";
+
+  if (isAdmin) {
+    console.log("Admin user detected in UserMenu:", {
+      email: userEmail,
+      name: userName,
+      role: profile?.role
+    });
+  } else {
+    console.log("Non-admin user detected:", {
+      email: userEmail,
+      name: userName,
+      role: profile?.role
+    });
+  }
 
   const handleAdminNavigation = () => {
     if (isInAdminPanel) {
@@ -52,6 +70,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
       navigate('/admin');
     }
     setIsInAdminPanel(!isInAdminPanel);
+    toast.success(isInAdminPanel ? "Switched to user view" : "Switched to admin view");
   };
 
   if (isMobile) {
