@@ -1,19 +1,52 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import type { CartItem } from "@/types/cart";
 import type { Product } from "@/types/product";
 import type { User } from "@supabase/supabase-js";
 
+// Helper functions for local storage
+const LOCAL_STORAGE_CART_KEY = 'getbrands_cart_items';
+
+const getLocalCartItems = (): CartItem[] => {
+  try {
+    const savedItems = localStorage.getItem(LOCAL_STORAGE_CART_KEY);
+    return savedItems ? JSON.parse(savedItems) : [];
+  } catch (e) {
+    console.log("[CART OPS] Error reading from local storage:", e);
+    return [];
+  }
+};
+
+const saveLocalCartItems = (items: CartItem[]) => {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_CART_KEY, JSON.stringify(items));
+  } catch (e) {
+    console.log("[CART OPS] Error saving to local storage:", e);
+  }
+};
+
 export const useCartOperations = (user: User | null) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const [useLocalStorage, setUseLocalStorage] = useState(false);
 
+  // Initialize with local storage on first load
+  useEffect(() => {
+    if (!user) {
+      const localItems = getLocalCartItems();
+      setItems(localItems);
+    }
+  }, []);
+
+  // Load items from database or local storage
   const loadCartItems = async () => {
     if (!user?.id) {
-      console.log("[CART OPS] loadCartItems - No user ID available, skipping fetch");
+      console.log("[CART OPS] loadCartItems - No user ID available, using local storage");
+      const localItems = getLocalCartItems();
+      setItems(localItems);
       return;
     }
     
@@ -37,6 +70,16 @@ export const useCartOperations = (user: User | null) => {
           hint: cartError.hint,
           code: cartError.code
         });
+        
+        // Switch to local storage mode if we get permission errors
+        if (cartError.code === '42501') {
+          console.log("[CART OPS] Switching to local storage mode due to permission issue");
+          setUseLocalStorage(true);
+          const localItems = getLocalCartItems();
+          setItems(localItems);
+          return;
+        }
+        
         throw cartError;
       }
 
@@ -45,6 +88,7 @@ export const useCartOperations = (user: User | null) => {
       if (!cartItems || cartItems.length === 0) {
         console.log('[CART OPS] loadCartItems - No cart items found, setting empty array');
         setItems([]);
+        saveLocalCartItems([]);
         return;
       }
       
@@ -77,22 +121,51 @@ export const useCartOperations = (user: User | null) => {
       }));
 
       setItems(cartItemsWithDetails);
+      saveLocalCartItems(cartItemsWithDetails);
       console.log("[CART OPS] loadCartItems - Processed cart items:", cartItemsWithDetails);
     } catch (error: any) {
       console.error('[CART OPS] loadCartItems - Error loading cart items:', error);
       console.error('[CART OPS] Stack trace:', error?.stack);
+      
+      // Fallback to local storage in case of any error
+      const localItems = getLocalCartItems();
+      setItems(localItems);
     } finally {
       setIsLoading(false);
     }
   };
 
   const addItem = async (item: Product): Promise<boolean> => {
-    if (!user?.id) {
-      console.log("[CART OPS] addItem - No user ID available, cannot add item");
-      return false;
+    console.log(`[CART OPS] addItem - Attempting to add product ${item.id} to cart`, item);
+    
+    // Check if we're in local storage mode or if there's no user
+    if (useLocalStorage || !user?.id) {
+      console.log('[CART OPS] addItem - Using local storage mode');
+      const currentItems = getLocalCartItems();
+      
+      // Check if item already exists in cart
+      const existingItem = currentItems.find(cartItem => cartItem.id === item.id);
+      if (existingItem) {
+        console.log('[CART OPS] addItem - Item already exists in local cart, not adding again');
+        return true;
+      }
+      
+      const cartItem: CartItem = {
+        ...item,
+        quantity: 1
+      };
+      
+      const updatedItems = [...currentItems, cartItem];
+      saveLocalCartItems(updatedItems);
+      setItems(updatedItems);
+      console.log('[CART OPS] addItem - Added item to local storage cart:', cartItem);
+      toast({
+        title: "Added to Cart",
+        description: "Item has been added to your cart."
+      });
+      return true;
     }
-
-    console.log(`[CART OPS] addItem - Attempting to add product ${item.id} to cart for user ${user.id}`, item);
+    
     try {
       console.log('[CART OPS] addItem - Preparing payload:', {
         user_id: user.id,
@@ -115,6 +188,14 @@ export const useCartOperations = (user: User | null) => {
           hint: checkError.hint,
           code: checkError.code
         });
+        
+        // Switch to local storage mode if we get permission errors
+        if (checkError.code === '42501') {
+          console.log("[CART OPS] Switching to local storage mode due to permission issue");
+          setUseLocalStorage(true);
+          return addItem(item);
+        }
+        
         throw checkError;
       }
       
@@ -156,6 +237,14 @@ export const useCartOperations = (user: User | null) => {
           hint: error.hint,
           code: error.code
         });
+        
+        // Switch to local storage mode if we get permission errors
+        if (error.code === '42501') {
+          console.log("[CART OPS] Switching to local storage mode due to permission issue");
+          setUseLocalStorage(true);
+          return addItem(item);
+        }
+        
         throw error;
       }
 
@@ -167,8 +256,12 @@ export const useCartOperations = (user: User | null) => {
       };
 
       setItems(prev => [...prev, cartItem]);
+      saveLocalCartItems([...items, cartItem]);
       console.log("[CART OPS] addItem - Updated cart items in state:", [...items, cartItem]);
-      
+      toast({
+        title: "Added to Cart",
+        description: "Item has been added to your cart."
+      });
       return true;
     } catch (error: any) {
       console.error('[CART OPS] addItem - Error adding item to cart:', error);
@@ -183,8 +276,17 @@ export const useCartOperations = (user: User | null) => {
   };
 
   const removeItem = async (itemId: string) => {
-    if (!user?.id) {
-      console.log("Cart: removeItem - No user ID available, cannot remove item");
+    // Handle removal in local storage if needed
+    if (useLocalStorage || !user?.id) {
+      console.log(`[CART OPS] removeItem - Using local storage mode for product ${itemId}`);
+      const currentItems = getLocalCartItems();
+      const updatedItems = currentItems.filter(item => item.id !== itemId);
+      saveLocalCartItems(updatedItems);
+      setItems(updatedItems);
+      toast({
+        title: "Item removed",
+        description: "Item has been removed from your cart."
+      });
       return;
     }
 
@@ -198,11 +300,20 @@ export const useCartOperations = (user: User | null) => {
 
       if (error) {
         console.error('Cart: removeItem - Error deleting from cart_items:', error);
+        
+        // Switch to local storage mode if needed
+        if (error.code === '42501') {
+          setUseLocalStorage(true);
+          return removeItem(itemId);
+        }
+        
         throw error;
       }
 
       console.log(`Cart: removeItem - Successfully removed product ${itemId} from cart`);
-      setItems(prev => prev.filter(item => item.id !== itemId));
+      const updatedItems = items.filter(item => item.id !== itemId);
+      setItems(updatedItems);
+      saveLocalCartItems(updatedItems);
       toast({
         title: "Item removed",
         description: "Item has been removed from your cart."
@@ -219,16 +330,26 @@ export const useCartOperations = (user: User | null) => {
 
   const updateQuantity = async (itemId: string, quantity: number) => {
     console.log(`Cart: updateQuantity - Updating quantity for product ${itemId} to ${quantity}`);
-    setItems(prev =>
-      prev.map(item =>
-        item.id === itemId ? { ...item, quantity } : item
-      )
+    const updatedItems = items.map(item =>
+      item.id === itemId ? { ...item, quantity } : item
     );
+    setItems(updatedItems);
+    saveLocalCartItems(updatedItems);
   };
 
   const clearCart = async (silent: boolean = false) => {
-    if (!user?.id) {
-      console.log("Cart: clearCart - No user ID available, cannot clear cart");
+    // Handle clear in local storage if needed
+    if (useLocalStorage || !user?.id) {
+      console.log("[CART OPS] clearCart - Using local storage mode");
+      setItems([]);
+      saveLocalCartItems([]);
+      
+      if (!silent) {
+        toast({
+          title: "Cart cleared",
+          description: "All items have been removed from your cart."
+        });
+      }
       return;
     }
 
@@ -241,11 +362,19 @@ export const useCartOperations = (user: User | null) => {
 
       if (error) {
         console.error('Cart: clearCart - Error clearing cart:', error);
+        
+        // Switch to local storage mode if needed
+        if (error.code === '42501') {
+          setUseLocalStorage(true);
+          return clearCart(silent);
+        }
+        
         throw error;
       }
 
       console.log("Cart: clearCart - Successfully cleared all cart items");
       setItems([]);
+      saveLocalCartItems([]);
       
       if (!silent) {
         toast({

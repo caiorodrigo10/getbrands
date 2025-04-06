@@ -35,8 +35,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         });
       });
     } else {
-      console.log("[CART CONTEXT] No user, clearing cart");
-      items.length > 0 && clearCart(true);
+      console.log("[CART CONTEXT] No user, loading cart from local storage");
+      loadCartItems().catch(error => {
+        console.error("[CART CONTEXT] Error loading cart from local storage:", error);
+      });
     }
   }, [user?.id]);
 

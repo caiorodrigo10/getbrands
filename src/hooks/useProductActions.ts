@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -67,40 +68,18 @@ export const useProductActions = (productId: string) => {
         throw new Error("Cart functionality is not available");
       }
 
-      // Direct database operation - For debugging purposes
-      console.log("[ORDER SAMPLE] Attempting direct database insert to cart_items table");
-      try {
-        const { data: directInsert, error: insertError } = await supabase
-          .from('cart_items')
-          .insert({
-            user_id: user.id,
-            product_id: product.id
-          })
-          .select();
-          
-        console.log("[ORDER SAMPLE] Direct insert result:", { 
-          data: directInsert, 
-          error: insertError,
-          errorMessage: insertError?.message,
-          errorDetails: insertError?.details
-        });
-        
-        if (insertError) {
-          console.error("[ORDER SAMPLE] Error with direct insert:", insertError);
-        } else {
-          console.log("[ORDER SAMPLE] Direct insert successful!");
-        }
-      } catch (insertCatchError: any) {
-        console.error("[ORDER SAMPLE] Exception during direct insert:", insertCatchError?.message);
-      }
-      
       // Add to cart via the Cart context
       console.log("[ORDER SAMPLE] Now attempting to add product via CartContext.addItem");
       try {
         const result = await addItem(product as Product);
         console.log("[ORDER SAMPLE] Add to cart via context completed, result:", result);
+        
+        if (!result) {
+          throw new Error("Failed to add item to cart");
+        }
       } catch (cartError: any) {
         console.error("[ORDER SAMPLE] Error during CartContext.addItem:", cartError?.message);
+        throw cartError;
       }
       
       // Reload cart items to ensure UI is updated
