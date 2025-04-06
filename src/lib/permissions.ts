@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 /**
  * A utility hook that provides user permissions
  * This is a wrapper around useAuthWithPermissions to standardize permission checks
+ * across the application and ensure all permission sources are considered
  */
 export const useUserPermissions = () => {
   const auth = useAuthWithPermissions();
@@ -18,6 +19,15 @@ export const useUserPermissions = () => {
   const isActuallyAdmin = 
     profileRole === "admin" || 
     userMetadataRole === "admin";
+  
+  // Debug logging for permissions
+  console.log("useUserPermissions - Role check:", { 
+    profileRole, 
+    userMetadataRole, 
+    isActuallyAdmin,
+    userEmail: user?.email,
+    userId: user?.id
+  });
   
   return {
     ...auth,
