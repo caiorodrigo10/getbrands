@@ -1,32 +1,42 @@
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import { ProjectStage } from "@/components/project/ProjectStage";
 import { CalendarStage } from "@/components/project/CalendarStage";
 import { ProductSelectionStage } from "@/components/project/ProductSelectionStage";
 import { PackageDesignStage } from "@/components/project/PackageDesignStage";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserPermissions } from "@/lib/permissions";
 import { toast } from "sonner";
 
 const ProjectDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isAdmin } = useUserPermissions();
 
   console.log("ProjectDetails - User info:", { 
     userId: user?.id,
-    projectId: id
+    projectId: id,
+    isAdmin
   });
 
   const { data: project, isLoading, error } = useQuery({
-    queryKey: ["project", id],
+    queryKey: ["project", id, isAdmin],
     queryFn: async () => {
+      if (!id || !user?.id) {
+        throw new Error("User ID and Project ID are required");
+      }
+      
       console.log("Fetching project details for id:", id);
       
-      const { data: projectData, error } = await supabase
+      // Choose client based on admin status
+      const client = isAdmin ? supabaseAdmin : supabase;
+      
+      const { data: projectData, error } = await client
         .from("projects")
         .select(`
           *,
@@ -52,8 +62,9 @@ const ProjectDetails = () => {
     enabled: !!id && !!user?.id,
     retry: 1,
     meta: {
-      onError: () => {
-        toast.error("Falha ao carregar detalhes do projeto");
+      onError: (error: any) => {
+        console.error("Error fetching project details:", error);
+        toast.error("Failed to load project details");
         navigate("/projects");
       }
     }
