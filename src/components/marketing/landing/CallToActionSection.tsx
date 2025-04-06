@@ -24,9 +24,9 @@ export const CallToActionSection = () => {
             <Button 
               size="lg" 
               asChild
-              className="bg-white text-[#f0562e] hover:bg-white/90"
+              className="bg-white hover:bg-white/90"
             >
-              <Link to="/signup" className="text-[#f0562e] font-medium">
+              <Link to="/signup" className="text-[#f0562e] font-medium flex items-center">
                 Start Your Brand Journey
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
