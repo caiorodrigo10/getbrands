@@ -57,45 +57,23 @@ export const useProductActions = (productId: string) => {
 
       console.log("Found product:", product);
       
-      // First check if the item is already in the cart
-      const { data: cartItems, error: cartError } = await supabase
-        .from("cart_items")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("product_id", productId);
-
-      if (cartError) {
-        console.error("Error checking cart:", cartError);
-        throw cartError;
-      }
-
-      if (cartItems && cartItems.length > 0) {
-        console.log("Product already in cart, skipping add operation");
-        toast({
-          title: "Already in Cart",
-          description: `${product.name} is already in your cart.`,
-        });
-      } else {
-        // Add the product to cart using the CartContext
-        await addItem(product as Product);
-        console.log("Product added to cart successfully");
-        
-        // Track sample request event
-        trackEvent("Sample Requested", {
-          product_id: productId,
-          product_name: product.name
-        });
-
-        // Success message
-        toast({
-          title: "Sample Added",
-          description: `${product.name} has been added to your cart.`,
-        });
-      }
+      // Add the product to cart using the CartContext
+      await addItem(product as Product);
       
       // Reload cart items to ensure UI is updated
       await loadCartItems();
-      console.log("Cart items reloaded");
+      
+      // Track sample request event
+      trackEvent("Sample Requested", {
+        product_id: productId,
+        product_name: product.name
+      });
+
+      // Success message
+      toast({
+        title: "Sample Added",
+        description: `${product.name} has been added to your cart.`,
+      });
       
       return true;
     } catch (error: any) {
@@ -125,13 +103,13 @@ export const useProductActions = (productId: string) => {
       }
       
       // Get projects for the current user
-      const { data: projects, error: projectsError } = await supabase
+      const { data: projects, error: projectError } = await supabase
         .from('projects')
         .select('*')
         .eq('user_id', user.id);
         
-      if (projectsError) {
-        throw projectsError;
+      if (projectError) {
+        throw projectError;
       }
       
       console.log("Available projects:", projects);

@@ -39,10 +39,10 @@ export const ProductActions = ({ productId, onSelectProduct, showNotification = 
       const success = await handleRequestSample();
       if (success) {
         console.log("Sample added successfully, navigating to checkout");
-        // Add a small delay to ensure cart state is updated before navigation
+        // Add a small delay to ensure cart state is updated
         setTimeout(() => {
-          navigate("/checkout/confirmation");
-        }, 1000);
+          navigate("/checkout/confirmation", { replace: true });
+        }, 800);
       }
     } catch (error) {
       console.error('Error requesting sample:', error);

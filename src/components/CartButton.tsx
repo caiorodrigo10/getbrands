@@ -9,37 +9,23 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useState, useEffect } from "react";
 
 export function CartButton() {
+  const { items } = useCart();
   const navigate = useNavigate();
-  const [totalQuantity, setTotalQuantity] = useState(0);
-  
-  // Use try/catch to gracefully handle when CartProvider isn't available
-  let cartItems = [];
-  try {
-    const { items } = useCart();
-    cartItems = items;
-    
-    // Update total quantity when items change
-    useEffect(() => {
-      const newTotalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
-      setTotalQuantity(newTotalQuantity);
-    }, [items]);
-  } catch (error) {
-    console.error("CartButton: CartProvider not available", error);
-    // Keep totalQuantity as 0
-  }
+
+  // Calculate total quantity considering the quantity of each item
+  const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleCartClick = () => {
     // Track event before navigation
     trackEvent("Cart Viewed", {
       items_count: totalQuantity,
-      items: cartItems.map(item => ({
-        product_id: item?.id,
-        product_name: item?.name,
-        quantity: item?.quantity,
-        price: item?.from_price
+      items: items.map(item => ({
+        product_id: item.id,
+        product_name: item.name,
+        quantity: item.quantity,
+        price: item.from_price
       }))
     });
 

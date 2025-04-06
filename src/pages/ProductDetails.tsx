@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,7 +8,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ProductContent } from "@/components/products/details/ProductContent";
 import { ProductAnalytics } from "@/components/products/details/ProductAnalytics";
 import { ProductDetailsHeader } from "@/components/products/ProductDetailsHeader";
-import { CartProvider } from "@/contexts/CartContext";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -166,25 +164,23 @@ const ProductDetails = () => {
   if (!product) return null;
 
   return (
-    <CartProvider>
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pt-0 pb-4">
-        <ProductDetailsHeader />
-        
-        <ProductAnalytics 
-          product={product}
-          productImages={productImages}
-        />
-        
-        <ProductContent 
-          product={product}
-          showProjectDialog={showProjectDialog}
-          setShowProjectDialog={setShowProjectDialog}
-          handleProjectSelection={handleProjectSelection}
-          handleSelectProduct={handleSelectProduct}
-          projects={projects}
-        />
-      </div>
-    </CartProvider>
+    <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pt-0 pb-4">
+      <ProductDetailsHeader />
+      
+      <ProductAnalytics 
+        product={product}
+        productImages={productImages}
+      />
+      
+      <ProductContent 
+        product={product}
+        showProjectDialog={showProjectDialog}
+        setShowProjectDialog={setShowProjectDialog}
+        handleProjectSelection={handleProjectSelection}
+        handleSelectProduct={handleSelectProduct}
+        projects={projects}
+      />
+    </div>
   );
 };
 
