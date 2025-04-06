@@ -84,6 +84,7 @@ const Dashboard = () => {
                 key={item.id} 
                 product={product}
                 projectName={projectName}
+                clickable={false} // Set to false to make it non-clickable
               />
             );
           })}

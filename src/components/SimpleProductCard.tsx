@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Product } from "@/types/product";
 import { useNavigate } from "react-router-dom";
@@ -8,9 +9,10 @@ import { supabase } from "@/integrations/supabase/client";
 interface SimpleProductCardProps {
   product: Product;
   projectName?: string;
+  clickable?: boolean; // Add this prop to control if the card is clickable
 }
 
-const SimpleProductCard = ({ product, projectName }: SimpleProductCardProps) => {
+const SimpleProductCard = ({ product, projectName, clickable = true }: SimpleProductCardProps) => {
   const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -30,7 +32,7 @@ const SimpleProductCard = ({ product, projectName }: SimpleProductCardProps) => 
   });
 
   const handleCardClick = () => {
-    if (product?.id) {
+    if (clickable && product?.id) {
       navigate(`/catalog/${product.id}`);
     }
   };
@@ -42,7 +44,9 @@ const SimpleProductCard = ({ product, projectName }: SimpleProductCardProps) => 
 
   return (
     <Card 
-      className="bg-white border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer"
+      className={`bg-white border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200 ${
+        clickable ? 'cursor-pointer' : ''
+      }`}
       onClick={handleCardClick}
     >
       <div className="relative aspect-square bg-gray-50">
