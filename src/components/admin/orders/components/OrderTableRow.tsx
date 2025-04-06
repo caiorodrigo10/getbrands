@@ -36,6 +36,9 @@ export const OrderTableRow = ({
     : (typeof order.subtotal === 'number' && typeof order.shipping_cost === 'number'
       ? order.subtotal + order.shipping_cost
       : 0);
+      
+  // Determine the customer email from different possible sources
+  const customerEmail = order.profile?.email || order.customer?.email || "No email";
 
   return (
     <TableRow>
@@ -51,7 +54,7 @@ export const OrderTableRow = ({
             {order.customer?.first_name || order.first_name || 'Unknown'} {order.customer?.last_name || order.last_name || ''}
           </span>
           <span className="text-sm text-muted-foreground">
-            {order.customer?.email || "No email"}
+            {customerEmail}
           </span>
         </div>
       </TableCell>
