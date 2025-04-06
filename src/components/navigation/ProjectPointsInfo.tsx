@@ -16,9 +16,10 @@ export const ProjectPointsInfo = () => {
       if (!user?.id) return 0;
       
       try {
+        console.log("Fetching points for user:", user?.id);
         const { data, error } = await supabase
           .from("projects")
-          .select("points, points_used")
+          .select("*") // Select all columns to see complete project data
           .eq("user_id", user.id);
           
         if (error) {
@@ -31,10 +32,11 @@ export const ProjectPointsInfo = () => {
           return 0;
         }
         
-        console.log("Projects points data:", data);
+        console.log("Projects data:", data);
         
         return data.reduce((total, project) => {
           const availablePoints = (project.points || 0) - (project.points_used || 0);
+          console.log(`Project ${project.id}: ${project.points} points, ${project.points_used} used, ${availablePoints} available`);
           return total + availablePoints;
         }, 0);
       } catch (err) {
@@ -45,10 +47,8 @@ export const ProjectPointsInfo = () => {
     enabled: !!user?.id,
   });
 
-  // Adicionar log para depuração
-  console.log("ProjectPointsInfo component - totalPoints:", totalPoints, "isLoading:", isLoading);
+  console.log("ProjectPointsInfo - totalPoints:", totalPoints, "isLoading:", isLoading);
 
-  // Sempre renderizar o componente, mesmo se totalPoints for 0
   return (
     <div className="p-4 bg-[#fff1ed] border-t border-[#f0562e]/20">
       <div className="space-y-4">

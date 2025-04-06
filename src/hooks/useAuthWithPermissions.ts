@@ -13,6 +13,8 @@ export const useAuthWithPermissions = () => {
       if (!user?.id) return null;
 
       try {
+        console.log("Fetching profile for user:", user.id);
+        
         // First try to get user role from profiles table
         const { data, error } = await supabase
           .from("profiles")
@@ -23,7 +25,6 @@ export const useAuthWithPermissions = () => {
         if (error) {
           console.error("Error fetching profile:", error);
           // Still return at least some basic profile info from auth user metadata
-          // This provides a fallback if RLS prevents access to profiles table
           if (user.user_metadata) {
             return {
               id: user.id,
@@ -46,7 +47,7 @@ export const useAuthWithPermissions = () => {
       }
     },
     enabled: !!user?.id,
-    retry: 2,
+    retry: 3,
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 5000),
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5, // 5 minutes

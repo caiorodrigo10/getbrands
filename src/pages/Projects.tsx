@@ -12,23 +12,27 @@ const Projects = () => {
   const { user } = useAuth();
   const { hasFullAccess, isAdmin, profile } = useUserPermissions();
   const navigate = useNavigate();
-  // Explicitly check for admin status
+  
+  // Explicitly check for admin status or full access
   const canAccessProjects = hasFullAccess || isAdmin === true;
   
+  // Debug logs
+  console.log("Projects page - User:", user?.id);
+  console.log("Projects page - Permission check:", { 
+    hasFullAccess, 
+    isAdmin, 
+    canAccessProjects,
+    profileRole: profile?.role,
+  });
+  
   useEffect(() => {
-    console.log("Projects - Permission check:", { 
-      hasFullAccess, 
-      isAdmin, 
-      canAccessProjects,
-      profileRole: profile?.role,
-      userId: user?.id
-    });
-    
-    if (!canAccessProjects) {
+    // Only redirect if not an admin and we're sure about permissions
+    if (user && !canAccessProjects) {
       console.log("Redirecting: user doesn't have permission to access Projects");
+      toast.error("You don't have permission to access projects");
       navigate('/catalog');
     }
-  }, [hasFullAccess, isAdmin, navigate, canAccessProjects, profile, user]);
+  }, [hasFullAccess, isAdmin, navigate, canAccessProjects, user]);
   
   const { data: projects, isLoading, error } = useQuery({
     queryKey: ["projects", user?.id],
@@ -38,6 +42,7 @@ const Projects = () => {
       }
       
       try {
+        console.log("Fetching projects for user:", user.id);
         const { data: projectsData, error: projectsError } = await supabase
           .from("projects")
           .select(`
@@ -46,8 +51,7 @@ const Projects = () => {
               id
             )
           `)
-          .eq('user_id', user.id)
-          .order("created_at", { ascending: false });
+          .eq('user_id', user.id);
 
         if (projectsError) {
           console.error("Error fetching projects:", projectsError);
@@ -62,12 +66,10 @@ const Projects = () => {
         throw err;
       }
     },
-    enabled: !!user?.id && canAccessProjects,
+    enabled: !!user?.id,
+    retry: 2,
+    retryDelay: 1000,
   });
-
-  if (!canAccessProjects) {
-    return null;
-  }
 
   if (isLoading) {
     return (
@@ -83,6 +85,7 @@ const Projects = () => {
   }
 
   if (error) {
+    console.error("Error in Projects component:", error);
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">My Projects</h1>

@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
+import { useUserPermissions } from "@/lib/permissions";
 
 export const useProductActions = (product: Product) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -14,9 +16,19 @@ export const useProductActions = (product: Product) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
+  const { hasFullAccess, isAdmin } = useUserPermissions();
+
+  // Add debug log
+  console.log("useProductActions(product) - Check:", {
+    productId: product?.id,
+    hasFullAccess,
+    isAdmin,
+    userId: user?.id
+  });
 
   const handleProjectSelection = async (projectId: string) => {
     try {
+      setIsLoading(true);
       const { data: existingProduct, error: checkError } = await supabase
         .from('project_products')
         .select('*')
@@ -78,65 +90,90 @@ export const useProductActions = (product: Product) => {
         title: "Error",
         description: "Failed to select product. Please try again.",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSelectProduct = async () => {
-    if (!user) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "You must be logged in to select products.",
-      });
-      return;
-    }
-
-    const userRole = user?.role;
-    const isRestrictedRole = userRole === "member" || userRole === "sampler";
-
-    if (isRestrictedRole) {
-      setShowPermissionDeniedDialog(true);
-      return;
-    }
-
     try {
-      const { data: userProjects, error: projectsError } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('user_id', user.id);
-
-      if (projectsError) {
+      setIsLoading(true);
+      
+      if (!user) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Failed to load projects. Please try again.",
+          description: "You must be logged in to select products.",
         });
         return;
       }
 
-      const projectsWithSufficientPoints = userProjects?.filter(project => {
-        const availablePoints = (project.points || 0) - (project.points_used || 0);
-        return availablePoints >= 1000;
-      }) || [];
+      // Debug permissions
+      console.log("handleSelectProduct - User permissions check:", { hasFullAccess, isAdmin, user });
 
-      if (projectsWithSufficientPoints.length > 0) {
-        setProjects(projectsWithSufficientPoints);
-        setShowProjectDialog(true);
-      } else {
-        setShowInsufficientPointsDialog(true);
+      // Check if the user has appropriate permissions
+      const canSelectProduct = hasFullAccess || isAdmin;
+      
+      if (!canSelectProduct) {
+        setShowPermissionDeniedDialog(true);
+        return;
       }
-    } catch (error) {
-      console.error('Error loading projects:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-      });
+
+      try {
+        // Fetch user projects with enough points
+        const { data: userProjects, error: projectsError } = await supabase
+          .from('projects')
+          .select('*')
+          .eq('user_id', user.id);
+
+        console.log("User projects fetched:", userProjects, "Error:", projectsError);
+        
+        if (projectsError) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to load projects. Please try again.",
+          });
+          return;
+        }
+
+        if (!userProjects || userProjects.length === 0) {
+          toast({
+            variant: "destructive",
+            title: "No Projects Available",
+            description: "You need to create a project first before adding products.",
+          });
+          return;
+        }
+
+        const projectsWithSufficientPoints = userProjects?.filter(project => {
+          const availablePoints = (project.points || 0) - (project.points_used || 0);
+          return availablePoints >= 1000;
+        }) || [];
+
+        console.log("Projects with sufficient points:", projectsWithSufficientPoints);
+
+        if (projectsWithSufficientPoints.length > 0) {
+          setProjects(projectsWithSufficientPoints);
+          setShowProjectDialog(true);
+        } else {
+          setShowInsufficientPointsDialog(true);
+        }
+      } catch (error) {
+        console.error('Error loading projects:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "An unexpected error occurred. Please try again.",
+        });
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleScheduleCall = () => {
-    navigate("/schedule-call");
+    navigate("/schedule-demo");
   };
 
   return {
