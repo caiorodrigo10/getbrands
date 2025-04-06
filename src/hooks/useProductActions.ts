@@ -21,16 +21,19 @@ export const useProductActions = (productId: string) => {
     productId,
     isAdmin,
     userId: user?.id,
-    cartOperations: !!addItem && !!loadCartItems
+    cartOperations: {
+      addItemExists: !!addItem,
+      loadCartItemsExists: !!loadCartItems
+    }
   });
 
   const handleRequestSample = async () => {
     try {
-      console.log("ProductAction: handleRequestSample - Starting sample request flow");
+      console.log("[ORDER SAMPLE] Starting sample request flow");
       setIsLoading(true);
       
       if (!user) {
-        console.log("ProductAction: handleRequestSample - No user, redirecting to login");
+        console.log("[ORDER SAMPLE] No user, redirecting to login");
         toast({
           title: "Login Required",
           description: "Please log in to request samples.",
@@ -39,7 +42,7 @@ export const useProductActions = (productId: string) => {
         return false;
       }
 
-      console.log(`ProductAction: handleRequestSample - Requesting sample for product ID: ${productId}`);
+      console.log(`[ORDER SAMPLE] Requesting sample for product ID: ${productId}, user ID: ${user.id}`);
       
       // Fetch product data first
       const { data: product, error: productError } = await supabase
@@ -49,32 +52,56 @@ export const useProductActions = (productId: string) => {
         .single();
         
       if (productError) {
-        console.error("ProductAction: handleRequestSample - Error fetching product:", productError);
+        console.error("[ORDER SAMPLE] Error fetching product:", productError);
         throw productError;
       }
       
       if (!product) {
-        console.error("ProductAction: handleRequestSample - Product not found");
+        console.error("[ORDER SAMPLE] Product not found");
         throw new Error("Product not found");
       }
 
-      console.log("ProductAction: handleRequestSample - Found product:", product);
+      console.log("[ORDER SAMPLE] Found product:", product);
       
       if (!addItem) {
-        console.error("ProductAction: handleRequestSample - addItem function is not available");
+        console.error("[ORDER SAMPLE] addItem function is not available");
         throw new Error("Cart functionality is not available");
       }
       
-      // Add the product to cart using the CartContext
-      await addItem(product as Product);
-      console.log("ProductAction: handleRequestSample - Product added to cart");
+      // Debug: Check addItem function
+      console.log("[ORDER SAMPLE] Before adding to cart - addItem function:", typeof addItem);
+      
+      try {
+        // Add the product to cart using the CartContext
+        console.log("[ORDER SAMPLE] Attempting to add product to cart with addItem");
+        const result = await addItem(product as Product);
+        console.log("[ORDER SAMPLE] Add to cart completed, result:", result);
+        
+        // Try to directly add the item to the cart_items table
+        console.log("[ORDER SAMPLE] Directly adding to cart_items table as fallback");
+        const { data: directInsert, error: insertError } = await supabase
+          .from('cart_items')
+          .insert({
+            user_id: user.id,
+            product_id: product.id
+          })
+          .select();
+          
+        console.log("[ORDER SAMPLE] Direct insert result:", { data: directInsert, error: insertError });
+      } catch (cartError) {
+        console.error("[ORDER SAMPLE] Error during cart operations:", cartError);
+      }
       
       // Reload cart items to ensure UI is updated
       if (loadCartItems) {
-        console.log("ProductAction: handleRequestSample - Reloading cart items");
-        await loadCartItems();
+        console.log("[ORDER SAMPLE] Reloading cart items");
+        try {
+          await loadCartItems();
+        } catch (loadError) {
+          console.error("[ORDER SAMPLE] Error reloading cart items:", loadError);
+        }
       } else {
-        console.warn("ProductAction: handleRequestSample - loadCartItems function is not available");
+        console.warn("[ORDER SAMPLE] loadCartItems function is not available");
       }
       
       try {
@@ -84,7 +111,7 @@ export const useProductActions = (productId: string) => {
           product_name: product.name
         });
       } catch (trackError) {
-        console.error("ProductAction: handleRequestSample - Error tracking event:", trackError);
+        console.error("[ORDER SAMPLE] Error tracking event:", trackError);
       }
 
       // Success message
@@ -94,14 +121,14 @@ export const useProductActions = (productId: string) => {
       });
       
       // After adding to cart, navigate to the checkout confirmation page
-      console.log("ProductAction: handleRequestSample - Navigating to checkout confirmation");
+      console.log("[ORDER SAMPLE] Navigating to checkout confirmation");
       setTimeout(() => {
         navigate("/checkout/confirmation", { replace: true });
       }, 800);
       
       return true;
     } catch (error: any) {
-      console.error('ProductAction: handleRequestSample - Error requesting sample:', error);
+      console.error('[ORDER SAMPLE] Error requesting sample:', error);
       toast({
         variant: "destructive",
         title: "Error",

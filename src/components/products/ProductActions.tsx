@@ -21,7 +21,7 @@ export const ProductActions = ({ productId, onSelectProduct, showNotification = 
   
   // Enhanced logging for permissions and component mounting
   useEffect(() => {
-    console.log("ProductActions component mounted with:", {
+    console.log("[PRODUCT ACTIONS] Component mounted with:", {
       productId,
       permissions: {
         hasFullAccess,
@@ -38,11 +38,12 @@ export const ProductActions = ({ productId, onSelectProduct, showNotification = 
 
   const handleOrderSample = async () => {
     try {
-      console.log("Order Sample button clicked for product:", productId);
-      await handleRequestSample();
+      console.log("[PRODUCT ACTIONS] Order Sample button clicked for product:", productId);
+      const result = await handleRequestSample();
+      console.log("[PRODUCT ACTIONS] handleRequestSample result:", result);
       // Navigation is now handled inside handleRequestSample
     } catch (error) {
-      console.error('Error requesting sample:', error);
+      console.error('[PRODUCT ACTIONS] Error requesting sample:', error);
       toast({
         variant: "destructive",
         title: "Error",

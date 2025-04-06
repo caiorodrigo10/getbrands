@@ -7,7 +7,7 @@ export interface CartItem extends Product {
 
 export interface CartOperations {
   items: CartItem[];
-  addItem: (product: Product) => Promise<void>;
+  addItem: (product: Product) => Promise<boolean>;
   removeItem: (id: string) => Promise<void>;
   updateQuantity: (id: string, quantity: number) => Promise<void>;
   clearCart: (silent?: boolean) => Promise<void>;

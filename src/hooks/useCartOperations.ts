@@ -13,11 +13,11 @@ export const useCartOperations = (user: User | null) => {
 
   const loadCartItems = async () => {
     if (!user?.id) {
-      console.log("Cart: loadCartItems - No user ID available, skipping fetch");
+      console.log("[CART OPS] loadCartItems - No user ID available, skipping fetch");
       return;
     }
     
-    console.log(`Cart: loadCartItems - Attempting to fetch cart items for user ${user.id}`);
+    console.log(`[CART OPS] loadCartItems - Attempting to fetch cart items for user ${user.id}`);
     setIsLoading(true);
     try {
       // First, get cart_items for the user
@@ -27,30 +27,33 @@ export const useCartOperations = (user: User | null) => {
         .eq('user_id', user.id);
 
       if (cartError) {
-        console.error('Cart: loadCartItems - Error fetching cart items:', cartError);
+        console.error('[CART OPS] loadCartItems - Error fetching cart items:', cartError);
         throw cartError;
       }
 
-      console.log(`Cart: loadCartItems - Retrieved ${cartItems?.length || 0} cart item references`);
+      console.log(`[CART OPS] loadCartItems - Retrieved ${cartItems?.length || 0} cart item references`);
       
       if (!cartItems || cartItems.length === 0) {
+        console.log('[CART OPS] loadCartItems - No cart items found, setting empty array');
         setItems([]);
         return;
       }
       
       // Then, get the product details in a separate query
       const productIds = cartItems.map(item => item.product_id);
+      console.log('[CART OPS] loadCartItems - Fetching product details for IDs:', productIds);
+      
       const { data: products, error: productsError } = await supabase
         .from('products')
         .select('*')
         .in('id', productIds);
         
       if (productsError) {
-        console.error('Cart: loadCartItems - Error fetching products:', productsError);
+        console.error('[CART OPS] loadCartItems - Error fetching products:', productsError);
         throw productsError;
       }
 
-      console.log(`Cart: loadCartItems - Retrieved ${products?.length || 0} product details`);
+      console.log(`[CART OPS] loadCartItems - Retrieved ${products?.length || 0} product details:`, products);
 
       // Convert to cart items with quantity
       const cartItemsWithDetails: CartItem[] = products.map(product => ({
@@ -59,9 +62,9 @@ export const useCartOperations = (user: User | null) => {
       }));
 
       setItems(cartItemsWithDetails);
-      console.log("Cart: loadCartItems - Processed cart items:", cartItemsWithDetails);
+      console.log("[CART OPS] loadCartItems - Processed cart items:", cartItemsWithDetails);
     } catch (error) {
-      console.error('Cart: loadCartItems - Error loading cart items:', error);
+      console.error('[CART OPS] loadCartItems - Error loading cart items:', error);
     } finally {
       setIsLoading(false);
     }
@@ -69,25 +72,31 @@ export const useCartOperations = (user: User | null) => {
 
   const addItem = async (item: Product): Promise<boolean> => {
     if (!user?.id) {
-      console.log("Cart: addItem - No user ID available, cannot add item");
+      console.log("[CART OPS] addItem - No user ID available, cannot add item");
       return false;
     }
 
-    console.log(`Cart: addItem - Attempting to add product ${item.id} to cart for user ${user.id}`, item);
+    console.log(`[CART OPS] addItem - Attempting to add product ${item.id} to cart for user ${user.id}`, item);
     try {
-      const { error } = await supabase
+      console.log('[CART OPS] addItem - Payload:', {
+        user_id: user.id,
+        product_id: item.id
+      });
+      
+      const { data, error } = await supabase
         .from('cart_items')
         .insert({
           user_id: user.id,
           product_id: item.id
-        });
+        })
+        .select();
 
       if (error) {
-        console.error('Cart: addItem - Error inserting into cart_items:', error);
+        console.error('[CART OPS] addItem - Error inserting into cart_items:', error);
         throw error;
       }
 
-      console.log(`Cart: addItem - Successfully added product ${item.id} to cart`);
+      console.log(`[CART OPS] addItem - Successfully added product ${item.id} to cart, response:`, data);
 
       const cartItem: CartItem = {
         ...item,
@@ -95,11 +104,11 @@ export const useCartOperations = (user: User | null) => {
       };
 
       setItems(prev => [...prev, cartItem]);
-      console.log("Cart: addItem - Updated cart items in state:", [...items, cartItem]);
+      console.log("[CART OPS] addItem - Updated cart items in state:", [...items, cartItem]);
       
       return true;
     } catch (error) {
-      console.error('Cart: addItem - Error adding item to cart:', error);
+      console.error('[CART OPS] addItem - Error adding item to cart:', error);
       toast({
         variant: "destructive",
         title: "Error",
