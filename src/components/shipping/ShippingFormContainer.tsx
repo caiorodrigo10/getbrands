@@ -74,7 +74,8 @@ export const ShippingFormContainer = ({
     enabled: !!user?.id,
   });
 
-  const saveAddress = async (values: ShippingFormData) => {
+  // Fixed return type to match the expected Promise<void> instead of Promise<boolean>
+  const saveAddress = async (values: ShippingFormData): Promise<void> => {
     try {
       if (!user?.id) throw new Error("User not authenticated");
 
@@ -119,7 +120,6 @@ export const ShippingFormContainer = ({
       }
       
       await refetchAddresses();
-      return true;
     } catch (error) {
       console.error("Error saving address:", error);
       throw error;

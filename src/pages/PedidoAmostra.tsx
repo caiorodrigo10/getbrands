@@ -1,11 +1,10 @@
-
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Minus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
-import { ProductSearch } from "@/components/ProductSearch";
+import { ProductSearchCheckout } from "@/components/checkout/ProductSearchCheckout";
 import { useShippingCalculation } from "@/hooks/useShippingCalculation";
 import { useToast } from "@/hooks/use-toast";
 
@@ -48,7 +47,7 @@ const PedidoAmostra = () => {
   return (
     <div className="max-w-4xl mx-auto px-0 sm:px-4 space-y-6">
       <div className="flex-1">
-        <ProductSearch addToCart />
+        <ProductSearchCheckout addToCart />
       </div>
 
       <div className="space-y-4 mb-6">
@@ -62,7 +61,6 @@ const PedidoAmostra = () => {
               </div>
             </div>
             
-            {/* Mobile controls - Rearranged layout */}
             <div className="sm:hidden flex items-center justify-between w-full mt-2">
               <div className="flex items-center gap-2">
                 <Button
@@ -96,7 +94,6 @@ const PedidoAmostra = () => {
               </Button>
             </div>
             
-            {/* Desktop controls */}
             <div className="hidden sm:flex items-center gap-6">
               <div className="flex items-center gap-2">
                 <Button

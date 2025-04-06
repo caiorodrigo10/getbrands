@@ -82,7 +82,7 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
   // Use React Query's useInfiniteQuery for mobile
   if (isMobile) {
     return useInfiniteQuery({
-      queryKey: ["products-infinite", { limit, search: searchTerm, categories }],
+      queryKey: ["catalog-products-infinite", { limit, search: searchTerm, categories }],
       queryFn: fetchProducts,
       initialPageParam: 1,
       getNextPageParam: (lastPage) => lastPage.nextPage,
@@ -91,7 +91,7 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
 
   // Use regular useQuery for desktop
   return useQuery({
-    queryKey: ["products", { page, limit, search: searchTerm, categories }],
+    queryKey: ["catalog-products", { page, limit, search: searchTerm, categories }],
     queryFn: () => fetchProducts({ pageParam: page }),
   });
 };
