@@ -36,6 +36,7 @@ export const CallToActionSection = () => {
               size="lg" 
               variant="outline"
               className="border-white text-white hover:bg-white/10 border-2"
+              asChild
             >
               <Link to="/catalog">
                 Browse Products First
