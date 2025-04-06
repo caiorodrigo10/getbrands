@@ -58,7 +58,7 @@ interface Order {
   products?: OrderProduct[];
 }
 
-// Interface para tipar o resultado da RPC count_order_items
+// Interface for the count_order_items RPC result
 interface ItemCount {
   sample_request_id: string;
   count: number;
@@ -94,7 +94,10 @@ const AdminOrders = () => {
           
           // Contagem de itens por pedido usando a função RPC
           const { data: itemCounts, error: countError } = await supabase
-            .rpc('count_order_items', { order_ids: orderIds });
+            .rpc('count_order_items', { order_ids: orderIds }) as { 
+              data: ItemCount[] | null, 
+              error: any 
+            };
             
           if (countError) throw countError;
           console.log("Item counts:", itemCounts);
