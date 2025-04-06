@@ -1,3 +1,4 @@
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Product, ProductImage } from "@/types/product";
@@ -9,6 +10,7 @@ import { ProductBenefits } from "./ProductBenefits";
 import { ProductCalculator } from "./ProductCalculator";
 import { ProductImages } from "./ProductImages";
 import { ProductLightbox } from "./ProductLightbox";
+import { FavoriteButton } from "@/components/favorites/FavoriteButton";
 
 interface ProductHeaderProps {
   product: Product;
@@ -100,10 +102,11 @@ export const ProductHeader = ({ product, onSelectProduct }: ProductHeaderProps) 
       </div>
 
       <div className="space-y-8">
-        <div className="space-y-4">
+        <div className="space-y-4 flex flex-row justify-between items-start">
           <h1 className="text-4xl font-bold">{product.name}</h1>
-          <p className="text-xl text-gray-600">Ships exclusively to US</p>
+          <FavoriteButton productId={product.id} size="lg" />
         </div>
+        <p className="text-xl text-gray-600">Ships exclusively to US</p>
         <div className="text-4xl font-bold mb-4">
           ${product.from_price.toFixed(2)}
         </div>

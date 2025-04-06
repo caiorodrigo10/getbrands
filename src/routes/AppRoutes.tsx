@@ -14,6 +14,7 @@ import Profile from "@/pages/Profile";
 import Projects from "@/pages/Projects";
 import ProjectDetails from "@/pages/ProjectDetails";
 import Catalog from "@/pages/Catalog";
+import Favorites from "@/pages/Favorites";
 import Dashboard from "@/pages/Dashboard";
 import Products from "@/pages/Products";
 import ProductDetails from "@/pages/ProductDetails";
@@ -103,6 +104,12 @@ export const AppRoutes = () => {
         <Route path="/catalog" element={
           <ProtectedRoute>
             <Catalog />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/favorites" element={
+          <ProtectedRoute>
+            <Favorites />
           </ProtectedRoute>
         } />
 

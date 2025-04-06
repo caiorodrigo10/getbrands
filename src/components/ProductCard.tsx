@@ -1,3 +1,4 @@
+
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Product } from "@/types/product";
@@ -5,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { FavoriteButton } from "./favorites/FavoriteButton";
 
 interface ProductCardProps {
   product: Product;
@@ -84,6 +86,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
         >
           1000 points
         </Badge>
+        
+        {/* Favorite Button */}
+        <div className="absolute bottom-6 right-6 z-10">
+          <FavoriteButton productId={product.id} />
+        </div>
+        
         <div className="relative w-full h-full">
           <img
             src={imageError ? '/placeholder.svg' : primaryImage}
