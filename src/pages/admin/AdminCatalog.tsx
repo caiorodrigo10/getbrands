@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -118,7 +119,7 @@ const AdminCatalog = () => {
               <Upload className="h-4 w-4 mr-2" />
               Import Products
             </Button>
-            <Button onClick={() => navigate("/admin/catalog/new")}>
+            <Button onClick={() => navigate("/admin/catalog/create")}>
               <Plus className="h-4 w-4 mr-2" />
               Add Product
             </Button>
