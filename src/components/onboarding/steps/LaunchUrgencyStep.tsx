@@ -6,7 +6,7 @@ import { QuizNavigation } from "./QuizNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { useState } from "react"; // Added useState
+import { useState } from "react";
 
 interface LaunchUrgencyStepProps {
   selected: string;
@@ -22,7 +22,7 @@ export const LaunchUrgencyStep = ({
   onBack
 }: LaunchUrgencyStepProps) => {
   const { user } = useAuth();
-  const [isSubmitting, setIsSubmitting] = useState(false); // Added for form submission state
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const options = [
     { value: "immediate", label: "Immediately (1-2 months)" },
@@ -72,9 +72,10 @@ export const LaunchUrgencyStep = ({
         return;
       }
       
-      // Try to update profile one more time to make sure data is saved
+      // Try to update both profile and user metadata for consistency
       if (user?.id) {
         try {
+          // Update database profile
           await supabase
             .from('profiles')
             .update({ 
@@ -83,6 +84,15 @@ export const LaunchUrgencyStep = ({
               updated_at: new Date().toISOString()
             })
             .eq('id', user.id);
+            
+          // Update user metadata
+          await supabase.auth.updateUser({
+            data: { 
+              onboarding_completed: true,
+              launch_urgency: selected
+            }
+          });
+          
         } catch (error) {
           console.error('Error in final update:', error);
           // Continue anyway

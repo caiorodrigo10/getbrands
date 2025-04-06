@@ -11,6 +11,9 @@ export const useOnboardingStatus = () => {
   const navigate = useNavigate();
   const { profile, isAdmin } = useAuthWithPermissions();
 
+  // Check if the user is already on the onboarding page to prevent loops
+  const isOnboardingPath = window.location.pathname.includes('/onboarding');
+
   useEffect(() => {
     const checkOnboardingStatus = async () => {
       if (!user?.id) {
@@ -18,14 +21,27 @@ export const useOnboardingStatus = () => {
         return;
       }
 
+      // Return early if we're already on the onboarding page to prevent loops
+      if (isOnboardingPath) {
+        console.log('[DEBUG] useOnboardingStatus - Already on onboarding page, no redirect needed');
+        return;
+      }
+
       // If we already have the profile from useAuthWithPermissions, use it
       if (profile) {
         console.log('[DEBUG] useOnboardingStatus - Using cached profile:', profile);
         
-        // Check for onboarding_completed in both profile and user metadata
-        const onboardingCompleted = 
-          profile.onboarding_completed === true || 
-          user?.user_metadata?.onboarding_completed === true;
+        // Use multiple sources to determine if onboarding is completed
+        const onboardingCompletedInProfile = profile.onboarding_completed === true;
+        const onboardingCompletedInMetadata = user?.user_metadata?.onboarding_completed === true;
+        const onboardingCompleted = onboardingCompletedInProfile || onboardingCompletedInMetadata;
+        
+        console.log('[DEBUG] useOnboardingStatus - Onboarding status check:', { 
+          onboardingCompletedInProfile, 
+          onboardingCompletedInMetadata,
+          isAdmin,
+          currentPath: window.location.pathname
+        });
         
         // Don't redirect if onboarding is completed or user is admin
         if (onboardingCompleted || isAdmin) return;
@@ -38,7 +54,8 @@ export const useOnboardingStatus = () => {
           '/catalog',
           '/products',
           '/sample-orders',
-          '/profile'
+          '/profile',
+          '/pt/onboarding'
         ];
 
         // Don't redirect if on excluded path
@@ -66,15 +83,16 @@ export const useOnboardingStatus = () => {
           return; // Don't disrupt user flow on errors
         }
 
-        console.log('[DEBUG] useOnboardingStatus - Profile:', profile, 'Current path:', window.location.pathname);
+        console.log('[DEBUG] useOnboardingStatus - Profile:', profile);
         
-        // Check for onboarding_completed in both profile and user metadata
-        const onboardingCompleted = 
-          profile?.onboarding_completed === true || 
-          user?.user_metadata?.onboarding_completed === true;
-          
+        // Use multiple sources to determine if onboarding is completed
+        const onboardingCompletedInProfile = profile?.onboarding_completed === true;
+        const onboardingCompletedInMetadata = user?.user_metadata?.onboarding_completed === true;
+        const onboardingCompleted = onboardingCompletedInProfile || onboardingCompletedInMetadata;
+        const isAdminFromProfile = profile?.role === 'admin';
+        
         // Don't redirect if onboarding is completed or user is admin
-        if (onboardingCompleted || profile?.role === 'admin') return;
+        if (onboardingCompleted || isAdminFromProfile) return;
 
         // List of routes that don't require onboarding redirection
         const excludedPaths = [
@@ -84,7 +102,8 @@ export const useOnboardingStatus = () => {
           '/catalog',
           '/products',
           '/sample-orders',
-          '/profile'
+          '/profile',
+          '/pt/onboarding'
         ];
 
         // Don't redirect if on excluded path
@@ -93,7 +112,7 @@ export const useOnboardingStatus = () => {
         }
 
         // Redirect to onboarding
-        console.log('[DEBUG] useOnboardingStatus - Redirecting to onboarding');
+        console.log('[DEBUG] useOnboardingStatus - Redirecting to onboarding from fetch');
         navigate('/onboarding');
       } catch (error) {
         console.error('[DEBUG] useOnboardingStatus - Error:', error);
@@ -102,5 +121,5 @@ export const useOnboardingStatus = () => {
     };
 
     checkOnboardingStatus();
-  }, [user, navigate, profile, isAdmin]);
+  }, [user, navigate, profile, isAdmin, isOnboardingPath]);
 };
