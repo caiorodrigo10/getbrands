@@ -27,8 +27,9 @@ export const OrderTableRow = ({
   onStatusChange,
   isUpdating,
 }: OrderTableRowProps) => {
-  // Get total items quantity safely
-  const totalItemsQuantity = order.total_items || 0;
+  // Get total items quantity safely - now looking at the products array
+  const products = Array.isArray(order.products) ? order.products : [];
+  const totalItemsQuantity = products.reduce((total, item) => total + (parseInt(item.quantity) || 1), 0);
   
   // Calculate total safely
   const total = typeof order.total === 'number' 

@@ -44,12 +44,16 @@ const AdminOrders = () => {
           .select(`
             *,
             profile:profiles(first_name, last_name, email),
-            product:products(*),
-            items:sample_request_products(
+            products:sample_request_products(
               id, 
               quantity, 
               unit_price,
-              product:products(*)
+              product:products(
+                id,
+                name,
+                from_price,
+                image_url
+              )
             )
           `, { count: 'exact' });
         
@@ -72,6 +76,15 @@ const AdminOrders = () => {
           throw error;
         }
 
+        // Log the structure of the first order to help debug
+        if (orders && orders.length > 0) {
+          console.log("Sample order structure:", {
+            id: orders[0].id,
+            productCount: orders[0].products?.length || 0,
+            firstProduct: orders[0].products?.[0] || 'No products'
+          });
+        }
+        
         console.log("Admin orders fetched successfully:", { count, resultsLength: orders?.length });
         
         return {

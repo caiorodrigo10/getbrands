@@ -34,6 +34,11 @@ interface AdminOrderExpandedDetailsProps {
       last_name: string;
       email: string;
     };
+    profile?: {
+      first_name: string;
+      last_name: string;
+      email: string;
+    };
     shipping_cost?: number;
   };
 }
@@ -41,6 +46,9 @@ interface AdminOrderExpandedDetailsProps {
 const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) => {
   const { toast } = useToast();
   const [trackingNumber, setTrackingNumber] = useState(order.tracking_number || "");
+  
+  // Log the products data for debugging
+  console.log("Admin order expanded details - products:", order.products);
   
   // Ensure products is always an array and filter out invalid products
   const products = Array.isArray(order.products) 
@@ -83,6 +91,11 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
     }
   };
 
+  // Get the customer name and email, preferring profile data if available
+  const firstName = order.profile?.first_name || order.customer?.first_name || order.first_name || 'Unknown';
+  const lastName = order.profile?.last_name || order.customer?.last_name || order.last_name || '';
+  const email = order.profile?.email || order.customer?.email || "No email available";
+
   return (
     <motion.div
       initial={{ height: 0, opacity: 0 }}
@@ -97,10 +110,10 @@ const AdminOrderExpandedDetails = ({ order }: AdminOrderExpandedDetailsProps) =>
             <h4 className="font-semibold text-lg mb-4">Customer Details</h4>
             <Card className="p-4">
               <p className="font-medium">
-                {order.customer?.first_name || order.first_name || 'Unknown'} {order.customer?.last_name || order.last_name || ''}
+                {firstName} {lastName}
               </p>
               <p className="text-sm text-muted-foreground mt-1">
-                {order.customer?.email || "No email available"}
+                {email}
               </p>
               <div className="mt-4 pt-4 border-t">
                 <p className="text-sm font-medium mb-1">Shipping Address:</p>
