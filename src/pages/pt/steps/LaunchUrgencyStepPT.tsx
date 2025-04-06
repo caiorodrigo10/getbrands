@@ -41,10 +41,7 @@ export const LaunchUrgencyStepPT = ({
       
       // If not logged in, just continue with the flow
       if (!user?.id) {
-        if (showNextButton) {
-          onNext();
-        }
-        return;
+        return; // Let onAnswer handle the navigation
       }
 
       // Try to update in Supabase if the user is authenticated
@@ -63,19 +60,10 @@ export const LaunchUrgencyStepPT = ({
       } else {
         toast.success("Preferência de lançamento salva!");
       }
-      
-      // Move to next step if needed
-      if (showNextButton) {
-        onNext();
-      }
     } catch (error: any) {
       console.error('Erro ao atualizar urgência de lançamento:', error);
       // Don't block the flow if there's an error
       console.warn('Continuando apesar do erro');
-      
-      if (showNextButton) {
-        onNext();
-      }
     }
   };
 

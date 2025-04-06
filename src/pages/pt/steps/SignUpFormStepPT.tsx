@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SignUpFormFields } from "@/components/auth/signup/SignUpFormFields";
-import { trackEvent } from "@/lib/analytics";
 import { useNavigate } from "react-router-dom";
 
 export interface SignUpFormStepPTProps {
