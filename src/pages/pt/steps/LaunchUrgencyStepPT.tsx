@@ -26,6 +26,7 @@ export const LaunchUrgencyStepPT = ({
   const { user } = useAuth();
   const location = useLocation();
   const isOnboarding = location.pathname === "/pt/onboarding";
+  const isComecaPT = location.pathname === "/comecarpt";
 
   const options = [
     { value: "immediate", label: "Imediatamente (1-2 meses)" },
@@ -111,7 +112,7 @@ export const LaunchUrgencyStepPT = ({
       <QuizNavigation
         onNext={onNext}
         onBack={onBack}
-        nextLabel={isOnboarding ? "Completar" : "Próximo"}
+        nextLabel={isOnboarding || isComecaPT ? "Completar" : "Próximo"}
         isNextDisabled={!selected}
       />
     </div>

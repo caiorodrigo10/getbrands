@@ -12,7 +12,11 @@ export const useOnboardingStatus = (shouldCheck = true) => {
   const { profile, isAdmin } = useAuthWithPermissions();
 
   // Check if the user is already on the onboarding page to prevent loops
-  const isOnboardingPath = window.location.pathname.includes('/onboarding');
+  const currentPath = window.location.pathname;
+  const isOnboardingPath = 
+    currentPath.includes('/onboarding') || 
+    currentPath.includes('/comecarpt') ||
+    currentPath === '/pt/signup';
 
   useEffect(() => {
     const checkOnboardingStatus = async () => {
@@ -21,7 +25,7 @@ export const useOnboardingStatus = (shouldCheck = true) => {
         return;
       }
 
-      console.log('[DEBUG] useOnboardingStatus - Checking status for user:', user.id);
+      console.log('[DEBUG] useOnboardingStatus - Checking status for user:', user.id, 'path:', currentPath);
 
       // If we already have the profile from useAuthWithPermissions, use it
       if (profile) {
@@ -36,7 +40,7 @@ export const useOnboardingStatus = (shouldCheck = true) => {
           onboardingCompletedInProfile, 
           onboardingCompletedInMetadata,
           isAdmin,
-          currentPath: window.location.pathname
+          currentPath
         });
         
         // Don't redirect if onboarding is completed or user is admin
@@ -51,17 +55,24 @@ export const useOnboardingStatus = (shouldCheck = true) => {
           '/products',
           '/sample-orders',
           '/profile',
-          '/pt/onboarding'
+          '/pt/onboarding',
+          '/pt/start-here',
+          '/pt/signup',
+          '/comecarpt'
         ];
 
         // Don't redirect if on excluded path
-        if (excludedPaths.some(path => window.location.pathname.startsWith(path))) {
+        if (excludedPaths.some(path => currentPath.startsWith(path))) {
           return;
         }
 
-        // Redirect to onboarding
-        console.log('[DEBUG] useOnboardingStatus - Redirecting to onboarding');
-        navigate('/onboarding');
+        // Determine correct onboarding path based on language
+        const language = profile.language || user?.user_metadata?.language || 'en';
+        const onboardingPath = language === 'pt' ? '/pt/onboarding' : '/onboarding';
+        
+        // Redirect to appropriate onboarding
+        console.log('[DEBUG] useOnboardingStatus - Redirecting to onboarding:', onboardingPath);
+        navigate(onboardingPath);
         return;
       }
 
@@ -69,7 +80,7 @@ export const useOnboardingStatus = (shouldCheck = true) => {
       try {
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('onboarding_completed, role')
+          .select('onboarding_completed, role, language')
           .eq('id', user.id)
           .single();
 
@@ -98,17 +109,24 @@ export const useOnboardingStatus = (shouldCheck = true) => {
           '/products',
           '/sample-orders',
           '/profile',
-          '/pt/onboarding'
+          '/pt/onboarding',
+          '/pt/start-here',
+          '/pt/signup',
+          '/comecarpt'
         ];
 
         // Don't redirect if on excluded path
-        if (excludedPaths.some(path => window.location.pathname.startsWith(path))) {
+        if (excludedPaths.some(path => currentPath.startsWith(path))) {
           return;
         }
 
-        // Redirect to onboarding
-        console.log('[DEBUG] useOnboardingStatus - Redirecting to onboarding from fetch');
-        navigate('/onboarding');
+        // Determine correct onboarding path based on language
+        const language = profile?.language || user?.user_metadata?.language || 'en';
+        const onboardingPath = language === 'pt' ? '/pt/onboarding' : '/onboarding';
+        
+        // Redirect to appropriate onboarding
+        console.log('[DEBUG] useOnboardingStatus - Redirecting to onboarding from fetch:', onboardingPath);
+        navigate(onboardingPath);
       } catch (error) {
         console.error('[DEBUG] useOnboardingStatus - Error:', error);
         // Don't show error to user to avoid disrupting their flow

@@ -34,6 +34,7 @@ export const OnboardingQuizPT = () => {
     try {
       if (!user?.id) {
         // Se não tiver usuário, continuar para o formulário de inscrição
+        handleNext(); // Avança para o formulário de cadastro
         return;
       }
 
@@ -124,6 +125,8 @@ export const OnboardingQuizPT = () => {
               selected={quizData.launchUrgency}
               onAnswer={(urgency) => {
                 setQuizData({ ...quizData, launchUrgency: urgency });
+                // Se já estiver logado, completa o onboarding
+                // Se não, avança para o formulário de cadastro
                 if (user) {
                   handleComplete();
                 } else {
