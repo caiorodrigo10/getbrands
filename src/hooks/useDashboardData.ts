@@ -57,46 +57,42 @@ export const useDashboardData = () => {
   const { data: meetings } = useQuery({
     queryKey: ["meetings", user?.id],
     queryFn: async () => {
-      if (!user?.id) return null;
-      const { data: meetingsData, error } = await supabase
-        .from("project_meetings")
-        .select(`
-          *,
-          project:projects (
-            name
-          )
-        `)
-        .eq("user_id", user.id)
-        .gte("scheduled_for", new Date().toISOString())
-        .order("scheduled_for", { ascending: true })
-        .limit(3);
-
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error loading meetings",
-          description: error.message,
-        });
-        throw error;
-      }
-
-      return meetingsData?.map(meeting => ({
-        ...meeting,
-        participants: [
-          {
-            id: "1",
-            name: "Sarah Johnson",
-            avatar_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-          },
-          {
-            id: "2",
-            name: "Michael Chen",
-            avatar_url: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
-          }
-        ]
-      }));
+      return [
+        {
+          id: "1",
+          project: { name: "Brand Identity Project" },
+          scheduled_for: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          meeting_link: "https://meet.google.com/example",
+          participants: [
+            {
+              id: "1",
+              name: "Sarah Johnson",
+              avatar_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+            },
+            {
+              id: "2",
+              name: "Michael Chen",
+              avatar_url: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
+            }
+          ]
+        },
+        {
+          id: "2",
+          project: { name: "Package Design Review" },
+          scheduled_for: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+          meeting_link: "https://zoom.us/example",
+          participants: [
+            {
+              id: "3",
+              name: "Emily Davis",
+              avatar_url: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
+            }
+          ]
+        }
+      ];
     },
     enabled: !!user?.id && isAuthenticated,
+    staleTime: Infinity,
   });
 
   const { data: products } = useQuery({

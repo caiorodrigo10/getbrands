@@ -52,7 +52,7 @@ export const supabaseUtils = {
   },
 
   // Inserir dados em uma tabela
-  async insertData(tableName: string, data: any) {
+  async insertData<T>(tableName: keyof Database["public"]["Tables"], data: T) {
     const { data: result, error } = await supabaseAdmin
       .from(tableName)
       .insert(data)
@@ -63,7 +63,7 @@ export const supabaseUtils = {
   },
 
   // Atualizar dados em uma tabela
-  async updateData(tableName: string, match: Record<string, any>, data: any) {
+  async updateData<T>(tableName: keyof Database["public"]["Tables"], match: Record<string, any>, data: T) {
     const { data: result, error } = await supabaseAdmin
       .from(tableName)
       .update(data)
@@ -75,7 +75,7 @@ export const supabaseUtils = {
   },
 
   // Deletar dados de uma tabela
-  async deleteData(tableName: string, match: Record<string, any>) {
+  async deleteData(tableName: keyof Database["public"]["Tables"], match: Record<string, any>) {
     const { data, error } = await supabaseAdmin
       .from(tableName)
       .delete()
@@ -87,7 +87,7 @@ export const supabaseUtils = {
   },
 
   // Buscar dados de uma tabela
-  async getData(tableName: string, query?: {
+  async getData(tableName: keyof Database["public"]["Tables"], query?: {
     select?: string,
     match?: Record<string, any>,
     limit?: number,
