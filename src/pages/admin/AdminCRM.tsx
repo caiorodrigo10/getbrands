@@ -8,29 +8,21 @@ import { Upload } from "lucide-react";
 import { CRMTable } from "@/components/admin/crm/CRMTable";
 import { ImportContactsDialog } from "@/components/admin/crm/ImportContactsDialog";
 import { toast } from "sonner";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-
-const ITEMS_PER_PAGE = 15;
+import AdminPagination from "@/components/admin/AdminPagination";
 
 const AdminCRM = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showImportDialog, setShowImportDialog] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
 
   const { data: usersData, isLoading, error, refetch } = useQuery({
-    queryKey: ["crm-users", currentPage],
+    queryKey: ["crm-users", page, pageSize],
     queryFn: async () => {
       try {
-        console.log("[AdminCRM] Fetching CRM users data for page:", currentPage);
-        const from = (currentPage - 1) * ITEMS_PER_PAGE;
-        const to = from + ITEMS_PER_PAGE - 1;
+        console.log("[AdminCRM] Fetching CRM users data for page:", page, "with pageSize:", pageSize);
+        const from = (page - 1) * pageSize;
+        const to = from + pageSize - 1;
 
         // Use supabaseAdmin instead of regular supabase client to bypass RLS policies
         const { data, error, count } = await supabaseAdmin
@@ -67,7 +59,7 @@ const AdminCRM = () => {
         return {
           users: data || [],
           totalUsers: count || 0,
-          totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE)
+          pageCount: Math.ceil((count || 0) / pageSize)
         };
       } catch (err) {
         console.error("[AdminCRM] Unexpected error:", err);
@@ -96,6 +88,10 @@ const AdminCRM = () => {
       (user.phone?.toLowerCase().includes(searchLower))
     );
   });
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
 
   if (isLoading) {
     return (
@@ -143,48 +139,27 @@ const AdminCRM = () => {
       </div>
 
       {filteredUsers && filteredUsers.length > 0 ? (
-        <CRMTable 
-          users={filteredUsers || []} 
-          onUserUpdated={refetch}
-          totalUsers={usersData?.totalUsers || 0}
-        />
+        <>
+          <CRMTable 
+            users={filteredUsers || []} 
+            onUserUpdated={refetch}
+            totalUsers={usersData?.totalUsers || 0}
+          />
+          
+          {usersData?.pageCount && usersData.pageCount > 1 && (
+            <AdminPagination
+              page={page}
+              pageCount={usersData.pageCount}
+              pageSize={pageSize}
+              totalItems={usersData.totalUsers}
+              onPageChange={handlePageChange}
+              setPageSize={setPageSize}
+            />
+          )}
+        </>
       ) : (
         <div className="text-center p-6 border rounded-md">
           {searchTerm ? 'No users found matching your search' : 'No users found'}
-        </div>
-      )}
-
-      {usersData?.totalPages && usersData.totalPages > 1 && (
-        <div className="flex justify-center mt-6">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                />
-              </PaginationItem>
-              
-              {Array.from({ length: usersData.totalPages }, (_, i) => i + 1).map((page) => (
-                <PaginationItem key={page}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(page)}
-                    isActive={currentPage === page}
-                    className="cursor-pointer"
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => setCurrentPage(Math.min(usersData.totalPages, currentPage + 1))}
-                  className={currentPage === usersData.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
         </div>
       )}
 
