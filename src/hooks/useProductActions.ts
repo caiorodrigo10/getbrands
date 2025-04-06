@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -104,12 +103,6 @@ export const useProductActions = (productId: string) => {
       } catch (trackError) {
         console.error("[ORDER SAMPLE] Error tracking event:", trackError);
       }
-
-      // Success message
-      toast({
-        title: "Sample Added",
-        description: `${product.name} has been added to your cart.`,
-      });
       
       // After adding to cart, navigate to the checkout confirmation page
       console.log("[ORDER SAMPLE] Navigating to checkout confirmation");

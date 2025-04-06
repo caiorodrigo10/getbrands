@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
@@ -17,11 +18,8 @@ export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue, onSave }
 
   const handleCancel = async () => {
     try {
-      await clearCart();
+      await clearCart(true); // Setting silent to true to suppress notification
       onCancel();
-      toast({
-        description: "Order cancelled and cart cleared.",
-      });
       navigate("/checkout/confirmation");
     } catch (error) {
       toast({

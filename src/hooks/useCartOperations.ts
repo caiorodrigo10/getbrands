@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -159,10 +158,6 @@ export const useCartOperations = (user: User | null) => {
       saveLocalCartItems(updatedItems);
       setItems(updatedItems);
       console.log('[CART OPS] addItem - Added item to local storage cart:', cartItem);
-      toast({
-        title: "Added to Cart",
-        description: "Item has been added to your cart."
-      });
       return true;
     }
     
@@ -258,10 +253,6 @@ export const useCartOperations = (user: User | null) => {
       setItems(prev => [...prev, cartItem]);
       saveLocalCartItems([...items, cartItem]);
       console.log("[CART OPS] addItem - Updated cart items in state:", [...items, cartItem]);
-      toast({
-        title: "Added to Cart",
-        description: "Item has been added to your cart."
-      });
       return true;
     } catch (error: any) {
       console.error('[CART OPS] addItem - Error adding item to cart:', error);
@@ -283,10 +274,6 @@ export const useCartOperations = (user: User | null) => {
       const updatedItems = currentItems.filter(item => item.id !== itemId);
       saveLocalCartItems(updatedItems);
       setItems(updatedItems);
-      toast({
-        title: "Item removed",
-        description: "Item has been removed from your cart."
-      });
       return;
     }
 
@@ -314,17 +301,8 @@ export const useCartOperations = (user: User | null) => {
       const updatedItems = items.filter(item => item.id !== itemId);
       setItems(updatedItems);
       saveLocalCartItems(updatedItems);
-      toast({
-        title: "Item removed",
-        description: "Item has been removed from your cart."
-      });
     } catch (error) {
       console.error('Cart: removeItem - Error removing item from cart:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to remove item from cart"
-      });
     }
   };
 
