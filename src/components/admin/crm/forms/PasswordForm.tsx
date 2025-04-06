@@ -1,107 +1,105 @@
-import { useState } from "react";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { supabaseAdmin } from "@/lib/supabase/admin";
+import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
-interface PasswordFormProps {
-  onClose: () => void;
-  userId: string;
-}
+const formSchema = z
+  .object({
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
-export function PasswordForm({ onClose, userId }: PasswordFormProps) {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+export function PasswordForm({ onClose, userId }: { onClose: () => void; userId: string }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
-    if (password !== confirmPassword) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Passwords do not match",
-      });
-      setIsLoading(false);
-      return;
-    }
-
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const response = await fetch(
-        'https://skrvprmnncxpkojraoem.supabase.co/functions/v1/update-user-password',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session?.access_token}`,
-          },
-          body: JSON.stringify({
-            userId,
-            password,
-          }),
-        }
+      // Use supabaseAdmin for admin operations
+      const { error } = await supabaseAdmin.auth.admin.updateUserById(
+        userId,
+        { password: values.password }
       );
 
-      const data = await response.json();
-      
-      if (!response.ok) throw new Error(data.error || 'Failed to update password');
+      if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Password updated successfully",
+        title: "Password updated",
+        description: "User password has been updated successfully.",
       });
-      setPassword("");
-      setConfirmPassword("");
+      
       onClose();
     } catch (error: any) {
+      console.error("Error updating password:", error);
       toast({
         variant: "destructive",
         title: "Error",
         description: error.message || "Failed to update password",
       });
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
-  };
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="password">New Password</Label>
-        <Input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter new password"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>New Password</FormLabel>
+              <FormControl>
+                <Input type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="confirmPassword">Confirm Password</Label>
-        <Input
-          id="confirmPassword"
-          type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          placeholder="Confirm new password"
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
+                <Input type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="flex justify-end space-x-2">
-        <Button variant="outline" type="button" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Updating..." : "Update Password"}
-        </Button>
-      </div>
-    </form>
+        <div className="flex justify-end space-x-2">
+          <Button variant="outline" onClick={onClose} type="button">
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Updating..." : "Update Password"}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
@@ -32,7 +32,8 @@ const AdminCRM = () => {
         const from = (currentPage - 1) * ITEMS_PER_PAGE;
         const to = from + ITEMS_PER_PAGE - 1;
 
-        const { data, error, count } = await supabase
+        // Use supabaseAdmin instead of regular supabase client to bypass RLS policies
+        const { data, error, count } = await supabaseAdmin
           .from("profiles")
           .select(`
             id,

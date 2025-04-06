@@ -1,3 +1,4 @@
+
 import {
   Table,
   TableBody,
@@ -16,7 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CRMSelectionBar } from "./CRMSelectionBar";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface CRMUser {
@@ -74,8 +75,8 @@ export const CRMTable = ({ users, onUserUpdated, totalUsers }: CRMTableProps) =>
 
   const handleDeleteSelected = async () => {
     try {
-      // Delete profiles
-      const { error } = await supabase
+      // Use supabaseAdmin for permission to delete profiles
+      const { error } = await supabaseAdmin
         .from('profiles')
         .delete()
         .in('id', selectedUsers);

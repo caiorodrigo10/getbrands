@@ -8,32 +8,20 @@ import { useUserPermissions } from "@/lib/permissions";
 export const AdminLayout = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isAdmin, profile, isLoading } = useUserPermissions();
-
+  const { isAdmin, isLoading } = useUserPermissions();
+  
   useEffect(() => {
     // Enhanced debugging for admin access
-    const userMetadataRole = user?.user_metadata?.role;
-    const profileRole = profile?.role;
-    
-    console.log("AdminLayout - Comprehensive admin check:", {
+    console.log("AdminLayout - Access check:", {
       isAdmin, 
-      profileRole,
-      userMetadataRole,
       email: user?.email,
-      profile
     });
     
-    // Multi-source admin check
-    const userIsAdmin = 
-      isAdmin === true || 
-      profileRole === "admin" || 
-      userMetadataRole === "admin";
-    
-    if (!isLoading && !userIsAdmin) {
+    if (!isLoading && !isAdmin) {
       console.log("User is not admin, redirecting from admin area");
       navigate("/");
     }
-  }, [isAdmin, isLoading, navigate, profile, user]);
+  }, [isAdmin, isLoading, navigate, user]);
 
   if (isLoading) {
     return (
@@ -43,13 +31,7 @@ export const AdminLayout = () => {
     );
   }
 
-  // Multi-source admin check for rendering
-  const userIsAdmin = 
-    isAdmin === true || 
-    profile?.role === "admin" || 
-    user?.user_metadata?.role === "admin";
-  
-  if (!userIsAdmin) {
+  if (!isAdmin) {
     return null;
   }
 
