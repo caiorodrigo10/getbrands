@@ -1,3 +1,4 @@
+
 import { Product } from "@/types/product";
 import CatalogHeader from "@/components/CatalogHeader";
 import CatalogFilters from "@/components/CatalogFilters";
@@ -6,23 +7,61 @@ import CatalogPagination from "./CatalogPagination";
 import { CartButton } from "@/components/CartButton";
 import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/components/ui/use-toast";
 import { useProducts } from "@/hooks/useProducts";
 import { UseQueryResult, UseInfiniteQueryResult } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { useWindowSize } from "@/hooks/useWindowSize";
 import { useSearchParams } from "react-router-dom";
+import { useCatalogState } from "@/hooks/useCatalogState";
 
 const MOBILE_ITEMS_PER_PAGE = 7;
 const DESKTOP_ITEMS_PER_PAGE = 9;
 
 const CatalogLayout = () => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { getSavedCatalogState } = useCatalogState();
+  const [currentPage, setCurrentPage] = useState(() => {
+    const pageParam = searchParams.get("page");
+    return pageParam ? parseInt(pageParam, 10) : 1;
+  });
   const { width } = useWindowSize();
   const isMobile = width ? width < 768 : false;
   const itemsPerPage = isMobile ? MOBILE_ITEMS_PER_PAGE : DESKTOP_ITEMS_PER_PAGE;
   const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [searchParams] = useSearchParams();
+  
+  // Restore saved catalog state on initial load
+  useEffect(() => {
+    const savedState = getSavedCatalogState();
+    if (savedState) {
+      const newParams = new URLSearchParams(searchParams);
+      
+      // Only set these parameters if they're not already present in the URL
+      if (!searchParams.has("page") && savedState.page) {
+        newParams.set("page", savedState.page);
+        setCurrentPage(parseInt(savedState.page, 10));
+      }
+      
+      if (!searchParams.has("search") && savedState.search) {
+        newParams.set("search", savedState.search);
+      }
+      
+      if (!searchParams.has("categories") && savedState.categories) {
+        newParams.set("categories", savedState.categories);
+      }
+      
+      // Only update URL if there were changes
+      if (newParams.toString() !== searchParams.toString()) {
+        setSearchParams(newParams);
+      }
+    }
+  }, []);
+
+  // Update URL when page changes
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("page", currentPage.toString());
+    setSearchParams(newParams);
+  }, [currentPage, setSearchParams]);
   
   const { ref: loadMoreRef, inView } = useInView({
     threshold: 0,
@@ -50,29 +89,17 @@ const CatalogLayout = () => {
   useEffect(() => {
     if (isMobile && infiniteData?.pages) {
       const products = infiniteData.pages.flatMap(page => page.data);
-      setAllProducts(filterProducts(products));
+      setAllProducts(products);
     } else if (productsData?.data) {
-      setAllProducts(filterProducts(productsData.data));
+      setAllProducts(productsData.data);
     }
-  }, [productsData?.data, infiniteData?.pages, isMobile, searchParams]);
+  }, [productsData?.data, infiniteData?.pages, isMobile]);
 
   useEffect(() => {
     if (inView && isMobile && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
   }, [inView, isMobile, hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-  const filterProducts = (products: Product[]) => {
-    const selectedCategories = searchParams.get("categories")?.split(",") || [];
-    
-    if (selectedCategories.length === 0) {
-      return products;
-    }
-
-    return products.filter(product => 
-      selectedCategories.includes(product.category)
-    );
-  };
 
   if (error) {
     return (

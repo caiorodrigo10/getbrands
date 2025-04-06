@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { FavoriteButton } from "./favorites/FavoriteButton";
 
 interface SimpleProductCardProps {
   product: Product;
@@ -53,6 +54,9 @@ const SimpleProductCard = ({ product, projectName, clickable = true }: SimplePro
         {!imageLoaded && (
           <div className="absolute inset-0 bg-gray-100 animate-pulse" />
         )}
+        <div className="absolute bottom-4 right-4 z-10">
+          <FavoriteButton productId={product.id} size="sm" />
+        </div>
         <img
           src={imageError ? '/placeholder.svg' : displayImage}
           alt={product.name}

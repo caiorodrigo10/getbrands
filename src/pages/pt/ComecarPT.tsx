@@ -1,3 +1,4 @@
+
 import { OnboardingQuizPT } from "@/pages/pt/OnboardingQuiz";
 import { useEffect } from "react";
 
@@ -11,6 +12,9 @@ const ComecarPT = () => {
         language: 'pt'
       });
     }
+    
+    // Adiciona log para debug
+    console.log('[DEBUG] ComecarPT - Renderizado');
   }, []);
 
   return <OnboardingQuizPT />;

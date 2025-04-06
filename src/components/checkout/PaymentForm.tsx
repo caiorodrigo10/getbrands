@@ -90,14 +90,11 @@ export const PaymentForm = ({ clientSecret, total, shippingCost, discountAmount 
         confirmParams: {
           return_url: `${window.location.origin}/checkout/success`,
           payment_method_data: {
-            // Removing the invalid metadata property from billing_details
-            billing_details: {}
-          },
-          metadata: {
-            orderId: sampleRequest.id
-          },
-          redirect: 'if_required',
-        },
+            billing_details: {
+              // Add other billing details as needed
+            }
+          }
+        }
       });
 
       if (paymentError) {
