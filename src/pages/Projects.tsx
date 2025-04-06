@@ -35,7 +35,12 @@ const Projects = () => {
         // Get all projects where user_id matches the logged-in user
         const { data: projectsData, error: projectsError } = await supabase
           .from("projects")
-          .select("*")
+          .select(`
+            *,
+            project_products (
+              id
+            )
+          `)
           .eq("user_id", user.id)
           .order("created_at", { ascending: false });
 

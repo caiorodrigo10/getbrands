@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 
@@ -6,7 +7,7 @@ export const useCategoryFilter = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Sincroniza o estado com os parâmetros da URL quando o componente monta
+  // Synchronize state with URL parameters when the component mounts
   useEffect(() => {
     const categoriesParam = searchParams.get("categories");
     if (categoriesParam) {
@@ -41,9 +42,10 @@ export const useCategoryFilter = () => {
   const applyFilters = () => {
     const newParams = new URLSearchParams(searchParams);
     if (selectedCategories.length > 0) {
-      const encodedCategories = selectedCategories
-        .map(cat => encodeURIComponent(cat.trim()))
-        .join(",");
+      // Correctly encode the categories as a URL parameter
+      const encodedCategories = encodeURIComponent(
+        selectedCategories.join(",")
+      );
       newParams.set("categories", encodedCategories);
     } else {
       newParams.delete("categories");

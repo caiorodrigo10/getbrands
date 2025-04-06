@@ -1,3 +1,4 @@
+
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
@@ -9,16 +10,16 @@ interface UseProductsOptions {
   limit?: number;
 }
 
-interface ProductsResponse {
-  data: Product[];
-  totalPages: number;
-  totalCount: number;
-}
-
 export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) => {
   const [searchParams] = useSearchParams();
   const searchTerm = searchParams.get("search");
-  const categories = searchParams.get("categories")?.split(",") || [];
+  
+  // Properly decode the URL categories parameter
+  const categoriesParam = searchParams.get("categories");
+  const categories = categoriesParam ? 
+    decodeURIComponent(categoriesParam).split(",").map(cat => cat.trim()) : 
+    [];
+    
   const { width } = useWindowSize();
   const isMobile = width ? width < 768 : false;
 
