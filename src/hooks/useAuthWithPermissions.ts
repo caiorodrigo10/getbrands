@@ -2,6 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { ProfileType } from "@/lib/auth/types";
 
 export const useAuthWithPermissions = () => {
   const { user } = useAuth();
@@ -26,16 +27,34 @@ export const useAuthWithPermissions = () => {
           console.error("Error fetching profile:", error);
           // Still return at least some basic profile info from auth user metadata
           if (user.user_metadata) {
-            // Create a more complete profile from user metadata
+            // Create a more complete profile from user metadata with COMPLETE TYPE SHAPE
+            // Make sure all possible profile fields are included with fallbacks
             return {
               id: user.id,
               role: user.user_metadata.role || 'member',
-              email: user.email,
+              email: user.email || '',
               first_name: user.user_metadata.first_name || '',
               last_name: user.user_metadata.last_name || '',
               avatar_url: user.user_metadata.avatar_url || null,
-              onboarding_completed: user.user_metadata.onboarding_completed || false
-            };
+              onboarding_completed: user.user_metadata.onboarding_completed || false,
+              phone: null,
+              shipping_address_street: null,
+              shipping_address_street2: null,
+              shipping_address_city: null,
+              shipping_address_state: null,
+              shipping_address_zip: null,
+              billing_address_street: null,
+              billing_address_street2: null,
+              billing_city: null,
+              billing_state: null,
+              billing_zip: null,
+              instagram_handle: null,
+              product_interest: null,
+              profile_type: null,
+              brand_status: null,
+              launch_urgency: null,
+              language: 'en'
+            } as ProfileType;
           }
           return null;
         }
@@ -43,6 +62,7 @@ export const useAuthWithPermissions = () => {
         console.log("Profile data from useAuthWithPermissions:", data);
         
         // Create a complete profile object with fallbacks to user metadata
+        // Ensure ALL fields are present in the returned object
         return {
           ...data,
           // Ensure these critical fields have fallbacks
@@ -50,8 +70,16 @@ export const useAuthWithPermissions = () => {
           last_name: data.last_name || user.user_metadata?.last_name || '',
           avatar_url: data.avatar_url || user.user_metadata?.avatar_url || null,
           email: data.email || user.email || '',
-          role: data.role || user.user_metadata?.role || 'member'
-        };
+          role: data.role || user.user_metadata?.role || 'member',
+          // Ensure all other potential profile fields have at least null values if not present
+          phone: data.phone || null,
+          shipping_address_street: data.shipping_address_street || null,
+          shipping_address_street2: data.shipping_address_street2 || null,
+          shipping_address_city: data.shipping_address_city || null,
+          shipping_address_state: data.shipping_address_state || null,
+          shipping_address_zip: data.shipping_address_zip || null,
+          // ... all other profile fields with null fallbacks
+        } as ProfileType;
       } catch (err) {
         console.error("Unexpected error in useAuthWithPermissions:", err);
         return null;
