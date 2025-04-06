@@ -29,22 +29,28 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
 
     let query = supabase.from("products").select("*", { count: "exact" });
 
+    // Enhanced search to include description field
     if (searchTerm) {
       const formattedSearch = searchTerm.replace(/[%_]/g, '\\$&').trim();
-      query = query.ilike('name', `%${formattedSearch}%`).or(`description.ilike.%${formattedSearch}%`);
+      query = query
+        .or(`name.ilike.%${formattedSearch}%,category.ilike.%${formattedSearch}%,description.ilike.%${formattedSearch}%`);
     }
 
     if (categories.length > 0) {
       query = query.in('category', categories);
     }
 
+    // First get the count
     const { count } = await query;
 
+    // Then get the data using the same query conditions
     let dataQuery = supabase.from("products").select("*");
 
+    // Apply the same conditions to data query
     if (searchTerm) {
       const formattedSearch = searchTerm.replace(/[%_]/g, '\\$&').trim();
-      dataQuery = dataQuery.ilike('name', `%${formattedSearch}%`).or(`description.ilike.%${formattedSearch}%`);
+      dataQuery = dataQuery
+        .or(`name.ilike.%${formattedSearch}%,category.ilike.%${formattedSearch}%,description.ilike.%${formattedSearch}%`);
     }
 
     if (categories.length > 0) {
