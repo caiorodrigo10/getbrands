@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { supabaseAdmin } from "@/lib/supabase/admin"; // Add admin client import
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -62,6 +62,8 @@ const Products = () => {
         .from('project_products')
         .select(`
           id,
+          project_id,
+          product_id,
           project:projects (
             id,
             name,
@@ -89,8 +91,16 @@ const Products = () => {
         throw productsError;
       }
       
-      console.log("Products fetched:", projectProducts?.length || 0);
-      return projectProducts as ProjectProduct[];
+      // Transform the data to match the expected ProjectProduct structure
+      const formattedProducts = projectProducts?.map(item => ({
+        id: item.id,
+        project: item.project || null,
+        product: item.product,
+        specific: item.specific
+      })) || [];
+      
+      console.log("Products fetched:", formattedProducts?.length || 0);
+      return formattedProducts as ProjectProduct[];
     },
     enabled: !!user?.id && isAuthenticated,
     retry: 1,
