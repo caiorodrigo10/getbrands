@@ -101,11 +101,14 @@ export const useAuthWithPermissions = () => {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Get role from multiple potential sources to ensure robustness
-  // Use explicit checks to avoid type coercion issues
-  const role = profile?.role || user?.user_metadata?.role || null;
+  // Enhanced admin detection - check all possible sources for the role
+  const userMetadataRole = user?.user_metadata?.role;
+  const profileRole = profile?.role;
   
-  // Explicit boolean conversion using strict equality for safety
+  // Determine role using multiple sources to ensure robustness
+  const role = profileRole || userMetadataRole || null;
+  
+  // Explicit boolean conversion for role-based permissions
   const isAdmin = role === "admin";
   const isMember = role === "member";
   const isSampler = role === "sampler";
@@ -113,16 +116,16 @@ export const useAuthWithPermissions = () => {
   const hasLimitedAccess = isMember === true || isSampler === true;
   const isAuthenticated = !!profile || !!user;
 
-  console.log("useAuthWithPermissions - detailed permissions check:", { 
+  console.log("useAuthWithPermissions - comprehensive permissions check:", { 
     isAdmin, 
     isMember, 
     isSampler, 
     hasFullAccess,
     role,
+    profileRole,
+    userMetadataRole,
     userId: user?.id,
-    userEmail: user?.email,
-    userMetadata: user?.user_metadata,
-    profileData: profile
+    userEmail: user?.email
   });
 
   return {

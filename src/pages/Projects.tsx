@@ -10,29 +10,35 @@ import { toast } from "sonner";
 
 const Projects = () => {
   const { user } = useAuth();
-  const { hasFullAccess, isAdmin, profile } = useUserPermissions();
+  const { hasFullAccess, isAdmin, role, profile } = useUserPermissions();
   const navigate = useNavigate();
   
+  // Enhanced admin check that considers all sources
+  const actuallyIsAdmin = isAdmin === true || profile?.role === 'admin' || user?.user_metadata?.role === 'admin';
+  
   // Explicitly check for admin status or full access
-  const canAccessProjects = hasFullAccess || isAdmin === true;
+  const canAccessProjects = hasFullAccess || actuallyIsAdmin;
   
   // Debug logs
-  console.log("Projects page - User:", user?.id);
-  console.log("Projects page - Permission check:", { 
-    hasFullAccess, 
-    isAdmin, 
-    canAccessProjects,
+  console.log("Projects page - User permissions:", { 
+    userId: user?.id,
+    userEmail: user?.email,
+    userMetadataRole: user?.user_metadata?.role,
     profileRole: profile?.role,
+    hasFullAccess, 
+    isAdmin: actuallyIsAdmin, 
+    canAccessProjects,
+    role
   });
   
   useEffect(() => {
     // Only redirect if not an admin and we're sure about permissions
-    if (user && !canAccessProjects) {
+    if (user && !canAccessProjects && !hasFullAccess && !actuallyIsAdmin) {
       console.log("Redirecting: user doesn't have permission to access Projects");
       toast.error("You don't have permission to access projects");
       navigate('/catalog');
     }
-  }, [hasFullAccess, isAdmin, navigate, canAccessProjects, user]);
+  }, [hasFullAccess, isAdmin, actuallyIsAdmin, navigate, canAccessProjects, user]);
   
   const { data: projects, isLoading, error } = useQuery({
     queryKey: ["projects", user?.id],
@@ -43,22 +49,29 @@ const Projects = () => {
       
       try {
         console.log("Fetching projects for user:", user.id);
-        const { data: projectsData, error: projectsError } = await supabase
+        
+        let query = supabase
           .from("projects")
           .select(`
             *,
             project_products (
               id
             )
-          `)
-          .eq('user_id', user.id);
+          `);
+        
+        // If user is admin, they can see all projects, otherwise only their own
+        if (!actuallyIsAdmin) {
+          query = query.eq('user_id', user.id);
+        }
+          
+        const { data: projectsData, error: projectsError } = await query;
 
         if (projectsError) {
           console.error("Error fetching projects:", projectsError);
           throw projectsError;
         }
         
-        console.log("Projects fetched:", projectsData);
+        console.log("Projects fetched:", projectsData?.length || 0);
         return projectsData;
       } catch (err) {
         console.error("Unexpected error in projects query:", err);
@@ -89,7 +102,7 @@ const Projects = () => {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">My Projects</h1>
-        <div className="text-red-500">
+        <div className="text-red-500 p-4 border rounded-md">
           Failed to load projects. Please try again later.
         </div>
       </div>
@@ -98,7 +111,9 @@ const Projects = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">My Projects</h1>
+      <h1 className="text-2xl font-bold">
+        {actuallyIsAdmin ? "All Projects" : "My Projects"}
+      </h1>
 
       <div className="grid gap-4">
         {projects?.map((project) => (
@@ -106,7 +121,7 @@ const Projects = () => {
         ))}
         {(!projects || projects.length === 0) && (
           <div className="p-8 text-center border rounded-lg">
-            <p className="text-muted-foreground">You don't have any projects yet.</p>
+            <p className="text-muted-foreground">No projects found.</p>
           </div>
         )}
       </div>

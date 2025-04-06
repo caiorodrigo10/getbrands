@@ -10,6 +10,10 @@ export const useUserPermissions = () => {
   const auth = useAuthWithPermissions();
   const { user } = useAuth();
   
+  // Get role from all possible sources
+  const profileRole = auth.profile?.role;
+  const userMetadataRole = user?.user_metadata?.role;
+  
   // Enhanced logging with more comprehensive debug information
   console.log("useUserPermissions - detailed check:", { 
     isAdmin: auth.isAdmin,
@@ -17,18 +21,26 @@ export const useUserPermissions = () => {
     isMember: auth.isMember,
     isSampler: auth.isSampler,
     role: auth.role,
-    profileRole: auth.profile?.role,
-    userMetadataRole: user?.user_metadata?.role,
+    profileRole,
+    userMetadataRole,
     email: user?.email,
     profile: auth.profile
   });
   
+  // Enhanced admin check considering all potential sources
+  const isActuallyAdmin = 
+    auth.isAdmin === true || 
+    profileRole === "admin" || 
+    userMetadataRole === "admin";
+  
   return {
     ...auth,
+    // Override isAdmin with our enhanced check
+    isAdmin: isActuallyAdmin,
     // Helper functions with explicit boolean returns for common permission checks
-    canAccessAdmin: () => auth.isAdmin === true,
-    canAccessProjects: () => auth.hasFullAccess === true || auth.isAdmin === true,
-    canAccessDashboard: () => auth.hasFullAccess === true || auth.isAdmin === true
+    canAccessAdmin: () => isActuallyAdmin,
+    canAccessProjects: () => isActuallyAdmin || auth.hasFullAccess === true,
+    canAccessDashboard: () => isActuallyAdmin || auth.hasFullAccess === true
   };
 };
 
