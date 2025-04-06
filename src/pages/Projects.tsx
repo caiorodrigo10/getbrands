@@ -1,10 +1,25 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { ProjectProgressCard } from "@/components/projects/ProjectProgressCard";
+import { useUserPermissions } from "@/lib/permissions";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Projects = () => {
   const { user } = useAuth();
+  const { hasFullAccess, isAdmin } = useUserPermissions();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    console.log("Projects - Verificando permissões:", { hasFullAccess, isAdmin });
+    
+    if (!hasFullAccess) {
+      console.log("Redirecionando: usuário sem permissão para acessar Projects");
+      navigate('/catalog');
+    }
+  }, [hasFullAccess, isAdmin, navigate]);
   
   const { data: projects, isLoading } = useQuery({
     queryKey: ["projects"],
@@ -23,8 +38,12 @@ const Projects = () => {
       if (projectsError) throw projectsError;
       return projectsData;
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id && hasFullAccess,
   });
+
+  if (!hasFullAccess) {
+    return null;
+  }
 
   if (isLoading) {
     return (
@@ -41,7 +60,7 @@ const Projects = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">My Projects</h1>
+      <h1 className="text-2xl font-bold">Meus Projetos</h1>
 
       <div className="grid gap-4">
         {projects?.map((project) => (

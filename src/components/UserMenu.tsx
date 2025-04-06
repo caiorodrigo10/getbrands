@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -14,7 +14,7 @@ import { UserInfo } from "./user-menu/UserInfo";
 import { MobileMenu } from "./user-menu/MobileMenu";
 import { MenuItems } from "./user-menu/MenuItems";
 import { useSessionManagement } from "@/hooks/useSessionManagement";
-import { useAuthWithPermissions } from "@/hooks/useAuthWithPermissions";
+import { useUserPermissions } from "@/lib/permissions";
 import { errorMessages } from "@/utils/errorMessages";
 import { toast } from "sonner";
 
@@ -29,9 +29,16 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   const { handleLogout } = useSessionManagement();
   const [isInAdminPanel, setIsInAdminPanel] = useState(location.pathname.startsWith('/admin'));
   const isPortuguese = location.pathname.startsWith('/pt');
-  const { profile, isAdmin, isLoading } = useAuthWithPermissions();
+  const { profile, isAdmin, isLoading } = useUserPermissions();
 
-  console.log("UserMenu - User profile and permissions:", { profile, isAdmin, isInAdminPanel });
+  useEffect(() => {
+    console.log("UserMenu - Perfil e permissões:", { 
+      profile, 
+      isAdmin, 
+      isInAdminPanel,
+      profileRole: profile?.role 
+    });
+  }, [profile, isAdmin, isInAdminPanel]);
 
   const getErrorMessage = (key: string) => {
     return errorMessages[key][isPortuguese ? 'pt' : 'en'];
@@ -50,7 +57,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
 
   const handleAdminNavigation = () => {
     if (isInAdminPanel) {
-      navigate('/dashboard');
+      navigate('/catalog');
       toast.success(isPortuguese ? "Voltou para visão de usuário" : "Switched to user view");
     } else {
       navigate('/admin');

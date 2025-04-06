@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,9 +7,7 @@ import AdminOrdersTable from "@/components/admin/orders/AdminOrdersTable";
 import { Pagination } from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 import OrderStatusFilters from "@/components/sample-orders/OrderStatusFilters";
-import OrderFilters from "@/components/sample-orders/OrderFilters";
 
 interface AdminOrdersProps { }
 
@@ -21,9 +20,9 @@ const AdminOrders: React.FC<AdminOrdersProps> = () => {
 
   const { toast } = useToast();
 
-  const { data: ordersData, isLoading, error } = useQuery(
-    ["admin-orders", page, statusFilter, showOnHold, searchQuery, pageSize],
-    async () => {
+  const { data: ordersData, isLoading, error } = useQuery({
+    queryKey: ["admin-orders", page, statusFilter, showOnHold, searchQuery, pageSize],
+    queryFn: async () => {
       let query = supabase
         .from("sample_requests")
         .select("*", { count: "exact" })
@@ -53,7 +52,7 @@ const AdminOrders: React.FC<AdminOrdersProps> = () => {
         count: count || 0,
       };
     }
-  );
+  });
 
   const totalOrders = ordersData?.count || 0;
   const orders = ordersData?.data || [];
@@ -103,14 +102,16 @@ const AdminOrders: React.FC<AdminOrdersProps> = () => {
           <AdminOrdersTable orders={orders} totalOrders={totalOrders} />
 
           {totalOrders > 0 && (
-            <Pagination
-              page={page}
-              onPageChange={handlePageChange}
-              pageCount={pageCount}
-              pageSize={pageSize}
-              setPageSize={setPageSize}
-              totalItems={totalOrders}
-            />
+            <div className="mt-4">
+              <Pagination
+                page={page}
+                onPageChange={handlePageChange}
+                pageCount={pageCount}
+                pageSize={pageSize}
+                setPageSize={setPageSize}
+                totalItems={totalOrders}
+              />
+            </div>
           )}
         </>
       )}

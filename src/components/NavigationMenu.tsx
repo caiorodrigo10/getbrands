@@ -1,22 +1,30 @@
 
 import { useLocation, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { useAuthWithPermissions } from "@/hooks/useAuthWithPermissions";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DesktopNavigation } from "./navigation/DesktopNavigation";
 import { MobileNavigation } from "./navigation/MobileNavigation";
 import { getMenuItems } from "./navigation/MenuItems";
 import { MenuItem } from "./navigation/types";
+import { useUserPermissions } from "@/lib/permissions";
 
 export const NavigationMenu = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { hasFullAccess, isMember, isSampler, isAdmin } = useAuthWithPermissions();
+  const { hasFullAccess, isMember, isSampler, isAdmin, profile } = useUserPermissions();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Log permissions for debugging
-  console.log("Navigation permissions:", { hasFullAccess, isMember, isSampler, isAdmin });
+  // Log de permissões para depuração
+  useEffect(() => {
+    console.log("NavigationMenu - Permissões:", { 
+      hasFullAccess, 
+      isMember, 
+      isSampler, 
+      isAdmin,
+      profileRole: profile?.role
+    });
+  }, [hasFullAccess, isMember, isSampler, isAdmin, profile]);
 
   const showStartHere = isMember || isSampler;
   const menuItems = getMenuItems(showStartHere);
