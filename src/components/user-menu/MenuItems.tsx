@@ -28,6 +28,9 @@ export const MenuItems = ({
     });
   }, [isAdmin, isInAdminPanel, user]);
   
+  // Check for admin status in multiple places for redundancy
+  const showAdminOption = isAdmin === true || user?.user_metadata?.role === "admin";
+  
   return (
     <div className="flex flex-col space-y-1">
       <Link
@@ -46,7 +49,7 @@ export const MenuItems = ({
         <span>Orders</span>
       </Link>
       
-      {(isAdmin === true || user?.user_metadata?.role === "admin") && (
+      {showAdminOption && (
         <button
           onClick={handleAdminNavigation}
           className="flex items-center gap-2 px-3 py-2 text-sm text-purple-600 hover:bg-[#fff4fc] hover:text-purple-700 rounded-md w-full text-left"
