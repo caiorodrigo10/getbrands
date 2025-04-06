@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/admin"; // Add admin client import
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -12,26 +13,34 @@ import { ProductPricing } from "@/components/products/ProductPricing";
 import { ProductPriceInfo } from "@/components/products/ProductPriceInfo";
 import { ProjectProduct } from "@/types/product";
 import { useToast } from "@/components/ui/use-toast";
+import { useUserPermissions } from "@/lib/permissions";
 
 const Products = () => {
   const { user, isAuthenticated } = useAuth();
+  const { isAdmin } = useUserPermissions();
   const location = useLocation();
   const navigate = useNavigate();
   const [showConfetti, setShowConfetti] = useState(false);
   const { toast } = useToast();
 
   const { data: products, isLoading, error, refetch } = useQuery({
-    queryKey: ['my-products', user?.id],
+    queryKey: ['my-products', user?.id, isAdmin],
     queryFn: async () => {
       if (!user?.id) throw new Error('User not authenticated');
       
+      // Use the appropriate client based on admin status
+      const supabaseClient = isAdmin ? supabaseAdmin : supabase;
+      
+      console.log("Fetching products with client:", isAdmin ? "supabaseAdmin" : "supabase");
+      
       // Explicitly filter by the current user's ID
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('projects')
         .select('id')
         .eq('user_id', user.id);
 
       if (error) {
+        console.error("Error fetching projects:", error);
         toast({
           variant: "destructive",
           title: "Error loading projects",
@@ -49,7 +58,7 @@ const Products = () => {
       const projectIds = data.map(project => project.id);
       
       // Get all product selections for the user's projects
-      const { data: projectProducts, error: productsError } = await supabase
+      const { data: projectProducts, error: productsError } = await supabaseClient
         .from('project_products')
         .select(`
           id,
@@ -71,6 +80,7 @@ const Products = () => {
         .in('project_id', projectIds);
 
       if (productsError) {
+        console.error("Error fetching project products:", productsError);
         toast({
           variant: "destructive",
           title: "Error loading products",
@@ -79,7 +89,7 @@ const Products = () => {
         throw productsError;
       }
       
-      console.log("Products fetched:", projectProducts);
+      console.log("Products fetched:", projectProducts?.length || 0);
       return projectProducts as ProjectProduct[];
     },
     enabled: !!user?.id && isAuthenticated,

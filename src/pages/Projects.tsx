@@ -1,6 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/admin"; // Add admin client import
 import { useAuth } from "@/contexts/AuthContext";
 import { ProjectProgressCard } from "@/components/projects/ProjectProgressCard";
 import { useUserPermissions } from "@/lib/permissions";
@@ -35,16 +36,19 @@ const Projects = () => {
   }, [hasFullAccess, isAdmin, navigate, canAccessProjects, user]);
   
   const { data: projects, isLoading, error } = useQuery({
-    queryKey: ["projects", user?.id],
+    queryKey: ["projects", user?.id, isAdmin],
     queryFn: async () => {
       if (!user?.id) {
         throw new Error("User ID is required");
       }
       
       try {
-        console.log("Fetching projects for user:", user.id);
+        console.log("Fetching projects for user:", user.id, "isAdmin:", isAdmin);
         
-        let query = supabase
+        // Use supabaseAdmin for fetching data to bypass RLS
+        const supabaseClient = isAdmin ? supabaseAdmin : supabase;
+        
+        let query = supabaseClient
           .from("projects")
           .select(`
             *,

@@ -16,7 +16,6 @@ export const useUserPermissions = () => {
   
   // Enhanced admin check considering all potential sources
   const isActuallyAdmin = 
-    auth.isAdmin === true || 
     profileRole === "admin" || 
     userMetadataRole === "admin";
   

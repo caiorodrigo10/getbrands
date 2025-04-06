@@ -1,21 +1,38 @@
+
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/admin"; // Add admin client import
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ProjectStage } from "@/components/project/ProjectStage";
 import { CalendarStage } from "@/components/project/CalendarStage";
 import { ProductSelectionStage } from "@/components/project/ProductSelectionStage";
 import { PackageDesignStage } from "@/components/project/PackageDesignStage";
+import { useUserPermissions } from "@/lib/permissions";
+import { useAuth } from "@/contexts/AuthContext";
 
 const ProjectDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { isAdmin } = useUserPermissions();
+  const { user } = useAuth();
+
+  console.log("ProjectDetails - User permissions:", { 
+    isAdmin,
+    userId: user?.id,
+    projectId: id
+  });
 
   const { data: project, isLoading } = useQuery({
-    queryKey: ["project", id],
+    queryKey: ["project", id, isAdmin],
     queryFn: async () => {
-      const { data: projectData, error } = await supabase
+      // Use the appropriate client based on admin status
+      const supabaseClient = isAdmin ? supabaseAdmin : supabase;
+      
+      console.log("Fetching project with client:", isAdmin ? "supabaseAdmin" : "supabase");
+      
+      const { data: projectData, error } = await supabaseClient
         .from("projects")
         .select(`
           *,
@@ -31,9 +48,20 @@ const ProjectDetails = () => {
         .eq("id", id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching project details:", error);
+        throw error;
+      }
+      
+      // If admin, they can see any project, but if regular user, verify ownership
+      if (!isAdmin && projectData.user_id !== user?.id) {
+        console.error("Permission denied: User does not own this project");
+        throw new Error("You don't have permission to view this project");
+      }
+      
       return projectData;
     },
+    enabled: !!id,
   });
 
   if (isLoading) {
