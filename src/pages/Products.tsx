@@ -92,12 +92,19 @@ const Products = () => {
       }
       
       // Transform the data to match the expected ProjectProduct structure
-      const formattedProducts = projectProducts?.map(item => ({
-        id: item.id,
-        project: item.project && item.project.length > 0 ? item.project[0] : null,
-        product: Array.isArray(item.product) && item.product.length > 0 ? item.product[0] : item.product,
-        specific: item.specific
-      })) || [];
+      const formattedProducts = projectProducts?.map(item => {
+        // Ensure project is an object with expected properties, not an array
+        const project = Array.isArray(item.project) && item.project.length > 0 
+          ? item.project[0] 
+          : item.project || null;
+
+        return {
+          id: item.id,
+          project: project,
+          product: Array.isArray(item.product) && item.product.length > 0 ? item.product[0] : item.product,
+          specific: item.specific
+        };
+      }) || [];
       
       console.log("Products fetched:", formattedProducts?.length || 0);
       return formattedProducts as ProjectProduct[];

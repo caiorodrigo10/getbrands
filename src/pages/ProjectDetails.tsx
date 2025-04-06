@@ -63,9 +63,11 @@ const ProjectDetails = () => {
     },
     enabled: !!id && !!user?.id,
     retry: 1,
-    onError: () => {
-      toast.error("Failed to load project details");
-      navigate("/projects");
+    meta: {
+      onError: () => {
+        toast.error("Failed to load project details");
+        navigate("/projects");
+      }
     }
   });
 
