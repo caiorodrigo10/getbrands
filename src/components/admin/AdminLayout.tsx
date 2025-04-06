@@ -1,35 +1,27 @@
+
 import { useEffect } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { AdminNavigationMenu } from "./AdminNavigationMenu";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useUserPermissions } from "@/lib/permissions";
 
 export const AdminLayout = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ["admin-profile", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user?.id,
-  });
-
+  const { isAdmin, isLoading } = useUserPermissions();
+  
   useEffect(() => {
-    if (!isLoading && profile?.role !== "admin") {
+    // Enhanced debugging for admin access
+    console.log("AdminLayout - Access check:", {
+      isAdmin, 
+      email: user?.email,
+    });
+    
+    if (!isLoading && !isAdmin) {
+      console.log("User is not admin, redirecting from admin area");
       navigate("/");
     }
-  }, [profile, isLoading, navigate]);
+  }, [isAdmin, isLoading, navigate, user]);
 
   if (isLoading) {
     return (
@@ -39,7 +31,7 @@ export const AdminLayout = () => {
     );
   }
 
-  if (profile?.role !== "admin") {
+  if (!isAdmin) {
     return null;
   }
 

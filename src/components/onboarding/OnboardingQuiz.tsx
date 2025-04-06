@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -8,6 +9,7 @@ import { ProfileTypeStep } from "./steps/ProfileTypeStep";
 import { BrandStatusStep } from "./steps/BrandStatusStep";
 import { LaunchUrgencyStep } from "./steps/LaunchUrgencyStep";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackOnboardingCompleted } from "@/lib/analytics/onboarding";
 
 type Step = {
   component: React.ComponentType<any>;
@@ -42,24 +44,65 @@ export function OnboardingQuiz() {
         return;
       }
 
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          product_interest: quizData.productCategories,
-          profile_type: quizData.profileType,
-          brand_status: quizData.brandStatus,
-          launch_urgency: quizData.launchUrgency,
-          onboarding_completed: true,
-        })
-        .eq("id", user.id);
+      // Update both database profile and user metadata for consistency
+      try {
+        // 1. Update database profile first
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({
+            product_interest: quizData.productCategories,
+            profile_type: quizData.profileType,
+            brand_status: quizData.brandStatus,
+            launch_urgency: quizData.launchUrgency,
+            onboarding_completed: true,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", user.id);
 
-      if (error) throw error;
-
-      toast.success("Profile updated successfully!");
+        if (profileError) {
+          console.error("Error updating profile:", profileError);
+          toast.error("Failed to update profile");
+        } else {
+          // 2. Update user metadata to match profile
+          const { error: metadataError } = await supabase.auth.updateUser({
+            data: { 
+              onboarding_completed: true,
+              profile_type: quizData.profileType,
+              brand_status: quizData.brandStatus,
+              launch_urgency: quizData.launchUrgency
+            }
+          });
+          
+          if (metadataError) {
+            console.error("Error updating user metadata:", metadataError);
+          }
+          
+          // Track completion event in analytics
+          if (user.id) {
+            try {
+              trackOnboardingCompleted(user.id, {
+                profile_type: quizData.profileType,
+                product_interest: quizData.productCategories,
+                brand_status: quizData.brandStatus
+              });
+            } catch (analyticsError) {
+              console.error("Error tracking onboarding completion:", analyticsError);
+            }
+          }
+          
+          toast.success("Profile updated successfully!");
+        }
+      } catch (updateError) {
+        console.error("Exception during profile update:", updateError);
+      }
+      
+      // Always navigate to the next page, even if there was an error
       navigate("/start-here");
     } catch (error: any) {
-      console.error("Error updating profile:", error);
-      toast.error(error.message || "Failed to update profile");
+      console.error("Error in handleComplete:", error);
+      toast.error(error.message || "Failed to complete onboarding");
+      // Try to navigate anyway
+      navigate("/start-here");
     }
   };
 

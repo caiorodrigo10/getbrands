@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -5,6 +6,7 @@ import { QuizNavigation } from "./QuizNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useState } from "react";
 
 interface LaunchUrgencyStepProps {
   selected: string;
@@ -20,6 +22,8 @@ export const LaunchUrgencyStep = ({
   onBack
 }: LaunchUrgencyStepProps) => {
   const { user } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const options = [
     { value: "immediate", label: "Immediately (1-2 months)" },
     { value: "soon", label: "Soon (3-6 months)" },
@@ -28,31 +32,77 @@ export const LaunchUrgencyStep = ({
 
   const handleOptionSelect = async (value: string) => {
     try {
-      if (!user?.id) {
-        throw new Error('User not authenticated');
-      }
-
       // First update local state
       onAnswer(value);
 
-      // Then update Supabase
-      const { error } = await supabase
-        .from('profiles')
-        .update({ 
-          launch_urgency: value,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
+      // Only try to update in Supabase if the user is authenticated
+      if (user?.id) {
+        const { error } = await supabase
+          .from('profiles')
+          .update({ 
+            launch_urgency: value,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
+        if (error) {
+          console.error('Supabase error:', error);
+          // Don't block the flow if there's an error in Supabase
+          console.warn('Continuing despite Supabase error');
+        } else {
+          // Only show success if there was no error
+          toast.success("Launch timeline preference saved!");
+        }
       }
-
-      toast.success("Launch timeline preference saved!");
     } catch (error: any) {
       console.error('Error updating launch urgency:', error);
-      toast.error(error.message || "Failed to save your selection. Please try again.");
+      // Don't block the flow if there's an error
+      console.warn('Continuing despite error');
+    }
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    
+    try {
+      // If we don't have a selection yet, show error
+      if (!selected) {
+        toast.error("Please select a launch timeline option");
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // Try to update both profile and user metadata for consistency
+      if (user?.id) {
+        try {
+          // Update database profile
+          await supabase
+            .from('profiles')
+            .update({ 
+              launch_urgency: selected,
+              onboarding_completed: true,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', user.id);
+            
+          // Update user metadata
+          await supabase.auth.updateUser({
+            data: { 
+              onboarding_completed: true,
+              launch_urgency: selected
+            }
+          });
+          
+        } catch (error) {
+          console.error('Error in final update:', error);
+          // Continue anyway
+        }
+      }
+      
+      // Always call onComplete regardless of errors
+      onComplete();
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -98,10 +148,10 @@ export const LaunchUrgencyStep = ({
       </RadioGroup>
 
       <QuizNavigation
-        onNext={onComplete}
+        onNext={handleSubmit}
         onBack={onBack}
         nextLabel="Complete"
-        isNextDisabled={!selected}
+        isNextDisabled={!selected || isSubmitting}
       />
     </div>
   );

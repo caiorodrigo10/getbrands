@@ -1,35 +1,63 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Coins, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useUserPermissions } from "@/lib/permissions";
 
 export const ProjectPointsInfo = () => {
   const { user } = useAuth();
+  const { isAdmin } = useUserPermissions();
   const navigate = useNavigate();
 
-  const { data: totalPoints } = useQuery({
+  const { data: totalPoints, isLoading } = useQuery({
     queryKey: ["total-project-points", user?.id],
     queryFn: async () => {
       if (!user?.id) return 0;
       
-      const { data, error } = await supabase
-        .from("projects")
-        .select("points, points_used")
-        .eq("user_id", user.id);
+      try {
+        console.log("Fetching points for user:", user?.id, "isAdmin:", isAdmin);
         
-      if (error) throw error;
-      
-      return data.reduce((total, project) => {
-        const availablePoints = (project.points || 0) - (project.points_used || 0);
-        return total + availablePoints;
-      }, 0);
+        // For admin users, we'll show a fixed sample value
+        // This is a temporary solution until we implement proper admin points
+        if (isAdmin) {
+          console.log("Admin user detected - using sample points");
+          return 2000; // Show sample points for admin
+        }
+        
+        const { data, error } = await supabase
+          .from("projects")
+          .select("*") // Select all columns to see complete project data
+          .eq("user_id", user.id);
+          
+        if (error) {
+          console.error("Error fetching project points:", error);
+          return 0;
+        }
+        
+        if (!data || data.length === 0) {
+          console.log("No projects found for user:", user.id);
+          return 0;
+        }
+        
+        console.log("Projects data:", data);
+        
+        return data.reduce((total, project) => {
+          const availablePoints = (project.points || 0) - (project.points_used || 0);
+          console.log(`Project ${project.id}: ${project.points} points, ${project.points_used} used, ${availablePoints} available`);
+          return total + availablePoints;
+        }, 0);
+      } catch (err) {
+        console.error("Unexpected error fetching points:", err);
+        return 0;
+      }
     },
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
-  if (!totalPoints) return null;
+  console.log("ProjectPointsInfo - totalPoints:", totalPoints, "isLoading:", isLoading);
 
   return (
     <div className="p-4 bg-[#fff1ed] border-t border-[#f0562e]/20">
@@ -39,7 +67,7 @@ export const ProjectPointsInfo = () => {
             <Coins className="h-4 w-4" />
             <span className="text-sm font-medium">Available Points</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{totalPoints}</p>
+          <p className="text-2xl font-bold text-gray-900">{isLoading ? "..." : totalPoints}</p>
         </div>
         
         <Button 

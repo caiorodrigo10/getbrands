@@ -1,27 +1,26 @@
+
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { PasswordChangeForm } from "@/components/profile/PasswordChangeForm";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuthWithPermissions } from "@/hooks/useAuthWithPermissions";
+import { useEffect } from "react";
 
-const Perfil = () => {
+const Profile = () => {
   const { user } = useAuth();
+  const { profile, isLoading } = useAuthWithPermissions();
 
-  const { data: profile } = useQuery({
-    queryKey: ["profile", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-      return data;
-    },
-    enabled: !!user?.id,
-  });
+  useEffect(() => {
+    console.log("Profile page - Current profile data:", {
+      profile,
+      user: user?.user_metadata,
+      isLoading
+    });
+  }, [profile, isLoading, user]);
+
+  // Safe extraction of avatar URL with proper fallbacks
+  const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url || null;
 
   return (
     <div className="container max-w-2xl mx-auto space-y-8 p-4">
@@ -41,7 +40,7 @@ const Perfil = () => {
           <Separator className="my-4" />
           <AvatarUpload 
             user={user} 
-            avatarUrl={profile?.avatar_url} 
+            avatarUrl={avatarUrl} 
             setAvatarUrl={(url) => {}} 
           />
         </div>
@@ -68,4 +67,4 @@ const Perfil = () => {
   );
 };
 
-export default Perfil;
+export default Profile;

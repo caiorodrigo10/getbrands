@@ -1,69 +1,54 @@
+
+import { useAuthWithPermissions } from "@/hooks/useAuthWithPermissions";
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 
-export type UserRole = 'admin' | 'member' | 'sampler';
-
+/**
+ * A utility hook that provides user permissions
+ * This is a wrapper around useAuthWithPermissions to standardize permission checks
+ */
 export const useUserPermissions = () => {
+  const auth = useAuthWithPermissions();
   const { user } = useAuth();
-
-  const { data: profile } = useQuery({
-    queryKey: ["user-profile", user?.id],
-    queryFn: async () => {
-      if (!user?.id) {
-        console.log("[DEBUG] No user ID found");
-        return null;
-      }
-      
-      console.log("[DEBUG] Fetching profile for user ID:", user.id);
-      
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")  // Selecting all fields to see complete profile data
-        .eq("id", user.id)
-        .single();
-      
-      if (error) {
-        console.error("[DEBUG] Error fetching profile:", error);
-        return null;
-      }
-      
-      console.log("[DEBUG] Complete profile data:", data);
-      return data;
-    },
-    enabled: !!user?.id,
-    staleTime: 0, // Disable cache to always get the latest role
-  });
-
-  const isAdmin = profile?.role === 'admin';
-  const isMember = profile?.role === 'member';
-  const isSampler = profile?.role === 'sampler';
-
-  console.log("[DEBUG] User role and permissions:", { 
-    role: profile?.role,
-    isAdmin,
-    isMember,
-    isSampler,
-    profile: profile || 'No profile found'
-  });
-
-  const hasFullAccess = isAdmin;
-  const hasLimitedAccess = isMember || isSampler;
-
+  
+  // Get role from all possible sources to ensure we don't miss any admin role
+  const profileRole = auth.profile?.role;
+  const userMetadataRole = user?.user_metadata?.role;
+  
+  // Enhanced admin check considering all potential sources
+  const isActuallyAdmin = 
+    profileRole === "admin" || 
+    userMetadataRole === "admin";
+  
+  // Debug logging for permissions with more detail
+  useEffect(() => {
+    console.log("useUserPermissions - Detailed role check:", { 
+      profileRole, 
+      userMetadataRole, 
+      isActuallyAdmin,
+      userEmail: user?.email,
+      userId: user?.id,
+      profileObj: auth.profile,
+      userMetadata: user?.user_metadata
+    });
+  }, [profileRole, userMetadataRole, auth.profile, user]);
+  
   return {
-    isAdmin,
-    isMember,
-    isSampler,
-    hasFullAccess,
-    hasLimitedAccess,
+    ...auth,
+    // Override isAdmin with our enhanced check
+    isAdmin: isActuallyAdmin
   };
 };
 
-export const RESTRICTED_ROUTES = [
-  '/projects',
-  '/products',
-];
-
-export const isRestrictedRoute = (pathname: string) => {
-  return RESTRICTED_ROUTES.some(route => pathname.startsWith(route));
+/**
+ * Gets the user role from various sources
+ * Useful for non-React components
+ */
+export const getUserRole = (profile: any, user: any = null) => {
+  if (!profile && !user) return null;
+  
+  // Check multiple sources in priority order
+  return profile?.role || 
+         user?.user_metadata?.role || 
+         null;
 };

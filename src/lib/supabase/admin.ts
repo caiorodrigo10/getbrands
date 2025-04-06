@@ -1,21 +1,28 @@
+
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 
 const supabaseUrl = "https://skrvprmnncxpkojraoem.supabase.co";
 const supabaseServiceKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrcnZwcm1ubmN4cGtvanJhb2VtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczMTUwNDI2NCwiZXhwIjoyMDQ3MDgwMjY0fQ.MeT3SqrNFjhffSm3DBMAo2TNDxlKaUT38pN9xey8oJo";
 
-// Cliente com permissões administrativas
-export const supabaseAdmin = createClient(
+// Client with admin privileges
+export const supabaseAdmin = createClient<Database>(
   supabaseUrl,
-  supabaseServiceKey
+  supabaseServiceKey,
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  }
 );
 
-// Funções auxiliares para gerenciar tabelas
+// Helper functions for managing tables
 export const supabaseUtils = {
-  // Criar novo usuário
+  // Create new user
   async createUser(email: string, password: string, userData?: any) {
     try {
-      // 1. Criar usuário no auth
+      // 1. Create user in auth
       const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
         email,
         password,
@@ -24,7 +31,7 @@ export const supabaseUtils = {
 
       if (authError) throw authError;
 
-      // 2. Se tiver dados adicionais, criar perfil do usuário
+      // 2. If additional data provided, create user profile
       if (userData && authUser.user) {
         const { error: profileError } = await supabaseAdmin
           .from('profiles')
@@ -39,79 +46,99 @@ export const supabaseUtils = {
 
       return authUser;
     } catch (error) {
-      console.error('Erro ao criar usuário:', error);
+      console.error('Error creating user:', error);
       throw error;
     }
   },
 
-  // Inserir dados em uma tabela
-  async insertData(tableName: string, data: any) {
-    const { data: result, error } = await supabaseAdmin
-      .from(tableName)
-      .insert(data)
-      .select();
-    
-    if (error) throw error;
-    return result;
+  // Insert data into a table
+  async insertData<T>(tableName: keyof Database["public"]["Tables"], data: T) {
+    try {
+      const { data: result, error } = await supabaseAdmin
+        .from(tableName)
+        .insert(data)
+        .select();
+      
+      if (error) throw error;
+      return result;
+    } catch (error) {
+      console.error(`Error inserting into ${tableName}:`, error);
+      throw error;
+    }
   },
 
-  // Atualizar dados em uma tabela
-  async updateData(tableName: string, match: Record<string, any>, data: any) {
-    const { data: result, error } = await supabaseAdmin
-      .from(tableName)
-      .update(data)
-      .match(match)
-      .select();
-    
-    if (error) throw error;
-    return result;
+  // Update data in a table
+  async updateData<T>(tableName: keyof Database["public"]["Tables"], match: Record<string, any>, data: T) {
+    try {
+      const { data: result, error } = await supabaseAdmin
+        .from(tableName)
+        .update(data)
+        .match(match)
+        .select();
+      
+      if (error) throw error;
+      return result;
+    } catch (error) {
+      console.error(`Error updating ${tableName}:`, error);
+      throw error;
+    }
   },
 
-  // Deletar dados de uma tabela
-  async deleteData(tableName: string, match: Record<string, any>) {
-    const { data, error } = await supabaseAdmin
-      .from(tableName)
-      .delete()
-      .match(match)
-      .select();
-    
-    if (error) throw error;
-    return data;
+  // Delete data from a table
+  async deleteData(tableName: keyof Database["public"]["Tables"], match: Record<string, any>) {
+    try {
+      const { data, error } = await supabaseAdmin
+        .from(tableName)
+        .delete()
+        .match(match)
+        .select();
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error(`Error deleting from ${tableName}:`, error);
+      throw error;
+    }
   },
 
-  // Buscar dados de uma tabela
-  async getData(tableName: string, query?: {
+  // Get data from a table with error handling
+  async getData(tableName: keyof Database["public"]["Tables"], query?: {
     select?: string,
     match?: Record<string, any>,
     limit?: number,
     offset?: number,
     order?: { column: string, ascending?: boolean }
   }) {
-    let request = supabaseAdmin
-      .from(tableName)
-      .select(query?.select || '*');
+    try {
+      let request = supabaseAdmin
+        .from(tableName)
+        .select(query?.select || '*');
 
-    if (query?.match) {
-      request = request.match(query.match);
+      if (query?.match) {
+        request = request.match(query.match);
+      }
+
+      if (query?.limit) {
+        request = request.limit(query.limit);
+      }
+
+      if (query?.offset) {
+        request = request.range(query.offset, query.offset + (query?.limit || 10) - 1);
+      }
+
+      if (query?.order) {
+        request = request.order(query.order.column, {
+          ascending: query.order.ascending ?? true
+        });
+      }
+
+      const { data, error } = await request;
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error(`Error getting data from ${tableName}:`, error);
+      throw error;
     }
-
-    if (query?.limit) {
-      request = request.limit(query.limit);
-    }
-
-    if (query?.offset) {
-      request = request.range(query.offset, query.offset + (query?.limit || 10) - 1);
-    }
-
-    if (query?.order) {
-      request = request.order(query.order.column, {
-        ascending: query.order.ascending ?? true
-      });
-    }
-
-    const { data, error } = await request;
-    
-    if (error) throw error;
-    return data;
   }
 };

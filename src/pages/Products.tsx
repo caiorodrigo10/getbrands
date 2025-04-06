@@ -1,6 +1,8 @@
+
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,23 +13,56 @@ import { ProductPricing } from "@/components/products/ProductPricing";
 import { ProductPriceInfo } from "@/components/products/ProductPriceInfo";
 import { ProjectProduct } from "@/types/product";
 import { useToast } from "@/components/ui/use-toast";
+import { useUserPermissions } from "@/lib/permissions";
 
 const Products = () => {
   const { user, isAuthenticated } = useAuth();
+  const { isAdmin } = useUserPermissions();
   const location = useLocation();
   const navigate = useNavigate();
   const [showConfetti, setShowConfetti] = useState(false);
   const { toast } = useToast();
 
   const { data: products, isLoading, error, refetch } = useQuery({
-    queryKey: ['my-products', user?.id],
+    queryKey: ['my-products', user?.id, isAdmin],
     queryFn: async () => {
       if (!user?.id) throw new Error('User not authenticated');
       
-      const { data, error } = await supabase
+      console.log("Fetching products for user:", user.id);
+      
+      // Com as políticas RLS configuradas, podemos usar o cliente regular
+      const client = isAdmin ? supabaseAdmin : supabase;
+      
+      const { data, error } = await client
+        .from('projects')
+        .select('id')
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error("Error fetching projects:", error);
+        toast({
+          variant: "destructive",
+          title: "Error loading projects",
+          description: error.message
+        });
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        console.log("No projects found for user:", user.id);
+        return [];
+      }
+
+      // Get project IDs to use in the next query
+      const projectIds = data.map(project => project.id);
+      
+      // Get all product selections for the user's projects
+      const { data: projectProducts, error: productsError } = await client
         .from('project_products')
         .select(`
           id,
+          project_id,
+          product_id,
           project:projects (
             id,
             name,
@@ -43,17 +78,35 @@ const Products = () => {
             selling_price
           )
         `)
-        .order('created_at', { ascending: false });
+        .in('project_id', projectIds);
 
-      if (error) {
+      if (productsError) {
+        console.error("Error fetching project products:", productsError);
         toast({
           variant: "destructive",
           title: "Error loading products",
-          description: error.message
+          description: productsError.message
         });
-        throw error;
+        throw productsError;
       }
-      return data as ProjectProduct[];
+      
+      // Transform the data to match the expected ProjectProduct structure
+      const formattedProducts = projectProducts?.map(item => {
+        // Ensure project is an object with expected properties, not an array
+        const project = Array.isArray(item.project) && item.project.length > 0 
+          ? item.project[0] 
+          : item.project || null;
+
+        return {
+          id: item.id,
+          project: project,
+          product: Array.isArray(item.product) && item.product.length > 0 ? item.product[0] : item.product,
+          specific: item.specific
+        };
+      }) || [];
+      
+      console.log("Products fetched:", formattedProducts?.length || 0);
+      return formattedProducts as ProjectProduct[];
     },
     enabled: !!user?.id && isAuthenticated,
     retry: 1,
@@ -185,7 +238,7 @@ const Products = () => {
             </Card>
           );
         })}
-        {products?.length === 0 && (
+        {(!products || products.length === 0) && (
           <div className="col-span-full text-center py-12">
             <p className="text-lg text-gray-600">No products selected yet.</p>
           </div>

@@ -1,4 +1,8 @@
+
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUserPermissions } from "@/lib/permissions";
+import { useDashboardData } from "@/hooks/useDashboardData";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Package, ArrowRight } from "lucide-react";
@@ -8,22 +12,13 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import ProjectsOverview from "@/components/dashboard/ProjectsOverview";
 import ProjectDetails from "@/components/dashboard/ProjectDetails";
 import UpcomingMeetings from "@/components/dashboard/UpcomingMeetings";
-import { useDashboardData } from "@/hooks/useDashboardData";
-import { useUserPermissions } from "@/lib/permissions";
-import { useEffect } from "react";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselPrevious,
-  CarouselNext,
-} from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { hasFullAccess } = useUserPermissions();
+  const { hasFullAccess, isAdmin, profile } = useUserPermissions();
   const {
-    profile,
+    profile: dashboardProfile,
     projects,
     meetings,
     products,
@@ -32,13 +27,23 @@ const Dashboard = () => {
     isAuthenticated,
   } = useDashboardData();
 
+  const canAccessDashboard = hasFullAccess || isAdmin === true;
+
   useEffect(() => {
-    if (!hasFullAccess) {
+    console.log("Dashboard - Checking permissions:", {
+      hasFullAccess,
+      isAdmin,
+      canAccessDashboard,
+      profileRole: profile?.role
+    });
+    
+    if (!canAccessDashboard) {
+      console.log("Redirecting: user doesn't have permission to access the Dashboard");
       navigate('/catalog');
     }
-  }, [hasFullAccess, navigate]);
+  }, [hasFullAccess, isAdmin, profile, navigate, canAccessDashboard]);
 
-  if (!isAuthenticated || !hasFullAccess) {
+  if (!isAuthenticated || !canAccessDashboard) {
     return null;
   }
 
@@ -47,21 +52,18 @@ const Dashboard = () => {
   return (
     <div className="space-y-8 animate-fade-in">
       <DashboardHeader userName={userName} />
-
+      
       <div className="grid grid-cols-12 gap-6">
-        {/* Left Column */}
         <div className="col-span-12 lg:col-span-7 space-y-6">
           <ProjectsOverview projects={projects || []} />
           <UpcomingMeetings meetings={meetings || []} />
         </div>
         
-        {/* Right Column */}
         <div className="col-span-12 lg:col-span-5">
           <ProjectDetails />
         </div>
       </div>
 
-      {/* Your Products */}
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold">Your Products</h2>
@@ -72,24 +74,29 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products?.slice(0, 3).map((item) => {
             const specificProduct = item.specific?.[0];
-            const displayProduct = {
-              ...item.product,
-              name: specificProduct?.name || item.product?.name,
-              image_url: specificProduct?.image_url || item.product?.image_url,
-              id: item.product?.id,
-            };
+            const product = item.product;
+            const projectName = item.project?.name;
+            
+            if (!product) return null;
+            
             return (
               <SimpleProductCard 
                 key={item.id} 
-                product={displayProduct}
-                projectName={item.project?.name}
+                product={product}
+                projectName={projectName}
+                clickable={false} // Set to false to make it non-clickable
               />
             );
           })}
+          
+          {(!products || products.length === 0) && (
+            <div className="col-span-full text-center py-12">
+              <p className="text-lg text-gray-600">No products selected yet.</p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Catalog Carousel */}
       <div className="overflow-hidden">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold">Featured Products</h2>
@@ -116,7 +123,6 @@ const Dashboard = () => {
         </Carousel>
       </div>
 
-      {/* Sample Requests */}
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold">Sample Requests</h2>
@@ -141,6 +147,12 @@ const Dashboard = () => {
               </div>
             </Card>
           ))}
+          
+          {(!samples || samples.length === 0) && (
+            <div className="col-span-full text-center py-12">
+              <p className="text-lg text-gray-600">No sample requests found.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,21 +1,42 @@
-import { useParams } from "react-router-dom";
+
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import { ProjectStage } from "@/components/project/ProjectStage";
 import { CalendarStage } from "@/components/project/CalendarStage";
 import { ProductSelectionStage } from "@/components/project/ProductSelectionStage";
 import { PackageDesignStage } from "@/components/project/PackageDesignStage";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserPermissions } from "@/lib/permissions";
+import { toast } from "sonner";
 
 const ProjectDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { isAdmin } = useUserPermissions();
 
-  const { data: project, isLoading } = useQuery({
-    queryKey: ["project", id],
+  console.log("ProjectDetails - User info:", { 
+    userId: user?.id,
+    projectId: id,
+    isAdmin
+  });
+
+  const { data: project, isLoading, error } = useQuery({
+    queryKey: ["project", id, isAdmin],
     queryFn: async () => {
-      const { data: projectData, error } = await supabase
+      if (!id || !user?.id) {
+        throw new Error("User ID and Project ID are required");
+      }
+      
+      console.log("Fetching project details for id:", id);
+      
+      // Choose client based on admin status
+      const client = isAdmin ? supabaseAdmin : supabase;
+      
+      const { data: projectData, error } = await client
         .from("projects")
         .select(`
           *,
@@ -31,13 +52,42 @@ const ProjectDetails = () => {
         .eq("id", id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching project details:", error);
+        throw error;
+      }
+      
       return projectData;
     },
+    enabled: !!id && !!user?.id,
+    retry: 1,
+    meta: {
+      onError: (error: any) => {
+        console.error("Error fetching project details:", error);
+        toast.error("Failed to load project details");
+        navigate("/projects");
+      }
+    }
   });
 
   if (isLoading) {
     return <div>Loading...</div>;
+  }
+  
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Project Not Found</h1>
+          <Button variant="outline" onClick={() => navigate("/projects")}>
+            Back
+          </Button>
+        </div>
+        <div className="text-red-500 p-4 border rounded-md">
+          Unable to load project details.
+        </div>
+      </div>
+    );
   }
 
   const totalPoints = project?.points || 1000;

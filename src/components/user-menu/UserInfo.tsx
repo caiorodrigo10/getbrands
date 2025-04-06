@@ -1,3 +1,4 @@
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserAvatar } from "./UserAvatar";
 
@@ -21,12 +22,14 @@ export const UserInfo = ({ isLoading, userName, userEmail, userAvatar }: UserInf
     );
   }
 
+  const displayName = userName && userName.trim() ? userName : userEmail ? userEmail.split('@')[0] : 'User';
+
   return (
     <>
-      <UserAvatar userAvatar={userAvatar} userName={userName} />
+      <UserAvatar userAvatar={userAvatar} userName={displayName} />
       <div className="flex flex-col">
-        <span className="text-sm font-medium text-black">{userName}</span>
-        <span className="text-xs text-gray-600">{userEmail}</span>
+        <span className="text-sm font-medium text-black">{displayName}</span>
+        <span className="text-xs text-gray-600">{userEmail || ''}</span>
       </div>
     </>
   );

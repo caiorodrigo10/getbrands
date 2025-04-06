@@ -1,18 +1,36 @@
+
 import { Outlet, useLocation } from "react-router-dom";
 import { NavigationMenu } from "@/components/NavigationMenu";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const AppLayout = () => {
   const location = useLocation();
+  const { user } = useAuth();
   
-  // Só usar useOnboardingStatus se não estiver em rotas específicas
-  const excludedPaths = ['/login', '/signup', '/onboarding', '/catalog', '/products'];
-  if (!excludedPaths.some(path => location.pathname.startsWith(path))) {
-    useOnboardingStatus();
-  }
+  // Create a more comprehensive exclusion list for onboarding check
+  const excludedPaths = [
+    '/login', 
+    '/signup', 
+    '/onboarding', 
+    '/catalog', 
+    '/products',
+    '/pt/onboarding',
+    '/pt/signup',
+    '/forgot-password',
+    '/reset-password'
+  ];
+  
+  // Only check onboarding when we have a user and not on excluded paths
+  const shouldCheckOnboarding = 
+    !!user && 
+    !excludedPaths.some(path => location.pathname.startsWith(path));
+  
+  // Always call the hook, but pass a flag to control its behavior
+  useOnboardingStatus(shouldCheckOnboarding);
 
   // Don't show navigation menu for onboarding and auth pages
-  const hideNav = ['/login', '/signup', '/onboarding'].includes(location.pathname);
+  const hideNav = ['/login', '/signup', '/onboarding', '/pt/onboarding', '/pt/signup'].includes(location.pathname);
 
   return (
     <div className="min-h-screen bg-background">

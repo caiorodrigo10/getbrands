@@ -1,5 +1,7 @@
+
 import { Routes, Route } from "react-router-dom";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { ProtectedRoute } from "./ProtectedRoute";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminCatalog from "@/pages/admin/AdminCatalog";
 import AdminProductCreate from "@/pages/admin/AdminProductCreate";
@@ -15,7 +17,13 @@ import AdminCoupons from "@/pages/admin/AdminCoupons";
 const AdminRoutes = () => {
   return (
     <Routes>
-      <Route element={<AdminLayout />}>
+      <Route 
+        element={
+          <ProtectedRoute requireAdmin={true}>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
         <Route index element={<AdminDashboard />} />
         <Route path="catalog" element={<AdminCatalog />} />
         <Route path="catalog/create" element={<AdminProductCreate />} />

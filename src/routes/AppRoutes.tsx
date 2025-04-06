@@ -166,7 +166,7 @@ export const AppRoutes = () => {
       
       {/* Admin Routes */}
       <Route path="/admin/*" element={
-        <ProtectedRoute>
+        <ProtectedRoute requireAdmin={true}>
           <AdminRoutes />
         </ProtectedRoute>
       } />

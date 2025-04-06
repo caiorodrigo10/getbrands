@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -13,8 +14,9 @@ import { UserInfo } from "./user-menu/UserInfo";
 import { MobileMenu } from "./user-menu/MobileMenu";
 import { MenuItems } from "./user-menu/MenuItems";
 import { useSessionManagement } from "@/hooks/useSessionManagement";
-import { useProfileManagement } from "@/hooks/useProfileManagement";
+import { useAuthWithPermissions } from "@/hooks/useAuthWithPermissions";
 import { errorMessages } from "@/utils/errorMessages";
+import { toast } from "sonner";
 
 interface UserMenuProps {
   isMobile: boolean;
@@ -27,29 +29,50 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   const { handleLogout } = useSessionManagement();
   const [isInAdminPanel, setIsInAdminPanel] = useState(location.pathname.startsWith('/admin'));
   const isPortuguese = location.pathname.startsWith('/pt');
+  const { profile, isAdmin, isLoading } = useAuthWithPermissions();
+
+  useEffect(() => {
+    console.log("UserMenu - Profile and permissions:", { 
+      profile, 
+      isAdmin, 
+      isInAdminPanel,
+      profileRole: profile?.role,
+      firstName: profile?.first_name,
+      lastName: profile?.last_name,
+      email: profile?.email,
+      fullName: `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim(),
+      userMetadata: user?.user_metadata
+    });
+  }, [profile, isAdmin, isInAdminPanel, user]);
 
   const getErrorMessage = (key: string) => {
     return errorMessages[key][isPortuguese ? 'pt' : 'en'];
   };
 
-  const { profile, isLoading } = useProfileManagement({
-    user,
-    isPortuguese,
-    getErrorMessage,
-  });
-
   if (!user) return null;
-
-  const userEmail = user.email || "";
-  const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : "";
-  const userAvatar = profile?.avatar_url;
-  const isAdmin = profile?.role === "admin";
+  
+  // Enhanced logic to get the most reliable user information
+  const userEmail = profile?.email || user.email || "";
+  
+  // Get name fields from profile with fallbacks
+  const firstName = profile?.first_name || user.user_metadata?.first_name || "";
+  const lastName = profile?.last_name || user.user_metadata?.last_name || "";
+  
+  // Create display name with priority order and fallbacks
+  const userName = firstName || lastName 
+    ? `${firstName} ${lastName}`.trim() 
+    : userEmail.split('@')[0];
+  
+  // Use profile avatar URL with fallback to user metadata
+  const userAvatar = profile?.avatar_url || user.user_metadata?.avatar_url || "";
 
   const handleAdminNavigation = () => {
     if (isInAdminPanel) {
-      navigate('/dashboard');
+      navigate('/catalog');
+      toast.success(isPortuguese ? "Voltou para visão de usuário" : "Switched to user view");
     } else {
       navigate('/admin');
+      toast.success(isPortuguese ? "Alterado para visão de admin" : "Switched to admin view");
     }
     setIsInAdminPanel(!isInAdminPanel);
   };

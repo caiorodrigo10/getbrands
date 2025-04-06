@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -28,23 +29,25 @@ export const LaunchUrgencyStepPT = ({
 
   const options = [
     { value: "immediate", label: "Imediatamente (1-2 meses)" },
-    { value: "next_month", label: "Em breve (3-6 meses)" },
+    { value: "soon", label: "Em breve (3-6 meses)" },
     { value: "next_quarter", label: "Fase de Planejamento (6+ meses)" },
     { value: "no_rush", label: "Apenas explorando" }
   ];
 
   const handleOptionSelect = async (value: string) => {
     try {
+      // Sempre atualiza o estado local primeiro
+      onAnswer(value);
+      
+      // Se não estiver logado, apenas continua o fluxo
       if (!user?.id) {
-        onAnswer(value);
         if (showNextButton) {
           onNext();
         }
         return;
       }
 
-      onAnswer(value);
-
+      // Tenta atualizar no Supabase se o usuário estiver autenticado
       const { error } = await supabase
         .from('profiles')
         .update({ 
@@ -55,17 +58,24 @@ export const LaunchUrgencyStepPT = ({
 
       if (error) {
         console.error('Erro Supabase:', error);
-        throw error;
+        // Não impede o fluxo se houver erro
+        console.warn('Continuando apesar do erro no Supabase');
+      } else {
+        toast.success("Preferência de lançamento salva!");
       }
-
-      toast.success("Preferência de lançamento salva!");
       
+      // Avança ao próximo passo se necessário
       if (showNextButton) {
         onNext();
       }
     } catch (error: any) {
       console.error('Erro ao atualizar urgência de lançamento:', error);
-      toast.error(error.message || "Falha ao salvar sua seleção. Por favor, tente novamente.");
+      // Não impedir o fluxo se houver erro
+      console.warn('Continuando apesar do erro');
+      
+      if (showNextButton) {
+        onNext();
+      }
     }
   };
 

@@ -1,255 +1,150 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Input } from "@/components/ui/input";
 import AdminOrdersTable from "@/components/admin/orders/AdminOrdersTable";
-import { Skeleton } from "@/components/ui/skeleton";
-import OrderStatusFilters from "@/components/sample-orders/OrderStatusFilters";
-import { 
-  Pagination, 
-  PaginationContent, 
-  PaginationItem, 
-  PaginationLink, 
-  PaginationNext, 
-  PaginationPrevious 
-} from "@/components/ui/pagination";
-
-const ITEMS_PER_PAGE = 10;
-
-// Define interfaces for type safety
-interface OrderProduct {
-  id?: string;
-  sample_request_id: string;
-  product_id: string;
-  quantity: number;
-  unit_price: number;
-  product: {
-    id: string;
-    name: string;
-    image_url: string | null;
-    from_price?: number;
-  };
-}
-
-interface OrderCustomer {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-}
-
-interface Order {
-  id: string;
-  created_at: string;
-  status: string;
-  shipping_address?: string;
-  shipping_city?: string;
-  shipping_state?: string;
-  shipping_zip?: string;
-  tracking_number?: string | null;
-  first_name?: string;
-  last_name?: string;
-  customer?: OrderCustomer;
-  total?: number;
-  subtotal?: number;
-  shipping_cost?: number;
-  total_items?: number;
-  products?: OrderProduct[];
-}
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Search, Users } from "lucide-react";
+import AdminPagination from "@/components/admin/AdminPagination";
 
 const AdminOrders = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("all");
-  const [showOnHold, setShowOnHold] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentTab, setCurrentTab] = useState("all");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  
+  const handleTabChange = (value: string) => {
+    setCurrentTab(value);
+    setPage(1);
+  };
 
-  const { data: ordersData, isLoading } = useQuery({
-    queryKey: ["admin-orders", selectedStatus, currentPage],
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-orders", currentTab, searchTerm, page, pageSize],
     queryFn: async () => {
-      try {
-        // Get orders with customer info
-        const { data: orders, error, count } = await supabase
-          .from("sample_requests")
-          .select(`
-            *,
-            customer:profiles(id, first_name, last_name, email)
-          `, { count: 'exact' })
-          .eq(selectedStatus !== "all" ? 'status' : 'id', selectedStatus !== "all" ? selectedStatus : 'id')
-          .order('created_at', { ascending: false })
-          .range((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE - 1);
+      // Calculate the range for pagination
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
 
-        if (error) throw error;
-        
-        console.log("Fetched admin orders data:", orders);
-
-        if (orders && orders.length > 0) {
-          const orderIds = orders.map(order => order.id);
-          
-          // Count items per order - fixed query syntax
-          const { data: itemCounts, error: countError } = await supabase
-            .from('sample_request_products')
-            .select('sample_request_id, count(*)')
-            .in('sample_request_id', orderIds)
-            .groupBy('sample_request_id');
-            
-          if (countError) throw countError;
-          console.log("Item counts:", itemCounts);
-          
-          // Create a map of order ID to item count
-          const itemCountMap: Record<string, number> = {};
-          itemCounts?.forEach((item: any) => {
-            itemCountMap[item.sample_request_id] = parseInt(item.count, 10);
-          });
-          
-          // Add item count to each order
-          const ordersWithTotalItems = orders.map(order => ({
-            ...order,
-            total_items: itemCountMap[order.id] || 0,
-          }));
-          
-          // Get all products for these orders
-          const { data: orderProducts, error: productsError } = await supabase
-            .from('sample_request_products')
-            .select(`
-              id,
-              sample_request_id,
-              product_id,
-              quantity,
-              unit_price,
-              product:products(*)
-            `)
-            .in('sample_request_id', orderIds);
-            
-          if (productsError) throw productsError;
-          
-          console.log("Order products data:", orderProducts);
-          
-          // Group products by order ID
-          const orderProductsMap: Record<string, OrderProduct[]> = {};
-          orderProducts?.forEach((item: any) => {
-            if (!orderProductsMap[item.sample_request_id]) {
-              orderProductsMap[item.sample_request_id] = [];
-            }
-            orderProductsMap[item.sample_request_id].push(item);
-          });
-          
-          // Add products to each order
-          const ordersWithProducts = ordersWithTotalItems.map(order => ({
-            ...order,
-            products: orderProductsMap[order.id] || [],
-          }));
-
-          return {
-            data: ordersWithProducts,
-            totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE),
-            totalCount: count || 0,
-            currentPage
-          };
-        }
-
-        return {
-          data: orders as Order[],
-          totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE),
-          totalCount: count || 0,
-          currentPage
-        };
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-        throw error;
+      // Build query based on filter criteria
+      let query = supabase
+        .from("sample_requests")
+        .select(`
+          *,
+          profile:profiles(first_name, last_name, email),
+          product:products(*),
+          items:sample_request_products(
+            id, 
+            quantity, 
+            unit_price,
+            product:products(*)
+          )
+        `, { count: 'exact' });
+      
+      // Apply filters
+      if (currentTab !== "all") {
+        query = query.eq("status", currentTab);
       }
-    }
+      
+      if (searchTerm) {
+        query = query.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,profiles.email.ilike.%${searchTerm}%`);
+      }
+      
+      // Apply pagination
+      const { data: orders, error, count } = await query
+        .order('created_at', { ascending: false })
+        .range(from, to);
+
+      if (error) throw error;
+
+      return {
+        orders: orders || [],
+        totalOrders: count || 0,
+        pageCount: Math.ceil((count || 0) / pageSize)
+      };
+    },
   });
 
-  const filteredOrders = ordersData?.data?.filter(order => {
-    if (!searchTerm) return true;
-    
-    const searchLower = searchTerm.toLowerCase();
-    const customerName = `${order.customer?.first_name} ${order.customer?.last_name}`.toLowerCase();
-    const orderId = `SPL${order.id.slice(0, 6)}`.toLowerCase();
-    const customerEmail = order.customer?.email?.toLowerCase() || '';
-    
-    return customerName.includes(searchLower) || 
-           orderId.includes(searchLower) ||
-           customerEmail.includes(searchLower);
-  });
-
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-64" />
-          <Skeleton className="h-4 w-96" />
-        </div>
-        <Skeleton className="h-[400px] w-full" />
-      </div>
-    );
-  }
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPage(1); // Reset to first page on new search
+  };
+  
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
 
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Orders Management</h1>
-        <p className="text-muted-foreground mt-2">
-          View and manage all customer sample orders
-        </p>
-      </div>
-
-      <div className="space-y-4">
-        <OrderStatusFilters
-          selectedStatus={selectedStatus}
-          setSelectedStatus={setSelectedStatus}
-          showOnHold={showOnHold}
-          setShowOnHold={setShowOnHold}
-        />
-
-        <div className="flex justify-between items-center">
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <h1 className="text-3xl font-bold">Orders</h1>
+        <form 
+          onSubmit={handleSearch}
+          className="relative w-full md:w-auto"
+        >
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by customer name, email or order number..."
-            className="max-w-md"
+            placeholder="Search orders..."
+            className="pl-9 w-full md:w-[300px]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-        </div>
+        </form>
       </div>
 
-      <AdminOrdersTable 
-        orders={filteredOrders || []} 
-        totalOrders={ordersData?.totalCount}
-      />
-
-      {ordersData?.totalPages && ordersData.totalPages > 1 && (
-        <div className="flex justify-center mt-6">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                />
-              </PaginationItem>
-              
-              {Array.from({ length: ordersData.totalPages }, (_, i) => i + 1).map((page) => (
-                <PaginationItem key={page}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(page)}
-                    isActive={currentPage === page}
-                    className="cursor-pointer"
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => setCurrentPage(Math.min(ordersData.totalPages, currentPage + 1))}
-                  className={currentPage === ordersData.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+      <Tabs value={currentTab} onValueChange={handleTabChange}>
+        <div className="flex flex-col sm:flex-row justify-between">
+          <TabsList className="mb-4 sm:mb-0">
+            <TabsTrigger value="all">All Orders</TabsTrigger>
+            <TabsTrigger value="pending">Pending</TabsTrigger>
+            <TabsTrigger value="processing">Processing</TabsTrigger>
+            <TabsTrigger value="shipped">Shipped</TabsTrigger>
+            <TabsTrigger value="delivered">Delivered</TabsTrigger>
+            <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
+          </TabsList>
         </div>
-      )}
+
+        <TabsContent value={currentTab} className="mt-4">
+          <Card>
+            <CardHeader className="px-6 pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Users className="h-5 w-5 text-muted-foreground" />
+                {isLoading 
+                  ? "Loading orders..." 
+                  : `${data?.totalOrders || 0} ${currentTab === 'all' ? 'Total' : currentTab} Orders`
+                }
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {isLoading ? (
+                <div className="flex items-center justify-center p-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : (
+                <>
+                  <AdminOrdersTable 
+                    orders={data?.orders || []} 
+                    totalOrders={data?.totalOrders || 0}
+                  />
+                  {data?.pageCount && data.pageCount > 1 && (
+                    <div className="px-6">
+                      <AdminPagination
+                        page={page}
+                        pageCount={data?.pageCount || 1}
+                        pageSize={pageSize}
+                        setPageSize={setPageSize}
+                        onPageChange={handlePageChange}
+                        totalItems={data?.totalOrders || 0}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
