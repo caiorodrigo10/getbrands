@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,8 +43,7 @@ const Products = () => {
             images,
             selling_price
           )
-        `)
-        .order('created_at', { ascending: false });
+        `);
 
       if (error) {
         toast({
@@ -53,6 +53,8 @@ const Products = () => {
         });
         throw error;
       }
+      
+      console.log("Products fetched:", data);
       return data as ProjectProduct[];
     },
     enabled: !!user?.id && isAuthenticated,
@@ -185,7 +187,7 @@ const Products = () => {
             </Card>
           );
         })}
-        {products?.length === 0 && (
+        {(!products || products.length === 0) && (
           <div className="col-span-full text-center py-12">
             <p className="text-lg text-gray-600">No products selected yet.</p>
           </div>

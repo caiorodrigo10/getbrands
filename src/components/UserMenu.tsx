@@ -53,6 +53,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
     ? `${firstName} ${lastName}`.trim() 
     : userEmail.split('@')[0];
   
+  // Handle both profile and user_metadata as potential sources of avatar URL
   const userAvatar = profile?.avatar_url || user?.user_metadata?.avatar_url;
 
   const handleAdminNavigation = () => {

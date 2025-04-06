@@ -30,7 +30,9 @@ export const useAuthWithPermissions = () => {
               role: user.user_metadata.role || 'member',
               email: user.email,
               first_name: user.user_metadata.first_name,
-              last_name: user.user_metadata.last_name
+              last_name: user.user_metadata.last_name,
+              avatar_url: user.user_metadata.avatar_url,
+              onboarding_completed: user.user_metadata.onboarding_completed || false
             };
           }
           return null;

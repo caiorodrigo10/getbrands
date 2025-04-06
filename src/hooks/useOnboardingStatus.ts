@@ -22,8 +22,13 @@ export const useOnboardingStatus = () => {
       if (profile) {
         console.log('[DEBUG] useOnboardingStatus - Using cached profile:', profile);
         
+        // Check for onboarding_completed in both profile and user metadata
+        const onboardingCompleted = 
+          profile.onboarding_completed === true || 
+          user?.user_metadata?.onboarding_completed === true;
+        
         // Don't redirect if onboarding is completed or user is admin
-        if (profile.onboarding_completed || isAdmin) return;
+        if (onboardingCompleted || isAdmin) return;
         
         // List of routes that don't require onboarding redirection
         const excludedPaths = [
@@ -63,8 +68,13 @@ export const useOnboardingStatus = () => {
 
         console.log('[DEBUG] useOnboardingStatus - Profile:', profile, 'Current path:', window.location.pathname);
         
+        // Check for onboarding_completed in both profile and user metadata
+        const onboardingCompleted = 
+          profile?.onboarding_completed === true || 
+          user?.user_metadata?.onboarding_completed === true;
+          
         // Don't redirect if onboarding is completed or user is admin
-        if (profile?.onboarding_completed || profile?.role === 'admin') return;
+        if (onboardingCompleted || profile?.role === 'admin') return;
 
         // List of routes that don't require onboarding redirection
         const excludedPaths = [
