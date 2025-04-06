@@ -17,80 +17,63 @@ export const useAuthWithPermissions = () => {
       try {
         console.log("Fetching profile for user:", user.id);
         
-        // Always use supabaseAdmin to prevent RLS issues with profiles
-        // This ensures we bypass any problematic RLS policies
-        const { data, error } = await supabaseAdmin
+        // Primeiro tentamos com o cliente regular
+        const { data, error } = await supabase
           .from("profiles")
           .select("*")
           .eq("id", user.id)
           .single();
 
         if (error) {
-          console.error("Error fetching profile with admin client:", error);
-          // Still return at least some basic profile info from auth user metadata
-          if (user.user_metadata) {
-            // Create a complete profile from user metadata with COMPLETE TYPE SHAPE
-            return {
-              id: user.id,
-              email: user.email || '',
-              role: user.user_metadata.role || 'member',
-              first_name: user.user_metadata.first_name || '',
-              last_name: user.user_metadata.last_name || '',
-              avatar_url: user.user_metadata.avatar_url || null,
-              onboarding_completed: user.user_metadata.onboarding_completed || false,
-              phone: null,
-              shipping_address_street: null,
-              shipping_address_street2: null,
-              shipping_address_city: null,
-              shipping_address_state: null,
-              shipping_address_zip: null,
-              billing_address_street: null,
-              billing_address_street2: null,
-              billing_city: null,
-              billing_state: null,
-              billing_zip: null,
-              instagram_handle: null,
-              product_interest: null,
-              profile_type: null,
-              brand_status: null,
-              launch_urgency: null,
-              language: 'en'
-            } as ProfileType;
+          console.error("Error fetching profile with regular client, trying admin client:", error);
+          
+          // Se falhar, tentamos com o cliente admin
+          const { data: adminData, error: adminError } = await supabaseAdmin
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .single();
+            
+          if (adminError) {
+            console.error("Error fetching profile with admin client:", adminError);
+            // Still return at least some basic profile info from auth user metadata
+            if (user.user_metadata) {
+              // Create a complete profile from user metadata with COMPLETE TYPE SHAPE
+              return {
+                id: user.id,
+                email: user.email || '',
+                role: user.user_metadata.role || 'member',
+                first_name: user.user_metadata.first_name || '',
+                last_name: user.user_metadata.last_name || '',
+                avatar_url: user.user_metadata.avatar_url || null,
+                onboarding_completed: user.user_metadata.onboarding_completed || false,
+                phone: null,
+                shipping_address_street: null,
+                shipping_address_street2: null,
+                shipping_address_city: null,
+                shipping_address_state: null,
+                shipping_address_zip: null,
+                billing_address_street: null,
+                billing_address_street2: null,
+                billing_city: null,
+                billing_state: null,
+                billing_zip: null,
+                instagram_handle: null,
+                product_interest: null,
+                profile_type: null,
+                brand_status: null,
+                launch_urgency: null,
+                language: 'en'
+              } as ProfileType;
+            }
+            return null;
           }
-          return null;
+          
+          return adminData as ProfileType;
         }
 
         console.log("Profile data from useAuthWithPermissions:", data);
-        
-        // Create a complete profile object with fallbacks to user metadata
-        const completeProfile: ProfileType = {
-          id: data.id || user.id,
-          email: data.email || user.email || '',
-          role: data.role || user.user_metadata?.role || 'member',
-          first_name: data.first_name || user.user_metadata?.first_name || '',
-          last_name: data.last_name || user.user_metadata?.last_name || '',
-          avatar_url: data.avatar_url || user.user_metadata?.avatar_url || null,
-          onboarding_completed: data.onboarding_completed || user.user_metadata?.onboarding_completed || false,
-          phone: data.phone || null,
-          shipping_address_street: data.shipping_address_street || null,
-          shipping_address_street2: data.shipping_address_street2 || null,
-          shipping_address_city: data.shipping_address_city || null,
-          shipping_address_state: data.shipping_address_state || null,
-          shipping_address_zip: data.shipping_address_zip || null,
-          billing_address_street: data.billing_address_street || null,
-          billing_address_street2: data.billing_address_street2 || null,
-          billing_city: data.billing_city || null,
-          billing_state: data.billing_state || null,
-          billing_zip: data.billing_zip || null,
-          instagram_handle: data.instagram_handle || null,
-          product_interest: data.product_interest || null,
-          profile_type: data.profile_type || null,
-          brand_status: data.brand_status || null,
-          launch_urgency: data.launch_urgency || null,
-          language: data.language || 'en'
-        };
-        
-        return completeProfile;
+        return data as ProfileType;
       } catch (err) {
         console.error("Unexpected error in useAuthWithPermissions:", err);
         // Create a complete profile from user metadata as fallback

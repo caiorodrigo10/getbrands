@@ -1,6 +1,8 @@
+
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ProjectStage } from "@/components/project/ProjectStage";
@@ -28,7 +30,10 @@ const ProjectDetails = () => {
     queryFn: async () => {
       console.log("Fetching project with client:", isAdmin ? "admin" : "regular");
       
-      const { data: projectData, error } = await supabase
+      // Utilizar o cliente correto baseado na permissão do usuário
+      const client = isAdmin ? supabaseAdmin : supabase;
+      
+      const { data: projectData, error } = await client
         .from("projects")
         .select(`
           *,
