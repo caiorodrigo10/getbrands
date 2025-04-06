@@ -62,11 +62,14 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
       .order("created_at", { ascending: false });
 
     if (error) {
+      console.error("Error fetching products:", error);
       throw error;
     }
 
     const totalCount = count || 0;
     const hasNextPage = from + limit < totalCount;
+
+    console.log(`Fetched ${data?.length || 0} products, totalCount: ${totalCount}, hasNextPage: ${hasNextPage}`);
 
     return {
       data: data as Product[],

@@ -1,25 +1,26 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client"; 
+import { useUserPermissions } from "@/lib/permissions";
 import { useCart } from "@/contexts/CartContext";
 import { trackEvent } from "@/lib/analytics";
-import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
-import { useUserPermissions } from "@/lib/permissions";
-import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
 
 export const useProductActions = (productId: string) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { addItem, loadCartItems } = useCart();
-  const { user } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
-  const { hasFullAccess, isAdmin } = useUserPermissions();
+  const { user } = useAuth();
+  const { isAdmin } = useUserPermissions();
+  const { addItem, loadCartItems } = useCart();
 
-  // Debug log to help trace permission issues
-  console.log("useProductActions - Permissions check:", { 
-    productId, 
-    hasFullAccess, 
-    isAdmin, 
+  // Debug log to track admin status and product ID
+  console.log("useProductActions - Status check:", {
+    productId,
+    isAdmin,
     userId: user?.id
   });
 
@@ -27,33 +28,62 @@ export const useProductActions = (productId: string) => {
     try {
       setIsLoading(true);
       
+      if (!user) {
+        toast({
+          title: "Login Required",
+          description: "Please log in to request samples.",
+        });
+        navigate("/login");
+        return false;
+      }
+
+      console.log("Requesting sample for product ID:", productId);
+      
       // Fetch product data first
-      const { data: product, error } = await supabase
+      const { data: product, error: productError } = await supabase
         .from('products')
         .select('*')
         .eq('id', productId)
         .single();
         
-      if (error) throw error;
+      if (productError) {
+        console.error("Error fetching product:", productError);
+        throw productError;
+      }
       
+      if (!product) {
+        throw new Error("Product not found");
+      }
+
+      console.log("Found product:", product);
+      
+      // Add the product to cart using the CartContext
       await addItem(product as Product);
-      await loadCartItems(); // Reload cart items after adding
+      
+      // Reload cart items to ensure UI is updated
+      await loadCartItems();
       
       // Track sample request event
       trackEvent("Sample Requested", {
-        product_id: productId
+        product_id: productId,
+        product_name: product.name
       });
 
-      // Return true to indicate success
+      // Success message
+      toast({
+        title: "Sample Added",
+        description: `${product.name} has been added to your cart.`,
+      });
+      
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error requesting sample:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to add sample to cart. Please try again."
+        description: error.message || "Failed to add sample to cart. Please try again."
       });
-      throw error;
+      return false;
     } finally {
       setIsLoading(false);
     }

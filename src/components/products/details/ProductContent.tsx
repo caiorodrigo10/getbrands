@@ -1,8 +1,10 @@
+
 import { Product, ProductImage } from "@/types/product";
 import { ProductHeader } from "../ProductHeader";
 import { ProductBenefits } from "../ProductBenefits";
 import { ProductCalculator } from "../ProductCalculator";
 import ProjectSelectionDialog from "@/components/dialogs/ProjectSelectionDialog";
+import { useEffect } from "react";
 
 interface ProductContentProps {
   product: Product;
@@ -21,6 +23,15 @@ export const ProductContent = ({
   handleSelectProduct,
   projects
 }: ProductContentProps) => {
+  
+  // Add a debug log to track product data
+  useEffect(() => {
+    console.log("ProductContent rendering with product:", {
+      id: product.id,
+      name: product.name
+    });
+  }, [product]);
+
   return (
     <>
       <ProductHeader 

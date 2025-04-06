@@ -35,8 +35,10 @@ export const ProductActions = ({ productId, onSelectProduct, showNotification = 
 
   const handleOrderSample = async () => {
     try {
+      console.log("Order Sample button clicked for product:", productId);
       const success = await handleRequestSample();
       if (success) {
+        console.log("Sample added successfully, navigating to checkout");
         // Add a small delay to ensure cart state is updated
         setTimeout(() => {
           navigate("/checkout/confirmation", { replace: true });
