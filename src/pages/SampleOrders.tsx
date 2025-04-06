@@ -36,13 +36,15 @@ const SampleOrders = () => {
         .from("sample_requests")
         .select(`
           *,
-          products:sample_request_products (
+          products:sample_request_products(
+            id,
             quantity,
             unit_price,
-            product:products (
+            product:products(
               id,
               name,
-              image_url
+              image_url,
+              from_price
             )
           )
         `, { count: 'exact' })
@@ -68,21 +70,22 @@ const SampleOrders = () => {
         throw error;
       }
 
-      // Process data to ensure products are correctly formatted
+      // Process data to ensure products are correctly formatted and log for debugging
       const processedData = data.map(order => {
-        // Log raw order data for debugging
-        console.log("Raw order data:", order);
+        console.log(`Order ${order.id} raw data:`, order);
         
         // Ensure products is an array
-        const products = Array.isArray(order.products) ? order.products : [];
+        const products = Array.isArray(order.products) 
+          ? order.products.filter(item => item && item.product)
+          : [];
+        
+        console.log(`Order ${order.id} processed products:`, products);
         
         return {
           ...order,
           products
         };
       });
-
-      console.log("Processed orders data:", processedData);
 
       return {
         data: processedData,

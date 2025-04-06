@@ -4,6 +4,7 @@ import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { AdminNavigationMenu } from "./AdminNavigationMenu";
 import { useUserPermissions } from "@/lib/permissions";
+import { toast } from "sonner";
 
 export const AdminLayout = () => {
   const navigate = useNavigate();
@@ -14,15 +15,21 @@ export const AdminLayout = () => {
     // Enhanced debugging for admin access
     console.log("AdminLayout - Access check:", {
       isAdmin, 
+      user: user?.id,
       email: user?.email,
+      metadataRole: user?.user_metadata?.role,
+      currentPath: window.location.pathname
     });
     
-    if (!isLoading && !isAdmin) {
+    // Only redirect if explicitly not admin - don't redirect during loading
+    if (!isLoading && isAdmin === false) {
       console.log("User is not admin, redirecting from admin area");
-      navigate("/");
+      toast.error("Access denied: You need administrator privileges to access this page");
+      navigate("/catalog");
     }
   }, [isAdmin, isLoading, navigate, user]);
 
+  // Show loading state while checking permissions
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -31,7 +38,8 @@ export const AdminLayout = () => {
     );
   }
 
-  if (!isAdmin) {
+  // Skip rendering if not admin (prevent flash)
+  if (isAdmin === false) {
     return null;
   }
 

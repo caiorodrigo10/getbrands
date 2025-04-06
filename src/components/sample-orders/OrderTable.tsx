@@ -19,9 +19,6 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
-  // Log the orders data structure for debugging
-  console.log("Orders data in OrderTable:", orders);
-
   const toggleOrderExpansion = (orderId: string) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
   };
@@ -44,13 +41,24 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
           </TableHeader>
           <TableBody>
             {orders?.map((order) => {
-              // Ensure products array is properly formatted
-              const products = order.products || [];
+              // Ensure products array is properly structured
+              const products = Array.isArray(order.products) ? order.products : [];
+              
+              // Calculate the total items quantity
+              const totalItems = products.reduce(
+                (sum, item) => sum + (parseInt(item.quantity) || 1), 
+                0
+              );
+              
               const subtotal = calculateOrderSubtotal(products);
               const total = subtotal + (order.shipping_cost || 0);
-
-              // Log each order's products for debugging
-              console.log(`Order ${order.id} products:`, products);
+              
+              console.log(`OrderTable - Order ${order.id}:`, { 
+                productsCount: products.length,
+                totalItems,
+                subtotal,
+                total
+              });
 
               return (
                 <>
@@ -83,7 +91,7 @@ const OrderTable = ({ orders, onOrdersChange }: OrderTableProps) => {
                         minute: "2-digit",
                       })}
                     </TableCell>
-                    <TableCell className="whitespace-nowrap">{products.length || 0} items</TableCell>
+                    <TableCell className="whitespace-nowrap">{totalItems} items</TableCell>
                     <TableCell>
                       {order.tracking_number ? (
                         <div className="flex items-center gap-2 whitespace-nowrap">

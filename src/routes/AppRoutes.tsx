@@ -39,9 +39,17 @@ export const AppRoutes = () => {
     console.log('[DEBUG] AppRoutes - Current location:', location.pathname);
   }, [location]);
 
+  // The admin routes need to be defined before the user routes to prevent conflicts
   return (
     <Routes>
-      {/* Root Route */}
+      {/* Admin Routes - Place these first to have priority */}
+      <Route path="/admin/*" element={
+        <ProtectedRoute requireAdmin={true}>
+          <AdminRoutes />
+        </ProtectedRoute>
+      } />
+
+      {/* Root Route and User Routes */}
       <Route element={<AppLayout />}>
         <Route path="/" element={
           <ProtectedRoute>
@@ -164,13 +172,6 @@ export const AppRoutes = () => {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/onboarding" element={<OnboardingQuizPage />} />
       
-      {/* Admin Routes */}
-      <Route path="/admin/*" element={
-        <ProtectedRoute requireAdmin={true}>
-          <AdminRoutes />
-        </ProtectedRoute>
-      } />
-
       {/* Standalone Checkout Routes */}
       <Route path="/checkout/*" element={
         <ProtectedRoute>

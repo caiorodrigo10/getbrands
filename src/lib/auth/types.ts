@@ -36,3 +36,6 @@ export interface AuthContextType {
   logout: () => Promise<void>;
   isAuthenticated: boolean;
 }
+
+// Define a type for user roles for better type safety throughout the application
+export type UserRole = 'admin' | 'member' | 'sampler' | 'customer';

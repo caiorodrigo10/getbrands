@@ -23,10 +23,11 @@ export function ProtectedRoute({
       console.log("ProtectedRoute - Admin access check:", {
         isAdmin,
         path: location.pathname,
-        userEmail: user?.email
+        userEmail: user?.email,
+        isLoading
       });
     }
-  }, [isAuthenticated, requireAdmin, isAdmin, user, location.pathname]);
+  }, [isAuthenticated, requireAdmin, isAdmin, user, location.pathname, isLoading]);
 
   if (isLoading) {
     return (
@@ -40,7 +41,8 @@ export function ProtectedRoute({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
-  if (requireAdmin && !isAdmin) {
+  // Only redirect if explicitly not admin and admin is required
+  if (requireAdmin && isAdmin === false) {
     console.error("Access denied: user is not admin", {
       path: location.pathname,
       email: user?.email

@@ -2,18 +2,21 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import AdminOrdersTable from "@/components/admin/orders/AdminOrdersTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Search, Users } from "lucide-react";
 import AdminPagination from "@/components/admin/AdminPagination";
+import { useUserPermissions } from "@/lib/permissions";
 
 const AdminOrders = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentTab, setCurrentTab] = useState("all");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const { isAdmin } = useUserPermissions();
   
   const handleTabChange = (value: string) => {
     setCurrentTab(value);
@@ -21,49 +24,80 @@ const AdminOrders = () => {
   };
 
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-orders", currentTab, searchTerm, page, pageSize],
+    queryKey: ["admin-orders", currentTab, searchTerm, page, pageSize, isAdmin],
     queryFn: async () => {
+      if (!isAdmin) {
+        console.error("Unauthorized access to admin orders");
+        return { orders: [], totalOrders: 0, pageCount: 0 };
+      }
+
       // Calculate the range for pagination
       const from = (page - 1) * pageSize;
       const to = from + pageSize - 1;
 
-      // Build query based on filter criteria
-      let query = supabase
-        .from("sample_requests")
-        .select(`
-          *,
-          profile:profiles(first_name, last_name, email),
-          product:products(*),
-          items:sample_request_products(
-            id, 
-            quantity, 
-            unit_price,
-            product:products(*)
-          )
-        `, { count: 'exact' });
-      
-      // Apply filters
-      if (currentTab !== "all") {
-        query = query.eq("status", currentTab);
-      }
-      
-      if (searchTerm) {
-        query = query.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,profiles.email.ilike.%${searchTerm}%`);
-      }
-      
-      // Apply pagination
-      const { data: orders, error, count } = await query
-        .order('created_at', { ascending: false })
-        .range(from, to);
+      console.log("Fetching admin orders with:", { currentTab, searchTerm, page, from, to });
 
-      if (error) throw error;
+      try {
+        // Use supabaseAdmin for admin operations
+        let query = supabaseAdmin
+          .from("sample_requests")
+          .select(`
+            *,
+            profile:profiles(first_name, last_name, email),
+            products:sample_request_products(
+              id, 
+              quantity, 
+              unit_price,
+              product:products(
+                id,
+                name,
+                from_price,
+                image_url
+              )
+            )
+          `, { count: 'exact' });
+        
+        // Apply filters
+        if (currentTab !== "all") {
+          query = query.eq("status", currentTab);
+        }
+        
+        if (searchTerm) {
+          query = query.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,profiles.email.ilike.%${searchTerm}%`);
+        }
+        
+        // Apply pagination
+        const { data: orders, error, count } = await query
+          .order('created_at', { ascending: false })
+          .range(from, to);
 
-      return {
-        orders: orders || [],
-        totalOrders: count || 0,
-        pageCount: Math.ceil((count || 0) / pageSize)
-      };
+        if (error) {
+          console.error("Error fetching admin orders:", error);
+          throw error;
+        }
+
+        // Log the structure of the first order to help debug
+        if (orders && orders.length > 0) {
+          console.log("Sample order structure:", {
+            id: orders[0].id,
+            productCount: orders[0].products?.length || 0,
+            firstProduct: orders[0].products?.[0] || 'No products'
+          });
+        }
+        
+        console.log("Admin orders fetched successfully:", { count, resultsLength: orders?.length });
+        
+        return {
+          orders: orders || [],
+          totalOrders: count || 0,
+          pageCount: Math.ceil((count || 0) / pageSize)
+        };
+      } catch (err) {
+        console.error("Unexpected error in admin orders query:", err);
+        return { orders: [], totalOrders: 0, pageCount: 0 };
+      }
     },
+    enabled: !!isAdmin,
   });
 
   const handleSearch = (e: React.FormEvent) => {

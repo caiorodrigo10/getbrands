@@ -5,13 +5,15 @@ import { Card } from "@/components/ui/card";
 import { calculateOrderSubtotal } from "@/lib/orderCalculations";
 
 interface OrderProduct {
+  id?: string;
+  quantity: number;
+  unit_price: number;
   product: {
     id: string;
     name: string;
     image_url: string | null;
+    from_price?: number;
   };
-  quantity: number;
-  unit_price: number;
 }
 
 interface OrderExpandedDetailsProps {
@@ -21,7 +23,7 @@ interface OrderExpandedDetailsProps {
     shipping_city: string;
     shipping_state: string;
     shipping_zip: string;
-    products: OrderProduct[];
+    products?: OrderProduct[] | null;
     tracking_number?: string | null;
     first_name?: string;
     last_name?: string;
@@ -33,12 +35,24 @@ interface OrderExpandedDetailsProps {
 }
 
 const OrderExpandedDetails = ({ order }: OrderExpandedDetailsProps) => {
-  const subtotal = calculateOrderSubtotal(order.products);
+  // Log the order data structure
+  console.log("OrderExpandedDetails - order data:", order);
+  
+  // Ensure products is always a valid array
+  const products = Array.isArray(order.products) 
+    ? order.products.filter(item => item && item.product) 
+    : [];
+
+  const subtotal = calculateOrderSubtotal(products);
   const shippingCost = order.shipping_cost || 0;
   const total = subtotal + shippingCost;
 
-  // Debug logs to verify data structure
-  console.log("Order products data:", order.products);
+  console.log("Order products processed:", {
+    rawProducts: order.products,
+    filteredProducts: products,
+    subtotal,
+    total
+  });
 
   return (
     <motion.div
@@ -79,9 +93,9 @@ const OrderExpandedDetails = ({ order }: OrderExpandedDetailsProps) => {
               <div className="space-y-6">
                 {/* Products List */}
                 <div className="space-y-4">
-                  {order.products && order.products.length > 0 ? (
-                    order.products.map((item) => (
-                      <div key={item.product.id} className="flex items-center gap-4">
+                  {products && products.length > 0 ? (
+                    products.map((item) => (
+                      <div key={item.id || `${item.product.id}-${Math.random()}`} className="flex items-center gap-4">
                         <img
                           src={item.product.image_url || "/placeholder.svg"}
                           alt={item.product.name}
@@ -93,7 +107,7 @@ const OrderExpandedDetails = ({ order }: OrderExpandedDetailsProps) => {
                             SKU: {item.product.id.slice(0, 8)}
                           </p>
                           <p className="text-sm font-medium mt-1">
-                            {item.quantity} x {formatCurrency(item.unit_price)}
+                            {item.quantity} x {formatCurrency(item.unit_price || item.product.from_price || 0)}
                           </p>
                         </div>
                       </div>

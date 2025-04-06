@@ -1,10 +1,12 @@
+
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import AdminProjectsTable from "@/components/admin/projects/AdminProjectsTable";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import type { Database } from "@/integrations/supabase/types";
 import { ProjectPackType } from "@/types/project";
+import { useUserPermissions } from "@/lib/permissions";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Project = Database['public']['Tables']['projects']['Row'];
@@ -31,43 +33,62 @@ interface FormattedProject {
 
 const AdminProjects = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { isAdmin } = useUserPermissions();
 
   const { data: projects, isLoading } = useQuery({
-    queryKey: ["admin-projects"],
+    queryKey: ["admin-projects", isAdmin],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("projects")
-        .select(`
-          *,
-          profiles:user_id (
-            id,
-            first_name,
-            last_name,
-            email,
-            phone
-          )
-        `)
-        .order('created_at', { ascending: false });
+      if (!isAdmin) {
+        console.error("Unauthorized access to admin projects");
+        return [];
+      }
 
-      if (error) throw error;
+      console.log("Fetching admin projects data");
       
-      const formattedProjects: FormattedProject[] = (data as unknown as ProjectWithProfile[]).map(project => ({
-        id: project.id,
-        name: project.name,
-        client: `${project.profiles?.first_name || ''} ${project.profiles?.last_name || ''}`.trim(),
-        email: project.profiles?.email || '',
-        phone: project.profiles?.phone || '',
-        status: project.status === 'em_andamento' ? 'Active' : 'Completed',
-        progress: 65,
-        accountManager: "Sarah Johnson",
-        points: project.points || 0,
-        lastUpdate: "Product selection phase completed",
-        updatedAt: project.updated_at,
-        pack_type: project.pack_type || 'start'
-      }));
+      try {
+        const { data, error } = await supabaseAdmin
+          .from("projects")
+          .select(`
+            *,
+            profiles:user_id (
+              id,
+              first_name,
+              last_name,
+              email,
+              phone
+            )
+          `)
+          .order('created_at', { ascending: false });
 
-      return formattedProjects;
-    }
+        if (error) {
+          console.error("Error fetching admin projects:", error);
+          throw error;
+        }
+        
+        console.log("Admin projects fetched successfully:", { count: data?.length });
+        
+        const formattedProjects: FormattedProject[] = (data as unknown as ProjectWithProfile[]).map(project => ({
+          id: project.id,
+          name: project.name,
+          client: `${project.profiles?.first_name || ''} ${project.profiles?.last_name || ''}`.trim(),
+          email: project.profiles?.email || '',
+          phone: project.profiles?.phone || '',
+          status: project.status === 'em_andamento' ? 'Active' : 'Completed',
+          progress: 65,
+          accountManager: "Sarah Johnson",
+          points: project.points || 0,
+          lastUpdate: "Product selection phase completed",
+          updatedAt: project.updated_at,
+          pack_type: project.pack_type || 'start'
+        }));
+
+        return formattedProjects;
+      } catch (err) {
+        console.error("Unexpected error in admin projects query:", err);
+        return [];
+      }
+    },
+    enabled: !!isAdmin
   });
 
   const filteredProjects = (projects || []).filter(project => {
@@ -107,7 +128,13 @@ const AdminProjects = () => {
         />
       </div>
 
-      <AdminProjectsTable projects={filteredProjects} />
+      {projects && projects.length > 0 ? (
+        <AdminProjectsTable projects={filteredProjects} />
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-lg text-gray-500">No projects found</p>
+        </div>
+      )}
     </div>
   );
 };
