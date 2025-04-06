@@ -57,10 +57,14 @@ export const ProductSearch = ({ addToCart, onSelectProduct }: ProductSearchProps
 
   const products = productsQuery.data?.data || [];
 
-  const filteredProducts = query 
-    ? products.filter(product =>
-        product.name.toLowerCase().includes(query.toLowerCase())
-      )
+  // Show all products when the dropdown is open and no query,
+  // otherwise filter by the query
+  const filteredProducts = open
+    ? query
+      ? products.filter(product =>
+          product.name.toLowerCase().includes(query.toLowerCase())
+        )
+      : products
     : [];
 
   const handleSelect = async (product: Product) => {
@@ -95,7 +99,7 @@ export const ProductSearch = ({ addToCart, onSelectProduct }: ProductSearchProps
             placeholder="Search products..."
           />
         </div>
-        {open && query && (
+        {open && (
           <div className="absolute top-full z-50 w-full rounded-md border bg-white shadow-md mt-2">
             <Command.List className="max-h-[300px] overflow-y-auto p-2">
               {filteredProducts.length === 0 && (
