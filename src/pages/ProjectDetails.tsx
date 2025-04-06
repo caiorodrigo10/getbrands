@@ -2,38 +2,31 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ProjectStage } from "@/components/project/ProjectStage";
 import { CalendarStage } from "@/components/project/CalendarStage";
 import { ProductSelectionStage } from "@/components/project/ProductSelectionStage";
 import { PackageDesignStage } from "@/components/project/PackageDesignStage";
-import { useUserPermissions } from "@/lib/permissions";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 const ProjectDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAdmin } = useUserPermissions();
   const { user } = useAuth();
 
-  console.log("ProjectDetails - User permissions:", { 
-    isAdmin,
+  console.log("ProjectDetails - User info:", { 
     userId: user?.id,
     projectId: id
   });
 
   const { data: project, isLoading, error } = useQuery({
-    queryKey: ["project", id, isAdmin],
+    queryKey: ["project", id],
     queryFn: async () => {
-      console.log("Fetching project with client:", isAdmin ? "admin" : "regular");
+      console.log("Fetching project details for id:", id);
       
-      // Utilizar o cliente correto baseado na permissão do usuário
-      const client = isAdmin ? supabaseAdmin : supabase;
-      
-      const { data: projectData, error } = await client
+      const { data: projectData, error } = await supabase
         .from("projects")
         .select(`
           *,

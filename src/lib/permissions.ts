@@ -5,7 +5,6 @@ import { useAuth } from "@/contexts/AuthContext";
 /**
  * A utility hook that provides user permissions
  * This is a wrapper around useAuthWithPermissions to standardize permission checks
- * across the application and ensure all permission sources are considered
  */
 export const useUserPermissions = () => {
   const auth = useAuthWithPermissions();
@@ -32,11 +31,7 @@ export const useUserPermissions = () => {
   return {
     ...auth,
     // Override isAdmin with our enhanced check
-    isAdmin: isActuallyAdmin,
-    // Helper functions with explicit boolean returns for common permission checks
-    canAccessAdmin: () => isActuallyAdmin,
-    canAccessProjects: () => isActuallyAdmin || auth.hasFullAccess === true,
-    canAccessDashboard: () => isActuallyAdmin || auth.hasFullAccess === true
+    isAdmin: isActuallyAdmin
   };
 };
 

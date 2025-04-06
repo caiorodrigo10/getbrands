@@ -1,54 +1,28 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client"; 
-import { supabaseAdmin } from "@/lib/supabase/admin"; 
 import { useAuth } from "@/contexts/AuthContext";
 import { ProjectProgressCard } from "@/components/projects/ProjectProgressCard";
-import { useUserPermissions } from "@/lib/permissions";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 
 const Projects = () => {
   const { user } = useAuth();
-  const { hasFullAccess, isAdmin } = useUserPermissions();
-  const navigate = useNavigate();
   
-  // Verificação explícita para status de administrador ou acesso total
-  const canAccessProjects = hasFullAccess || isAdmin;
-  
-  // Logs de depuração
-  console.log("Projects page - User permissions:", { 
+  console.log("Projects page - User:", { 
     userId: user?.id,
-    userEmail: user?.email,
-    hasFullAccess, 
-    isAdmin, 
-    canAccessProjects
+    userEmail: user?.email
   });
   
-  useEffect(() => {
-    // Apenas redirecionar se não for admin e tivermos certeza sobre as permissões
-    if (user && !canAccessProjects) {
-      console.log("Redirecionando: usuário não tem permissão para acessar Projects");
-      toast.error("Você não tem permissão para acessar projetos");
-      navigate('/catalog');
-    }
-  }, [hasFullAccess, isAdmin, navigate, canAccessProjects, user]);
-  
   const { data: projects, isLoading, error } = useQuery({
-    queryKey: ["projects", user?.id, isAdmin],
+    queryKey: ["projects", user?.id],
     queryFn: async () => {
       if (!user?.id) {
         throw new Error("User ID is required");
       }
       
       try {
-        console.log("Fetching projects for user:", user.id, "isAdmin:", isAdmin);
+        console.log("Fetching projects for user:", user.id);
         
-        // Vamos utilizar o cliente correto baseado na permissão do usuário
-        const client = isAdmin ? supabaseAdmin : supabase;
-        
-        const { data: projectsData, error: projectsError } = await client
+        const { data: projectsData, error: projectsError } = await supabase
           .from("projects")
           .select(`
             *,
@@ -66,11 +40,10 @@ const Projects = () => {
         return projectsData;
       } catch (err) {
         console.error("Unexpected error in projects query:", err);
-        toast.error("Falha ao carregar projetos. Por favor, tente novamente.");
         throw err;
       }
     },
-    enabled: !!user?.id && canAccessProjects,
+    enabled: !!user?.id,
     retry: 2,
     retryDelay: 1000,
   });
@@ -103,7 +76,7 @@ const Projects = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">
-        {isAdmin ? "All Projects" : "My Projects"}
+        My Projects
       </h1>
 
       <div className="grid gap-4">

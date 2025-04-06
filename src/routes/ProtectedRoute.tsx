@@ -19,9 +19,8 @@ export function ProtectedRoute({
   const location = useLocation();
 
   useEffect(() => {
-    // Enhanced debugging for admin routes
     if (isAuthenticated && requireAdmin) {
-      console.log("ProtectedRoute - ADMIN ACCESS CHECK:", {
+      console.log("ProtectedRoute - Admin access check:", {
         isAdmin,
         path: location.pathname,
         userEmail: user?.email
