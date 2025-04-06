@@ -131,7 +131,7 @@ export const Footer = () => {
                   placeholder="Enter your email"
                   className="bg-gray-800 border-gray-700 text-white"
                 />
-                <Button variant="primary" size="sm" className="whitespace-nowrap">
+                <Button variant="outline" size="sm" className="whitespace-nowrap bg-primary/20 border-primary hover:bg-primary/30">
                   Subscribe
                 </Button>
               </div>

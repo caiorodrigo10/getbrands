@@ -1,47 +1,68 @@
-import { Check } from "lucide-react";
+
+import { Check, Shield, Clock, Award, Users } from "lucide-react";
 
 export const WhyChooseSection = () => {
   const benefits = [
     {
+      icon: <Clock className="w-10 h-10 text-white" />,
       title: "Fast Production",
-      description: "Get your products manufactured and delivered quickly",
+      description: "Get your products manufactured and delivered quickly with our streamlined processes and dedicated production team."
     },
     {
+      icon: <Shield className="w-10 h-10 text-white" />,
       title: "Quality Guaranteed",
-      description: "Premium quality products that meet all standards",
+      description: "Every product meets rigorous quality standards with thorough testing and premium ingredients or materials."
     },
     {
+      icon: <Users className="w-10 h-10 text-white" />,
       title: "Full Support",
-      description: "Expert guidance throughout your journey",
+      description: "Our expert team provides guidance throughout your journey, from concept to launch and beyond."
     },
     {
+      icon: <Award className="w-10 h-10 text-white" />,
       title: "Custom Branding",
-      description: "Complete customization for your brand identity",
-    },
+      description: "Complete customization for your brand identity with professional design services and flexible packaging options."
+    }
   ];
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-24 bg-gradient-to-b from-gray-900 to-slate-950 text-white">
       <div className="container mx-auto px-4">
-        <div className="max-w-3xl mx-auto text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+        <div className="max-w-3xl mx-auto text-center mb-16">
+          <h2 className="text-4xl font-bold mb-6">
             Why Choose GetBrands
           </h2>
-          <p className="text-lg text-gray-600">
-            We provide everything you need to launch and grow your brand
+          <p className="text-xl text-gray-300">
+            The trusted partner for entrepreneurs building successful brands
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16 max-w-5xl mx-auto">
           {benefits.map((benefit, index) => (
-            <div key={index} className="flex flex-col items-center text-center p-6 bg-white rounded-lg shadow-sm">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                <Check className="w-6 h-6 text-primary" />
+            <div key={index} className="flex gap-6">
+              <div className="shrink-0">
+                <div className="w-16 h-16 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
+                  {benefit.icon}
+                </div>
               </div>
-              <h3 className="text-xl font-semibold mb-2">{benefit.title}</h3>
-              <p className="text-gray-600">{benefit.description}</p>
+              <div>
+                <h3 className="text-2xl font-semibold mb-3">{benefit.title}</h3>
+                <p className="text-gray-300">{benefit.description}</p>
+              </div>
             </div>
           ))}
+        </div>
+        
+        <div className="mt-20 border-t border-gray-800 pt-16 max-w-4xl mx-auto">
+          <h3 className="text-2xl font-semibold mb-6 text-center">Our Commitment</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+            {["Sustainable Practice", "Transparent Pricing", "Ethical Production"].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 bg-gray-800/50 px-6 py-4 rounded-lg">
+                <Check className="text-primary shrink-0" />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
