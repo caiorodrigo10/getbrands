@@ -38,7 +38,7 @@ export const CallToActionSection = () => {
               className="border-white text-white hover:bg-white/10 border-2"
               asChild
             >
-              <Link to="/catalog">
+              <Link to="/catalog" className="text-white">
                 Browse Products First
               </Link>
             </Button>
