@@ -4,18 +4,18 @@ import { ArrowRight, ShoppingBag, PenTool, Package2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useSessionManagement } from "@/hooks/useSessionManagement";
 
 const Index = () => {
-  const { user } = useAuth();
+  const { session } = useSessionManagement();
   const navigate = useNavigate();
   
   // Redirect authenticated users to dashboard
   useEffect(() => {
-    if (user) {
+    if (session) {
       navigate("/dashboard");
     }
-  }, [user, navigate]);
+  }, [session, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
@@ -87,8 +87,8 @@ const Index = () => {
             asChild
             className="bg-[#f0562e] hover:bg-[#f0562e]/90 text-white"
           >
-            <Link to="/catalog">
-              Explore Our Product Catalog
+            <Link to="/marketing">
+              Learn More About Our Process
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
