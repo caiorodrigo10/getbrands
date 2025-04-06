@@ -85,29 +85,26 @@ const AdminOrders = () => {
         if (orders && orders.length > 0) {
           const orderIds = orders.map(order => order.id);
           
-          // Count items per order - fixed query syntax
+          // Contagem de itens por pedido - corrigindo a sintaxe
           const { data: itemCounts, error: countError } = await supabase
-            .from('sample_request_products')
-            .select('sample_request_id, count(*)')
-            .in('sample_request_id', orderIds)
-            .groupBy('sample_request_id');
+            .rpc('count_order_items', { order_ids: orderIds });
             
           if (countError) throw countError;
           console.log("Item counts:", itemCounts);
           
-          // Create a map of order ID to item count
+          // Criar um mapa de ID do pedido para contagem de itens
           const itemCountMap: Record<string, number> = {};
           itemCounts?.forEach((item: any) => {
             itemCountMap[item.sample_request_id] = parseInt(item.count, 10);
           });
           
-          // Add item count to each order
+          // Adicionar contagem de itens a cada pedido
           const ordersWithTotalItems = orders.map(order => ({
             ...order,
             total_items: itemCountMap[order.id] || 0,
           }));
           
-          // Get all products for these orders
+          // Obter todos os produtos para estes pedidos
           const { data: orderProducts, error: productsError } = await supabase
             .from('sample_request_products')
             .select(`
@@ -124,7 +121,7 @@ const AdminOrders = () => {
           
           console.log("Order products data:", orderProducts);
           
-          // Group products by order ID
+          // Agrupar produtos por ID do pedido
           const orderProductsMap: Record<string, OrderProduct[]> = {};
           orderProducts?.forEach((item: any) => {
             if (!orderProductsMap[item.sample_request_id]) {
@@ -133,7 +130,7 @@ const AdminOrders = () => {
             orderProductsMap[item.sample_request_id].push(item);
           });
           
-          // Add products to each order
+          // Adicionar produtos a cada pedido
           const ordersWithProducts = ordersWithTotalItems.map(order => ({
             ...order,
             products: orderProductsMap[order.id] || [],
