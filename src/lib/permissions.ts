@@ -2,13 +2,13 @@
 import { useAuthWithPermissions } from "@/hooks/useAuthWithPermissions";
 
 /**
- * Um hook utilitário que fornece permissões de usuário
- * Este é um wrapper em torno do useAuthWithPermissions para padronizar verificações de permissão
+ * A utility hook that provides user permissions
+ * This is a wrapper around useAuthWithPermissions to standardize permission checks
  */
 export const useUserPermissions = () => {
   const auth = useAuthWithPermissions();
   
-  console.log("useUserPermissions - permissões:", { 
+  console.log("useUserPermissions - permissions:", { 
     isAdmin: auth.isAdmin,
     hasFullAccess: auth.hasFullAccess,
     profile: auth.profile
@@ -16,16 +16,16 @@ export const useUserPermissions = () => {
   
   return {
     ...auth,
-    // Funções auxiliares para verificações comuns
+    // Helper functions for common permission checks
     canAccessAdmin: () => auth.isAdmin,
-    canAccessProjects: () => auth.hasFullAccess,
-    canAccessDashboard: () => auth.hasFullAccess
+    canAccessProjects: () => auth.hasFullAccess || auth.isAdmin,
+    canAccessDashboard: () => auth.hasFullAccess || auth.isAdmin
   };
 };
 
 /**
- * Obtém o papel do usuário a partir do perfil
- * Util para componentes que não são React
+ * Gets the user role from the profile
+ * Useful for non-React components
  */
 export const getUserRole = (profile: any) => {
   if (!profile) return null;

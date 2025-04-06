@@ -15,9 +15,9 @@ export const NavigationMenu = () => {
   const { hasFullAccess, isMember, isSampler, isAdmin, profile } = useUserPermissions();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Log de permissões para depuração
+  // Log permissions for debugging
   useEffect(() => {
-    console.log("NavigationMenu - Permissões:", { 
+    console.log("NavigationMenu - Permissions:", { 
       hasFullAccess, 
       isMember, 
       isSampler, 
@@ -30,7 +30,8 @@ export const NavigationMenu = () => {
   const menuItems = getMenuItems(showStartHere);
 
   const handleRestrictedNavigation = (path: string) => {
-    if (!hasFullAccess) {
+    // Only show permission restriction for non-admin users
+    if (!hasFullAccess && !isAdmin) {
       navigate("/start-here");
       setIsOpen(false);
       return;
@@ -47,10 +48,11 @@ export const NavigationMenu = () => {
       isActive
         ? "bg-[#fff4fc] text-black font-medium"
         : "text-black hover:bg-[#fff4fc] hover:text-black",
-      item.restricted && !hasFullAccess && "opacity-50 cursor-not-allowed"
+      item.restricted && !hasFullAccess && !isAdmin && "opacity-50 cursor-not-allowed"
     );
 
-    if (item.restricted && !hasFullAccess) {
+    // Allow access to restricted areas for admin users
+    if (item.restricted && !hasFullAccess && !isAdmin) {
       return (
         <button
           key={item.path}

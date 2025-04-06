@@ -7,7 +7,7 @@ import UserMenu from "../UserMenu";
 import { ProjectPointsInfo } from "./ProjectPointsInfo";
 import { ScheduleDemoInfo } from "./ScheduleDemoInfo";
 import { MenuItem } from "./types";
-import { useAuthWithPermissions } from "@/hooks/useAuthWithPermissions";
+import { useUserPermissions } from "@/lib/permissions";
 
 interface MobileNavigationProps {
   menuItems: MenuItem[];
@@ -22,7 +22,8 @@ export const MobileNavigation = ({
   isOpen, 
   setIsOpen 
 }: MobileNavigationProps) => {
-  const { hasFullAccess, isMember, isSampler } = useAuthWithPermissions();
+  const { hasFullAccess, isMember, isSampler, isAdmin } = useUserPermissions();
+  const showProjectPoints = hasFullAccess || isAdmin;
 
   return (
     <>
@@ -52,8 +53,8 @@ export const MobileNavigation = ({
                     <nav className="flex-1 overflow-y-auto p-4">
                       {menuItems.map(item => renderMenuItem(item, true))}
                     </nav>
-                    {hasFullAccess && <ProjectPointsInfo />}
-                    {(isMember || isSampler) && <ScheduleDemoInfo />}
+                    {showProjectPoints && <ProjectPointsInfo />}
+                    {(isMember || isSampler) && !isAdmin && <ScheduleDemoInfo />}
                   </div>
                 </SheetContent>
               </Sheet>

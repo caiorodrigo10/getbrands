@@ -16,7 +16,8 @@ export const ProductActions = ({ productId, onSelectProduct, showNotification = 
   const { isLoading, handleRequestSample } = useProductActions(productId);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { hasFullAccess, isMember, isSampler } = useUserPermissions();
+  const { hasFullAccess, isMember, isSampler, isAdmin } = useUserPermissions();
+  const canSelectProduct = hasFullAccess || isAdmin;
 
   const handleOrderSample = async () => {
     try {
@@ -48,7 +49,7 @@ export const ProductActions = ({ productId, onSelectProduct, showNotification = 
         {isLoading ? "Adding to cart..." : "Order Sample"}
       </Button>
       
-      {hasFullAccess ? (
+      {canSelectProduct ? (
         <Button 
           size="lg"
           className="w-full bg-primary hover:bg-primary-dark text-white h-14 sm:h-12 text-base font-medium rounded-full"

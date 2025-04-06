@@ -19,7 +19,7 @@ export function ProtectedRoute({
 
   useEffect(() => {
     if (isAuthenticated && requireAdmin) {
-      console.log("ProtectedRoute - Verificando permissão de admin:", {
+      console.log("ProtectedRoute - Checking admin permission:", {
         isAdmin,
         profileRole: profile?.role,
         path: location.pathname
@@ -40,7 +40,7 @@ export function ProtectedRoute({
   }
 
   if (requireAdmin && !isAdmin) {
-    console.log("Acesso negado: usuário não é admin");
+    console.log("Access denied: user is not admin");
     return <Navigate to="/catalog" replace />;
   }
 

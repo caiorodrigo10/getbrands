@@ -11,15 +11,16 @@ const Projects = () => {
   const { user } = useAuth();
   const { hasFullAccess, isAdmin } = useUserPermissions();
   const navigate = useNavigate();
+  const canAccessProjects = hasFullAccess || isAdmin;
   
   useEffect(() => {
-    console.log("Projects - Verificando permissões:", { hasFullAccess, isAdmin });
+    console.log("Projects - Checking permissions:", { hasFullAccess, isAdmin });
     
-    if (!hasFullAccess) {
-      console.log("Redirecionando: usuário sem permissão para acessar Projects");
+    if (!canAccessProjects) {
+      console.log("Redirecting: user doesn't have permission to access Projects");
       navigate('/catalog');
     }
-  }, [hasFullAccess, isAdmin, navigate]);
+  }, [hasFullAccess, isAdmin, navigate, canAccessProjects]);
   
   const { data: projects, isLoading } = useQuery({
     queryKey: ["projects"],
@@ -38,10 +39,10 @@ const Projects = () => {
       if (projectsError) throw projectsError;
       return projectsData;
     },
-    enabled: !!user?.id && hasFullAccess,
+    enabled: !!user?.id && canAccessProjects,
   });
 
-  if (!hasFullAccess) {
+  if (!canAccessProjects) {
     return null;
   }
 
@@ -60,7 +61,7 @@ const Projects = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Meus Projetos</h1>
+      <h1 className="text-2xl font-bold">My Projects</h1>
 
       <div className="grid gap-4">
         {projects?.map((project) => (
