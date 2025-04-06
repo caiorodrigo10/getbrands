@@ -36,9 +36,12 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
       profile, 
       isAdmin, 
       isInAdminPanel,
-      profileRole: profile?.role 
+      profileRole: profile?.role,
+      firstName: profile?.first_name,
+      lastName: profile?.last_name,
+      userMetadata: user?.user_metadata
     });
-  }, [profile, isAdmin, isInAdminPanel]);
+  }, [profile, isAdmin, isInAdminPanel, user]);
 
   const getErrorMessage = (key: string) => {
     return errorMessages[key][isPortuguese ? 'pt' : 'en'];
@@ -47,8 +50,12 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   if (!user) return null;
 
   const userEmail = user.email || "";
+  
+  // Try to get name from multiple sources with proper fallbacks
   const firstName = profile?.first_name || user?.user_metadata?.first_name || "";
   const lastName = profile?.last_name || user?.user_metadata?.last_name || "";
+  
+  // Create display name with priority order and fallbacks
   const userName = firstName || lastName 
     ? `${firstName} ${lastName}`.trim() 
     : userEmail.split('@')[0];

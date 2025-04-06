@@ -26,6 +26,7 @@ export const useAuthWithPermissions = () => {
           console.error("Error fetching profile:", error);
           // Still return at least some basic profile info from auth user metadata
           if (user.user_metadata) {
+            // Create a more complete profile from user metadata
             return {
               id: user.id,
               role: user.user_metadata.role || 'member',
@@ -40,6 +41,18 @@ export const useAuthWithPermissions = () => {
         }
 
         console.log("Profile data from useAuthWithPermissions:", data);
+        
+        // Merge profile data with user metadata for completeness
+        if (data && user.user_metadata) {
+          // Fill in any missing profile data from user_metadata as fallback
+          return {
+            ...data,
+            first_name: data.first_name || user.user_metadata.first_name,
+            last_name: data.last_name || user.user_metadata.last_name,
+            avatar_url: data.avatar_url || user.user_metadata.avatar_url,
+          };
+        }
+        
         return data;
       } catch (err) {
         console.error("Unexpected error in useAuthWithPermissions:", err);
@@ -73,7 +86,8 @@ export const useAuthWithPermissions = () => {
     role,
     userId: user?.id,
     userEmail: user?.email,
-    userMetadata: user?.user_metadata
+    userMetadata: user?.user_metadata,
+    profileData: profile
   });
 
   return {

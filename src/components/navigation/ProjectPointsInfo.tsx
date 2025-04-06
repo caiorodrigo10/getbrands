@@ -5,9 +5,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Coins, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useUserPermissions } from "@/lib/permissions";
 
 export const ProjectPointsInfo = () => {
   const { user } = useAuth();
+  const { isAdmin } = useUserPermissions();
   const navigate = useNavigate();
 
   const { data: totalPoints, isLoading } = useQuery({
@@ -16,7 +18,15 @@ export const ProjectPointsInfo = () => {
       if (!user?.id) return 0;
       
       try {
-        console.log("Fetching points for user:", user?.id);
+        console.log("Fetching points for user:", user?.id, "isAdmin:", isAdmin);
+        
+        // For admin users, we'll show a fixed sample value
+        // This is a temporary solution until we implement proper admin points
+        if (isAdmin) {
+          console.log("Admin user detected - using sample points");
+          return 2000; // Show sample points for admin
+        }
+        
         const { data, error } = await supabase
           .from("projects")
           .select("*") // Select all columns to see complete project data
