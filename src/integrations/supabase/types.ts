@@ -1363,6 +1363,26 @@ export type Database = {
           projects: Json | null
           role: string | null
         }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string | null
+          last_name?: string | null
+          phone?: string | null
+          projects?: never
+          role?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string | null
+          last_name?: string | null
+          phone?: string | null
+          projects?: never
+          role?: string | null
+        }
         Relationships: []
       }
     }
