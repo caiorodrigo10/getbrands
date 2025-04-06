@@ -29,7 +29,7 @@ export const WhyChooseSection = () => {
     <section className="py-24 bg-gradient-to-b from-gray-900 to-slate-950 text-white">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center mb-16">
-          <h2 className="text-4xl font-bold mb-6">
+          <h2 className="text-4xl font-bold mb-6 text-white">
             Why Choose GetBrands
           </h2>
           <p className="text-xl text-gray-300">
@@ -46,7 +46,7 @@ export const WhyChooseSection = () => {
                 </div>
               </div>
               <div>
-                <h3 className="text-2xl font-semibold mb-3">{benefit.title}</h3>
+                <h3 className="text-2xl font-semibold mb-3 text-white">{benefit.title}</h3>
                 <p className="text-gray-300">{benefit.description}</p>
               </div>
             </div>
@@ -54,12 +54,12 @@ export const WhyChooseSection = () => {
         </div>
         
         <div className="mt-20 border-t border-gray-800 pt-16 max-w-4xl mx-auto">
-          <h3 className="text-2xl font-semibold mb-6 text-center">Our Commitment</h3>
+          <h3 className="text-2xl font-semibold mb-6 text-center text-white">Our Commitment</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             {["Sustainable Practice", "Transparent Pricing", "Ethical Production"].map((item, i) => (
               <div key={i} className="flex items-center gap-3 bg-gray-800/50 px-6 py-4 rounded-lg">
                 <Check className="text-primary shrink-0" />
-                <span>{item}</span>
+                <span className="text-gray-200">{item}</span>
               </div>
             ))}
           </div>
