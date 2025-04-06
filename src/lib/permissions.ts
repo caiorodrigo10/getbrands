@@ -34,7 +34,8 @@ export const useUserPermissions = () => {
       userEmail: user?.email,
       userId: user?.id,
       profileObj: auth.profile,
-      userMetadata: user?.user_metadata
+      userMetadata: user?.user_metadata,
+      currentPath: window.location.pathname
     });
   }, [profileRole, userMetadataRole, auth.profile, user]);
   
