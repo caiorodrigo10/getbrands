@@ -11,16 +11,57 @@ import { useProducts } from "@/hooks/useProducts";
 import { UseQueryResult, UseInfiniteQueryResult } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { useWindowSize } from "@/hooks/useWindowSize";
+import { useSearchParams } from "react-router-dom";
+import { useCatalogState } from "@/hooks/useCatalogState";
 
 const MOBILE_ITEMS_PER_PAGE = 7;
 const DESKTOP_ITEMS_PER_PAGE = 9;
 
 const CatalogLayout = () => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { getSavedCatalogState } = useCatalogState();
+  const [currentPage, setCurrentPage] = useState(() => {
+    const pageParam = searchParams.get("page");
+    return pageParam ? parseInt(pageParam, 10) : 1;
+  });
   const { width } = useWindowSize();
   const isMobile = width ? width < 768 : false;
   const itemsPerPage = isMobile ? MOBILE_ITEMS_PER_PAGE : DESKTOP_ITEMS_PER_PAGE;
   const [allProducts, setAllProducts] = useState<Product[]>([]);
+  
+  // Restore saved catalog state on initial load
+  useEffect(() => {
+    const savedState = getSavedCatalogState();
+    if (savedState) {
+      const newParams = new URLSearchParams(searchParams);
+      
+      // Only set these parameters if they're not already present in the URL
+      if (!searchParams.has("page") && savedState.page) {
+        newParams.set("page", savedState.page);
+        setCurrentPage(parseInt(savedState.page, 10));
+      }
+      
+      if (!searchParams.has("search") && savedState.search) {
+        newParams.set("search", savedState.search);
+      }
+      
+      if (!searchParams.has("categories") && savedState.categories) {
+        newParams.set("categories", savedState.categories);
+      }
+      
+      // Only update URL if there were changes
+      if (newParams.toString() !== searchParams.toString()) {
+        setSearchParams(newParams);
+      }
+    }
+  }, []);
+
+  // Update URL when page changes
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("page", currentPage.toString());
+    setSearchParams(newParams);
+  }, [currentPage, setSearchParams]);
   
   const { ref: loadMoreRef, inView } = useInView({
     threshold: 0,
