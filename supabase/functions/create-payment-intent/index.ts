@@ -1,94 +1,48 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import Stripe from "https://esm.sh/stripe@12.4.0?target=deno"
 
-const stripe = new Stripe(Deno.env.get('NEW_STRIPE_SECRET_KEY') as string, {
-  apiVersion: '2023-10-16',
-  httpClient: Stripe.createFetchHttpClient(),
-});
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
-const MINIMUM_CHARGE_AMOUNT = 50; // 50 cents minimum
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { stripe } from '../_shared/stripe.ts';
+import { corsHeaders } from '../_shared/cors.ts';
 
 serve(async (req) => {
-  // Handle CORS
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { amount, currency = 'usd', shipping_amount, items, subtotal, total, discountAmount, metadata, couponCode } = await req.json();
+    const { amount, currency = 'usd', items = [], subtotal, shipping_amount, metadata = {} } = await req.json();
 
-    console.log('Creating payment intent with:', { 
-      amount, 
-      currency, 
-      shipping_amount, 
-      subtotal, 
-      total, 
-      discountAmount,
-      couponCode,
-      metadata 
-    });
-
-    // Calculate final amount after discount
-    let finalAmount = Math.max(Math.round((amount - (discountAmount || 0)) * 100), MINIMUM_CHARGE_AMOUNT);
-
-    // If the amount would be less than minimum, adjust discount to maintain minimum charge
-    if (finalAmount < MINIMUM_CHARGE_AMOUNT) {
-      const maxAllowableDiscount = amount * 100 - MINIMUM_CHARGE_AMOUNT;
-      finalAmount = MINIMUM_CHARGE_AMOUNT;
-      console.log(`Adjusted discount to maintain minimum charge. Original discount: ${discountAmount}, Max allowable: ${maxAllowableDiscount/100}`);
+    if (!amount || amount < 50) { // Minimum 50 cents
+      return new Response(
+        JSON.stringify({ error: 'Amount must be at least 50 cents' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    console.log('Payment calculation:', {
-      originalAmount: amount,
-      discountAmount: discountAmount || 0,
-      finalAmountInCents: finalAmount,
-      minimumCharge: MINIMUM_CHARGE_AMOUNT,
-      couponApplied: !!couponCode
-    });
+    console.log(`Creating payment intent for ${amount} cents`);
 
+    // Create the payment intent
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: finalAmount,
+      amount: Math.round(amount * 100), // Convert to cents and ensure it's an integer
       currency,
-      automatic_payment_methods: {
-        enabled: true,
-      },
       metadata: {
-        shipping_amount: shipping_amount || 0,
-        subtotal: subtotal || 0,
-        discount_amount: discountAmount || 0,
-        original_amount: metadata?.original_amount || 0,
-        final_amount: finalAmount / 100,
-        coupon_code: couponCode || null
-      }
-    });
-
-    console.log('Payment intent created:', {
-      id: paymentIntent.id,
-      amount: paymentIntent.amount,
-      currency: paymentIntent.currency,
-      metadata: paymentIntent.metadata
+        ...metadata,
+        subtotal: subtotal?.toString() || '0',
+        shipping_amount: shipping_amount?.toString() || '0',
+        items_count: items.length.toString(),
+      },
     });
 
     return new Response(
       JSON.stringify({ clientSecret: paymentIntent.client_secret }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      },
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('Error creating payment intent:', error);
+    
     return new Response(
       JSON.stringify({ error: error.message }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
-      },
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
