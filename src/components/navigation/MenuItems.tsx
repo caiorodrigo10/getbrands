@@ -1,5 +1,5 @@
 
-import { LucideIcon, Home, Package2, ListChecks, LayoutDashboard, ShoppingBag, FileText, Calculator, Star } from "lucide-react";
+import { LucideIcon, Home, Package2, ListChecks, LayoutDashboard, Search, FileText, Calculator, Star } from "lucide-react";
 
 export interface MenuItem {
   label: string;
@@ -27,13 +27,13 @@ export const getMenuItems = (showStartHere = false): MenuItem[] => {
     {
       label: "Products",
       path: "/products",
-      icon: ShoppingBag,
+      icon: ListChecks, // Changed from ShoppingBag to ListChecks (Sample Orders icon)
       restricted: true
     },
     {
       label: "Catalog",
       path: "/catalog",
-      icon: Home,
+      icon: Search, // Changed from Home to Search (magnifying glass)
       restricted: false
     },
     {
