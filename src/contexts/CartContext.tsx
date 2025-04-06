@@ -35,7 +35,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Provide all cart operations to consumers
   const cartOperations: CartOperations = {
     items, 
-    addItem, 
+    addItem: async (product) => {
+      const result = await addItem(product);
+      return;
+    }, 
     removeItem, 
     updateQuantity, 
     clearCart, 

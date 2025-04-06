@@ -20,41 +20,46 @@ export const useCartOperations = (user: User | null) => {
     console.log(`Cart: loadCartItems - Attempting to fetch cart items for user ${user.id}`);
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // First, get cart_items for the user
+      const { data: cartItems, error: cartError } = await supabase
         .from('cart_items')
-        .select(`
-          product_id,
-          products (
-            id,
-            name,
-            description,
-            image_url,
-            from_price,
-            category,
-            srp,
-            is_new,
-            is_tiktok,
-            created_at,
-            updated_at
-          )
-        `)
+        .select('product_id')
         .eq('user_id', user.id);
 
-      if (error) {
-        console.error('Cart: loadCartItems - Error fetching cart items:', error);
-        throw error;
+      if (cartError) {
+        console.error('Cart: loadCartItems - Error fetching cart items:', cartError);
+        throw cartError;
       }
 
-      console.log(`Cart: loadCartItems - Successfully fetched ${data?.length} cart items:`, data);
+      console.log(`Cart: loadCartItems - Retrieved ${cartItems?.length || 0} cart item references`);
+      
+      if (!cartItems || cartItems.length === 0) {
+        setItems([]);
+        return;
+      }
+      
+      // Then, get the product details in a separate query
+      const productIds = cartItems.map(item => item.product_id);
+      const { data: products, error: productsError } = await supabase
+        .from('products')
+        .select('*')
+        .in('id', productIds);
+        
+      if (productsError) {
+        console.error('Cart: loadCartItems - Error fetching products:', productsError);
+        throw productsError;
+      }
 
-      const cartItems: CartItem[] = data.map(item => ({
-        id: item.product_id,
-        ...item.products,
+      console.log(`Cart: loadCartItems - Retrieved ${products?.length || 0} product details`);
+
+      // Convert to cart items with quantity
+      const cartItemsWithDetails: CartItem[] = products.map(product => ({
+        ...product,
         quantity: 1
       }));
 
-      setItems(cartItems);
-      console.log("Cart: loadCartItems - Processed cart items:", cartItems);
+      setItems(cartItemsWithDetails);
+      console.log("Cart: loadCartItems - Processed cart items:", cartItemsWithDetails);
     } catch (error) {
       console.error('Cart: loadCartItems - Error loading cart items:', error);
     } finally {
@@ -62,10 +67,10 @@ export const useCartOperations = (user: User | null) => {
     }
   };
 
-  const addItem = async (item: Product) => {
+  const addItem = async (item: Product): Promise<boolean> => {
     if (!user?.id) {
       console.log("Cart: addItem - No user ID available, cannot add item");
-      return;
+      return false;
     }
 
     console.log(`Cart: addItem - Attempting to add product ${item.id} to cart for user ${user.id}`, item);

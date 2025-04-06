@@ -66,8 +66,8 @@ export const useProductActions = (productId: string) => {
       }
       
       // Add the product to cart using the CartContext
-      const addSuccess = await addItem(product as Product);
-      console.log(`ProductAction: handleRequestSample - Add to cart ${addSuccess ? 'successful' : 'failed'}`);
+      await addItem(product as Product);
+      console.log("ProductAction: handleRequestSample - Product added to cart");
       
       // Reload cart items to ensure UI is updated
       if (loadCartItems) {
