@@ -27,6 +27,13 @@ export const ShippingFormContainer = ({
   const [isAddressSaved, setIsAddressSaved] = useState(false);
   const [initialFormPopulated, setInitialFormPopulated] = useState(false);
 
+  // Check if address was saved on mount
+  useEffect(() => {
+    const savedStatus = localStorage.getItem('addressSaved') === 'true';
+    setIsAddressSaved(savedStatus);
+    console.log("Initial addressSaved status:", savedStatus);
+  }, []);
+
   const { data: addresses, refetch: refetchAddresses } = useQuery({
     queryKey: ["addresses", user?.id],
     queryFn: async () => {
@@ -67,33 +74,11 @@ export const ShippingFormContainer = ({
     enabled: !!user?.id,
   });
 
-  // Check if address was saved on mount
-  useEffect(() => {
-    const savedStatus = localStorage.getItem('addressSaved') === 'true';
-    setIsAddressSaved(savedStatus);
-  }, []);
-
   const saveAddress = async (values: ShippingFormData) => {
     try {
       if (!user?.id) throw new Error("User not authenticated");
 
-      localStorage.setItem('firstName', values.firstName);
-      localStorage.setItem('lastName', values.lastName);
-      localStorage.setItem('phone', values.phone);
-      localStorage.setItem('shipping_address', values.address1);
-      localStorage.setItem('shipping_address2', values.address2 || '');
-      localStorage.setItem('shipping_city', values.city);
-      localStorage.setItem('shipping_state', values.state);
-      localStorage.setItem('shipping_zip', values.zipCode);
-
-      if (!values.useSameForBilling) {
-        localStorage.setItem('billing_address', values.billingAddress1 || '');
-        localStorage.setItem('billing_address2', values.billingAddress2 || '');
-        localStorage.setItem('billing_city', values.billingCity || '');
-        localStorage.setItem('billing_state', values.billingState || '');
-        localStorage.setItem('billing_zip', values.billingZipCode || '');
-      }
-
+      // Save to database
       const { error } = await supabase
         .from('addresses')
         .insert({
@@ -107,24 +92,36 @@ export const ShippingFormContainer = ({
           zip_code: values.zipCode,
           type: 'shipping',
           phone: values.phone,
-          used_in_order: false
+          used_in_order: true
         });
 
       if (error) throw error;
       
-      setIsAddressSaved(true);
-      localStorage.setItem('addressSaved', 'true');
-      toast({
-        title: "Success",
-        description: "Address saved successfully",
-      });
+      // Also save billing address if different
+      if (!values.useSameForBilling && values.billingAddress1) {
+        const { error: billingError } = await supabase
+          .from('addresses')
+          .insert({
+            user_id: user.id,
+            first_name: values.firstName,
+            last_name: values.lastName,
+            street_address1: values.billingAddress1,
+            street_address2: values.billingAddress2,
+            city: values.billingCity || "",
+            state: values.billingState || "",
+            zip_code: values.billingZipCode || "",
+            type: 'billing',
+            phone: values.phone,
+            used_in_order: true
+          });
+        
+        if (billingError) console.error("Error saving billing address:", billingError);
+      }
+      
+      await refetchAddresses();
+      return true;
     } catch (error) {
       console.error("Error saving address:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to save address. Please try again.",
-      });
       throw error;
     }
   };

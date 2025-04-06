@@ -31,7 +31,7 @@ export const AddressFormSection = ({
   const useSameForBilling = form.watch("useSameForBilling");
   const { toast } = useToast();
 
-  // Don't reset the form in useEffect - this causes issues with editing fields
+  // Initialize the billing checkbox once
   useEffect(() => {
     // Only initialize the billing checkbox if it hasn't been set already
     if (form.getValues("useSameForBilling") === undefined) {
@@ -59,6 +59,7 @@ export const AddressFormSection = ({
       return;
     }
 
+    // If not using same address for billing, validate billing fields
     if (!useSameForBilling) {
       const hasBillingFields = values.billingAddress1 && 
                               values.billingCity && 
@@ -75,6 +76,15 @@ export const AddressFormSection = ({
       }
     }
 
+    // Copy shipping address to billing if using same address
+    if (useSameForBilling) {
+      form.setValue("billingAddress1", values.address1);
+      form.setValue("billingAddress2", values.address2 || "");
+      form.setValue("billingCity", values.city);
+      form.setValue("billingState", values.state);
+      form.setValue("billingZipCode", values.zipCode);
+    }
+
     // Store all form values in localStorage
     localStorage.setItem('firstName', values.firstName);
     localStorage.setItem('lastName', values.lastName);
@@ -87,20 +97,34 @@ export const AddressFormSection = ({
     localStorage.setItem('useSameForBilling', useSameForBilling.toString());
     localStorage.setItem('addressSaved', 'true');
 
-    // Store billing address if different from shipping
-    if (!useSameForBilling) {
-      localStorage.setItem('billing_address', values.billingAddress1 || '');
-      localStorage.setItem('billing_address2', values.billingAddress2 || '');
-      localStorage.setItem('billing_city', values.billingCity || '');
-      localStorage.setItem('billing_state', values.billingState || '');
-      localStorage.setItem('billing_zip', values.billingZipCode || '');
-    }
+    // Store billing address
+    localStorage.setItem('billing_address', values.billingAddress1 || '');
+    localStorage.setItem('billing_address2', values.billingAddress2 || '');
+    localStorage.setItem('billing_city', values.billingCity || '');
+    localStorage.setItem('billing_state', values.billingState || '');
+    localStorage.setItem('billing_zip', values.billingZipCode || '');
 
-    await onSubmit(values);
-    setIsAddressSaved(true);
+    try {
+      await onSubmit(values);
+      setIsAddressSaved(true);
+      console.log("Address saved successfully, isAddressSaved set to true");
+      
+      toast({
+        title: "Success",
+        description: "Address saved successfully! You can now continue to payment.",
+      });
+    } catch (error) {
+      console.error("Error saving address:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to save address. Please try again.",
+      });
+    }
   };
 
   console.log("Current form values:", form.getValues());
+  console.log("isAddressSaved:", isAddressSaved);
 
   return (
     <Form {...form}>
@@ -115,6 +139,7 @@ export const AddressFormSection = ({
             checked={useSameForBilling}
             onCheckedChange={(checked) => {
               form.setValue("useSameForBilling", checked as boolean);
+              
               if (checked) {
                 const values = form.getValues();
                 form.setValue("billingAddress1", values.address1);
@@ -122,13 +147,6 @@ export const AddressFormSection = ({
                 form.setValue("billingCity", values.city);
                 form.setValue("billingState", values.state);
                 form.setValue("billingZipCode", values.zipCode);
-              } else {
-                form.setValue("billingAddress1", "");
-                form.setValue("billingAddress2", "");
-                form.setValue("billingCity", "");
-                form.setValue("billingState", "");
-                form.setValue("billingZipCode", "");
-                setIsAddressSaved(false);
               }
             }}
           />

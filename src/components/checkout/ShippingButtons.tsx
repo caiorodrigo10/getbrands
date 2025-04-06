@@ -13,13 +13,11 @@ interface ShippingButtonsProps {
 
 export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue, onSave }: ShippingButtonsProps) => {
   const navigate = useNavigate();
-  const { clearCart } = useCart();
   const { toast } = useToast();
 
   const handleCancel = () => {
-    // Just navigate back without clearing the cart
+    // Just call the provided onCancel function
     onCancel();
-    navigate("/checkout/confirmation");
   };
 
   return (
@@ -38,11 +36,11 @@ export const ShippingButtons = ({ isAddressSaved, onCancel, onContinue, onSave }
       <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
         <Button
           type="button"
-          variant="destructive"
+          variant="outline"
           className="text-sm sm:text-base px-3 sm:px-4 h-10 sm:h-11 w-full sm:w-auto"
           onClick={handleCancel}
         >
-          Cancel Order
+          Back to Cart
         </Button>
         <Button
           type="button"

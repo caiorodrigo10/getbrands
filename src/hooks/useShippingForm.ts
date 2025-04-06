@@ -15,31 +15,50 @@ const formSchema = z.object({
   zipCode: z.string().min(5, "ZIP code is required"),
   phone: z.string().min(10, "Phone number is required"),
   useSameForBilling: z.boolean().default(true),
-  billingAddress1: z.string().min(5, "Billing address is required").optional().or(z.string()),
+  // Make billing fields conditional based on useSameForBilling
+  billingAddress1: z.string().optional().refine(
+    (val) => val !== undefined, 
+    { message: "Billing address is required when not using same address" }
+  ),
   billingAddress2: z.string().optional(),
-  billingCity: z.string().min(2, "Billing city is required").optional().or(z.string()),
-  billingState: z.string().min(2, "Billing state is required").optional().or(z.string()),
-  billingZipCode: z.string().min(5, "Billing ZIP code is required").optional().or(z.string()),
+  billingCity: z.string().optional().refine(
+    (val) => val !== undefined,
+    { message: "Billing city is required when not using same address" }
+  ),
+  billingState: z.string().optional().refine(
+    (val) => val !== undefined,
+    { message: "Billing state is required when not using same address" }
+  ),
+  billingZipCode: z.string().optional().refine(
+    (val) => val !== undefined,
+    { message: "Billing ZIP code is required when not using same address" }
+  ),
 });
 
 export const useShippingForm = () => {
   // Get saved values from localStorage once
-  const getSavedValues = () => ({
-    firstName: localStorage.getItem('firstName') || "",
-    lastName: localStorage.getItem('lastName') || "",
-    address1: localStorage.getItem('shipping_address') || "",
-    address2: localStorage.getItem('shipping_address2') || "",
-    city: localStorage.getItem('shipping_city') || "",
-    state: localStorage.getItem('shipping_state') || "",
-    zipCode: localStorage.getItem('shipping_zip') || "",
-    phone: localStorage.getItem('phone') || "",
-    useSameForBilling: localStorage.getItem('useSameForBilling') !== 'false', // Default to true
-    billingAddress1: localStorage.getItem('billing_address') || "",
-    billingAddress2: localStorage.getItem('billing_address2') || "",
-    billingCity: localStorage.getItem('billing_city') || "",
-    billingState: localStorage.getItem('billing_state') || "",
-    billingZipCode: localStorage.getItem('billing_zip') || "",
-  });
+  const getSavedValues = () => {
+    // Get all values from localStorage
+    const values = {
+      firstName: localStorage.getItem('firstName') || "",
+      lastName: localStorage.getItem('lastName') || "",
+      address1: localStorage.getItem('shipping_address') || "",
+      address2: localStorage.getItem('shipping_address2') || "",
+      city: localStorage.getItem('shipping_city') || "",
+      state: localStorage.getItem('shipping_state') || "",
+      zipCode: localStorage.getItem('shipping_zip') || "",
+      phone: localStorage.getItem('phone') || "",
+      useSameForBilling: localStorage.getItem('useSameForBilling') !== 'false', // Default to true
+      billingAddress1: localStorage.getItem('billing_address') || "",
+      billingAddress2: localStorage.getItem('billing_address2') || "",
+      billingCity: localStorage.getItem('billing_city') || "",
+      billingState: localStorage.getItem('billing_state') || "",
+      billingZipCode: localStorage.getItem('billing_zip') || "",
+    };
+
+    console.log("Getting saved form values from localStorage:", values);
+    return values;
+  };
 
   const form = useForm<ShippingFormData>({
     resolver: zodResolver(formSchema),
@@ -48,7 +67,9 @@ export const useShippingForm = () => {
   });
 
   // Log initial form values
-  console.log('Initial shipping form values:', form.getValues());
+  useEffect(() => {
+    console.log('Initial shipping form values:', form.getValues());
+  }, [form]);
 
   return form;
 };
