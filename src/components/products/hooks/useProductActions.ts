@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client"; 
-import { supabaseAdmin } from "@/lib/supabase/admin"; // Add admin client import
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { Product } from "@/types/product";
 import { useUserPermissions } from "@/lib/permissions";
 
@@ -35,8 +35,11 @@ export const useProductActions = (productId: string) => {
         return false;
       }
 
+      // Use the appropriate client based on admin status
+      const supabaseClient = isAdmin ? supabaseAdmin : supabase;
+
       // Check if product is already in cart
-      const { data: cartItems, error: cartError } = await supabase
+      const { data: cartItems, error: cartError } = await supabaseClient
         .from("cart_items")
         .select("*")
         .eq("user_id", user.id)
@@ -53,7 +56,7 @@ export const useProductActions = (productId: string) => {
       }
 
       // Add product to cart using the client
-      const { error: insertError } = await supabase
+      const { error: insertError } = await supabaseClient
         .from("cart_items")
         .insert({
           user_id: user.id,

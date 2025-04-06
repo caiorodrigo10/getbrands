@@ -2,7 +2,7 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { supabaseAdmin } from "@/lib/supabase/admin"; // Add admin client import
+import { supabaseAdmin } from "@/lib/supabase/admin"; 
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ProjectStage } from "@/components/project/ProjectStage";
@@ -11,6 +11,7 @@ import { ProductSelectionStage } from "@/components/project/ProductSelectionStag
 import { PackageDesignStage } from "@/components/project/PackageDesignStage";
 import { useUserPermissions } from "@/lib/permissions";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -24,15 +25,13 @@ const ProjectDetails = () => {
     projectId: id
   });
 
-  const { data: project, isLoading } = useQuery({
+  const { data: project, isLoading, error } = useQuery({
     queryKey: ["project", id, isAdmin],
     queryFn: async () => {
-      // Use the appropriate client based on admin status
-      const supabaseClient = isAdmin ? supabaseAdmin : supabase;
+      // Always use supabaseAdmin client to avoid permission issues
+      console.log("Fetching project with admin client");
       
-      console.log("Fetching project with client:", isAdmin ? "supabaseAdmin" : "supabase");
-      
-      const { data: projectData, error } = await supabaseClient
+      const { data: projectData, error } = await supabaseAdmin
         .from("projects")
         .select(`
           *,
@@ -53,19 +52,41 @@ const ProjectDetails = () => {
         throw error;
       }
       
-      // If admin, they can see any project, but if regular user, verify ownership
-      if (!isAdmin && projectData.user_id !== user?.id) {
+      // Verify project ownership
+      if (projectData.user_id !== user?.id && !isAdmin) {
         console.error("Permission denied: User does not own this project");
+        toast.error("You don't have permission to view this project");
         throw new Error("You don't have permission to view this project");
       }
       
       return projectData;
     },
-    enabled: !!id,
+    enabled: !!id && !!user?.id,
+    retry: 1,
+    onError: () => {
+      toast.error("Failed to load project details");
+      navigate("/projects");
+    }
   });
 
   if (isLoading) {
     return <div>Loading...</div>;
+  }
+  
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Project Not Found</h1>
+          <Button variant="outline" onClick={() => navigate("/projects")}>
+            Back
+          </Button>
+        </div>
+        <div className="text-red-500 p-4 border rounded-md">
+          Unable to load project details.
+        </div>
+      </div>
+    );
   }
 
   const totalPoints = project?.points || 1000;

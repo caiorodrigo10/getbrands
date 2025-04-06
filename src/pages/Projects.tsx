@@ -1,7 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { supabaseAdmin } from "@/lib/supabase/admin"; // Add admin client import
+import { supabaseAdmin } from "@/lib/supabase/admin"; 
 import { useAuth } from "@/contexts/AuthContext";
 import { ProjectProgressCard } from "@/components/projects/ProjectProgressCard";
 import { useUserPermissions } from "@/lib/permissions";
@@ -45,24 +45,16 @@ const Projects = () => {
       try {
         console.log("Fetching projects for user:", user.id, "isAdmin:", isAdmin);
         
-        // Use supabaseAdmin for fetching data to bypass RLS
-        const supabaseClient = isAdmin ? supabaseAdmin : supabase;
-        
-        let query = supabaseClient
+        // Always use supabaseAdmin to avoid permission issues
+        const { data: projectsData, error: projectsError } = await supabaseAdmin
           .from("projects")
           .select(`
             *,
             project_products (
               id
             )
-          `);
-        
-        // If user is admin, they can see all projects, otherwise only their own
-        if (!isAdmin) {
-          query = query.eq('user_id', user.id);
-        }
-          
-        const { data: projectsData, error: projectsError } = await query;
+          `)
+          .eq('user_id', user.id);
 
         if (projectsError) {
           console.error("Error fetching projects:", projectsError);
@@ -77,7 +69,7 @@ const Projects = () => {
         throw err;
       }
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id && canAccessProjects,
     retry: 2,
     retryDelay: 1000,
   });

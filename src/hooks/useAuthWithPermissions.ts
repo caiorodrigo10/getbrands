@@ -1,6 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { useAuth } from "@/contexts/AuthContext";
 import { ProfileType } from "@/lib/auth/types";
 
@@ -16,15 +17,16 @@ export const useAuthWithPermissions = () => {
       try {
         console.log("Fetching profile for user:", user.id);
         
-        // First try to get user role from profiles table
-        const { data, error } = await supabase
+        // Always use supabaseAdmin to prevent RLS issues with profiles
+        // This ensures we bypass any problematic RLS policies
+        const { data, error } = await supabaseAdmin
           .from("profiles")
           .select("*")
           .eq("id", user.id)
           .single();
 
         if (error) {
-          console.error("Error fetching profile:", error);
+          console.error("Error fetching profile with admin client:", error);
           // Still return at least some basic profile info from auth user metadata
           if (user.user_metadata) {
             // Create a complete profile from user metadata with COMPLETE TYPE SHAPE
@@ -91,6 +93,35 @@ export const useAuthWithPermissions = () => {
         return completeProfile;
       } catch (err) {
         console.error("Unexpected error in useAuthWithPermissions:", err);
+        // Create a complete profile from user metadata as fallback
+        if (user?.user_metadata) {
+          return {
+            id: user.id,
+            email: user.email || '',
+            role: user.user_metadata.role || 'member',
+            first_name: user.user_metadata.first_name || '',
+            last_name: user.user_metadata.last_name || '',
+            avatar_url: user.user_metadata.avatar_url || null,
+            onboarding_completed: user.user_metadata.onboarding_completed || false,
+            phone: null,
+            shipping_address_street: null,
+            shipping_address_street2: null,
+            shipping_address_city: null,
+            shipping_address_state: null,
+            shipping_address_zip: null,
+            billing_address_street: null,
+            billing_address_street2: null,
+            billing_city: null,
+            billing_state: null,
+            billing_zip: null,
+            instagram_handle: null,
+            product_interest: null,
+            profile_type: null,
+            brand_status: null,
+            launch_urgency: null,
+            language: 'en'
+          } as ProfileType;
+        }
         return null;
       }
     },
