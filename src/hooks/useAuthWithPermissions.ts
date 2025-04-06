@@ -31,9 +31,9 @@ export const useAuthWithPermissions = () => {
               id: user.id,
               role: user.user_metadata.role || 'member',
               email: user.email,
-              first_name: user.user_metadata.first_name,
-              last_name: user.user_metadata.last_name,
-              avatar_url: user.user_metadata.avatar_url,
+              first_name: user.user_metadata.first_name || '',
+              last_name: user.user_metadata.last_name || '',
+              avatar_url: user.user_metadata.avatar_url || null,
               onboarding_completed: user.user_metadata.onboarding_completed || false
             };
           }
@@ -42,17 +42,16 @@ export const useAuthWithPermissions = () => {
 
         console.log("Profile data from useAuthWithPermissions:", data);
         
-        // Enhance the profile data by merging it with user metadata for completeness
-        // But PRIORITIZE profile data from the database over user metadata
-        if (data && user.user_metadata) {
-          return {
-            ...user.user_metadata, // Base layer (lower priority)
-            ...data,               // Profile data from database (higher priority)
-            email: data.email || user.email // Ensure email is always available
-          };
-        }
-        
-        return data;
+        // Create a complete profile object with fallbacks to user metadata
+        return {
+          ...data,
+          // Ensure these critical fields have fallbacks
+          first_name: data.first_name || user.user_metadata?.first_name || '',
+          last_name: data.last_name || user.user_metadata?.last_name || '',
+          avatar_url: data.avatar_url || user.user_metadata?.avatar_url || null,
+          email: data.email || user.email || '',
+          role: data.role || user.user_metadata?.role || 'member'
+        };
       } catch (err) {
         console.error("Unexpected error in useAuthWithPermissions:", err);
         return null;

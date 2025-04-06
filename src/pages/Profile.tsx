@@ -4,49 +4,12 @@ import { PasswordChangeForm } from "@/components/profile/PasswordChangeForm";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuthWithPermissions } from "@/hooks/useAuthWithPermissions";
 import { useEffect } from "react";
 
 const Profile = () => {
   const { user } = useAuth();
-
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ["profile", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      
-      console.log("Profile page - Fetching profile for user:", user.id);
-      
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching profile in Profile page:", error);
-        // Return basic profile with user email if we can't fetch from database
-        if (user) {
-          return {
-            id: user.id,
-            email: user.email,
-            // Add empty values for fields we might need to reference safely
-            avatar_url: user.user_metadata?.avatar_url || null,
-            first_name: user.user_metadata?.first_name || '',
-            last_name: user.user_metadata?.last_name || '',
-          };
-        }
-        throw error;
-      }
-      
-      console.log("Profile page - Profile data:", data);
-      return data;
-    },
-    enabled: !!user?.id,
-    retry: 3,
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 5000),
-  });
+  const { profile, isLoading } = useAuthWithPermissions();
 
   useEffect(() => {
     console.log("Profile page - Current profile data:", {
@@ -56,7 +19,7 @@ const Profile = () => {
     });
   }, [profile, isLoading, user]);
 
-  // Safely extract avatar URL with fallbacks
+  // Safe extraction of avatar URL with proper fallbacks
   const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url || null;
 
   return (

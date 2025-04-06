@@ -5,7 +5,8 @@ import { Form } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAuthWithPermissions } from "@/hooks/useAuthWithPermissions";
+import { useQueryClient } from "@tanstack/react-query";
 import { ProfileFormData, profileFormSchema } from "./types";
 import { PersonalInfoFields } from "./PersonalInfoFields";
 import { AddressFields } from "./AddressFields";
@@ -16,32 +17,7 @@ export const ProfileForm = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ["profile", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      
-      console.log("ProfileForm - Fetching profile for user:", user.id);
-      
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching profile in ProfileForm:", error);
-        throw error;
-      }
-      
-      console.log("ProfileForm - Profile data retrieved:", data);
-      return data;
-    },
-    enabled: !!user?.id,
-    retry: 3,
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 5000),
-  });
+  const { profile, isLoading } = useAuthWithPermissions();
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileFormSchema),

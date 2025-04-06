@@ -14,7 +14,7 @@ import { UserInfo } from "./user-menu/UserInfo";
 import { MobileMenu } from "./user-menu/MobileMenu";
 import { MenuItems } from "./user-menu/MenuItems";
 import { useSessionManagement } from "@/hooks/useSessionManagement";
-import { useUserPermissions } from "@/lib/permissions";
+import { useAuthWithPermissions } from "@/hooks/useAuthWithPermissions";
 import { errorMessages } from "@/utils/errorMessages";
 import { toast } from "sonner";
 
@@ -29,7 +29,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   const { handleLogout } = useSessionManagement();
   const [isInAdminPanel, setIsInAdminPanel] = useState(location.pathname.startsWith('/admin'));
   const isPortuguese = location.pathname.startsWith('/pt');
-  const { profile, isAdmin, isLoading } = useUserPermissions();
+  const { profile, isAdmin, isLoading } = useAuthWithPermissions();
 
   useEffect(() => {
     console.log("UserMenu - Profile and permissions:", { 
@@ -50,13 +50,13 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   };
 
   if (!user) return null;
-
+  
   // Enhanced logic to get the most reliable user information
   const userEmail = profile?.email || user.email || "";
   
-  // Use profile data with fallbacks to get the most accurate name
-  const firstName = profile?.first_name || "";
-  const lastName = profile?.last_name || "";
+  // Get name fields from profile with fallbacks
+  const firstName = profile?.first_name || user.user_metadata?.first_name || "";
+  const lastName = profile?.last_name || user.user_metadata?.last_name || "";
   
   // Create display name with priority order and fallbacks
   const userName = firstName || lastName 
@@ -64,7 +64,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
     : userEmail.split('@')[0];
   
   // Use profile avatar URL with fallback to user metadata
-  const userAvatar = profile?.avatar_url || "";
+  const userAvatar = profile?.avatar_url || user.user_metadata?.avatar_url || "";
 
   const handleAdminNavigation = () => {
     if (isInAdminPanel) {
