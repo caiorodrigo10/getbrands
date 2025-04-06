@@ -1,9 +1,13 @@
+
 import { useNavigate } from "react-router-dom";
 import { Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const ScheduleDemoInfo = () => {
   const navigate = useNavigate();
+
+  // Log adicionado para depuração
+  console.log("ScheduleDemoInfo component rendering");
 
   return (
     <div className="p-4 bg-[#fff1ed] border-t border-[#f0562e]/20">

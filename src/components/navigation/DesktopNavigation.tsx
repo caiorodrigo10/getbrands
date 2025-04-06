@@ -26,7 +26,7 @@ export const DesktopNavigation = ({ menuItems, renderMenuItem }: DesktopNavigati
     });
   }, [hasFullAccess, isMember, isSampler, isAdmin, profile]);
   
-  // Allow either full access or admin status
+  // Corrigindo lógica de exibição: permitir visualização para administradores ou usuários com acesso completo
   const showProjectPoints = hasFullAccess || isAdmin;
 
   return (

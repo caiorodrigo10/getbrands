@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,28 +10,45 @@ export const ProjectPointsInfo = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const { data: totalPoints } = useQuery({
+  const { data: totalPoints, isLoading } = useQuery({
     queryKey: ["total-project-points", user?.id],
     queryFn: async () => {
       if (!user?.id) return 0;
       
-      const { data, error } = await supabase
-        .from("projects")
-        .select("points, points_used")
-        .eq("user_id", user.id);
+      try {
+        const { data, error } = await supabase
+          .from("projects")
+          .select("points, points_used")
+          .eq("user_id", user.id);
+          
+        if (error) {
+          console.error("Error fetching project points:", error);
+          return 0;
+        }
         
-      if (error) throw error;
-      
-      return data.reduce((total, project) => {
-        const availablePoints = (project.points || 0) - (project.points_used || 0);
-        return total + availablePoints;
-      }, 0);
+        if (!data || data.length === 0) {
+          console.log("No projects found for user:", user.id);
+          return 0;
+        }
+        
+        console.log("Projects points data:", data);
+        
+        return data.reduce((total, project) => {
+          const availablePoints = (project.points || 0) - (project.points_used || 0);
+          return total + availablePoints;
+        }, 0);
+      } catch (err) {
+        console.error("Unexpected error fetching points:", err);
+        return 0;
+      }
     },
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
-  if (!totalPoints) return null;
+  // Adicionar log para depuração
+  console.log("ProjectPointsInfo component - totalPoints:", totalPoints, "isLoading:", isLoading);
 
+  // Sempre renderizar o componente, mesmo se totalPoints for 0
   return (
     <div className="p-4 bg-[#fff1ed] border-t border-[#f0562e]/20">
       <div className="space-y-4">
@@ -39,7 +57,7 @@ export const ProjectPointsInfo = () => {
             <Coins className="h-4 w-4" />
             <span className="text-sm font-medium">Available Points</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{totalPoints}</p>
+          <p className="text-2xl font-bold text-gray-900">{isLoading ? "..." : totalPoints}</p>
         </div>
         
         <Button 

@@ -23,6 +23,16 @@ export const MobileNavigation = ({
   setIsOpen 
 }: MobileNavigationProps) => {
   const { hasFullAccess, isMember, isSampler, isAdmin } = useUserPermissions();
+  
+  // Log para depuração
+  console.log("MobileNavigation - Permissions:", {
+    hasFullAccess,
+    isMember,
+    isSampler,
+    isAdmin
+  });
+  
+  // Corrigindo a lógica de exibição para corresponder à navegação desktop
   const showProjectPoints = hasFullAccess || isAdmin;
 
   return (

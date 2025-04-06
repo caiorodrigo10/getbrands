@@ -14,6 +14,8 @@ export const useUserPermissions = () => {
   console.log("useUserPermissions - detailed check:", { 
     isAdmin: auth.isAdmin,
     hasFullAccess: auth.hasFullAccess,
+    isMember: auth.isMember,
+    isSampler: auth.isSampler,
     role: auth.role,
     profileRole: auth.profile?.role,
     userMetadataRole: user?.user_metadata?.role,
