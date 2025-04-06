@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client"; 
 import { supabaseAdmin } from "@/lib/supabase/admin"; 
@@ -14,10 +13,10 @@ const Projects = () => {
   const { hasFullAccess, isAdmin } = useUserPermissions();
   const navigate = useNavigate();
   
-  // Explicitly check for admin status or full access
+  // Verificação explícita para status de administrador ou acesso total
   const canAccessProjects = hasFullAccess || isAdmin;
   
-  // Debug logs
+  // Logs de depuração
   console.log("Projects page - User permissions:", { 
     userId: user?.id,
     userEmail: user?.email,
@@ -27,10 +26,10 @@ const Projects = () => {
   });
   
   useEffect(() => {
-    // Only redirect if not an admin and we're sure about permissions
+    // Apenas redirecionar se não for admin e tivermos certeza sobre as permissões
     if (user && !canAccessProjects) {
-      console.log("Redirecting: user doesn't have permission to access Projects");
-      toast.error("You don't have permission to access projects");
+      console.log("Redirecionando: usuário não tem permissão para acessar Projects");
+      toast.error("Você não tem permissão para acessar projetos");
       navigate('/catalog');
     }
   }, [hasFullAccess, isAdmin, navigate, canAccessProjects, user]);
@@ -45,10 +44,9 @@ const Projects = () => {
       try {
         console.log("Fetching projects for user:", user.id, "isAdmin:", isAdmin);
         
-        // Agora com as políticas RLS configuradas, podemos usar o cliente regular
-        // Os admins verão todos os projetos, os usuários normais verão apenas os seus
-        const client = isAdmin ? supabaseAdmin : supabase;
-        const { data: projectsData, error: projectsError } = await client
+        // Com as novas políticas RLS, podemos usar o cliente regular
+        // Os admins verão todos os projetos devido à política RLS melhorada
+        const { data: projectsData, error: projectsError } = await supabase
           .from("projects")
           .select(`
             *,
@@ -66,7 +64,7 @@ const Projects = () => {
         return projectsData;
       } catch (err) {
         console.error("Unexpected error in projects query:", err);
-        toast.error("Failed to load projects. Please try again.");
+        toast.error("Falha ao carregar projetos. Por favor, tente novamente.");
         throw err;
       }
     },

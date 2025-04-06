@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { supabaseAdmin } from "@/lib/supabase/admin"; 
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ProjectStage } from "@/components/project/ProjectStage";
@@ -27,13 +26,9 @@ const ProjectDetails = () => {
   const { data: project, isLoading, error } = useQuery({
     queryKey: ["project", id, isAdmin],
     queryFn: async () => {
-      // Com as políticas RLS configuradas, podemos usar o cliente regular
-      // que vai automaticamente aplicar as restrições de acesso
-      const client = isAdmin ? supabaseAdmin : supabase;
-      
       console.log("Fetching project with client:", isAdmin ? "admin" : "regular");
       
-      const { data: projectData, error } = await client
+      const { data: projectData, error } = await supabase
         .from("projects")
         .select(`
           *,
@@ -60,7 +55,7 @@ const ProjectDetails = () => {
     retry: 1,
     meta: {
       onError: () => {
-        toast.error("Failed to load project details");
+        toast.error("Falha ao carregar detalhes do projeto");
         navigate("/projects");
       }
     }
