@@ -1,3 +1,4 @@
+
 import { User, ShoppingBag, LogOut, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -14,6 +15,8 @@ export const MenuItems = ({
   handleAdminNavigation,
   handleLogout,
 }: MenuItemsProps) => {
+  console.log("MenuItems props:", { isAdmin, isInAdminPanel });
+  
   return (
     <div className="flex flex-col space-y-1">
       <Link

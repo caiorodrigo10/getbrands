@@ -31,6 +31,8 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   const isPortuguese = location.pathname.startsWith('/pt');
   const { profile, isAdmin, isLoading } = useAuthWithPermissions();
 
+  console.log("UserMenu - User profile and permissions:", { profile, isAdmin, isInAdminPanel });
+
   const getErrorMessage = (key: string) => {
     return errorMessages[key][isPortuguese ? 'pt' : 'en'];
   };

@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -6,7 +7,7 @@ import UserMenu from "../UserMenu";
 import { ProjectPointsInfo } from "./ProjectPointsInfo";
 import { ScheduleDemoInfo } from "./ScheduleDemoInfo";
 import { MenuItem } from "./types";
-import { useUserPermissions } from "@/lib/permissions";
+import { useAuthWithPermissions } from "@/hooks/useAuthWithPermissions";
 
 interface MobileNavigationProps {
   menuItems: MenuItem[];
@@ -21,7 +22,7 @@ export const MobileNavigation = ({
   isOpen, 
   setIsOpen 
 }: MobileNavigationProps) => {
-  const { hasFullAccess, isMember, isSampler } = useUserPermissions();
+  const { hasFullAccess, isMember, isSampler } = useAuthWithPermissions();
 
   return (
     <>
@@ -53,9 +54,6 @@ export const MobileNavigation = ({
                     </nav>
                     {hasFullAccess && <ProjectPointsInfo />}
                     {(isMember || isSampler) && <ScheduleDemoInfo />}
-                    <div className="p-4 border-t border-gray-200">
-                      <ProjectPointsInfo />
-                    </div>
                   </div>
                 </SheetContent>
               </Sheet>

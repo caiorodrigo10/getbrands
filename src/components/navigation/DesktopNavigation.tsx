@@ -1,9 +1,10 @@
+
 import { Link } from "react-router-dom";
 import UserMenu from "../UserMenu";
 import { ProjectPointsInfo } from "./ProjectPointsInfo";
 import { ScheduleDemoInfo } from "./ScheduleDemoInfo";
 import { MenuItem } from "./types";
-import { useUserPermissions } from "@/lib/permissions";
+import { useAuthWithPermissions } from "@/hooks/useAuthWithPermissions";
 
 interface DesktopNavigationProps {
   menuItems: MenuItem[];
@@ -11,7 +12,7 @@ interface DesktopNavigationProps {
 }
 
 export const DesktopNavigation = ({ menuItems, renderMenuItem }: DesktopNavigationProps) => {
-  const { hasFullAccess, isMember, isSampler } = useUserPermissions();
+  const { hasFullAccess, isMember, isSampler } = useAuthWithPermissions();
 
   return (
     <header className="border-r border-gray-200 bg-[#fafafa] fixed left-0 top-0 h-screen hidden md:block w-64">
