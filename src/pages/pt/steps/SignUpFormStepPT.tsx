@@ -67,6 +67,7 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
     setIsLoading(true);
 
     try {
+      // Step 1: Sign up the user
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -76,6 +77,8 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
             last_name: formData.lastName,
             phone: formData.phone,
             role: 'member',
+            language: 'pt',
+            onboarding_completed: true
           },
         },
       });
@@ -90,57 +93,75 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
       }
 
       if (data?.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: data.user.id,
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            email: formData.email,
-            phone: formData.phone,
-            role: 'member',
-            language: 'pt',
-            product_interest: quizData.productCategories,
-            profile_type: quizData.profileType,
-            brand_status: quizData.brandStatus,
-            launch_urgency: quizData.launchUrgency,
-            onboarding_completed: true,
-            updated_at: new Date().toISOString()
-          });
+        // Step 2: Wait a moment to ensure the user record is created in the database
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Step 3: Try to update the profile with quiz data and needed information
+        try {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .update({
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+              email: formData.email,
+              phone: formData.phone,
+              role: 'member',
+              language: 'pt',
+              product_interest: quizData.productCategories,
+              profile_type: quizData.profileType,
+              brand_status: quizData.brandStatus,
+              launch_urgency: quizData.launchUrgency,
+              onboarding_completed: true,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', data.user.id);
 
-        if (profileError) throw profileError;
-
-        // Track signup event in Segment
-        if (window.analytics) {
-          window.analytics.identify(data.user.id, {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            phone: formData.phone,
-            language: 'pt',
-            product_interest: quizData.productCategories,
-            profile_type: quizData.profileType,
-            brand_status: quizData.brandStatus,
-            launch_urgency: quizData.launchUrgency
-          });
-
-          window.analytics.track('user_signed_up', {
-            userId: data.user.id,
-            email: formData.email,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            phone: formData.phone,
-            signupMethod: 'email',
-            language: 'pt',
-            product_interest: quizData.productCategories,
-            profile_type: quizData.profileType,
-            brand_status: quizData.brandStatus,
-            launch_urgency: quizData.launchUrgency,
-            onboarding_completed: true
-          });
+          if (profileError) {
+            console.error("Erro ao atualizar perfil:", profileError);
+            // Continue with the flow even if there's an error
+          }
+        } catch (profileUpdateError) {
+          console.error("Erro na atualização do perfil:", profileUpdateError);
+          // Continue with the flow even if there's an error
         }
 
-        // Use React Router's navigate instead of window.location
+        // Step 4: Track signup event in analytics
+        try {
+          if (window.analytics) {
+            window.analytics.identify(data.user.id, {
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              email: formData.email,
+              phone: formData.phone,
+              language: 'pt',
+              product_interest: quizData.productCategories,
+              profile_type: quizData.profileType,
+              brand_status: quizData.brandStatus,
+              launch_urgency: quizData.launchUrgency
+            });
+
+            window.analytics.track('user_signed_up', {
+              userId: data.user.id,
+              email: formData.email,
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              phone: formData.phone,
+              signupMethod: 'email',
+              language: 'pt',
+              product_interest: quizData.productCategories,
+              profile_type: quizData.profileType,
+              brand_status: quizData.brandStatus,
+              launch_urgency: quizData.launchUrgency,
+              onboarding_completed: true
+            });
+          }
+        } catch (analyticsError) {
+          console.error("Erro ao rastrear evento de cadastro:", analyticsError);
+          // Continue with the flow even if there's an analytics error
+        }
+
+        // Step 5: Navigate to the start page
+        toast.success("Conta criada com sucesso!");
         navigate("/pt/start-here");
       }
     } catch (error: any) {
