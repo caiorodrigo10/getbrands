@@ -23,10 +23,11 @@ export const CallToActionSection = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button 
               size="lg" 
-              asChild
+              variant="default"
               className="bg-white hover:bg-white/90"
+              asChild
             >
-              <Link to="/signup" className="text-[#f0562e] font-medium flex items-center">
+              <Link to="/signup" className="font-medium flex items-center text-[#f0562e]">
                 Start Your Brand Journey
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
@@ -35,10 +36,10 @@ export const CallToActionSection = () => {
             <Button 
               size="lg" 
               variant="outline"
-              className="border-white text-white hover:bg-white/10 border-2"
+              className="border-white hover:bg-white/10 border-2"
               asChild
             >
-              <Link to="/catalog" className="text-white">
+              <Link to="/catalog" className="text-white font-medium flex items-center">
                 Browse Products First
               </Link>
             </Button>
