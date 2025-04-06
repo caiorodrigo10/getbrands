@@ -18,22 +18,24 @@ export const useAuthWithPermissions = () => {
         .single();
 
       if (error) {
-        console.error("Erro ao buscar perfil:", error);
+        console.error("Error fetching profile:", error);
         return null;
       }
       
-      console.log("Dados do perfil de useAuthWithPermissions:", data);
+      console.log("Profile data from useAuthWithPermissions:", data);
       return data;
     },
     enabled: !!user?.id,
     retry: 3,
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 10000),
     refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 5, // 5 minutos
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Verificação mais robusta e detalhada para papeis de usuário
+  // More robust role checking
   const role = profile?.role || null;
+  
+  // Explicit boolean conversion to avoid type issues
   const isAdmin = role === "admin";
   const isMember = role === "member";
   const isSampler = role === "sampler";
@@ -41,7 +43,7 @@ export const useAuthWithPermissions = () => {
   const hasLimitedAccess = isMember || isSampler;
   const isAuthenticated = !!profile;
 
-  console.log("useAuthWithPermissions - permissões calculadas:", { 
+  console.log("useAuthWithPermissions - calculated permissions:", { 
     isAdmin, 
     isMember, 
     isSampler, 

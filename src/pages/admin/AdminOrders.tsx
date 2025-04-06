@@ -2,119 +2,149 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 import AdminOrdersTable from "@/components/admin/orders/AdminOrdersTable";
-import { Pagination } from "@/components/ui/pagination";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import OrderStatusFilters from "@/components/sample-orders/OrderStatusFilters";
+import { Search, Users } from "lucide-react";
+import AdminPagination from "@/components/admin/AdminPagination";
 
-interface AdminOrdersProps { }
-
-const AdminOrders: React.FC<AdminOrdersProps> = () => {
+const AdminOrders = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentTab, setCurrentTab] = useState("all");
   const [page, setPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [showOnHold, setShowOnHold] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [pageSize, setPageSize] = useState(10);
+  
+  const handleTabChange = (value: string) => {
+    setCurrentTab(value);
+    setPage(1);
+  };
 
-  const { toast } = useToast();
-
-  const { data: ordersData, isLoading, error } = useQuery({
-    queryKey: ["admin-orders", page, statusFilter, showOnHold, searchQuery, pageSize],
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-orders", currentTab, searchTerm, page, pageSize],
     queryFn: async () => {
+      // Calculate the range for pagination
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
+
+      // Build query based on filter criteria
       let query = supabase
         .from("sample_requests")
-        .select("*", { count: "exact" })
-        .range((page - 1) * pageSize, page * pageSize - 1)
-        .order("created_at", { ascending: false });
-
-      if (statusFilter !== "all") {
-        query = query.eq("status", statusFilter);
+        .select(`
+          *,
+          profile:profiles(first_name, last_name, email),
+          product:products(*),
+          items:sample_request_products(
+            id, 
+            quantity, 
+            unit_price,
+            product:products(*)
+          )
+        `, { count: 'exact' });
+      
+      // Apply filters
+      if (currentTab !== "all") {
+        query = query.eq("status", currentTab);
       }
-
-      if (showOnHold) {
-        query = query.eq("status", "on_hold");
+      
+      if (searchTerm) {
+        query = query.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,profiles.email.ilike.%${searchTerm}%`);
       }
+      
+      // Apply pagination
+      const { data: orders, error, count } = await query
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
-      if (searchQuery) {
-        query = query.ilike("product_name", `%${searchQuery}%`);
-      }
-
-      const { data, error, count } = await query;
-
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       return {
-        data,
-        count: count || 0,
+        orders: orders || [],
+        totalOrders: count || 0,
+        pageCount: Math.ceil((count || 0) / pageSize)
       };
-    }
+    },
   });
 
-  const totalOrders = ordersData?.count || 0;
-  const orders = ordersData?.data || [];
-  const pageCount = Math.ceil(totalOrders / pageSize);
-
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPage(1); // Reset to first page on new search
+  };
+  
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
   };
 
-  if (error) {
-    toast({
-      variant: "destructive",
-      title: "Error",
-      description: "Failed to fetch orders. Please try again.",
-    });
-  }
-
   return (
-    <div className="container mx-auto py-6">
-      <div className="mb-4 flex flex-col gap-4">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <h1 className="text-2xl font-semibold">Admin Orders</h1>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <h1 className="text-3xl font-bold">Orders</h1>
+        <form 
+          onSubmit={handleSearch}
+          className="relative w-full md:w-auto"
+        >
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by product or order number"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="max-w-md"
+            placeholder="Search orders..."
+            className="pl-9 w-full md:w-[300px]"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
-        </div>
-
-        <OrderStatusFilters
-          selectedStatus={statusFilter}
-          setSelectedStatus={setStatusFilter}
-          showOnHold={showOnHold}
-          setShowOnHold={setShowOnHold}
-        />
+        </form>
       </div>
 
-      {isLoading ? (
-        <div className="space-y-2">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-40 w-full" />
-          <Skeleton className="h-10 w-32" />
+      <Tabs value={currentTab} onValueChange={handleTabChange}>
+        <div className="flex flex-col sm:flex-row justify-between">
+          <TabsList className="mb-4 sm:mb-0">
+            <TabsTrigger value="all">All Orders</TabsTrigger>
+            <TabsTrigger value="pending">Pending</TabsTrigger>
+            <TabsTrigger value="processing">Processing</TabsTrigger>
+            <TabsTrigger value="shipped">Shipped</TabsTrigger>
+            <TabsTrigger value="delivered">Delivered</TabsTrigger>
+            <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
+          </TabsList>
         </div>
-      ) : (
-        <>
-          <AdminOrdersTable orders={orders} totalOrders={totalOrders} />
 
-          {totalOrders > 0 && (
-            <div className="mt-4">
-              <Pagination
-                page={page}
-                onPageChange={handlePageChange}
-                pageCount={pageCount}
-                pageSize={pageSize}
-                setPageSize={setPageSize}
-                totalItems={totalOrders}
-              />
-            </div>
-          )}
-        </>
-      )}
+        <TabsContent value={currentTab} className="mt-4">
+          <Card>
+            <CardHeader className="px-6 pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Users className="h-5 w-5 text-muted-foreground" />
+                {isLoading 
+                  ? "Loading orders..." 
+                  : `${data?.totalOrders || 0} ${currentTab === 'all' ? 'Total' : currentTab} Orders`
+                }
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {isLoading ? (
+                <div className="flex items-center justify-center p-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : (
+                <>
+                  <AdminOrdersTable 
+                    orders={data?.orders || []} 
+                    totalOrders={data?.totalOrders || 0}
+                  />
+                  {data?.pageCount && data.pageCount > 1 && (
+                    <div className="px-6">
+                      <AdminPagination
+                        page={page}
+                        pageCount={data?.pageCount || 1}
+                        pageSize={pageSize}
+                        setPageSize={setPageSize}
+                        onPageChange={handlePageChange}
+                        totalItems={data?.totalOrders || 0}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

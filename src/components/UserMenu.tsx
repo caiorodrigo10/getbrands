@@ -32,7 +32,7 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
   const { profile, isAdmin, isLoading } = useUserPermissions();
 
   useEffect(() => {
-    console.log("UserMenu - Perfil e permissões:", { 
+    console.log("UserMenu - Profile and permissions:", { 
       profile, 
       isAdmin, 
       isInAdminPanel,

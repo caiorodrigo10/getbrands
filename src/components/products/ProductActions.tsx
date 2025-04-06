@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { useUserPermissions } from "@/lib/permissions";
 import { Video } from "lucide-react";
+import { useEffect } from "react";
 
 interface ProductActionsProps {
   productId: string;
@@ -16,7 +17,20 @@ export const ProductActions = ({ productId, onSelectProduct, showNotification = 
   const { isLoading, handleRequestSample } = useProductActions(productId);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { hasFullAccess, isMember, isSampler, isAdmin } = useUserPermissions();
+  const { hasFullAccess, isMember, isSampler, isAdmin, profile } = useUserPermissions();
+  
+  // Enhanced logging for permissions
+  useEffect(() => {
+    console.log("ProductActions - User permissions:", {
+      hasFullAccess,
+      isMember,
+      isSampler,
+      isAdmin,
+      role: profile?.role
+    });
+  }, [hasFullAccess, isMember, isSampler, isAdmin, profile]);
+  
+  // Either full access or admin can select products
   const canSelectProduct = hasFullAccess || isAdmin;
 
   const handleOrderSample = async () => {

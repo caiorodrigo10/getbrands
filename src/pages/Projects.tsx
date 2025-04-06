@@ -9,18 +9,24 @@ import { useNavigate } from "react-router-dom";
 
 const Projects = () => {
   const { user } = useAuth();
-  const { hasFullAccess, isAdmin } = useUserPermissions();
+  const { hasFullAccess, isAdmin, profile } = useUserPermissions();
   const navigate = useNavigate();
-  const canAccessProjects = hasFullAccess || isAdmin;
+  // Explicitly check for admin status
+  const canAccessProjects = hasFullAccess || isAdmin === true;
   
   useEffect(() => {
-    console.log("Projects - Checking permissions:", { hasFullAccess, isAdmin });
+    console.log("Projects - Permission check:", { 
+      hasFullAccess, 
+      isAdmin, 
+      canAccessProjects,
+      profileRole: profile?.role 
+    });
     
     if (!canAccessProjects) {
       console.log("Redirecting: user doesn't have permission to access Projects");
       navigate('/catalog');
     }
-  }, [hasFullAccess, isAdmin, navigate, canAccessProjects]);
+  }, [hasFullAccess, isAdmin, navigate, canAccessProjects, profile]);
   
   const { data: projects, isLoading } = useQuery({
     queryKey: ["projects"],

@@ -8,18 +8,20 @@ import { useAuthWithPermissions } from "@/hooks/useAuthWithPermissions";
 export const useUserPermissions = () => {
   const auth = useAuthWithPermissions();
   
+  // More detailed logging to track permission issues
   console.log("useUserPermissions - permissions:", { 
     isAdmin: auth.isAdmin,
     hasFullAccess: auth.hasFullAccess,
+    role: auth.role,
     profile: auth.profile
   });
   
   return {
     ...auth,
     // Helper functions for common permission checks
-    canAccessAdmin: () => auth.isAdmin,
-    canAccessProjects: () => auth.hasFullAccess || auth.isAdmin,
-    canAccessDashboard: () => auth.hasFullAccess || auth.isAdmin
+    canAccessAdmin: () => auth.isAdmin === true,
+    canAccessProjects: () => auth.hasFullAccess === true || auth.isAdmin === true,
+    canAccessDashboard: () => auth.hasFullAccess === true || auth.isAdmin === true
   };
 };
 

@@ -15,27 +15,38 @@ export const NavigationMenu = () => {
   const { hasFullAccess, isMember, isSampler, isAdmin, profile } = useUserPermissions();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Log permissions for debugging
+  // Enhanced logging for debugging
   useEffect(() => {
-    console.log("NavigationMenu - Permissions:", { 
+    console.log("NavigationMenu - Current permissions:", { 
       hasFullAccess, 
       isMember, 
       isSampler, 
       isAdmin,
-      profileRole: profile?.role
+      profileRole: profile?.role,
+      path: location.pathname
     });
-  }, [hasFullAccess, isMember, isSampler, isAdmin, profile]);
+  }, [hasFullAccess, isMember, isSampler, isAdmin, profile, location.pathname]);
 
   const showStartHere = isMember || isSampler;
   const menuItems = getMenuItems(showStartHere);
 
   const handleRestrictedNavigation = (path: string) => {
-    // Only show permission restriction for non-admin users
+    // Enhanced admin check: ensure admin users can access restricted pages
     if (!hasFullAccess && !isAdmin) {
+      console.log("Access restricted: redirecting to start-here", {
+        hasFullAccess, 
+        isAdmin, 
+        userRole: profile?.role
+      });
       navigate("/start-here");
       setIsOpen(false);
       return;
     }
+    console.log("Navigating to restricted page:", path, {
+      hasFullAccess, 
+      isAdmin, 
+      userRole: profile?.role
+    });
     navigate(path);
     setIsOpen(false);
   };
@@ -43,15 +54,19 @@ export const NavigationMenu = () => {
   const renderMenuItem = (item: MenuItem, mobile: boolean = false) => {
     const Icon = item.icon;
     const isActive = location.pathname === item.path;
+    
+    // Allow admins to access restricted pages
+    const isRestricted = item.restricted && !hasFullAccess && !isAdmin;
+    
     const baseStyles = cn(
       "flex items-center gap-3 px-4 py-2.5 my-1 text-sm rounded-md transition-all duration-200",
       isActive
         ? "bg-[#fff4fc] text-black font-medium"
         : "text-black hover:bg-[#fff4fc] hover:text-black",
-      item.restricted && !hasFullAccess && !isAdmin && "opacity-50 cursor-not-allowed"
+      isRestricted && "opacity-50 cursor-not-allowed"
     );
 
-    // Allow access to restricted areas for admin users
+    // Route access for restricted areas: special handling for admins
     if (item.restricted && !hasFullAccess && !isAdmin) {
       return (
         <button
@@ -101,7 +116,7 @@ export const NavigationMenu = () => {
       />
       <MobileNavigation 
         menuItems={menuItems}
-        renderMenuItem={renderMenuItem}
+        renderMenuItem={(item) => renderMenuItem(item, true)}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
       />

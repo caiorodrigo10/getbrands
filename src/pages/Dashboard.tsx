@@ -26,20 +26,23 @@ const Dashboard = () => {
     isAuthenticated,
   } = useDashboardData();
 
+  const canAccessDashboard = hasFullAccess || isAdmin === true;
+
   useEffect(() => {
-    console.log("Dashboard - Verificando permissões:", {
+    console.log("Dashboard - Checking permissions:", {
       hasFullAccess,
       isAdmin,
+      canAccessDashboard,
       profileRole: profile?.role
     });
     
-    if (!hasFullAccess) {
-      console.log("Redirecionando: usuário sem permissão para acessar o Dashboard");
+    if (!canAccessDashboard) {
+      console.log("Redirecting: user doesn't have permission to access the Dashboard");
       navigate('/catalog');
     }
-  }, [hasFullAccess, isAdmin, profile, navigate]);
+  }, [hasFullAccess, isAdmin, profile, navigate, canAccessDashboard]);
 
-  if (!isAuthenticated || !hasFullAccess) {
+  if (!isAuthenticated || !canAccessDashboard) {
     return null;
   }
 
@@ -48,7 +51,7 @@ const Dashboard = () => {
   return (
     <div className="space-y-8 animate-fade-in">
       <DashboardHeader userName={userName} />
-
+      
       <div className="grid grid-cols-12 gap-6">
         <div className="col-span-12 lg:col-span-7 space-y-6">
           <ProjectsOverview projects={projects || []} />

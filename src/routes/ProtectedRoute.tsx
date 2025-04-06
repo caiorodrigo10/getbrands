@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Navigate, useLocation } from "react-router-dom";
 import { useUserPermissions } from "@/lib/permissions";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -22,7 +23,8 @@ export function ProtectedRoute({
       console.log("ProtectedRoute - Checking admin permission:", {
         isAdmin,
         profileRole: profile?.role,
-        path: location.pathname
+        path: location.pathname,
+        profile
       });
     }
   }, [isAuthenticated, requireAdmin, isAdmin, profile, location.pathname]);
@@ -39,8 +41,15 @@ export function ProtectedRoute({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Enhanced admin check with better logging
   if (requireAdmin && !isAdmin) {
-    console.log("Access denied: user is not admin");
+    console.error("Access denied: user is not admin", {
+      role: profile?.role,
+      isAdmin,
+      path: location.pathname
+    });
+    
+    toast.error("Access denied: You need administrator privileges to access this page");
     return <Navigate to="/catalog" replace />;
   }
 

@@ -5,6 +5,7 @@ import { ProjectPointsInfo } from "./ProjectPointsInfo";
 import { ScheduleDemoInfo } from "./ScheduleDemoInfo";
 import { MenuItem } from "./types";
 import { useUserPermissions } from "@/lib/permissions";
+import { useEffect } from "react";
 
 interface DesktopNavigationProps {
   menuItems: MenuItem[];
@@ -12,7 +13,20 @@ interface DesktopNavigationProps {
 }
 
 export const DesktopNavigation = ({ menuItems, renderMenuItem }: DesktopNavigationProps) => {
-  const { hasFullAccess, isMember, isSampler, isAdmin } = useUserPermissions();
+  const { hasFullAccess, isMember, isSampler, isAdmin, profile } = useUserPermissions();
+  
+  // Enhanced debugging for navigation permissions
+  useEffect(() => {
+    console.log("DesktopNavigation - User permissions:", {
+      hasFullAccess,
+      isMember,
+      isSampler,
+      isAdmin,
+      role: profile?.role
+    });
+  }, [hasFullAccess, isMember, isSampler, isAdmin, profile]);
+  
+  // Allow either full access or admin status
   const showProjectPoints = hasFullAccess || isAdmin;
 
   return (
