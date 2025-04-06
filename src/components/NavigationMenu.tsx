@@ -27,18 +27,18 @@ export const NavigationMenu = () => {
     });
   }, [hasFullAccess, isMember, isSampler, isAdmin, profile, location.pathname]);
 
-  const showStartHere = isMember || isSampler;
-  const menuItems = getMenuItems(showStartHere);
+  // Removed showStartHere parameter as it's no longer needed
+  const menuItems = getMenuItems();
 
   const handleRestrictedNavigation = (path: string) => {
     // Enhanced admin check: ensure admin users can access restricted pages
     if (!hasFullAccess && !isAdmin) {
-      console.log("Access restricted: redirecting to start-here", {
+      console.log("Access restricted: redirecting to catalog", {
         hasFullAccess, 
         isAdmin, 
         userRole: profile?.role
       });
-      navigate("/start-here");
+      navigate("/catalog");
       setIsOpen(false);
       return;
     }
