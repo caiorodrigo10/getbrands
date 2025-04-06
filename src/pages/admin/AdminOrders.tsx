@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -57,6 +58,12 @@ interface Order {
   products?: OrderProduct[];
 }
 
+// Interface para tipar o resultado da RPC count_order_items
+interface ItemCount {
+  sample_request_id: string;
+  count: number;
+}
+
 const AdminOrders = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -85,7 +92,7 @@ const AdminOrders = () => {
         if (orders && orders.length > 0) {
           const orderIds = orders.map(order => order.id);
           
-          // Contagem de itens por pedido - corrigindo a sintaxe
+          // Contagem de itens por pedido usando a função RPC
           const { data: itemCounts, error: countError } = await supabase
             .rpc('count_order_items', { order_ids: orderIds });
             
@@ -94,9 +101,11 @@ const AdminOrders = () => {
           
           // Criar um mapa de ID do pedido para contagem de itens
           const itemCountMap: Record<string, number> = {};
-          itemCounts?.forEach((item: any) => {
-            itemCountMap[item.sample_request_id] = parseInt(item.count, 10);
-          });
+          if (itemCounts && Array.isArray(itemCounts)) {
+            itemCounts.forEach((item: ItemCount) => {
+              itemCountMap[item.sample_request_id] = Number(item.count);
+            });
+          }
           
           // Adicionar contagem de itens a cada pedido
           const ordersWithTotalItems = orders.map(order => ({
