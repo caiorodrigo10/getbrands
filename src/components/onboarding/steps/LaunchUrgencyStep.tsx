@@ -6,6 +6,7 @@ import { QuizNavigation } from "./QuizNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useState } from "react"; // Added useState
 
 interface LaunchUrgencyStepProps {
   selected: string;
@@ -21,6 +22,8 @@ export const LaunchUrgencyStep = ({
   onBack
 }: LaunchUrgencyStepProps) => {
   const { user } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false); // Added for form submission state
+  
   const options = [
     { value: "immediate", label: "Immediately (1-2 months)" },
     { value: "soon", label: "Soon (3-6 months)" },
@@ -29,10 +32,10 @@ export const LaunchUrgencyStep = ({
 
   const handleOptionSelect = async (value: string) => {
     try {
-      // Primeiro atualizar o estado local
+      // First update local state
       onAnswer(value);
 
-      // Só tenta atualizar no Supabase se o usuário estiver autenticado
+      // Only try to update in Supabase if the user is authenticated
       if (user?.id) {
         const { error } = await supabase
           .from('profiles')
@@ -44,16 +47,52 @@ export const LaunchUrgencyStep = ({
 
         if (error) {
           console.error('Supabase error:', error);
-          // Não impedir o fluxo se houver erro no Supabase
+          // Don't block the flow if there's an error in Supabase
           console.warn('Continuing despite Supabase error');
         } else {
+          // Only show success if there was no error
           toast.success("Launch timeline preference saved!");
         }
       }
     } catch (error: any) {
       console.error('Error updating launch urgency:', error);
-      // Não impedir o fluxo se houver erro
+      // Don't block the flow if there's an error
       console.warn('Continuing despite error');
+    }
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    
+    try {
+      // If we don't have a selection yet, show error
+      if (!selected) {
+        toast.error("Please select a launch timeline option");
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // Try to update profile one more time to make sure data is saved
+      if (user?.id) {
+        try {
+          await supabase
+            .from('profiles')
+            .update({ 
+              launch_urgency: selected,
+              onboarding_completed: true,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', user.id);
+        } catch (error) {
+          console.error('Error in final update:', error);
+          // Continue anyway
+        }
+      }
+      
+      // Always call onComplete regardless of errors
+      onComplete();
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -99,10 +138,10 @@ export const LaunchUrgencyStep = ({
       </RadioGroup>
 
       <QuizNavigation
-        onNext={onComplete}
+        onNext={handleSubmit}
         onBack={onBack}
         nextLabel="Complete"
-        isNextDisabled={!selected}
+        isNextDisabled={!selected || isSubmitting}
       />
     </div>
   );

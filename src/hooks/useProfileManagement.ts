@@ -30,13 +30,17 @@ export const useProfileManagement = ({ user, isPortuguese, getErrorMessage }: Us
         
         if (sessionError) {
           console.error('Session error:', sessionError);
-          toast.error(getErrorMessage('sessionError'));
-          navigate('/');
+          // Silently handle session error but don't disrupt user flow
+          if (isMounted) {
+            setIsLoading(false);
+          }
           return;
         }
 
         if (!session) {
-          navigate('/');
+          if (isMounted) {
+            setIsLoading(false);
+          }
           return;
         }
 
@@ -65,14 +69,13 @@ export const useProfileManagement = ({ user, isPortuguese, getErrorMessage }: Us
           attempts++;
         }
         
-        // Se ainda houver erro e não for "no rows returned", reportar erro
+        // If we still have an error and it's not "no rows returned", just log it but continue
         if (profileError && profileError.code !== 'PGRST116') {
           console.error('Error fetching profile after retries:', profileError);
-          toast.error(getErrorMessage('profileError'));
-          // Continuar com o fluxo mesmo com erro
+          // Continue with the flow even with error
         }
 
-        // Se encontramos um perfil, use-o
+        // If we found a profile, use it
         if (profileData) {
           console.log('Found existing profile:', profileData);
           if (isMounted) {
@@ -82,35 +85,40 @@ export const useProfileManagement = ({ user, isPortuguese, getErrorMessage }: Us
           return;
         }
 
-        // Se nenhum perfil foi encontrado, criar um novo
+        // If no profile was found, create a new one
         console.log('Creating new profile for user:', user.id);
         try {
+          // Use user metadata to populate profile fields
+          const userData = {
+            id: user.id,
+            email: user.email,
+            language: isPortuguese ? 'pt' : 'en',
+            role: user.app_metadata?.role || 'member',
+            first_name: user.user_metadata?.first_name || '',
+            last_name: user.user_metadata?.last_name || '',
+            avatar_url: user.user_metadata?.avatar_url || ''
+          };
+          
           const { data: newProfile, error: createError } = await supabase
             .from('profiles')
-            .upsert([{ 
-              id: user.id, 
-              email: user.email,
-              language: isPortuguese ? 'pt' : 'en',
-              role: user.app_metadata?.role || 'member'
-            }])
+            .upsert([userData])
             .select()
             .single();
             
           if (createError) {
             console.error('Error creating profile:', createError);
-            toast.error(getErrorMessage('createError'));
-            // Continuar com o fluxo mesmo com erro
+            // Continue with the flow even with error
           } else if (newProfile && isMounted) {
             console.log('Created new profile:', newProfile);
             setProfile(newProfile);
           }
         } catch (upsertError) {
           console.error('Error in upsert operation:', upsertError);
-          // Continuar com o fluxo mesmo com erro
+          // Continue with the flow even with error
         }
       } catch (error) {
         console.error('Error in profile fetch:', error);
-        toast.error(getErrorMessage('networkError'));
+        // Don't show error to user, just log it
       } finally {
         if (isMounted) {
           setIsLoading(false);

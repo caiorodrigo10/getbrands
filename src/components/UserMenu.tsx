@@ -40,37 +40,27 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
     getErrorMessage,
   });
 
-  console.log("UserMenu - Current user profile:", profile, "isAdmin:", profile?.role === "admin");
-
   if (!user) return null;
 
   const userEmail = user.email || "";
-  const userName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : "";
-  const userAvatar = profile?.avatar_url;
+  const firstName = profile?.first_name || user?.user_metadata?.first_name || "";
+  const lastName = profile?.last_name || user?.user_metadata?.last_name || "";
+  const userName = firstName || lastName 
+    ? `${firstName} ${lastName}`.trim() 
+    : userEmail.split('@')[0];
+  
+  const userAvatar = profile?.avatar_url || user?.user_metadata?.avatar_url;
   const isAdmin = profile?.role === "admin";
-
-  if (isAdmin) {
-    console.log("Admin user detected in UserMenu:", {
-      email: userEmail,
-      name: userName,
-      role: profile?.role
-    });
-  } else {
-    console.log("Non-admin user detected:", {
-      email: userEmail,
-      name: userName,
-      role: profile?.role
-    });
-  }
 
   const handleAdminNavigation = () => {
     if (isInAdminPanel) {
       navigate('/dashboard');
+      toast.success(isPortuguese ? "Voltou para visão de usuário" : "Switched to user view");
     } else {
       navigate('/admin');
+      toast.success(isPortuguese ? "Alterado para visão de admin" : "Switched to admin view");
     }
     setIsInAdminPanel(!isInAdminPanel);
-    toast.success(isInAdminPanel ? "Switched to user view" : "Switched to admin view");
   };
 
   if (isMobile) {
