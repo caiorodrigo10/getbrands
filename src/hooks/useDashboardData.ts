@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -55,7 +54,6 @@ export const useDashboardData = () => {
     enabled: !!user?.id && isAuthenticated,
   });
 
-  // Use mock data for meetings to avoid backend calls
   const { data: meetings } = useQuery({
     queryKey: ["meetings", user?.id],
     queryFn: async () => {
@@ -97,7 +95,6 @@ export const useDashboardData = () => {
     staleTime: Infinity,
   });
 
-  // Fix the products query by using standard client instead of admin
   const { data: products } = useQuery({
     queryKey: ["my-products", user?.id],
     queryFn: async () => {
@@ -108,13 +105,20 @@ export const useDashboardData = () => {
           .from('project_products')
           .select(`
             id,
-            project:projects (
+            projects!project_id (
               id,
               name,
               description
             ),
-            product:products (*),
-            specific:project_specific_products (
+            products!product_id (
+              id,
+              name,
+              category,
+              from_price,
+              srp,
+              image_url
+            ),
+            project_specific_products (
               id,
               name,
               description,
@@ -122,7 +126,7 @@ export const useDashboardData = () => {
               selling_price
             )
           `)
-          .eq('project:projects.user_id', user.id)  // Filter by user's projects
+          .eq('projects.user_id', user.id)  // Filter by user's projects
           .order('created_at', { ascending: false })
           .limit(3);
 
@@ -173,7 +177,6 @@ export const useDashboardData = () => {
     staleTime: 30000,
   });
 
-  // Fix the samples query to handle errors better
   const { data: samples } = useQuery({
     queryKey: ["samples", user?.id],
     queryFn: async () => {
