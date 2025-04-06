@@ -1,16 +1,23 @@
+
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 
 const supabaseUrl = "https://skrvprmnncxpkojraoem.supabase.co";
 const supabaseServiceKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrcnZwcm1ubmN4cGtvanJhb2VtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczMTUwNDI2NCwiZXhwIjoyMDQ3MDgwMjY0fQ.MeT3SqrNFjhffSm3DBMAo2TNDxlKaUT38pN9xey8oJo";
 
-// Cliente com permissões administrativas
-export const supabaseAdmin = createClient(
+// Client with admin privileges - make sure this is initialized correctly
+export const supabaseAdmin = createClient<Database>(
   supabaseUrl,
-  supabaseServiceKey
+  supabaseServiceKey,
+  {
+    auth: {
+      persistSession: false, // Don't persist admin sessions
+      autoRefreshToken: false, // Don't auto refresh the admin token
+    },
+  }
 );
 
-// Funções auxiliares para gerenciar tabelas
+// Helper functions for managing tables
 export const supabaseUtils = {
   // Criar novo usuário
   async createUser(email: string, password: string, userData?: any) {

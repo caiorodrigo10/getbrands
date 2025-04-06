@@ -6,16 +6,29 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUserPermissions } from "@/lib/permissions";
 import { ProjectProgressCard } from "@/components/projects/ProjectProgressCard";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 const Projects = () => {
   const { user } = useAuth();
-  const { isAdmin } = useUserPermissions();
+  const { isAdmin, profile } = useUserPermissions();
   
-  console.log("Projects page - User:", { 
-    userId: user?.id,
-    userEmail: user?.email,
-    isAdmin
-  });
+  // Enhanced logging for debugging
+  useEffect(() => {
+    console.log("Projects page - Detailed auth info:", { 
+      userId: user?.id,
+      userEmail: user?.email,
+      isAdmin,
+      profileRole: profile?.role,
+      userMetadataRole: user?.user_metadata?.role,
+    });
+    
+    // Debug supabaseAdmin client
+    console.log("Projects page - Checking Supabase clients:", {
+      regularClientExists: !!supabase,
+      adminClientExists: !!supabaseAdmin,
+      adminServiceRoleKey: supabaseAdmin?.auth?.admin ? "initialized" : "not initialized"
+    });
+  }, [user, isAdmin, profile]);
   
   const { data: projects, isLoading, error } = useQuery({
     queryKey: ["projects", user?.id, isAdmin],
@@ -25,7 +38,19 @@ const Projects = () => {
       }
       
       try {
-        console.log("Fetching projects with permissions:", { isAdmin, userId: user.id });
+        console.log("Fetching projects with permissions:", { 
+          isAdmin, 
+          userId: user.id,
+          profileRole: profile?.role
+        });
+        
+        // Check if we're in an admin route specifically
+        const isAdminRoute = window.location.pathname.includes("/admin");
+        console.log("Current route info:", { 
+          path: window.location.pathname,
+          isAdminRoute,
+          usingAdminClient: isAdmin || isAdminRoute
+        });
         
         // If admin, fetch all projects, otherwise fetch only user's projects
         const query = isAdmin ? 
@@ -42,6 +67,8 @@ const Projects = () => {
             )
           `).eq("user_id", user.id);
         
+        console.log("About to execute query with client:", isAdmin ? "supabaseAdmin" : "supabase");
+        
         const { data: projectsData, error: projectsError } = await query;
 
         if (projectsError) {
@@ -49,7 +76,13 @@ const Projects = () => {
           throw projectsError;
         }
         
-        console.log("Projects fetched:", projectsData?.length || 0);
+        // Detailed logging of returned data
+        console.log("Projects fetched successfully:", {
+          count: projectsData?.length || 0,
+          firstProjectId: projectsData?.[0]?.id,
+          isAdminFetchingAll: isAdmin
+        });
+        
         return projectsData;
       } catch (err) {
         console.error("Unexpected error in projects query:", err);
@@ -66,6 +99,16 @@ const Projects = () => {
       }
     }
   });
+
+  // Additional debugging for the rendered state
+  useEffect(() => {
+    if (projects) {
+      console.log("Projects ready for rendering:", {
+        count: projects.length,
+        projectIds: projects.map(p => p.id).join(', ')
+      });
+    }
+  }, [projects]);
 
   if (isLoading) {
     return (

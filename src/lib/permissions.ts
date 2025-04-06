@@ -1,6 +1,7 @@
 
 import { useAuthWithPermissions } from "@/hooks/useAuthWithPermissions";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
 
 /**
  * A utility hook that provides user permissions
@@ -19,14 +20,18 @@ export const useUserPermissions = () => {
     profileRole === "admin" || 
     userMetadataRole === "admin";
   
-  // Debug logging for permissions
-  console.log("useUserPermissions - Role check:", { 
-    profileRole, 
-    userMetadataRole, 
-    isActuallyAdmin,
-    userEmail: user?.email,
-    userId: user?.id
-  });
+  // Debug logging for permissions with more detail
+  useEffect(() => {
+    console.log("useUserPermissions - Detailed role check:", { 
+      profileRole, 
+      userMetadataRole, 
+      isActuallyAdmin,
+      userEmail: user?.email,
+      userId: user?.id,
+      profileObj: auth.profile,
+      userMetadata: user?.user_metadata
+    });
+  }, [profileRole, userMetadataRole, auth.profile, user]);
   
   return {
     ...auth,
