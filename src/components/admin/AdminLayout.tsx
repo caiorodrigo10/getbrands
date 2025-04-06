@@ -4,6 +4,7 @@ import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { AdminNavigationMenu } from "./AdminNavigationMenu";
 import { useUserPermissions } from "@/lib/permissions";
+import { toast } from "sonner";
 
 export const AdminLayout = () => {
   const navigate = useNavigate();
@@ -14,11 +15,14 @@ export const AdminLayout = () => {
     // Enhanced debugging for admin access
     console.log("AdminLayout - Access check:", {
       isAdmin, 
+      user: user?.id,
       email: user?.email,
+      metadataRole: user?.user_metadata?.role
     });
     
     if (!isLoading && !isAdmin) {
       console.log("User is not admin, redirecting from admin area");
+      toast.error("Access denied: You need administrator privileges to access this page");
       navigate("/");
     }
   }, [isAdmin, isLoading, navigate, user]);

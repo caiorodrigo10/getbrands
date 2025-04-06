@@ -17,7 +17,7 @@ export const useAuthWithPermissions = () => {
       try {
         console.log("Fetching profile for user:", user.id);
         
-        // Primeiro tentamos com o cliente regular
+        // First try with the regular client
         const { data, error } = await supabase
           .from("profiles")
           .select("*")
@@ -27,7 +27,7 @@ export const useAuthWithPermissions = () => {
         if (error) {
           console.error("Error fetching profile with regular client, trying admin client:", error);
           
-          // Se falhar, tentamos com o cliente admin
+          // If that fails, try with the admin client
           const { data: adminData, error: adminError } = await supabaseAdmin
             .from("profiles")
             .select("*")

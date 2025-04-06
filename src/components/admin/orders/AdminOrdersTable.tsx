@@ -1,7 +1,8 @@
+
 import React, { useState } from "react";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { AnimatePresence } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
 import { OrderSelectionBar } from "./OrderSelectionBar";
@@ -38,12 +39,17 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
       setUpdatingOrderId(orderId);
-      const { error } = await supabase
+      console.log("Updating order status:", { orderId, newStatus });
+      
+      const { error } = await supabaseAdmin
         .from('sample_requests')
         .update({ status: newStatus })
         .eq('id', orderId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating order status:', error);
+        throw error;
+      }
 
       await queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
 
@@ -79,6 +85,11 @@ const AdminOrdersTable = ({ orders, totalOrders }: AdminOrdersTableProps) => {
       await queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
     }
   };
+
+  console.log("AdminOrdersTable rendering with:", { 
+    orderCount: orders?.length, 
+    totalOrders 
+  });
 
   if (!orders || orders.length === 0) {
     return (
