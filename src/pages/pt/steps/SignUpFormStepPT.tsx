@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SignUpFormFields } from "@/components/auth/signup/SignUpFormFields";
 import { trackEvent } from "@/lib/analytics";
+import { useNavigate } from "react-router-dom";
 
 export interface SignUpFormStepPTProps {
   onBack: () => void;
@@ -16,6 +18,7 @@ export interface SignUpFormStepPTProps {
 }
 
 export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -138,7 +141,8 @@ export const SignUpFormStepPT = ({ onBack, quizData }: SignUpFormStepPTProps) =>
           });
         }
 
-        window.location.href = "/pt/start-here";
+        // Use React Router's navigate instead of window.location
+        navigate("/pt/start-here");
       }
     } catch (error: any) {
       console.error("Erro ao criar conta:", error);

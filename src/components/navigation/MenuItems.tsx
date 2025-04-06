@@ -6,7 +6,7 @@ export interface MenuItem {
   path: string;
   icon: LucideIcon;
   active?: boolean;
-  restricted?: boolean;
+  restricted: boolean; // Changed from optional to required
 }
 
 export const getMenuItems = (showStartHere = false): MenuItem[] => {
@@ -15,12 +15,14 @@ export const getMenuItems = (showStartHere = false): MenuItem[] => {
     {
       label: "Catalog",
       path: "/catalog",
-      icon: Home
+      icon: Home,
+      restricted: false // Add restricted property to all items
     },
     {
       label: "Favorites",
       path: "/favorites",
-      icon: Star
+      icon: Star,
+      restricted: false
     },
     {
       label: "Projects",
@@ -37,7 +39,8 @@ export const getMenuItems = (showStartHere = false): MenuItem[] => {
     {
       label: "Sample Orders",
       path: "/sample-orders",
-      icon: ListChecks
+      icon: ListChecks,
+      restricted: false
     },
     {
       label: "Documents",
@@ -48,7 +51,8 @@ export const getMenuItems = (showStartHere = false): MenuItem[] => {
     {
       label: "Profit Calculator",
       path: "/profit-calculator",
-      icon: Calculator
+      icon: Calculator,
+      restricted: false
     }
   ];
 
@@ -58,7 +62,8 @@ export const getMenuItems = (showStartHere = false): MenuItem[] => {
       {
         label: "Start Here",
         path: "/start-here",
-        icon: LayoutDashboard
+        icon: LayoutDashboard,
+        restricted: false
       },
       ...baseItems
     ];

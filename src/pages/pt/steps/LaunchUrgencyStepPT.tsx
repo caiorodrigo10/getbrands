@@ -36,10 +36,10 @@ export const LaunchUrgencyStepPT = ({
 
   const handleOptionSelect = async (value: string) => {
     try {
-      // Sempre atualiza o estado local primeiro
+      // Always update local state first
       onAnswer(value);
       
-      // Se não estiver logado, apenas continua o fluxo
+      // If not logged in, just continue with the flow
       if (!user?.id) {
         if (showNextButton) {
           onNext();
@@ -47,7 +47,7 @@ export const LaunchUrgencyStepPT = ({
         return;
       }
 
-      // Tenta atualizar no Supabase se o usuário estiver autenticado
+      // Try to update in Supabase if the user is authenticated
       const { error } = await supabase
         .from('profiles')
         .update({ 
@@ -58,19 +58,19 @@ export const LaunchUrgencyStepPT = ({
 
       if (error) {
         console.error('Erro Supabase:', error);
-        // Não impede o fluxo se houver erro
+        // Don't block the flow if there's an error
         console.warn('Continuando apesar do erro no Supabase');
       } else {
         toast.success("Preferência de lançamento salva!");
       }
       
-      // Avança ao próximo passo se necessário
+      // Move to next step if needed
       if (showNextButton) {
         onNext();
       }
     } catch (error: any) {
       console.error('Erro ao atualizar urgência de lançamento:', error);
-      // Não impedir o fluxo se houver erro
+      // Don't block the flow if there's an error
       console.warn('Continuando apesar do erro');
       
       if (showNextButton) {

@@ -28,6 +28,7 @@ export const useFavorites = () => {
 
     setIsLoading(true);
     try {
+      // We need to explicitly type the table for TypeScript
       const { data, error } = await supabase
         .from("user_favorites")
         .select("*")
@@ -35,11 +36,13 @@ export const useFavorites = () => {
 
       if (error) throw error;
 
-      setFavorites(data || []);
+      // Ensure we cast the data to Favorite[] type
+      const favoritesData = data as unknown as Favorite[];
+      setFavorites(favoritesData || []);
       
       // Create a map for quick lookup
       const map: Record<string, boolean> = {};
-      data?.forEach(favorite => {
+      favoritesData?.forEach(favorite => {
         map[favorite.product_id] = true;
       });
       setFavoritesMap(map);
@@ -85,8 +88,10 @@ export const useFavorites = () => {
           .single();
 
         if (error) throw error;
-
-        setFavorites(prev => [...prev, data]);
+        
+        // Cast data to Favorite type
+        const newFavorite = data as unknown as Favorite;
+        setFavorites(prev => [...prev, newFavorite]);
         setFavoritesMap(prev => ({ ...prev, [productId]: true }));
         toast.success("Added to favorites");
       }
