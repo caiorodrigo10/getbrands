@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -94,8 +93,8 @@ const Products = () => {
       // Transform the data to match the expected ProjectProduct structure
       const formattedProducts = projectProducts?.map(item => ({
         id: item.id,
-        project: item.project || null,
-        product: item.product,
+        project: item.project && item.project.length > 0 ? item.project[0] : null,
+        product: Array.isArray(item.product) && item.product.length > 0 ? item.product[0] : item.product,
         specific: item.specific
       })) || [];
       
