@@ -1,6 +1,5 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { supabaseAdmin } from "@/lib/supabase/admin"; 
 import { useAuth } from "@/contexts/AuthContext";
 import { ProjectProgressCard } from "@/components/projects/ProjectProgressCard";

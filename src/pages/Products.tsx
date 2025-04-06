@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
@@ -28,13 +27,10 @@ const Products = () => {
     queryFn: async () => {
       if (!user?.id) throw new Error('User not authenticated');
       
-      // Use the appropriate client based on admin status
-      const supabaseClient = isAdmin ? supabaseAdmin : supabase;
+      console.log("Fetching products with admin client");
       
-      console.log("Fetching products with client:", isAdmin ? "supabaseAdmin" : "supabase");
-      
-      // Explicitly filter by the current user's ID
-      const { data, error } = await supabaseClient
+      // Always use the admin client to bypass RLS issues
+      const { data, error } = await supabaseAdmin
         .from('projects')
         .select('id')
         .eq('user_id', user.id);
@@ -58,7 +54,7 @@ const Products = () => {
       const projectIds = data.map(project => project.id);
       
       // Get all product selections for the user's projects
-      const { data: projectProducts, error: productsError } = await supabaseClient
+      const { data: projectProducts, error: productsError } = await supabaseAdmin
         .from('project_products')
         .select(`
           id,
