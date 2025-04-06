@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserPermissions } from "@/lib/permissions";
@@ -72,18 +73,25 @@ const Dashboard = () => {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products?.slice(0, 3).map((item) => {
+            // Handle both the transformed data structure and direct database response
             const specificProduct = item.specific?.[0];
+            const product = item.product;
+            const projectName = item.project?.name;
+            
+            if (!product) return null;
+            
             const displayProduct = {
-              ...item.product,
-              name: specificProduct?.name || item.product?.name,
-              image_url: specificProduct?.image_url || item.product?.image_url,
-              id: item.product?.id,
+              ...product,
+              name: specificProduct?.name || product?.name,
+              image_url: specificProduct?.image_url || product?.image_url,
+              id: product?.id,
             };
+            
             return (
               <SimpleProductCard 
                 key={item.id} 
                 product={displayProduct}
-                projectName={item.project?.name}
+                projectName={projectName}
               />
             );
           })}
