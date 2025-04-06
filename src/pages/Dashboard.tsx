@@ -73,34 +73,26 @@ const Dashboard = () => {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products?.slice(0, 3).map((item) => {
-            // Handle both the transformed data structure and direct database response
             const specificProduct = item.specific?.[0];
             const product = item.product;
             const projectName = item.project?.name;
             
             if (!product) return null;
             
-            // Ensure all required properties are included for the Product type
-            const displayProduct = {
-              ...product,
-              name: specificProduct?.name || product?.name,
-              image_url: specificProduct?.image_url || product?.image_url,
-              id: product?.id,
-              description: product?.description || '',
-              is_new: product?.is_new || false,
-              is_tiktok: product?.is_tiktok || false,
-              created_at: product?.created_at || new Date().toISOString(),
-              updated_at: product?.updated_at || new Date().toISOString()
-            };
-            
             return (
               <SimpleProductCard 
                 key={item.id} 
-                product={displayProduct}
+                product={product}
                 projectName={projectName}
               />
             );
           })}
+          
+          {(!products || products.length === 0) && (
+            <div className="col-span-full text-center py-12">
+              <p className="text-lg text-gray-600">No products selected yet.</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -154,6 +146,12 @@ const Dashboard = () => {
               </div>
             </Card>
           ))}
+          
+          {(!samples || samples.length === 0) && (
+            <div className="col-span-full text-center py-12">
+              <p className="text-lg text-gray-600">No sample requests found.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

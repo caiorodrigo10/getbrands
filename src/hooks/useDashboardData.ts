@@ -103,130 +103,76 @@ export const useDashboardData = () => {
       if (!user?.id) return [];
       
       try {
-        // For admin users or when there are RLS permissions issues, use mocked data
-        if (user?.user_metadata?.role === 'admin') {
-          return [
-            {
-              id: "1",
-              project: { id: "p1", name: "Beauty Brand Launch", description: "Luxury cosmetics launch" },
-              product: {
-                id: "prod1",
-                name: "Facial Cleanser",
-                category: "skincare",
-                from_price: 12.99,
-                srp: 24.99,
-                image_url: "https://images.unsplash.com/photo-1556228852-6d35a585d566"
-              },
-              specific: [
-                {
-                  id: "sp1",
-                  name: "Gentle Facial Cleanser",
-                  description: "Custom formulated for sensitive skin",
-                  image_url: "https://images.unsplash.com/photo-1556228852-6d35a585d566",
-                  selling_price: 22.99
-                }
-              ]
-            },
-            {
-              id: "2",
-              project: { id: "p1", name: "Beauty Brand Launch", description: "Luxury cosmetics launch" },
-              product: {
-                id: "prod2",
-                name: "Moisturizing Cream",
-                category: "skincare",
-                from_price: 18.99,
-                srp: 32.99,
-                image_url: "https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd"
-              },
-              specific: [
-                {
-                  id: "sp2",
-                  name: "Hydrating Moisturizer",
-                  description: "24-hour hydration with natural ingredients",
-                  image_url: "https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd",
-                  selling_price: 29.99
-                }
-              ]
-            },
-            {
-              id: "3",
-              project: { id: "p2", name: "Wellness Collection", description: "Natural wellness products" },
-              product: {
-                id: "prod3",
-                name: "Essential Oil Diffuser",
-                category: "wellness",
-                from_price: 24.99,
-                srp: 44.99,
-                image_url: "https://images.unsplash.com/photo-1608571423539-e951a27ea9e9"
-              },
-              specific: [
-                {
-                  id: "sp3",
-                  name: "Ultrasonic Aroma Diffuser",
-                  description: "Silent operation with color-changing LED",
-                  image_url: "https://images.unsplash.com/photo-1608571423539-e951a27ea9e9",
-                  selling_price: 39.99
-                }
-              ]
-            }
-          ];
-        }
+        // Use appropriate client based on user role
+        const client = user?.user_metadata?.role === 'admin' ? supabaseAdmin : supabase;
         
-        // Try to fetch data from database
-        const { data, error } = await supabase
+        // First, get the user's projects
+        const { data: projectsData, error: projectsError } = await client
+          .from('projects')
+          .select('id')
+          .eq('user_id', user.id);
+
+        if (projectsError) {
+          console.error("Error fetching projects:", projectsError);
+          throw projectsError;
+        }
+
+        if (!projectsData || projectsData.length === 0) {
+          return [];
+        }
+
+        // Get project IDs to use in the next query
+        const projectIds = projectsData.map(project => project.id);
+        
+        // Get all product selections for the user's projects
+        const { data: projectProducts, error: productsError } = await client
           .from('project_products')
           .select(`
             id,
-            projects:project_id (
+            project_id,
+            product_id,
+            project:projects (
               id,
               name,
               description
             ),
-            products:product_id (
-              id,
-              name,
-              category,
-              from_price,
-              srp,
-              image_url
-            ),
-            project_specific_products (
+            product:products (*),
+            specific:project_specific_products (
               id,
               name,
               description,
-              image_url,
+              main_image_url,
+              images,
               selling_price
             )
           `)
-          .eq('projects.user_id', user.id)
+          .in('project_id', projectIds)
           .order('created_at', { ascending: false })
           .limit(3);
 
-        if (error) {
-          console.error("Error loading products:", error);
-          toast({
-            variant: "destructive",
-            title: "Error loading products",
-            description: error.message
-          });
-          
-          // Return empty array on error
-          return [];
+        if (productsError) {
+          console.error("Error fetching project products:", productsError);
+          throw productsError;
         }
         
-        // Transform the data to match expected format for the Dashboard component
-        if (data && data.length > 0) {
-          return data.map(item => ({
+        // Transform the data to match the expected ProjectProduct structure
+        const formattedProducts = projectProducts?.map(item => {
+          // Ensure project is an object with expected properties, not an array
+          const project = Array.isArray(item.project) && item.project.length > 0 
+            ? item.project[0] 
+            : item.project || null;
+
+          return {
             id: item.id,
-            project: item.projects,
-            product: item.products,
-            specific: item.project_specific_products
-          }));
-        }
+            project: project,
+            product: item.product,
+            specific: item.specific
+          };
+        }) || [];
         
-        return [];
+        return formattedProducts;
       } catch (err) {
-        console.error("Unexpected error loading products:", err);
+        console.error("Error loading products:", err);
         return [];
       }
     },
