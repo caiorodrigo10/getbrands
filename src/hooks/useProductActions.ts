@@ -1,59 +1,124 @@
-
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client"; 
+import { useUserPermissions } from "@/lib/permissions";
 import { useCart } from "@/contexts/CartContext";
 import { trackEvent } from "@/lib/analytics";
-import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
-import { useUserPermissions } from "@/lib/permissions";
-import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
 
 export const useProductActions = (productId: string) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { addItem, loadCartItems } = useCart();
-  const { user } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
-  const { hasFullAccess, isAdmin } = useUserPermissions();
+  const { user } = useAuth();
+  const { isAdmin } = useUserPermissions();
+  const { addItem, loadCartItems } = useCart();
 
-  // Debug log to help trace permission issues
-  console.log("useProductActions - Permissions check:", { 
-    productId, 
-    hasFullAccess, 
-    isAdmin, 
-    userId: user?.id
+  console.log("[PRODUCT ACTIONS] Initialized with:", {
+    productId,
+    isAdmin,
+    userId: user?.id,
+    cartOperations: {
+      addItemExists: !!addItem,
+      loadCartItemsExists: !!loadCartItems
+    }
   });
 
   const handleRequestSample = async () => {
     try {
+      console.log("[ORDER SAMPLE] Starting sample request flow");
       setIsLoading(true);
       
+      if (!user) {
+        console.log("[ORDER SAMPLE] No user, redirecting to login");
+        toast({
+          title: "Login Required",
+          description: "Please log in to request samples.",
+        });
+        navigate("/login");
+        return false;
+      }
+
+      console.log(`[ORDER SAMPLE] Requesting sample for product ID: ${productId}, user ID: ${user.id}`);
+      
       // Fetch product data first
-      const { data: product, error } = await supabase
+      const { data: product, error: productError } = await supabase
         .from('products')
         .select('*')
         .eq('id', productId)
         .single();
         
-      if (error) throw error;
+      if (productError) {
+        console.error("[ORDER SAMPLE] Error fetching product:", productError);
+        throw productError;
+      }
       
-      await addItem(product as Product);
-      await loadCartItems(); // Reload cart items after adding
-      
-      // Track sample request event
-      trackEvent("Sample Requested", {
-        product_id: productId
-      });
+      if (!product) {
+        console.error("[ORDER SAMPLE] Product not found");
+        throw new Error("Product not found");
+      }
 
-      // Return true to indicate success
+      console.log("[ORDER SAMPLE] Found product:", product);
+      
+      if (!addItem) {
+        console.error("[ORDER SAMPLE] addItem function is not available");
+        throw new Error("Cart functionality is not available");
+      }
+
+      // Add to cart via the Cart context
+      console.log("[ORDER SAMPLE] Now attempting to add product via CartContext.addItem");
+      try {
+        const result = await addItem(product as Product);
+        console.log("[ORDER SAMPLE] Add to cart via context completed, result:", result);
+        
+        if (!result) {
+          throw new Error("Failed to add item to cart");
+        }
+      } catch (cartError: any) {
+        console.error("[ORDER SAMPLE] Error during CartContext.addItem:", cartError?.message);
+        throw cartError;
+      }
+      
+      // Reload cart items to ensure UI is updated
+      console.log("[ORDER SAMPLE] Attempting to reload cart items");
+      if (loadCartItems) {
+        try {
+          await loadCartItems();
+          console.log("[ORDER SAMPLE] Cart items reloaded");
+        } catch (loadError: any) {
+          console.error("[ORDER SAMPLE] Error reloading cart items:", loadError?.message);
+        }
+      } else {
+        console.warn("[ORDER SAMPLE] loadCartItems function is not available");
+      }
+      
+      try {
+        // Track sample request event
+        trackEvent("Sample Requested", {
+          product_id: productId,
+          product_name: product.name
+        });
+      } catch (trackError) {
+        console.error("[ORDER SAMPLE] Error tracking event:", trackError);
+      }
+      
+      // After adding to cart, navigate to the checkout confirmation page
+      console.log("[ORDER SAMPLE] Navigating to checkout confirmation");
+      setTimeout(() => {
+        navigate("/checkout/confirmation", { replace: true });
+      }, 800);
+      
       return true;
-    } catch (error) {
-      console.error('Error requesting sample:', error);
+    } catch (error: any) {
+      console.error('[ORDER SAMPLE] Error requesting sample:', error?.message);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to add sample to cart. Please try again."
+        description: error?.message || "Failed to add sample to cart. Please try again."
       });
-      throw error;
+      return false;
     } finally {
       setIsLoading(false);
     }

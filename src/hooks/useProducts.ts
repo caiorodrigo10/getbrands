@@ -62,11 +62,14 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
       .order("created_at", { ascending: false });
 
     if (error) {
+      console.error("Error fetching products:", error);
       throw error;
     }
 
     const totalCount = count || 0;
     const hasNextPage = from + limit < totalCount;
+
+    console.log(`Fetched ${data?.length || 0} products, totalCount: ${totalCount}, hasNextPage: ${hasNextPage}`);
 
     return {
       data: data as Product[],
@@ -79,7 +82,7 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
   // Use React Query's useInfiniteQuery for mobile
   if (isMobile) {
     return useInfiniteQuery({
-      queryKey: ["products-infinite", { limit, search: searchTerm, categories }],
+      queryKey: ["catalog-products-infinite", { limit, search: searchTerm, categories }],
       queryFn: fetchProducts,
       initialPageParam: 1,
       getNextPageParam: (lastPage) => lastPage.nextPage,
@@ -88,7 +91,7 @@ export const useProducts = ({ page = 1, limit = 9 }: UseProductsOptions = {}) =>
 
   // Use regular useQuery for desktop
   return useQuery({
-    queryKey: ["products", { page, limit, search: searchTerm, categories }],
+    queryKey: ["catalog-products", { page, limit, search: searchTerm, categories }],
     queryFn: () => fetchProducts({ pageParam: page }),
   });
 };

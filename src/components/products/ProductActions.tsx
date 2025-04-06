@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useProductActions } from "@/hooks/useProductActions";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useUserPermissions } from "@/lib/permissions";
 import { Video } from "lucide-react";
 import { useEffect } from "react";
@@ -19,31 +19,31 @@ export const ProductActions = ({ productId, onSelectProduct, showNotification = 
   const { toast } = useToast();
   const { hasFullAccess, isMember, isSampler, isAdmin, profile } = useUserPermissions();
   
-  // Enhanced logging for permissions
+  // Enhanced logging for permissions and component mounting
   useEffect(() => {
-    console.log("ProductActions - User permissions:", {
-      hasFullAccess,
-      isMember,
-      isSampler,
-      isAdmin,
-      role: profile?.role
+    console.log("[PRODUCT ACTIONS] Component mounted with:", {
+      productId,
+      permissions: {
+        hasFullAccess,
+        isMember,
+        isSampler,
+        isAdmin,
+        role: profile?.role
+      }
     });
-  }, [hasFullAccess, isMember, isSampler, isAdmin, profile]);
+  }, [productId, hasFullAccess, isMember, isSampler, isAdmin, profile]);
   
   // Either full access or admin can select products
   const canSelectProduct = hasFullAccess || isAdmin;
 
   const handleOrderSample = async () => {
     try {
-      const success = await handleRequestSample();
-      if (success) {
-        // Add a small delay to ensure cart state is updated
-        setTimeout(() => {
-          navigate("/checkout/confirmation", { replace: true });
-        }, 800);
-      }
+      console.log("[PRODUCT ACTIONS] Order Sample button clicked for product:", productId);
+      const result = await handleRequestSample();
+      console.log("[PRODUCT ACTIONS] handleRequestSample result:", result);
+      // Navigation is now handled inside handleRequestSample
     } catch (error) {
-      console.error('Error requesting sample:', error);
+      console.error('[PRODUCT ACTIONS] Error requesting sample:', error);
       toast({
         variant: "destructive",
         title: "Error",

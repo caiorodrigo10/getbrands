@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Command } from "cmdk";
@@ -13,12 +12,12 @@ interface ProductsResponse {
   error: any;
 }
 
-interface ProductSearchProps {
+interface ProductSearchCheckoutProps {
   addToCart?: boolean;
   onSelectProduct?: (product: Product) => void;
 }
 
-export const ProductSearch = ({ addToCart, onSelectProduct }: ProductSearchProps) => {
+export const ProductSearchCheckout = ({ addToCart, onSelectProduct }: ProductSearchCheckoutProps) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const { addItem } = useCart();
@@ -26,7 +25,7 @@ export const ProductSearch = ({ addToCart, onSelectProduct }: ProductSearchProps
   const searchRef = useRef<HTMLDivElement>(null);
 
   const productsQuery = useQuery({
-    queryKey: ["catalog-products"], // Using a specific query key for catalog
+    queryKey: ["checkout-products"], // Using a different query key for checkout
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
@@ -131,4 +130,4 @@ export const ProductSearch = ({ addToCart, onSelectProduct }: ProductSearchProps
   );
 };
 
-export default ProductSearch;
+export default ProductSearchCheckout;

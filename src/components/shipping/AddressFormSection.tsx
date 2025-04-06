@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useEffect } from "react";
 import { Form } from "@/components/ui/form";
 import { PersonalInfoFields } from "@/components/shipping/PersonalInfoFields";
 import { AddressFields } from "@/components/shipping/AddressFields";
@@ -30,6 +31,21 @@ export const AddressFormSection = ({
   const useSameForBilling = form.watch("useSameForBilling");
   const { toast } = useToast();
 
+  // Initialize the billing checkbox once
+  useEffect(() => {
+    // Only initialize the billing checkbox if it hasn't been set already
+    if (form.getValues("useSameForBilling") === undefined) {
+      form.setValue("useSameForBilling", true);
+      console.log("Set initial useSameForBilling value to true");
+    }
+
+    // Check if address was previously saved
+    const wasAddressSaved = localStorage.getItem('addressSaved') === 'true';
+    if (wasAddressSaved) {
+      setIsAddressSaved(true);
+    }
+  }, [form, setIsAddressSaved]);
+
   const handleSubmit = async () => {
     const values = form.getValues();
     const isValid = await form.trigger();
@@ -43,6 +59,7 @@ export const AddressFormSection = ({
       return;
     }
 
+    // If not using same address for billing, validate billing fields
     if (!useSameForBilling) {
       const hasBillingFields = values.billingAddress1 && 
                               values.billingCity && 
@@ -59,6 +76,15 @@ export const AddressFormSection = ({
       }
     }
 
+    // Copy shipping address to billing if using same address
+    if (useSameForBilling) {
+      form.setValue("billingAddress1", values.address1);
+      form.setValue("billingAddress2", values.address2 || "");
+      form.setValue("billingCity", values.city);
+      form.setValue("billingState", values.state);
+      form.setValue("billingZipCode", values.zipCode);
+    }
+
     // Store all form values in localStorage
     localStorage.setItem('firstName', values.firstName);
     localStorage.setItem('lastName', values.lastName);
@@ -71,57 +97,38 @@ export const AddressFormSection = ({
     localStorage.setItem('useSameForBilling', useSameForBilling.toString());
     localStorage.setItem('addressSaved', 'true');
 
-    // Store billing address if different from shipping
-    if (!useSameForBilling) {
-      localStorage.setItem('billing_address', values.billingAddress1 || '');
-      localStorage.setItem('billing_address2', values.billingAddress2 || '');
-      localStorage.setItem('billing_city', values.billingCity || '');
-      localStorage.setItem('billing_state', values.billingState || '');
-      localStorage.setItem('billing_zip', values.billingZipCode || '');
-    }
+    // Store billing address
+    localStorage.setItem('billing_address', values.billingAddress1 || '');
+    localStorage.setItem('billing_address2', values.billingAddress2 || '');
+    localStorage.setItem('billing_city', values.billingCity || '');
+    localStorage.setItem('billing_state', values.billingState || '');
+    localStorage.setItem('billing_zip', values.billingZipCode || '');
 
-    await onSubmit(values);
-    setIsAddressSaved(true);
+    try {
+      await onSubmit(values);
+      setIsAddressSaved(true);
+      console.log("Address saved successfully, isAddressSaved set to true");
+      
+      toast({
+        title: "Success",
+        description: "Address saved successfully! You can now continue to payment.",
+      });
+    } catch (error) {
+      console.error("Error saving address:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to save address. Please try again.",
+      });
+    }
   };
 
-  // Load saved values from localStorage when component mounts
-  React.useEffect(() => {
-    const savedValues = {
-      firstName: localStorage.getItem('firstName') || '',
-      lastName: localStorage.getItem('lastName') || '',
-      phone: localStorage.getItem('phone') || '',
-      address1: localStorage.getItem('shipping_address') || '',
-      address2: localStorage.getItem('shipping_address2') || '',
-      city: localStorage.getItem('shipping_city') || '',
-      state: localStorage.getItem('shipping_state') || '',
-      zipCode: localStorage.getItem('shipping_zip') || '',
-      useSameForBilling: localStorage.getItem('useSameForBilling') === 'true',
-      billingAddress1: localStorage.getItem('billing_address') || '',
-      billingAddress2: localStorage.getItem('billing_address2') || '',
-      billingCity: localStorage.getItem('billing_city') || '',
-      billingState: localStorage.getItem('billing_state') || '',
-      billingZipCode: localStorage.getItem('billing_zip') || '',
-    };
-
-    // Only set form values if they're not already set
-    if (!form.getValues().firstName) {
-      form.reset(savedValues);
-    }
-
-    // Check if address was previously saved
-    const wasAddressSaved = localStorage.getItem('addressSaved') === 'true';
-    if (wasAddressSaved) {
-      setIsAddressSaved(true);
-    }
-  }, [form, setIsAddressSaved]);
-
-  React.useEffect(() => {
-    form.setValue("useSameForBilling", true);
-  }, [form]);
+  console.log("Current form values:", form.getValues());
+  console.log("isAddressSaved:", isAddressSaved);
 
   return (
     <Form {...form}>
-      <form className="space-y-6">
+      <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
         <PersonalInfoFields form={form} />
         <AddressFields form={form} />
         <ContactFields form={form} />
@@ -132,6 +139,7 @@ export const AddressFormSection = ({
             checked={useSameForBilling}
             onCheckedChange={(checked) => {
               form.setValue("useSameForBilling", checked as boolean);
+              
               if (checked) {
                 const values = form.getValues();
                 form.setValue("billingAddress1", values.address1);
@@ -139,13 +147,6 @@ export const AddressFormSection = ({
                 form.setValue("billingCity", values.city);
                 form.setValue("billingState", values.state);
                 form.setValue("billingZipCode", values.zipCode);
-              } else {
-                form.setValue("billingAddress1", "");
-                form.setValue("billingAddress2", "");
-                form.setValue("billingCity", "");
-                form.setValue("billingState", "");
-                form.setValue("billingZipCode", "");
-                setIsAddressSaved(false);
               }
             }}
           />
