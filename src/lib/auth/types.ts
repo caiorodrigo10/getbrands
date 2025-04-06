@@ -1,7 +1,10 @@
+
 import { User } from "@supabase/supabase-js";
 import { Json } from "@/integrations/supabase/types";
 
 export interface ProfileType {
+  id: string;
+  email: string;
   onboarding_completed: boolean;
   role: string;
   first_name: string | null;

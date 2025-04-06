@@ -27,12 +27,12 @@ export const useAuthWithPermissions = () => {
           console.error("Error fetching profile:", error);
           // Still return at least some basic profile info from auth user metadata
           if (user.user_metadata) {
-            // Create a more complete profile from user metadata with COMPLETE TYPE SHAPE
+            // Create a complete profile from user metadata with COMPLETE TYPE SHAPE
             // Make sure all possible profile fields are included with fallbacks
             return {
               id: user.id,
-              role: user.user_metadata.role || 'member',
               email: user.email || '',
+              role: user.user_metadata.role || 'member',
               first_name: user.user_metadata.first_name || '',
               last_name: user.user_metadata.last_name || '',
               avatar_url: user.user_metadata.avatar_url || null,
@@ -65,20 +65,32 @@ export const useAuthWithPermissions = () => {
         // Ensure ALL fields are present in the returned object
         return {
           ...data,
+          id: data.id || user.id,
+          email: data.email || user.email || '',
           // Ensure these critical fields have fallbacks
           first_name: data.first_name || user.user_metadata?.first_name || '',
           last_name: data.last_name || user.user_metadata?.last_name || '',
           avatar_url: data.avatar_url || user.user_metadata?.avatar_url || null,
-          email: data.email || user.email || '',
           role: data.role || user.user_metadata?.role || 'member',
-          // Ensure all other potential profile fields have at least null values if not present
+          onboarding_completed: data.onboarding_completed || user.user_metadata?.onboarding_completed || false,
+          // Ensure all other profile fields have at least null values if not present
           phone: data.phone || null,
           shipping_address_street: data.shipping_address_street || null,
           shipping_address_street2: data.shipping_address_street2 || null,
           shipping_address_city: data.shipping_address_city || null,
           shipping_address_state: data.shipping_address_state || null,
           shipping_address_zip: data.shipping_address_zip || null,
-          // ... all other profile fields with null fallbacks
+          billing_address_street: data.billing_address_street || null,
+          billing_address_street2: data.billing_address_street2 || null,
+          billing_city: data.billing_city || null,
+          billing_state: data.billing_state || null,
+          billing_zip: data.billing_zip || null,
+          instagram_handle: data.instagram_handle || null,
+          product_interest: data.product_interest || null,
+          profile_type: data.profile_type || null,
+          brand_status: data.brand_status || null,
+          launch_urgency: data.launch_urgency || null,
+          language: data.language || 'en'
         } as ProfileType;
       } catch (err) {
         console.error("Unexpected error in useAuthWithPermissions:", err);
