@@ -1,7 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client"; 
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserPermissions } from "@/lib/permissions";
 import { ProjectProgressCard } from "@/components/projects/ProjectProgressCard";
@@ -21,55 +20,28 @@ const Projects = () => {
       profileRole: profile?.role,
       userMetadataRole: user?.user_metadata?.role,
     });
-    
-    // Debug supabaseAdmin client
-    console.log("Projects page - Checking Supabase clients:", {
-      regularClientExists: !!supabase,
-      adminClientExists: !!supabaseAdmin,
-      adminServiceRoleKey: supabaseAdmin?.auth?.admin ? "initialized" : "not initialized"
-    });
   }, [user, isAdmin, profile]);
   
   const { data: projects, isLoading, error } = useQuery({
-    queryKey: ["projects", user?.id, isAdmin],
+    queryKey: ["projects", user?.id],
     queryFn: async () => {
       if (!user?.id) {
         throw new Error("User ID is required");
       }
       
       try {
-        console.log("Fetching projects with permissions:", { 
-          isAdmin, 
-          userId: user.id,
-          profileRole: profile?.role
-        });
+        console.log("Fetching projects for user ID:", user.id);
         
-        // Check if we're in an admin route specifically
-        const isAdminRoute = window.location.pathname.includes("/admin");
-        console.log("Current route info:", { 
-          path: window.location.pathname,
-          isAdminRoute,
-          usingAdminClient: isAdmin || isAdminRoute
-        });
-        
-        // If admin, fetch all projects, otherwise fetch only user's projects
-        const query = isAdmin ? 
-          supabaseAdmin.from("projects").select(`
+        // On the regular /projects route, always filter by user_id, even for admins
+        const { data: projectsData, error: projectsError } = await supabase
+          .from("projects")
+          .select(`
             *,
             project_products (
               id
             )
-          `) :
-          supabase.from("projects").select(`
-            *,
-            project_products (
-              id
-            )
-          `).eq("user_id", user.id);
-        
-        console.log("About to execute query with client:", isAdmin ? "supabaseAdmin" : "supabase");
-        
-        const { data: projectsData, error: projectsError } = await query;
+          `)
+          .eq("user_id", user.id);
 
         if (projectsError) {
           console.error("Error fetching projects:", projectsError);
@@ -80,7 +52,6 @@ const Projects = () => {
         console.log("Projects fetched successfully:", {
           count: projectsData?.length || 0,
           firstProjectId: projectsData?.[0]?.id,
-          isAdminFetchingAll: isAdmin
         });
         
         return projectsData;
