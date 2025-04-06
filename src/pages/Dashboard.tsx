@@ -80,11 +80,17 @@ const Dashboard = () => {
             
             if (!product) return null;
             
+            // Ensure all required properties are included for the Product type
             const displayProduct = {
               ...product,
               name: specificProduct?.name || product?.name,
               image_url: specificProduct?.image_url || product?.image_url,
               id: product?.id,
+              description: product?.description || '',
+              is_new: product?.is_new || false,
+              is_tiktok: product?.is_tiktok || false,
+              created_at: product?.created_at || new Date().toISOString(),
+              updated_at: product?.updated_at || new Date().toISOString()
             };
             
             return (
