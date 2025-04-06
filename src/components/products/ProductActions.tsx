@@ -19,16 +19,19 @@ export const ProductActions = ({ productId, onSelectProduct, showNotification = 
   const { toast } = useToast();
   const { hasFullAccess, isMember, isSampler, isAdmin, profile } = useUserPermissions();
   
-  // Enhanced logging for permissions
+  // Enhanced logging for permissions and component mounting
   useEffect(() => {
-    console.log("ProductActions - User permissions:", {
-      hasFullAccess,
-      isMember,
-      isSampler,
-      isAdmin,
-      role: profile?.role
+    console.log("ProductActions component mounted with:", {
+      productId,
+      permissions: {
+        hasFullAccess,
+        isMember,
+        isSampler,
+        isAdmin,
+        role: profile?.role
+      }
     });
-  }, [hasFullAccess, isMember, isSampler, isAdmin, profile]);
+  }, [productId, hasFullAccess, isMember, isSampler, isAdmin, profile]);
   
   // Either full access or admin can select products
   const canSelectProduct = hasFullAccess || isAdmin;

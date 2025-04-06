@@ -4,10 +4,15 @@ import { NavigationMenu } from "@/components/NavigationMenu";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import { useAuth } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { useEffect } from "react";
 
 export const AppLayout = () => {
   const location = useLocation();
   const { user } = useAuth();
+  
+  useEffect(() => {
+    console.log("AppLayout: Rendering with location:", location.pathname);
+  }, [location.pathname]);
   
   // Create a more comprehensive exclusion list for onboarding check
   const excludedPaths = [
@@ -36,6 +41,15 @@ export const AppLayout = () => {
   // Check if we're in the checkout flow
   const isCheckoutPath = location.pathname.startsWith("/checkout");
 
+  // Debug log for CartProvider wrapping
+  useEffect(() => {
+    console.log("AppLayout: CartProvider wrapping state:", {
+      isCheckoutPath,
+      location: location.pathname,
+      userId: user?.id
+    });
+  }, [isCheckoutPath, location.pathname, user?.id]);
+
   // Render the content with or without the cart provider based on the path
   const renderContent = () => (
     <div className="min-h-screen bg-background">
@@ -48,13 +62,10 @@ export const AppLayout = () => {
     </div>
   );
 
-  // Wrap non-checkout paths with CartProvider
-  // Checkout paths already have CartProvider
-  return isCheckoutPath ? (
-    renderContent()
-  ) : (
+  // Always wrap with CartProvider since both checkout and non-checkout paths need it
+  return (
     <CartProvider>
       {renderContent()}
     </CartProvider>
   );
-};
+}

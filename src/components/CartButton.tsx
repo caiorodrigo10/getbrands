@@ -16,15 +16,22 @@ export function CartButton() {
   const { items, loadCartItems } = useCart();
   const navigate = useNavigate();
 
-  // Load cart items on mount
+  // Load cart items on mount and log
   useEffect(() => {
-    loadCartItems();
+    console.log("CartButton: Mounted, loading cart items");
+    loadCartItems().then(() => {
+      console.log("CartButton: Finished loading cart items");
+    }).catch(error => {
+      console.error("CartButton: Error loading cart items:", error);
+    });
   }, []);
 
   // Calculate total quantity considering the quantity of each item
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+  console.log("CartButton: Current cart has", totalQuantity, "items");
 
   const handleCartClick = () => {
+    console.log("CartButton: Cart button clicked, navigating to checkout");
     // Track event before navigation
     trackEvent("Cart Viewed", {
       items_count: totalQuantity,

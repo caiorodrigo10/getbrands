@@ -17,18 +17,20 @@ export const useProductActions = (productId: string) => {
   const { isAdmin } = useUserPermissions();
   const { addItem, loadCartItems } = useCart();
 
-  // Debug log to track admin status and product ID
-  console.log("useProductActions - Status check:", {
+  console.log("useProductActions - initialized with:", {
     productId,
     isAdmin,
-    userId: user?.id
+    userId: user?.id,
+    cartOperations: !!addItem && !!loadCartItems
   });
 
   const handleRequestSample = async () => {
     try {
+      console.log("ProductAction: handleRequestSample - Starting sample request flow");
       setIsLoading(true);
       
       if (!user) {
+        console.log("ProductAction: handleRequestSample - No user, redirecting to login");
         toast({
           title: "Login Required",
           description: "Please log in to request samples.",
@@ -37,7 +39,7 @@ export const useProductActions = (productId: string) => {
         return false;
       }
 
-      console.log("Requesting sample for product ID:", productId);
+      console.log(`ProductAction: handleRequestSample - Requesting sample for product ID: ${productId}`);
       
       // Fetch product data first
       const { data: product, error: productError } = await supabase
@@ -47,27 +49,43 @@ export const useProductActions = (productId: string) => {
         .single();
         
       if (productError) {
-        console.error("Error fetching product:", productError);
+        console.error("ProductAction: handleRequestSample - Error fetching product:", productError);
         throw productError;
       }
       
       if (!product) {
+        console.error("ProductAction: handleRequestSample - Product not found");
         throw new Error("Product not found");
       }
 
-      console.log("Found product:", product);
+      console.log("ProductAction: handleRequestSample - Found product:", product);
+      
+      if (!addItem) {
+        console.error("ProductAction: handleRequestSample - addItem function is not available");
+        throw new Error("Cart functionality is not available");
+      }
       
       // Add the product to cart using the CartContext
-      await addItem(product as Product);
+      const addSuccess = await addItem(product as Product);
+      console.log(`ProductAction: handleRequestSample - Add to cart ${addSuccess ? 'successful' : 'failed'}`);
       
       // Reload cart items to ensure UI is updated
-      await loadCartItems();
+      if (loadCartItems) {
+        console.log("ProductAction: handleRequestSample - Reloading cart items");
+        await loadCartItems();
+      } else {
+        console.warn("ProductAction: handleRequestSample - loadCartItems function is not available");
+      }
       
-      // Track sample request event
-      trackEvent("Sample Requested", {
-        product_id: productId,
-        product_name: product.name
-      });
+      try {
+        // Track sample request event
+        trackEvent("Sample Requested", {
+          product_id: productId,
+          product_name: product.name
+        });
+      } catch (trackError) {
+        console.error("ProductAction: handleRequestSample - Error tracking event:", trackError);
+      }
 
       // Success message
       toast({
@@ -76,13 +94,14 @@ export const useProductActions = (productId: string) => {
       });
       
       // After adding to cart, navigate to the checkout confirmation page
+      console.log("ProductAction: handleRequestSample - Navigating to checkout confirmation");
       setTimeout(() => {
         navigate("/checkout/confirmation", { replace: true });
       }, 800);
       
       return true;
     } catch (error: any) {
-      console.error('Error requesting sample:', error);
+      console.error('ProductAction: handleRequestSample - Error requesting sample:', error);
       toast({
         variant: "destructive",
         title: "Error",
