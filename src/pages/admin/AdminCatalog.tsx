@@ -9,30 +9,22 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import AdminCatalogTable from "@/components/admin/catalog/AdminCatalogTable";
 import { ImportProductsDialog } from "@/components/admin/bulk-actions/ImportProductsDialog";
-import { 
-  Pagination, 
-  PaginationContent, 
-  PaginationItem, 
-  PaginationLink, 
-  PaginationNext, 
-  PaginationPrevious 
-} from "@/components/ui/pagination";
-
-const ITEMS_PER_PAGE = 15;
+import AdminPagination from "@/components/admin/AdminPagination";
 
 const AdminCatalog = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
   const [showImportDialog, setShowImportDialog] = useState(false);
 
   // Removing the redundant auth check that was causing redirection
 
   const { data: productsData, isLoading } = useQuery({
-    queryKey: ["admin-catalog", currentPage],
+    queryKey: ["admin-catalog", page, pageSize],
     queryFn: async () => {
-      const from = (currentPage - 1) * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
 
       const { data, error, count } = await supabase
         .from("products")
@@ -45,8 +37,9 @@ const AdminCatalog = () => {
       return {
         data,
         totalProducts: count || 0,
-        totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE),
-        currentPage
+        totalPages: Math.ceil((count || 0) / pageSize),
+        pageCount: Math.ceil((count || 0) / pageSize),
+        currentPage: page
       };
     },
   });
@@ -61,6 +54,10 @@ const AdminCatalog = () => {
     return productName.includes(searchLower) || 
            productCategory.includes(searchLower);
   });
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
 
   if (isLoading) {
     return (
@@ -112,38 +109,15 @@ const AdminCatalog = () => {
         totalProducts={productsData?.totalProducts || 0}
       />
 
-      {productsData?.totalPages && productsData.totalPages > 1 && (
-        <div className="flex justify-center mt-6">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                />
-              </PaginationItem>
-              
-              {Array.from({ length: productsData.totalPages }, (_, i) => i + 1).map((page) => (
-                <PaginationItem key={page}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(page)}
-                    isActive={currentPage === page}
-                    className="cursor-pointer"
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => setCurrentPage(Math.min(productsData.totalPages, currentPage + 1))}
-                  className={currentPage === productsData.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+      {productsData?.pageCount && productsData.pageCount > 1 && (
+        <AdminPagination
+          page={page}
+          pageCount={productsData.pageCount}
+          pageSize={pageSize}
+          totalItems={productsData.totalProducts || 0}
+          onPageChange={handlePageChange}
+          setPageSize={setPageSize}
+        />
       )}
 
       <ImportProductsDialog 
