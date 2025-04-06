@@ -1,6 +1,6 @@
-
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { supabaseAdmin } from "@/lib/supabase/admin"; 
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -27,10 +27,13 @@ const ProjectDetails = () => {
   const { data: project, isLoading, error } = useQuery({
     queryKey: ["project", id, isAdmin],
     queryFn: async () => {
-      // Always use supabaseAdmin client to avoid permission issues
-      console.log("Fetching project with admin client");
+      // Com as políticas RLS configuradas, podemos usar o cliente regular
+      // que vai automaticamente aplicar as restrições de acesso
+      const client = isAdmin ? supabaseAdmin : supabase;
       
-      const { data: projectData, error } = await supabaseAdmin
+      console.log("Fetching project with client:", isAdmin ? "admin" : "regular");
+      
+      const { data: projectData, error } = await client
         .from("projects")
         .select(`
           *,
@@ -49,13 +52,6 @@ const ProjectDetails = () => {
       if (error) {
         console.error("Error fetching project details:", error);
         throw error;
-      }
-      
-      // Verify project ownership
-      if (projectData.user_id !== user?.id && !isAdmin) {
-        console.error("Permission denied: User does not own this project");
-        toast.error("You don't have permission to view this project");
-        throw new Error("You don't have permission to view this project");
       }
       
       return projectData;

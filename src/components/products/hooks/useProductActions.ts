@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client"; 
-import { supabaseAdmin } from "@/lib/supabase/admin";
-import { Product } from "@/types/product";
 import { useUserPermissions } from "@/lib/permissions";
 
 export const useProductActions = (productId: string) => {
@@ -35,11 +33,11 @@ export const useProductActions = (productId: string) => {
         return false;
       }
 
-      // Use the appropriate client based on admin status
-      const supabaseClient = isAdmin ? supabaseAdmin : supabase;
+      // Agora podemos usar o cliente regular do Supabase
+      // As políticas RLS garantirão os direitos de acesso
 
       // Check if product is already in cart
-      const { data: cartItems, error: cartError } = await supabaseClient
+      const { data: cartItems, error: cartError } = await supabase
         .from("cart_items")
         .select("*")
         .eq("user_id", user.id)
@@ -55,8 +53,8 @@ export const useProductActions = (productId: string) => {
         return true;
       }
 
-      // Add product to cart using the client
-      const { error: insertError } = await supabaseClient
+      // Add product to cart
+      const { error: insertError } = await supabase
         .from("cart_items")
         .insert({
           user_id: user.id,

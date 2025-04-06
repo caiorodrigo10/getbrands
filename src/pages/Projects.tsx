@@ -1,5 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client"; 
 import { supabaseAdmin } from "@/lib/supabase/admin"; 
 import { useAuth } from "@/contexts/AuthContext";
 import { ProjectProgressCard } from "@/components/projects/ProjectProgressCard";
@@ -44,16 +45,17 @@ const Projects = () => {
       try {
         console.log("Fetching projects for user:", user.id, "isAdmin:", isAdmin);
         
-        // Always use supabaseAdmin to avoid permission issues
-        const { data: projectsData, error: projectsError } = await supabaseAdmin
+        // Agora com as políticas RLS configuradas, podemos usar o cliente regular
+        // Os admins verão todos os projetos, os usuários normais verão apenas os seus
+        const client = isAdmin ? supabaseAdmin : supabase;
+        const { data: projectsData, error: projectsError } = await client
           .from("projects")
           .select(`
             *,
             project_products (
               id
             )
-          `)
-          .eq('user_id', user.id);
+          `);
 
         if (projectsError) {
           console.error("Error fetching projects:", projectsError);

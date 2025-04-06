@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
@@ -27,10 +28,12 @@ const Products = () => {
     queryFn: async () => {
       if (!user?.id) throw new Error('User not authenticated');
       
-      console.log("Fetching products with admin client");
+      console.log("Fetching products for user:", user.id);
       
-      // Always use the admin client to bypass RLS issues
-      const { data, error } = await supabaseAdmin
+      // Com as políticas RLS configuradas, podemos usar o cliente regular
+      const client = isAdmin ? supabaseAdmin : supabase;
+      
+      const { data, error } = await client
         .from('projects')
         .select('id')
         .eq('user_id', user.id);
@@ -54,7 +57,7 @@ const Products = () => {
       const projectIds = data.map(project => project.id);
       
       // Get all product selections for the user's projects
-      const { data: projectProducts, error: productsError } = await supabaseAdmin
+      const { data: projectProducts, error: productsError } = await client
         .from('project_products')
         .select(`
           id,
