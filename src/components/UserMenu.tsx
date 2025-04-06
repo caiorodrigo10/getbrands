@@ -39,6 +39,8 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
       profileRole: profile?.role,
       firstName: profile?.first_name,
       lastName: profile?.last_name,
+      email: profile?.email,
+      fullName: `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim(),
       userMetadata: user?.user_metadata
     });
   }, [profile, isAdmin, isInAdminPanel, user]);
@@ -49,19 +51,20 @@ const UserMenu = ({ isMobile }: UserMenuProps) => {
 
   if (!user) return null;
 
-  const userEmail = user.email || "";
+  // Enhanced logic to get the most reliable user information
+  const userEmail = profile?.email || user.email || "";
   
-  // Try to get name from multiple sources with proper fallbacks
-  const firstName = profile?.first_name || user?.user_metadata?.first_name || "";
-  const lastName = profile?.last_name || user?.user_metadata?.last_name || "";
+  // Use profile data with fallbacks to get the most accurate name
+  const firstName = profile?.first_name || "";
+  const lastName = profile?.last_name || "";
   
   // Create display name with priority order and fallbacks
   const userName = firstName || lastName 
     ? `${firstName} ${lastName}`.trim() 
     : userEmail.split('@')[0];
   
-  // Handle both profile and user_metadata as potential sources of avatar URL
-  const userAvatar = profile?.avatar_url || user?.user_metadata?.avatar_url;
+  // Use profile avatar URL with fallback to user metadata
+  const userAvatar = profile?.avatar_url || "";
 
   const handleAdminNavigation = () => {
     if (isInAdminPanel) {

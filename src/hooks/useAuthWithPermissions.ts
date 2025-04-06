@@ -42,14 +42,13 @@ export const useAuthWithPermissions = () => {
 
         console.log("Profile data from useAuthWithPermissions:", data);
         
-        // Merge profile data with user metadata for completeness
+        // Enhance the profile data by merging it with user metadata for completeness
+        // But PRIORITIZE profile data from the database over user metadata
         if (data && user.user_metadata) {
-          // Fill in any missing profile data from user_metadata as fallback
           return {
-            ...data,
-            first_name: data.first_name || user.user_metadata.first_name,
-            last_name: data.last_name || user.user_metadata.last_name,
-            avatar_url: data.avatar_url || user.user_metadata.avatar_url,
+            ...user.user_metadata, // Base layer (lower priority)
+            ...data,               // Profile data from database (higher priority)
+            email: data.email || user.email // Ensure email is always available
           };
         }
         

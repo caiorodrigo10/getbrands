@@ -1,3 +1,4 @@
+
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { PasswordChangeForm } from "@/components/profile/PasswordChangeForm";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
@@ -5,23 +6,51 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 
-const Perfil = () => {
+const Profile = () => {
   const { user } = useAuth();
 
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const { data } = await supabase
+      
+      console.log("Profile page - Fetching profile for user:", user.id);
+      
+      const { data, error } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", user.id)
         .single();
+
+      if (error) {
+        console.error("Error fetching profile in Profile page:", error);
+        // Return basic profile with user email if we can't fetch from database
+        if (user) {
+          return {
+            id: user.id,
+            email: user.email,
+          };
+        }
+        throw error;
+      }
+      
+      console.log("Profile page - Profile data:", data);
       return data;
     },
     enabled: !!user?.id,
+    retry: 3,
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 5000),
   });
+
+  useEffect(() => {
+    console.log("Profile page - Current profile data:", {
+      profile,
+      user: user?.user_metadata,
+      isLoading
+    });
+  }, [profile, isLoading, user]);
 
   return (
     <div className="container max-w-2xl mx-auto space-y-8 p-4">
@@ -68,4 +97,4 @@ const Perfil = () => {
   );
 };
 
-export default Perfil;
+export default Profile;
