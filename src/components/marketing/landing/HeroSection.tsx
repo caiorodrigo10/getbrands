@@ -2,8 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useWindowSize } from "@/hooks/useWindowSize";
 
 export const HeroSection = () => {
+  const { width } = useWindowSize();
+  const isMobile = width < 768;
+
   return (
     <section className="relative bg-white pt-20 pb-16 lg:pt-32">
       {/* Login Button */}
@@ -72,36 +76,69 @@ export const HeroSection = () => {
             </Button>
           </div>
           
-          {/* Social proof */}
+          {/* Social proof - adjusted for better mobile experience */}
           <div className="mt-12 pt-6 border-t border-gray-100">
-            <p className="text-sm text-gray-500 mb-3">Trusted by brands across the US</p>
-            <div className="flex justify-center items-center flex-wrap gap-8">
-              <img 
-                src="/lovable-uploads/4cec31ab-a832-4679-bc88-32cd5137cb4a.png" 
-                alt="Client Brand Logo" 
-                className="h-14 object-contain"
-              />
-              <img 
-                src="/lovable-uploads/934ab001-8c6b-4af3-9e77-acdfeeecfd41.png" 
-                alt="Holistica Bloom Logo" 
-                className="h-14 object-contain"
-              />
-              <img 
-                src="/lovable-uploads/d3bc5abc-7c82-4804-852c-cb6ee8675b30.png" 
-                alt="Olympic Logo" 
-                className="h-14 object-contain"
-              />
-              <img 
-                src="/lovable-uploads/8f42921f-1f7d-485b-919b-2f22f05e1422.png" 
-                alt="Client Brand Logo" 
-                className="h-14 object-contain"
-              />
-              <img 
-                src="/lovable-uploads/75e9db4b-0b11-443e-8a57-0926c37769b7.png" 
-                alt="Client Brand Logo" 
-                className="h-14 object-contain"
-              />
-            </div>
+            <p className="text-sm text-gray-500 mb-5">Trusted by brands across the US</p>
+            
+            {isMobile ? (
+              /* Mobile layout - scrollable row */
+              <div className="flex overflow-x-auto pb-4 gap-8 justify-start px-4 no-scrollbar">
+                <img 
+                  src="/lovable-uploads/4cec31ab-a832-4679-bc88-32cd5137cb4a.png" 
+                  alt="Client Brand Logo" 
+                  className="h-12 w-auto object-contain flex-shrink-0"
+                />
+                <img 
+                  src="/lovable-uploads/934ab001-8c6b-4af3-9e77-acdfeeecfd41.png" 
+                  alt="Holistica Bloom Logo" 
+                  className="h-12 w-auto object-contain flex-shrink-0"
+                />
+                <img 
+                  src="/lovable-uploads/d3bc5abc-7c82-4804-852c-cb6ee8675b30.png" 
+                  alt="Olympic Logo" 
+                  className="h-12 w-auto object-contain flex-shrink-0"
+                />
+                <img 
+                  src="/lovable-uploads/8f42921f-1f7d-485b-919b-2f22f05e1422.png" 
+                  alt="Client Brand Logo" 
+                  className="h-12 w-auto object-contain flex-shrink-0"
+                />
+                <img 
+                  src="/lovable-uploads/75e9db4b-0b11-443e-8a57-0926c37769b7.png" 
+                  alt="Dolce Vitta Logo" 
+                  className="h-12 w-auto object-contain flex-shrink-0"
+                />
+              </div>
+            ) : (
+              /* Desktop layout - grid with balanced layout */
+              <div className="grid grid-cols-5 gap-6 items-center justify-items-center">
+                <img 
+                  src="/lovable-uploads/4cec31ab-a832-4679-bc88-32cd5137cb4a.png" 
+                  alt="Client Brand Logo" 
+                  className="h-14 object-contain"
+                />
+                <img 
+                  src="/lovable-uploads/934ab001-8c6b-4af3-9e77-acdfeeecfd41.png" 
+                  alt="Holistica Bloom Logo" 
+                  className="h-14 object-contain"
+                />
+                <img 
+                  src="/lovable-uploads/d3bc5abc-7c82-4804-852c-cb6ee8675b30.png" 
+                  alt="Olympic Logo" 
+                  className="h-14 object-contain"
+                />
+                <img 
+                  src="/lovable-uploads/8f42921f-1f7d-485b-919b-2f22f05e1422.png" 
+                  alt="Client Brand Logo" 
+                  className="h-14 object-contain"
+                />
+                <img 
+                  src="/lovable-uploads/75e9db4b-0b11-443e-8a57-0926c37769b7.png" 
+                  alt="Dolce Vitta Logo" 
+                  className="h-14 object-contain"
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
