@@ -50,10 +50,6 @@ export const HeroSection = () => {
               <CheckCircle className="h-5 w-5 text-green-500" />
               <span className="text-sm font-medium">FDA Approved</span>
             </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-500" />
-              <span className="text-sm font-medium">FDA Approved</span>
-            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
