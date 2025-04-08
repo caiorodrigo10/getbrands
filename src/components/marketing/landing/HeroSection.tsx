@@ -1,8 +1,14 @@
+
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useWindowSize } from "@/hooks/useWindowSize";
+import { BrandLogoCarousel } from "./BrandLogoCarousel";
 
 export const HeroSection = () => {
+  const { width } = useWindowSize();
+  const isMobile = width < 768;
+
   return (
     <section className="relative bg-white pt-20 pb-16 lg:pt-32">
       {/* Login Button */}
@@ -27,21 +33,37 @@ export const HeroSection = () => {
           />
           
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Create your own private label on demand
+            Launch Your Premium Private Label Brand <span className="text-[#f0562e]">Without Inventory Costs</span>
           </h1>
           
           <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-            We specialize in cosmetics, supplements, and coffee. From idea to launch, 
-            we build your brand from the ground up.
+            From cosmetics to supplements and coffee - we handle everything from concept to delivery.
+            Join 2,500+ entrepreneurs who've trusted our end-to-end brand building solution.
           </p>
 
-          <div className="flex justify-center gap-4">
+          {/* Trust indicators */}
+          <div className="flex flex-wrap justify-center gap-4 mb-10">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-500" />
+              <span className="text-sm font-medium">No Minimum Orders</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-500" />
+              <span className="text-sm font-medium">American Suppliers</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-500" />
+              <span className="text-sm font-medium">FDA Approved</span>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link to="/signup">
               <Button 
                 size="lg"
-                className="bg-[#f0562e] hover:bg-[#f0562e]/90 text-white font-semibold px-8"
+                className="bg-[#f0562e] hover:bg-[#f0562e]/90 text-white font-semibold px-8 w-full sm:w-auto"
               >
-                Start Now
+                Start Your Brand Now
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
@@ -49,11 +71,14 @@ export const HeroSection = () => {
             <Button 
               size="lg"
               variant="outline"
-              className="border-2 border-[#f0562e] text-[#f0562e] hover:bg-[#f0562e]/10 font-semibold px-8"
+              className="border-2 border-[#f0562e] text-[#f0562e] hover:bg-[#f0562e]/10 font-semibold px-8 w-full sm:w-auto"
             >
-              Book a Demo
+              Schedule Free Consultation
             </Button>
           </div>
+          
+          {/* Replaced the previous scrolling logos with our new carousel component */}
+          <BrandLogoCarousel />
         </div>
       </div>
     </section>

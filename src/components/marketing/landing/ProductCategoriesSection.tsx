@@ -1,44 +1,98 @@
+
 import { Card } from "@/components/ui/card";
-import { Package2, Coffee, ShoppingBag, Users } from "lucide-react";
+import { Pill, Coffee, ShoppingBag, Dumbbell, Droplet, Bean, FlaskRound, Brush } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 export const ProductCategoriesSection = () => {
+  const categories = [
+    {
+      icon: <Pill className="w-10 h-10 text-primary" />,
+      title: "Supplements",
+      description: "Premium vitamins and supplements for your health brand",
+      link: "/catalog?category=supplements",
+    },
+    {
+      icon: <Coffee className="w-10 h-10 text-primary" />,
+      title: "Coffee",
+      description: "Specialty coffee solutions for your brand",
+      link: "/catalog?category=coffee",
+    },
+    {
+      icon: <ShoppingBag className="w-10 h-10 text-primary" />,
+      title: "Cosmetics",
+      description: "Beauty products for your skincare line",
+      link: "/catalog?category=cosmetics",
+    },
+    {
+      icon: <Dumbbell className="w-10 h-10 text-primary" />,
+      title: "Fitness",
+      description: "Performance products for fitness enthusiasts",
+      link: "/catalog?category=fitness",
+    },
+    {
+      icon: <Droplet className="w-10 h-10 text-primary" />,
+      title: "Essential Oils",
+      description: "Natural aromatherapy products for wellness",
+      link: "/catalog?category=essential-oils",
+    },
+    {
+      icon: <Bean className="w-10 h-10 text-primary" />,
+      title: "Organic Foods",
+      description: "Sustainable organic food products",
+      link: "/catalog?category=organic-foods",
+    },
+    {
+      icon: <FlaskRound className="w-10 h-10 text-primary" />,
+      title: "Wellness",
+      description: "Innovative wellness solutions",
+      link: "/catalog?category=wellness",
+    },
+    {
+      icon: <Brush className="w-10 h-10 text-primary" />,
+      title: "Personal Care",
+      description: "Premium personal care products",
+      link: "/catalog?category=personal-care",
+    }
+  ];
+
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-24 bg-gray-50">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
-          Explore Our Wide Range of Products
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <Card className="p-6 text-center hover:shadow-lg transition-shadow bg-white">
-            <Package2 className="w-16 h-16 mx-auto mb-4 text-primary" />
-            <h3 className="font-semibold mb-2 text-gray-900">Supplements</h3>
-            <p className="text-sm text-gray-600">
-              Build your health brand with our premium supplements
-            </p>
-          </Card>
-          <Card className="p-6 text-center hover:shadow-lg transition-shadow bg-white">
-            <Coffee className="w-16 h-16 mx-auto mb-4 text-primary" />
-            <h3 className="font-semibold mb-2 text-gray-900">Coffee</h3>
-            <p className="text-sm text-gray-600">
-              Premium coffee solutions for your brand
-            </p>
-          </Card>
-          <Card className="p-6 text-center hover:shadow-lg transition-shadow bg-white">
-            <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-primary" />
-            <h3 className="font-semibold mb-2 text-gray-900">Cosmetics</h3>
-            <p className="text-sm text-gray-600">
-              Create your beauty line with our products
-            </p>
-          </Card>
-          <Card className="p-6 text-center hover:shadow-lg transition-shadow bg-white">
-            <Users className="w-16 h-16 mx-auto mb-4 text-primary" />
-            <h3 className="font-semibold mb-2 text-gray-900">Fitness</h3>
-            <p className="text-sm text-gray-600">
-              Launch your fitness brand with our solutions
-            </p>
-          </Card>
+        <div className="max-w-3xl mx-auto text-center mb-16">
+          <h2 className="text-4xl font-bold mb-6 text-gray-900">
+            Explore Our Product Categories
+          </h2>
+          <p className="text-xl text-gray-600">
+            Discover our wide range of high-quality products ready for your brand
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {categories.map((category, index) => (
+            <Link to={category.link} key={index} className="block group">
+              <Card className="overflow-hidden border hover:border-primary hover:shadow-lg transition-all duration-300 h-full p-6 flex flex-col items-center text-center">
+                <div className="bg-primary/10 rounded-full p-5 mb-4">
+                  {category.icon}
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {category.title}
+                </h3>
+                <p className="text-gray-600 text-sm line-clamp-2">
+                  {category.description}
+                </p>
+              </Card>
+            </Link>
+          ))}
+        </div>
+        
+        <div className="mt-16 text-center">
+          <Button asChild variant="outline" size="lg" className="rounded-full px-8">
+            <Link to="/catalog">View All Categories</Link>
+          </Button>
         </div>
       </div>
     </section>
   );
 };
+

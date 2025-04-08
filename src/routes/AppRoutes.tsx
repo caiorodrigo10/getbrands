@@ -50,14 +50,11 @@ export const AppRoutes = () => {
         </ProtectedRoute>
       } />
 
+      {/* Marketing Routes - These are public and come before protected routes */}
+      {MarketingRoutes}
+
       {/* Root Route and User Routes */}
       <Route element={<AppLayout />}>
-        <Route path="/" element={
-          <ProtectedRoute>
-            <Catalog />
-          </ProtectedRoute>
-        } />
-        
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Dashboard />
@@ -168,9 +165,6 @@ export const AppRoutes = () => {
         </ProtectedRoute>
       } />
       <Route path="/comecarpt" element={<ComecarPT />} />
-
-      {/* Marketing Routes */}
-      {MarketingRoutes}
       
       {/* Public Routes */}
       <Route path="/login" element={<Login />} />

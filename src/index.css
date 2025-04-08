@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 
 @tailwind base;
@@ -81,3 +82,33 @@
   from { width: 0; }
   to { width: var(--progress-width, 0%); }
 }
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Animation for auto-scrolling logos - faster, continuous, rightward motion */
+@keyframes scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+.animate-scroll {
+  animation: scroll 30s linear infinite; /* Faster animation (30s instead of 60s) for quicker scrolling */
+}
+
+/* Ensure all logos are properly aligned in container */
+.logos-slide {
+  display: inline-flex;
+  width: fit-content;
+}
+
+/* Remove the embla-carousel-slide transition since we're not using the carousel anymore */
+

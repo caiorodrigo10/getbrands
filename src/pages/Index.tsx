@@ -1,19 +1,25 @@
+
+import { Button } from "@/components/ui/button";
+import { ArrowRight, ShoppingBag, PenTool, Package2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+
 const Index = () => {
-  return (
-    <div className="space-y-6">
-      <h1>Welcome to Mainer Portal</h1>
-      <div className="grid gap-6">
-        <div className="card p-6">
-          <h2 className="text-xl font-semibold mb-4">Overview</h2>
-          <div className="space-y-4">
-            <p className="text-muted-foreground">
-              Access your projects, products, and documents in one place.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
+
+  // This component is no longer used as the index page
+  // since LandingPage.tsx is now rendering at the root path
+  return null;
 };
 
 export default Index;

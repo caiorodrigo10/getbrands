@@ -1,3 +1,4 @@
+
 import { HeroSection } from "@/components/marketing/landing/HeroSection";
 import { ServicesSection } from "@/components/marketing/landing/ServicesSection";
 import { WhyChooseSection } from "@/components/marketing/landing/WhyChooseSection";
@@ -6,6 +7,7 @@ import { BrandBuildingSection } from "@/components/marketing/landing/BrandBuildi
 import { ProductCategoriesSection } from "@/components/marketing/landing/ProductCategoriesSection";
 import { CreativeSection } from "@/components/marketing/landing/CreativeSection";
 import { BrandExpandableSection } from "@/components/marketing/landing/BrandExpandableSection";
+import { CallToActionSection } from "@/components/marketing/landing/CallToActionSection";
 import { Footer } from "@/components/marketing/landing/Footer";
 
 const LandingPage = () => {
@@ -19,6 +21,7 @@ const LandingPage = () => {
       <BrandBuildingSection />
       <ProductCategoriesSection />
       <WhyChooseSection />
+      <CallToActionSection />
       <Footer />
     </div>
   );
