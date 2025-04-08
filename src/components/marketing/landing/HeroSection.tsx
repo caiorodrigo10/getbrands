@@ -38,7 +38,7 @@ export const HeroSection = () => {
           
           <p className="text-xl text-gray-600 mb-8 leading-relaxed">
             From cosmetics to supplements and coffee - we handle everything from concept to delivery.
-            Join 2,500+ entrepreneurs who've trusted our end-to-end brand building solution.
+            Join entrepreneurs who've trusted our end-to-end brand building solution.
           </p>
 
           {/* Trust indicators */}
