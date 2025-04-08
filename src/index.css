@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 
 @tailwind base;
@@ -94,17 +93,20 @@
   scrollbar-width: none;  /* Firefox */
 }
 
-/* Animation for auto-scrolling logos - adjusted for slower scroll */
+/* Animation for auto-scrolling logos - slower, continuous, rightward motion */
 @keyframes scroll {
   from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  to { transform: translateX(-100%); }
 }
 
 .animate-scroll {
-  animation: scroll 45s linear infinite; /* Slowed down the animation from 30s to 45s */
+  animation: scroll 60s linear infinite; /* Very slow animation (60s) for smooth scrolling */
 }
 
-/* Enhanced carousel transitions */
-.embla-carousel-slide {
-  transition: transform 0.5s ease-in-out;
+/* Ensure all logos are properly aligned in container */
+.logos-slide {
+  display: inline-flex;
+  width: fit-content;
 }
+
+/* Remove the embla-carousel-slide transition since we're not using the carousel anymore */
