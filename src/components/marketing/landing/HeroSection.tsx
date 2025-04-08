@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useWindowSize } from "@/hooks/useWindowSize";
+import { BrandLogoCarousel } from "./BrandLogoCarousel";
 
 export const HeroSection = () => {
   const { width } = useWindowSize();
@@ -76,72 +77,8 @@ export const HeroSection = () => {
             </Button>
           </div>
           
-          {/* Social proof with automatic scrolling - fixing logo overlap issue */}
-          <div className="mt-12 pt-6 border-t border-gray-100">
-            <p className="text-sm text-gray-500 mb-5">Trusted by brands across the US</p>
-            
-            <div className="w-full overflow-hidden">
-              <div className="flex animate-scroll gap-16 items-center whitespace-nowrap">
-                {/* First set of logos - increased gap between items */}
-                <div className="flex gap-16 items-center">
-                  <img 
-                    src="/lovable-uploads/4cec31ab-a832-4679-bc88-32cd5137cb4a.png" 
-                    alt="Client Brand Logo" 
-                    className="h-14 w-auto object-contain flex-shrink-0"
-                  />
-                  <img 
-                    src="/lovable-uploads/934ab001-8c6b-4af3-9e77-acdfeeecfd41.png" 
-                    alt="Holistica Bloom Logo" 
-                    className="h-14 w-auto object-contain flex-shrink-0"
-                  />
-                  <img 
-                    src="/lovable-uploads/d3bc5abc-7c82-4804-852c-cb6ee8675b30.png" 
-                    alt="Olympic Logo" 
-                    className="h-14 w-auto object-contain flex-shrink-0"
-                  />
-                  <img 
-                    src="/lovable-uploads/8f42921f-1f7d-485b-919b-2f22f05e1422.png" 
-                    alt="Client Brand Logo" 
-                    className="h-14 w-auto object-contain flex-shrink-0"
-                  />
-                  <img 
-                    src="/lovable-uploads/75e9db4b-0b11-443e-8a57-0926c37769b7.png" 
-                    alt="Dolce Vitta Logo" 
-                    className="h-14 w-auto object-contain flex-shrink-0"
-                  />
-                </div>
-                
-                {/* Duplicate logos to create seamless scrolling effect - increased gap between items */}
-                <div className="flex gap-16 items-center">
-                  <img 
-                    src="/lovable-uploads/4cec31ab-a832-4679-bc88-32cd5137cb4a.png" 
-                    alt="Client Brand Logo" 
-                    className="h-14 w-auto object-contain flex-shrink-0"
-                  />
-                  <img 
-                    src="/lovable-uploads/934ab001-8c6b-4af3-9e77-acdfeeecfd41.png" 
-                    alt="Holistica Bloom Logo" 
-                    className="h-14 w-auto object-contain flex-shrink-0"
-                  />
-                  <img 
-                    src="/lovable-uploads/d3bc5abc-7c82-4804-852c-cb6ee8675b30.png" 
-                    alt="Olympic Logo" 
-                    className="h-14 w-auto object-contain flex-shrink-0"
-                  />
-                  <img 
-                    src="/lovable-uploads/8f42921f-1f7d-485b-919b-2f22f05e1422.png" 
-                    alt="Client Brand Logo" 
-                    className="h-14 w-auto object-contain flex-shrink-0"
-                  />
-                  <img 
-                    src="/lovable-uploads/75e9db4b-0b11-443e-8a57-0926c37769b7.png" 
-                    alt="Dolce Vitta Logo" 
-                    className="h-14 w-auto object-contain flex-shrink-0"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Replaced the previous scrolling logos with our new carousel component */}
+          <BrandLogoCarousel />
         </div>
       </div>
     </section>
