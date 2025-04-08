@@ -39,21 +39,40 @@ const logoItems: LogoItem[] = [
   },
 ];
 
+// Duplicate the logos to create a continuous effect
+const extendedLogoItems = [...logoItems, ...logoItems];
+
 export const BrandLogoCarousel = () => {
   const { width } = useWindowSize();
   const isMobile = width < 768;
   const [api, setApi] = useState<any>(null);
   
-  // Auto-rotation effect
+  // Auto-rotation effect with improved continuous scrolling
   useEffect(() => {
     if (!api) return;
     
-    // Set up auto-rotation
-    const intervalId = setInterval(() => {
-      api.scrollNext();
-    }, 3000); // Change slide every 3 seconds
+    // Set up auto-rotation with continuous movement
+    const autoScrollInterval = setInterval(() => {
+      api.scrollNext({ animation: "slide" });
+    }, 2000); // Scroll every 2 seconds for smoother feeling
 
-    return () => clearInterval(intervalId);
+    // Reset to the beginning when reaching the end for infinite loop effect
+    const onSelect = () => {
+      // If near the end, quickly reset to the beginning
+      if (api.selectedScrollSnap() > logoItems.length - 1) {
+        // Use a timeout to make the transition less noticeable
+        setTimeout(() => {
+          api.scrollTo(0, false);
+        }, 100);
+      }
+    };
+    
+    api.on('select', onSelect);
+
+    return () => {
+      clearInterval(autoScrollInterval);
+      api.off('select', onSelect);
+    };
   }, [api]);
 
   return (
@@ -65,14 +84,17 @@ export const BrandLogoCarousel = () => {
         opts={{
           align: "start",
           loop: true,
+          dragFree: true,
+          skipSnaps: true,
+          startIndex: 1
         }}
-        className="w-full"
+        className="w-full overflow-hidden"
       >
-        <CarouselContent>
-          {logoItems.map((logo, index) => (
+        <CarouselContent className="transition-transform duration-500 ease-linear">
+          {extendedLogoItems.map((logo, index) => (
             <CarouselItem 
               key={index} 
-              className={`${isMobile ? 'basis-1/2' : 'basis-1/5'} flex justify-center items-center px-4`}
+              className={`${isMobile ? 'basis-1/2' : 'basis-1/5'} flex justify-center items-center px-4 transition-all`}
             >
               <img
                 src={logo.src}
