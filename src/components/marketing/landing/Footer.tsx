@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
@@ -111,15 +110,15 @@ export const Footer = () => {
             <div className="space-y-4 text-gray-300">
               <div className="flex items-start">
                 <MapPin className="h-5 w-5 text-primary mr-3 mt-0.5" />
-                <p>123 Market Street, Suite 456<br />San Francisco, CA 94105</p>
+                <p>7345 W SAND LAKE RD<br />STE 210 OFFICE 1742<br />Orlando, FL 32819<br />United States</p>
               </div>
               <div className="flex items-center">
                 <Phone className="h-5 w-5 text-primary mr-3" />
-                <p>(555) 123-4567</p>
+                <p>+19035002593</p>
               </div>
               <div className="flex items-center">
                 <Mail className="h-5 w-5 text-primary mr-3" />
-                <p>support@getbrands.com</p>
+                <p>brands@getbrands.io</p>
               </div>
             </div>
             
