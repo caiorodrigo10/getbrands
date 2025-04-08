@@ -79,27 +79,27 @@ export const HeroSection = () => {
               <img 
                 src="/lovable-uploads/4cec31ab-a832-4679-bc88-32cd5137cb4a.png" 
                 alt="Client Brand Logo" 
-                className="h-10 object-contain"
+                className="h-14 object-contain"
               />
               <img 
                 src="/lovable-uploads/934ab001-8c6b-4af3-9e77-acdfeeecfd41.png" 
                 alt="Holistica Bloom Logo" 
-                className="h-10 object-contain"
+                className="h-14 object-contain"
               />
               <img 
                 src="/lovable-uploads/d3bc5abc-7c82-4804-852c-cb6ee8675b30.png" 
                 alt="Olympic Logo" 
-                className="h-10 object-contain"
+                className="h-14 object-contain"
               />
               <img 
                 src="/lovable-uploads/8f42921f-1f7d-485b-919b-2f22f05e1422.png" 
                 alt="Client Brand Logo" 
-                className="h-10 object-contain"
+                className="h-14 object-contain"
               />
               <img 
                 src="/lovable-uploads/75e9db4b-0b11-443e-8a57-0926c37769b7.png" 
                 alt="Client Brand Logo" 
-                className="h-10 object-contain"
+                className="h-14 object-contain"
               />
             </div>
           </div>
