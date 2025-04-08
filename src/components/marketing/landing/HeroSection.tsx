@@ -75,11 +75,32 @@ export const HeroSection = () => {
           {/* Social proof */}
           <div className="mt-12 pt-6 border-t border-gray-100">
             <p className="text-sm text-gray-500 mb-3">Trusted by brands across the US</p>
-            <div className="flex justify-center items-center gap-8">
-              <div className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div>
-              <div className="h-8 w-20 bg-gray-200 rounded animate-pulse"></div>
-              <div className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div>
-              <div className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+            <div className="flex justify-center items-center flex-wrap gap-8">
+              <img 
+                src="/lovable-uploads/4cec31ab-a832-4679-bc88-32cd5137cb4a.png" 
+                alt="Client Brand Logo" 
+                className="h-10 object-contain"
+              />
+              <img 
+                src="/lovable-uploads/934ab001-8c6b-4af3-9e77-acdfeeecfd41.png" 
+                alt="Holistica Bloom Logo" 
+                className="h-10 object-contain"
+              />
+              <img 
+                src="/lovable-uploads/d3bc5abc-7c82-4804-852c-cb6ee8675b30.png" 
+                alt="Olympic Logo" 
+                className="h-10 object-contain"
+              />
+              <img 
+                src="/lovable-uploads/8f42921f-1f7d-485b-919b-2f22f05e1422.png" 
+                alt="Client Brand Logo" 
+                className="h-10 object-contain"
+              />
+              <img 
+                src="/lovable-uploads/75e9db4b-0b11-443e-8a57-0926c37769b7.png" 
+                alt="Client Brand Logo" 
+                className="h-10 object-contain"
+              />
             </div>
           </div>
         </div>
