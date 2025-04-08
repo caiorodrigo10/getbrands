@@ -76,14 +76,14 @@ export const HeroSection = () => {
             </Button>
           </div>
           
-          {/* Social proof with automatic scrolling - works for both mobile and desktop */}
+          {/* Social proof with automatic scrolling - fixing logo overlap issue */}
           <div className="mt-12 pt-6 border-t border-gray-100">
             <p className="text-sm text-gray-500 mb-5">Trusted by brands across the US</p>
             
             <div className="w-full overflow-hidden">
-              <div className="flex animate-scroll gap-8 whitespace-nowrap">
-                {/* First set of logos */}
-                <div className="flex gap-8 items-center">
+              <div className="flex animate-scroll gap-16 items-center whitespace-nowrap">
+                {/* First set of logos - increased gap between items */}
+                <div className="flex gap-16 items-center">
                   <img 
                     src="/lovable-uploads/4cec31ab-a832-4679-bc88-32cd5137cb4a.png" 
                     alt="Client Brand Logo" 
@@ -111,8 +111,8 @@ export const HeroSection = () => {
                   />
                 </div>
                 
-                {/* Duplicate logos to create seamless scrolling effect */}
-                <div className="flex gap-8 items-center">
+                {/* Duplicate logos to create seamless scrolling effect - increased gap between items */}
+                <div className="flex gap-16 items-center">
                   <img 
                     src="/lovable-uploads/4cec31ab-a832-4679-bc88-32cd5137cb4a.png" 
                     alt="Client Brand Logo" 

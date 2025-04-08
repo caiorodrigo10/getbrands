@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 
 @tailwind base;
@@ -94,12 +93,12 @@
   scrollbar-width: none;  /* Firefox */
 }
 
-/* Animation for auto-scrolling logos */
+/* Animation for auto-scrolling logos - adjusted for slower scroll */
 @keyframes scroll {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
 
 .animate-scroll {
-  animation: scroll 30s linear infinite;
+  animation: scroll 45s linear infinite; /* Slowed down the animation from 30s to 45s */
 }
