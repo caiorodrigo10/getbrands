@@ -1,4 +1,5 @@
 import { toast } from 'sonner';
+import { getUtmData } from './utm';
 
 let analyticsInitialized = false;
 
@@ -47,8 +48,10 @@ export const identifyUser = async (userId: string, traits?: Record<string, any>)
   try {
     await waitForAnalytics();
     
+    const utmData = getUtmData();
     const identifyTraits = {
       ...traits,
+      ...utmData,
       lastIdentified: new Date().toISOString(),
       environment: process.env.NODE_ENV,
       source: 'web_app'
@@ -64,8 +67,10 @@ export const trackEvent = async (eventName: string, properties?: Record<string, 
   try {
     await waitForAnalytics();
     
+    const utmData = getUtmData();
     const eventProperties = {
       ...properties,
+      ...utmData,
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV,
       source: 'web_app'
@@ -82,6 +87,7 @@ export const trackPage = async (properties?: Record<string, any>) => {
     await waitForAnalytics();
     
     const path = properties?.path || window.location.pathname;
+    const utmData = getUtmData();
     
     let pageName = "";
     
@@ -124,6 +130,7 @@ export const trackPage = async (properties?: Record<string, any>) => {
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV,
       source: 'web_app',
+      ...utmData,
       ...properties,
       ...(properties?.url ? { url: formatUrl(properties.url) } : {})
     };
@@ -134,7 +141,6 @@ export const trackPage = async (properties?: Record<string, any>) => {
   }
 };
 
-// Initialize analytics as soon as possible
 if (typeof window !== 'undefined') {
   initializeAnalytics();
 }
