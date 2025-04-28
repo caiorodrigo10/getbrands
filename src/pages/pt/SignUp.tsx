@@ -66,6 +66,7 @@ const SignUpPT = () => {
             last_name: formData.lastName,
             phone: formData.phone,
             role: 'member',
+            language: 'pt'
           },
         },
       });
@@ -94,26 +95,31 @@ const SignUpPT = () => {
 
         if (profileError) throw profileError;
 
-        // Track signup event in Segment
-        if (window.analytics) {
-          window.analytics.identify(data.user.id, {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            phone: formData.phone,
-            language: 'pt'
-          });
+        setTimeout(() => {
+          try {
+            if (window.analytics) {
+              window.analytics.identify(data.user.id, {
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                phone: formData.phone,
+                language: 'pt'
+              });
 
-          window.analytics.track('user_signed_up', {
-            userId: data.user.id,
-            email: formData.email,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            phone: formData.phone,
-            signupMethod: 'email',
-            language: 'pt'
-          });
-        }
+              window.analytics.track('user_signed_up', {
+                userId: data.user.id,
+                email: formData.email,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                phone: formData.phone,
+                signupMethod: 'email',
+                language: 'pt'
+              });
+            }
+          } catch (analyticsError) {
+            console.error("Erro ao rastrear evento de cadastro:", analyticsError);
+          }
+        }, 500);
 
         navigate("/pt/onboarding");
       }
