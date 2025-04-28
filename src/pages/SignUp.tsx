@@ -73,6 +73,7 @@ const SignUp = () => {
         return;
       }
 
+      // Step 1: Sign up the user first
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -89,26 +90,33 @@ const SignUp = () => {
       if (signUpError) throw signUpError;
 
       if (data?.user) {
-        // Track signup event in Segment
-        if (window.analytics) {
-          window.analytics.identify(data.user.id, {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            phone: formData.phone,
-            language: 'en'
-          });
+        // Step 2: Wait for profile creation before tracking
+        setTimeout(() => {
+          try {
+            if (window.analytics) {
+              window.analytics.identify(data.user.id, {
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                phone: formData.phone,
+                language: 'en'
+              });
 
-          window.analytics.track('user_signed_up', {
-            userId: data.user.id,
-            email: formData.email,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            phone: formData.phone,
-            signupMethod: 'email',
-            language: 'en'
-          });
-        }
+              window.analytics.track('user_signed_up', {
+                userId: data.user.id,
+                email: formData.email,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                phone: formData.phone,
+                signupMethod: 'email',
+                language: 'en'
+              });
+            }
+          } catch (analyticsError) {
+            console.error("Analytics error:", analyticsError);
+            // Continue with the flow even if analytics fails
+          }
+        }, 500);
 
         navigate("/onboarding");
       }
